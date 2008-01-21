@@ -1,0 +1,5 @@
+
+<ul>
+<li> <b> <%= _self_.name %> </b> : link </li>
+</ul>
+
