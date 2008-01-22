@@ -122,14 +122,14 @@ def removeBootStraps(tree):
         #chaine = ""
   #return taxas
 
-def getTaxas(tree):
+def getTaxa(tree):
   """ Return the taxas list """
   tree = removeBootStraps(tree)
   if len(getChildren(tree)) == 0:
     return [tree]
   l = []
   for child in getChildren(tree):
-    l.extend(getTaxas(child))
+    l.extend(getTaxa(child))
   return l
 
 def getParent(tree,node):
