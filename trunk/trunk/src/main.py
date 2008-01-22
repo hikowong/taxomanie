@@ -1,28 +1,24 @@
 
-def isInTree( taxa, tree ):
-    pass
+from species import Species
 
-def generateTree( tree ):
-    finaltree = {}
-    # On récupère la liste des taxa
+TREE = {}
+LIST_PARENT = []
 
-    for taxon in taxa:
-        if isInTree( taxa, finaltree ):
-            addTaxa( taxa, finaltree )
-        else:
-            pass
-            # on insère le taxon au bon endroit
-    # Pour chaque taxon, on recupère son père
-    
+def createTree( name ):
+    child = Species( name = name )
+    parent = child.getParent()
+    if name != "root":
+        parent.setChild( child )
+   # if parent not in LIST_PARENT:
+   #     LIST_PARENT.append( parent )
+    while parent.name != "root":
+        child = parent
+        parent = child.getParent()
+        parent.setChild( child )
+        print parent.name
+   #     if parent not in LIST_PARENT:
+   #         LIST_PARENT.append( parent )
+    return parent
 
-def setVal( val ):
-    val = val.replace( "(", "[" ).replace( ")", "]" )
-    val = val.replace( ",", "','" ).replace( "]',", "]," ).replace(",'[",",[")
-    val = val.replace("[","['").replace( "['[", "[[" )
-    val = val.replace( "]", "']" ).replace( "]']", "]]")
-    val = val.replace("['[", "[[" )
-    val = val.replace("]']", "]]" )
-    return eval( val )
-
-l = "((((Bos,Canis),(((Homo,Pan),Macaca),((Mus,Rattus),Oryctolagu))),Dasypus),(Echinops,Loxodonta))"
-print setVal( l )[0]
+PARENT = createTree( "root" )
+#print LIST_PARENT
