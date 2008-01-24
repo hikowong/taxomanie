@@ -22,11 +22,14 @@ from species import Species
 def createTree( name ):
     currentTaxon = Species( name = name )
     LIST_PARENT = []
+
     while currentTaxon.name != "root":
         parent = currentTaxon.getParent()
-        parent.setChild( currentTaxon )	
+        parent.setChild( currentTaxon )
+	
         if currentTaxon not in LIST_PARENT:
-            LIST_PARENT.append( currentTaxon )		
+            LIST_PARENT.append( currentTaxon )	
+	
     return LIST_PARENT
 
 
@@ -34,13 +37,15 @@ def getCommonParent( name_a, name_b ):
     taxon_a = Species( name = name_a )
     taxon_b = Species( name = name_b )
     TREE_A = createTree( taxon_a.name )
+
     while taxon_b.name != "root":       
         for currentParent_a in TREE_A:
             if taxon_b.name == currentParent_a.name:
                 return taxon_b			
 		taxon_b = taxon_b.getParent()
-	if taxon_b.name == "root":
-	    return taxon_b
+
+    if taxon_b.name == "root":
+        return taxon_b
 
 print getCommonParent( "rattus", "conus rattus" )
 }}}
