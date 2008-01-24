@@ -47,6 +47,8 @@ def getCommonParent( name_a, name_b ):
 
     if taxon_b.name == "root":
         return taxon_b
+    else:
+        return "Pas d'ancetre commun"
 
 print getCommonParent( "rattus", "conus rattus" )
 }}}
