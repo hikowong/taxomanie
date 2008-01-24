@@ -1,4 +1,4 @@
-#Bout de code pour le parcours des parents communs
+Bout de code pour le parcours des parents communs
 
 = Introduction =
 
@@ -16,7 +16,7 @@ fameux projet du prems semestre Novell que j'avais oublié!
 voila Sorel, maigre contribution
 
 = Details =
-^
+{{{
 from species import Species
 
 def createTree( name ):
@@ -43,4 +43,4 @@ def getCommonParent( name_a, name_b ):
 	    return taxon_b
 
 print getCommonParent( "rattus", "conus rattus" )
-^
+}}}
