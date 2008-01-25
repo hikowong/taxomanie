@@ -33,16 +33,20 @@ class testSpecies( unittest.TestCase ):
     def test_nameCorrect( self ):
         """ Test with a correct name """
         rattus = Species( "rattus" )
-        self.assertEqual( rattus.checkName(), [] )
+        self.assertEqual( rattus.checkName( "rattus" ), [] )
 
     def test_nameIncorrect( self ):
         """ Test with an incorrect name """
         ratus = Species( "ratus" )
-        self.assertEqual( ratus.checkName(), ['matus', 'rats', 'catus',
+        self.assertEqual( ratus.checkName( "rattus" ), ['matus', 'rats', 'catus',
         'rarus', 'atus', 'aratus', 'gratus', 'ravus', 'rattus', 'artus',
         'latus'] )
 #        print ratus.pickName( "rattus" )
 
+    def test_getParent( self ):
+        """ get the parent of species """
+        ratus = Species( "rattus" )
+        print ratus.getParent()
 
     
 if __name__ == '__main__':

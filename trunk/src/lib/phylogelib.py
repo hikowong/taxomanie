@@ -7,7 +7,7 @@
 # http://www.cecill.info/
 #
 # Author:
-# Nicolas Clairon : clairon _chez_ gmail __point__ com
+# Nicolas Clairon : clairon [_at_] gmail.com
 #################################################
 """ Pylogenic trees manipulating fonctions """
 def getChildren(tree):
@@ -76,52 +76,6 @@ def removeBootStraps(tree):
       chaine += i
   return chaine
 
-# def generateTree(tree,G):
-#   """ Convert a nwk string to a graph """
-#   G.add_node(tree)
-#   for child in getChildren(tree):
-#     if len(child) == 1:
-#       G.add_node(child)
-#       G.add_edge((tree,child))
-#     else:
-#       G.add_node(child)
-#       G.add_edge((tree,child))
-#       generateTree(child,G)
-
-# def getTaxas(tree):
-#   """ Extract Taxas from tree to a list with no redondance """
-#   tree = tree.replace("(","")
-#   tree = tree.replace(")","")
-#   tree = tree.replace(","," ")
-#   return tree.split()
-
-#def getTaxas(tree):
-  #""" Extract Taxas from tree to a list with no redondance """
-  #skip = False
-  #chaine = ""
-  #taxas = []
-  #j = 0
-  #for i in tree:
-    #j+=1
-    #if i==":":
-      #skip = True
-      #continue
-    #if i == "," or i == ";" or j == len(tree):
-      #skip = False
-      #if chaine != "" and chaine not in taxas:
-        #taxas.append(chaine)
-        #chaine = ""
-      #continue
-    #if i == "(" or i == ")":
-      #continue
-    #if skip == False:
-      #chaine += i
-    #if skip == True:
-      #if chaine != "" and chaine not in taxas:
-        #taxas.append(chaine)
-        #chaine = ""
-  #return taxas
-
 def getTaxa(tree):
   """ Return the taxas list """
   tree = removeBootStraps(tree)
@@ -156,13 +110,13 @@ def getTriplets(tree):
   """ Extract all triplets of the tree in the list listTriplets """
   listTriplets = []
   for child in getChildren(tree):
-    listTaxasChild = getTaxas(child)
+    listTaxasChild = getTaxa(child)
     listIn = []
     for i in listTaxasChild:
       for j in listTaxasChild:
         if i!=j and ([i,j] not in listIn) and ([j,i] not in listIn):
           listIn.append([i,j])
-    listExt = [i for i in getTaxas(tree) if i not in listTaxasChild]
+    listExt = [i for i in getTaxa(tree) if i not in listTaxasChild]
     for i in listExt:
       for j in listIn:
         chaine = "("+i+",("+j[0]+','+j[1]+"))"
@@ -174,47 +128,29 @@ def countTriplets(tree):
   """ Count the number of triplets in the tree """
   listNodes = getNodes(tree)
   listNodes.remove(tree)
-  for i in getTaxas(tree):
+  for i in getTaxa(tree):
     listNodes.remove(i)
   result = 0
   for child in listNodes:
-    nbTaxas = len(getTaxas(child))
-    result += (nbTaxas * (nbTaxas-1) * (len(getTaxas(getParent(tree,child))) - nbTaxas)) / 2
+    nbTaxas = len(getTaxa(child))
+    result += (nbTaxas * (nbTaxas-1) * (len(getTaxa(getParent(tree,child))) - nbTaxas)) / 2
   return result
 
-# def intToString(num):
-#   import string
-#   if num <= 0:
-#     return ""
-#   return str(string.ascii_lowercase[(num-1) % 26]) + intToString((num-1)/26)
+def nwk2list( nwk ):
+    """
+    Take a newick string and return a python list
 
-# def intToString(num):
-#   import string
-#   name = ""
-#   while num > 0:
-#     name += str(string.ascii_lowercase[(num-1) % 26])
-#     num = (num-1)/26
-#   return name
-
-# def generateTree(nbTaxas, name=1, maxChilds = 2):
-#   from random import random
-#   assert(nbTaxas > 0)
-#   assert(maxChilds >1)
-#   if nbTaxas == 1:
-#     return intToString(name)
-#   coupe = int((nbTaxas-1) * random()) + 1
-#   return "("+generateTree(coupe, name,maxChilds)+","+generateTree(nbTaxas - coupe, name+coupe,maxChilds)+")"
-
-def nwk2list( tree ):
-    tree = removeBootStraps( tree )
-    tree = tree.replace( "(", "[" ).replace( ")", "]" )
-    tree = tree.replace( ",", "','" ).replace( "]',", "]," ).replace(",'[",",[")
-    tree = tree.replace("[","['").replace( "['[", "[[" )
-    tree = tree.replace( "]", "']" ).replace( "]']", "]]")
-    tree = tree.replace("['[", "[[" )
-    tree = tree.replace("]']", "]]" )
-    return eval( tree )
- 
+    @nwk: string
+    @return: python list
+    """
+    nwk = removeBootStraps( nwk )
+    nwk = nwk.replace( "(", "[" ).replace( ")", "]" )
+    nwk = nwk.replace( ",", "','" ).replace( "]',", "]," ).replace(",'[",",[")
+    nwk = nwk.replace("[","['").replace( "['[", "[[" )
+    nwk = nwk.replace( "]", "']" ).replace( "]']", "]]")
+    nwk = nwk.replace("['[", "[[" )
+    nwk = nwk.replace("]']", "]]" )
+    return eval( nwk )
 
 def generateTree(nbTaxas, maxChildren = 2, name = 1):
   """ Generate randomly a pylogenic tree :
