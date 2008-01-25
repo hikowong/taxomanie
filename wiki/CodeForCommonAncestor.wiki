@@ -43,7 +43,7 @@ def getCommonParent( name_a, name_b ):
         for currentParent_a in TREE_A:
             if taxon_b.name == currentParent_a.name:
                 return taxon_b			
-		taxon_b = taxon_b.getParent()
+	taxon_b = taxon_b.getParent()
 
     if taxon_b.name == "root":
         return taxon_b
