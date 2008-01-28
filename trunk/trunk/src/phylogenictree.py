@@ -1,4 +1,5 @@
 from referencetree import ReferenceTree
+from lib.phylogelib import getTaxa
 
 class PhylogenicTree( object ):
     
@@ -11,7 +12,6 @@ class PhylogenicTree( object ):
         self.nwk = nwk
 
     def getMissSpelled( self ):
-        from lib.phylogelib import getTaxa
         taxa = [taxon.strip().lower() for taxon in getTaxa( self.nwk ) ]
         rel_dict = {}
         for taxon in taxa:
@@ -19,13 +19,14 @@ class PhylogenicTree( object ):
             if related_name:
                 rel_dict[taxon] = related_name
         return rel_dict
- 
 
-    def display( self, target = "text" ):
+    def display( self, target = "text", all_parents = False ):
         miss_spelled_dict = self.getMissSpelled()
         if miss_spelled_dict:
             return self.__displayMissSpelled( miss_spelled_dict, target )
         self.tree, self.root = self.ref_tree.getArborescence( self.nwk )
+        if not all_parents:
+            self.tree = self.__removeSingleParent( self.tree )
         if target == "text":
             return self.__display()
         elif target == "html":
@@ -118,15 +119,19 @@ class PhylogenicTree( object ):
             end_ul = False
         return result
 
+    def __removeSingleParent( self, tree ):
+        for node in tree:
+            n = tree.predecessors( node ) + tree.successors(node)
+            if len(n) == 2:
+                tree.delete_edge( n[0], node )
+                tree.delete_edge( node, n[1] )
+                tree.add_edge( n[0], n[1] )
+        return tree
 
 if __name__ == "__main__":
-#    taxonomy =  ReferenceTree()
-#    print taxonomy.getParents( "rattus" )
-#    print taxonomy.getCommonParent( "bos", "rattus" )
-
     
-#    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Rattus:0.016167):0.055242,Oryctolagus:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelphis:0.093131);"""
-    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Ratus:0.016167):0.055242,Oryctolagu:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelph:0.093131);"""
+    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Rattus:0.016167):0.055242,Oryctolagus:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelphis:0.093131);"""
+#    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Ratus:0.016167):0.055242,Oryctolagu:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelph:0.093131);"""
     ptree = PhylogenicTree( tree )
-    print ptree.display( "html" )
+    print ptree.display()
  
