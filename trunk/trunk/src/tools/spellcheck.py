@@ -1,6 +1,6 @@
 import re, collections
 
-class TaxoCheck( object ):
+class SpellCheck( object ):
 
     alphabet = 'abcdefghijklmnopqrstuvwxyz'
 
@@ -38,4 +38,4 @@ class TaxoCheck( object ):
 #    return max(candidates)# key)
 
 if __name__ == "__main__":
-    print list(TaxoCheck("../data/taxonomy/names.dmp").correct( "irathus" ))
+    pass

@@ -70,6 +70,19 @@ for node in file( NODES ).readlines():
         TBN[name] = {}
     TBN[name]["parent"] = parent
 
+print "Generating csv file..."
+import os
+open( "taxonomy.csv", "w" ).write("")
+csv = open( "taxonomy.csv", "a" )
+for species in TBI.keys():
+    line = "%s|%s|%s|%s|%s\n" % ( 
+      species,
+      TBI[species]["name"],
+      TBI[TBI[species]["parent"]]["name"],
+      "!".join(TBI[species]["synonym"]),
+      "!".join(TBI[species]["common"]) )
+    csv.write( line )
+
 
 TAXONOMY_BY_ID = TBI
 TAXONOMY_INDEX = TI

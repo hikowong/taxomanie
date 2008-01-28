@@ -11,12 +11,12 @@ import cherrypy
 from cherrypy.lib import static
 
 from lib import phylogelib
-from species import Species
+from phylogenictree import PhylogenicTree
 
 class Taxomanie(object):
     
     @cherrypy.expose
-    def index(self):
+    def index( self ):
         return """
         <html><body>
             <form action="check" method="post" enctype="multipart/form-data">
@@ -36,10 +36,6 @@ class Taxomanie(object):
         </body>
         </html>"""
         
-        # Although this just counts the file length, it demonstrates
-        # how to read large files in chunks instead of all at once.
-        # CherryPy uses Python's cgi module to read the uploaded file
-        # into a temporary file; myFile.file.read reads from that.
         size = 0
         data = ""
         while True:
@@ -49,17 +45,11 @@ class Taxomanie(object):
                 break
             size += len(recv)
          
-        result = ""
-        for taxon in phylogelib.getTaxa( data ):
-            try:
-                sp = Species( name = taxon )
-                sp = "<a href='http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=%s'> %s </a>" % (
-                    sp.id, sp.name )
-            except KeyError, e:
-                sp = "<strike>%s</strike> %s" % ( taxon, e )
-                
-            result += "<li> %s </li>\n" % sp 
-        return out % result
+        print "processing tree..."
+        mytree = PhylogenicTree( data )
+        print "processing display..."
+        output = mytree.display( target = "html" )
+        return out % output
     
     def download(self):
         path = os.path.join(absDir, "pdf_file.pdf")
