@@ -15,19 +15,36 @@ from phylogenictree import PhylogenicTree
 
 class Taxomanie(object):
     
+    reference = None
+
     @cherrypy.expose
     def index( self ):
         return """
         <html><body>
+            <fieldset>
+            <legend> Your collection file in newick format </legend>
             <form action="check" method="post" enctype="multipart/form-data">
             filename: <input type="file" name="myFile" /><br />
             <input type="submit" />
             </form>
+            </fieldset>
+            or
+            <fieldset>
+            <legend> Your string in newick format </legend>
+            <form action="check" method="post" enctype="multipart/form-data">
+            <textarea rows="10" cols="60" name="myFile"></textarea><br />
+            <input type="submit" />
+            </form>
+            </fieldset>
         </body></html>
         """
     
     @cherrypy.expose
     def check(self, myFile):
+        if self.reference is None:
+            from referencetree import ReferenceTree
+            Taxomanie.reference = ReferenceTree()
+
         out = """<html>
         <body>
             <ul>
@@ -36,17 +53,20 @@ class Taxomanie(object):
         </body>
         </html>"""
         
-        size = 0
-        data = ""
-        while True:
-            recv = myFile.file.read(8192)
-            data += recv
-            if not recv:
-                break
-            size += len(recv)
-         
+        if isinstance( myFile, str ):
+            data = myFile 
+        else:
+            size = 0
+            data = ""
+            while True:
+                recv = myFile.file.read(8192)
+                data += recv
+                if not recv:
+                    break
+                size += len(recv)
+              
         print "processing tree..."
-        mytree = PhylogenicTree( data )
+        mytree = PhylogenicTree( data, self.reference )
         print "processing display..."
         output = mytree.display( target = "html" )
         return out % output
