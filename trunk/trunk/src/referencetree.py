@@ -10,14 +10,14 @@ class ReferenceTree( NX.DiGraph ):
     reference for complete api documentation of this class.
     """
     
-    TAXONOMY = None
+    taxoref = None
 
     def __init__( self ):
         super( ReferenceTree, self ).__init__()
         self.parents = {}
-        if not self.TAXONOMY:
+        if self.taxoref is None:
             from tools.taxonomyreference import TaxonomyReference
-            self.taxoref = TaxonomyReference( "tools/taxonomy.csv" )
+            ReferenceTree.taxoref = TaxonomyReference( "tools/taxonomy.csv" )
             self.TAXONOMY = self.taxoref.TAXONOMY
         for taxon in self.TAXONOMY.iterkeys():
             parent = self.TAXONOMY[taxon]["parent"]
