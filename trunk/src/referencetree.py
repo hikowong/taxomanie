@@ -10,21 +10,17 @@ class ReferenceTree( NX.DiGraph ):
     reference for complete api documentation of this class.
     """
     
-    TBN = None
-    TBI = None
+    TAXONOMY = None
 
     def __init__( self ):
         super( ReferenceTree, self ).__init__()
         self.parents = {}
-        if not self.TBN or not self.TBI:
-            from tools.reference import TBI, TBN
-            self.TBN = TBN
-            self.TBI = TBI
-        for taxon in self.TBN.iterkeys():
-            try:
-                parent = self.TBI[self.TBN[taxon]["parent"]]["name"]
-            except:
-                print taxon, self.TBN[taxon]
+        if not self.TAXONOMY:
+            from tools.taxonomyreference import TaxonomyReference
+            self.taxoref = TaxonomyReference( "tools/taxonomy.csv" )
+            self.TAXONOMY = self.taxoref.TAXONOMY
+        for taxon in self.TAXONOMY.iterkeys():
+            parent = self.TAXONOMY[taxon]["parent"]
             self.add_edge( parent, taxon )
 
     def getParents( self, name ):
@@ -77,6 +73,13 @@ class ReferenceTree( NX.DiGraph ):
         from lib.phylogelib import getTaxa
         tree = NX.DiGraph()
         taxa = [taxon.lower() for taxon in getTaxa( nwk ) ]
+        rel_dict = {}
+        for taxon in taxa:
+            related_name = self.taxoref.correct( taxon )
+            if related_name:
+                rel_dict[taxon] = related_name
+        if rel_dict:
+            return rel_dict, None
         for taxon in taxa:
             parents = self.getParents( taxon )[:]
             parents.reverse()
@@ -95,73 +98,4 @@ class ReferenceTree( NX.DiGraph ):
         return node
     """
      
-class PhylogenicTree( object ):
-    
-    NCBI = "http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
-
-    def __init__( self, nwk ):
-        self.ref_tree = ReferenceTree()
-        self.tree, self.root = self.ref_tree.getArborescence( nwk )
-
-    def display( self, root = "",  mydepth = 0 ):
-        """
-        Pretty print of the tree.
-
-        @tree: networkx.DiGraph
-        """
-        if not root:
-            root = self.root
-            print root
-            print "|"
-        for node in self.tree.successors( root ):
-            depth = 0
-            while depth != mydepth :
-                print "| ",
-                depth += 1
-            subnodes = self.tree.successors( node )
-            if subnodes:
-                print "+-"+node
-                self.display( node, depth + 1)
-            else:
-                print "+-["+node+"]"
-
-    def displayHTML( self, root = "",  mydepth = 0 ):
-        """
-        Pretty print of the tree.
-
-        @tree: networkx.DiGraph
-        """
-        end_ul = False
-        if not root:
-            print "<ul>"
-            end_ul = True
-            root = self.root
-            print "<li><a href='"+self.NCBI+self.ref_tree.TBN[root]["id"]+"'>"+root+"</a></li>"
-        for node in self.tree.successors( root ):
-            depth = 0
-            while depth != mydepth :
-                depth += 1
-            subnodes = self.tree.successors( node )
-            print "<ul>"
-            if subnodes:
-                print "<li><a href='"+self.NCBI+self.ref_tree.TBN[node]["id"]+"'>"+node+"</a></li>"
-                self.displayHTML( node, depth + 1)
-            else:
-                print "<li><a href='"+self.NCBI+self.ref_tree.TBN[node]["id"]+"'>"+node+"</a></li>"
-            print "</ul>"
-        if end_ul:
-            print "</ul>"
-            end_ul = False
-
-
-if __name__ == "__main__":
-#    taxonomy =  ReferenceTree()
-#    print taxonomy.getParents( "rattus" )
-#    print taxonomy.getCommonParent( "bos", "rattus" )
-
-    
-    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Rattus:0.016167):0.055242,Oryctolagus:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.0
-    07440,Monodelphis:0.093131);"""
-    ptree = PhylogenicTree( tree )
-    ptree.displayHTML()
-    
+   
