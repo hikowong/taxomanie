@@ -6,9 +6,12 @@ class PhylogenicTree( object ):
     NCBI = "http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
     ref_tree = None
 
-    def __init__( self, nwk ):
+    def __init__( self, nwk, reference = None ):
         if self.ref_tree is None:
-            PhylogenicTree.ref_tree = ReferenceTree()
+            if reference is None:
+                PhylogenicTree.ref_tree = ReferenceTree()
+            else:
+                PhylogenicTree.ref_tree = reference
         self.nwk = nwk
 
     def getMissSpelled( self ):

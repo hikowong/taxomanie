@@ -84,7 +84,7 @@ class TaxonomyReference( object ):
                 if common_list:
                     return common_list
                 else:
-                    from spellcheck import SpellCheck
+                    from lib.spellcheck import SpellCheck
                     splchk = SpellCheck( self.TAXONOMY.iterkeys() )
                     return splchk.correct( name )
 

@@ -16,7 +16,7 @@ class ReferenceTree( NX.DiGraph ):
         super( ReferenceTree, self ).__init__()
         self.parents = {}
         if self.taxoref is None:
-            from tools.taxonomyreference import TaxonomyReference
+            from taxonomyreference import TaxonomyReference
             ReferenceTree.taxoref = TaxonomyReference( "tools/taxonomy.csv" )
             self.TAXONOMY = self.taxoref.TAXONOMY
         for taxon in self.TAXONOMY.iterkeys():
@@ -87,15 +87,3 @@ class ReferenceTree( NX.DiGraph ):
                 tree.add_edge( parent, taxon )
                 taxon = parent
         return tree, parent
-
-    """
-    def getRoot( self, tree ):
-        node = tree.nodes()[0]
-        parent = tree.predecessors( node )[0]
-        while parent:
-            node = parent
-            parent = tree.predecessors( node )
-        return node
-    """
-     
-   
