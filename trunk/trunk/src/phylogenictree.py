@@ -28,8 +28,7 @@ class PhylogenicTree( object ):
         if miss_spelled_dict:
             return self.__displayMissSpelled( miss_spelled_dict, target )
         self.tree, self.root = self.ref_tree.getArborescence( self.nwk )
-        if not all_parents:
-            self.tree = self.__removeSingleParent( self.tree )
+        self.tree = self.__removeSingleParent( self.tree )
         if target == "text":
             return self.__display()
         elif target == "html":
