@@ -70,13 +70,18 @@ class ReferenceTree( NX.DiGraph ):
         from lib.phylogelib import getTaxa
         tree = NX.DiGraph()
         taxa = [taxon.lower().strip() for taxon in getTaxa( nwk ) ]
+        rel_dict = {}
         for taxon in taxa:
+            related_name = self.taxoref.correct( taxon )
+            if related_name:
+                rel_dict[taxon] = related_name
+                continue
             parents = self.getParents( taxon )[:]
             parents.reverse()
             for parent in parents:
                 tree.add_edge( parent, taxon )
                 taxon = parent
-        return tree, parent
+        return tree, parent, rel_dict
 
     def getRelatedTaxa( self, nwk ):
         from lib.phylogelib import getTaxa

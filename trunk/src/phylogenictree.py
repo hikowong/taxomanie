@@ -24,17 +24,19 @@ class PhylogenicTree( object ):
         return rel_dict
 
     def display( self, target = "text", all_parents = False ):
-        miss_spelled_dict = self.getMissSpelled()
-        if miss_spelled_dict:
-            return self.__displayMissSpelled( miss_spelled_dict, target )
-        self.tree, self.root = self.ref_tree.getArborescence( self.nwk )
-        self.tree = self.__removeSingleParent( self.tree )
+        result = ""
+        self.tree, self.root, miss_spelled = self.ref_tree.getArborescence( self.nwk )
+        if miss_spelled:
+            result += self.__displayMissSpelled( miss_spelled, target )
+        if not all_parents:
+            self.tree = self.__removeSingleParent( self.tree )
         if target == "text":
-            return self.__display()
+            result += self.__display()
         elif target == "html":
-            return self.__displayHTML()
+            result += self.__displayHTML()
         else:
             raise ValueError, "Unknow target %s" % target
+        return result
 
     def __linkList( self, my_list ):
         """
