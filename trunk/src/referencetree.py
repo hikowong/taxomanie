@@ -32,10 +32,7 @@ class ReferenceTree( NX.DiGraph ):
         """
         if not self.parents.has_key( name ):
             self.parents[name] = []
-            try:
-                parent = self.predecessors( name )[0]
-            except:
-                raise RuntimeError, ">>> "+name
+            parent = self.predecessors( name )[0]
             while parent != "root":
                 self.parents[name].append( parent )
                 parent = self.predecessors( parent )[0]
@@ -72,14 +69,7 @@ class ReferenceTree( NX.DiGraph ):
         """
         from lib.phylogelib import getTaxa
         tree = NX.DiGraph()
-        taxa = [taxon.lower() for taxon in getTaxa( nwk ) ]
-        rel_dict = {}
-        for taxon in taxa:
-            related_name = self.taxoref.correct( taxon )
-            if related_name:
-                rel_dict[taxon] = related_name
-        if rel_dict:
-            return rel_dict, None
+        taxa = [taxon.lower().strip() for taxon in getTaxa( nwk ) ]
         for taxon in taxa:
             parents = self.getParents( taxon )[:]
             parents.reverse()
@@ -87,3 +77,14 @@ class ReferenceTree( NX.DiGraph ):
                 tree.add_edge( parent, taxon )
                 taxon = parent
         return tree, parent
+
+    def getRelatedTaxa( self, nwk ):
+        from lib.phylogelib import getTaxa
+        taxa = [taxon.lower() for taxon in getTaxa( nwk ) ]
+        rel_dict = {}
+        for taxon in taxa:
+            related_name = self.taxoref.correct( taxon )
+            if related_name:
+                rel_dict[taxon] = related_name
+        return rel_dict
+

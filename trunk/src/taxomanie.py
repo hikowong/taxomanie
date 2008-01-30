@@ -54,23 +54,28 @@ class Taxomanie(object):
         </html>"""
         
         if isinstance( myFile, str ):
-            data = myFile 
+            collection = myFile 
         else:
             size = 0
-            data = ""
+            collection = ""
             while True:
                 recv = myFile.file.read(8192)
-                data += recv
+                collection += recv
                 if not recv:
                     break
                 size += len(recv)
-              
-        print "processing tree..."
-        mytree = PhylogenicTree( data, self.reference )
-        print "processing display..."
-        output = mytree.display( target = "html" )
+
+        output = ""
+        for tree in collection.split(";"):
+            tree = tree.strip()    
+            if tree:
+                print "processing tree..."
+                mytree = PhylogenicTree( tree, self.reference )
+                print "processing display..."
+                output += mytree.display( target = "html" )
+                output += "<hr />\n"
         return out % output
-    
+        
     def download(self):
         path = os.path.join(absDir, "pdf_file.pdf")
         return static.serve_file(path, "application/x-download",
