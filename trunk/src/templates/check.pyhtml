@@ -1,15 +1,15 @@
-<html> <body>
-<ul>
+<html>
 
-<%
-from phylogenictree import PhylogenicTree
-tree = collection[index]
-if tree:
-    mytree = PhylogenicTree( tree, reference )
-    print mytree.display( target = "html", all_parents = allparents )
-    print "<hr />"
-%>
+<meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+<link rel="stylesheet" type="text/css" href="css">
+<title> Taxonamie </title>
 
+<body>
+<h1 align="center"> Your Collection </h1>
+
+<%#
+Navigation buttons beetween trees
+#%>
 
 <center>
 <table border='0' cellpadding='2' cellspacing='5'>
@@ -43,7 +43,25 @@ if len(collection) > 1:
 </tr>
 </table>
 </center>
+<hr />
 
+<%
+from phylogenictree import PhylogenicTree
+tree = collection[index]
+if tree:
+    mytree = PhylogenicTree( tree, reference )
+    tree = mytree.display( target = "html", all_parents = allparents )
+    tree += "<hr />"
+%>
+
+<%#
+The sidebar
+#%>
+
+<div id="sidebar">
+<b> Options </b>
+<ul>
+<li>
 <%
 if mytree.hasparents:
     if allparents:
@@ -56,7 +74,21 @@ if mytree.hasparents:
         <%|%>
         <a href='check?index=<%$ index %>&allparents=1'> Display all parents </a>
 <%|%>
-
+</li>
 </ul>
+
+<br />
+
+<b>Menu</b>
+<ul>
+<li><a href="."> Test another collection </a></li>
+</ul>
+</div>
+
+<ul>
+<%$ tree %>
+</ul>
+
+
 </body> </html>
 
