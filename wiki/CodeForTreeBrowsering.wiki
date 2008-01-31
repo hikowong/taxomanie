@@ -33,6 +33,9 @@ Comment sera placé cette fonction dans l'algo général?
 
 displayTreeBrowser(1,1)
 
+*Affichage voulu*
+
+First Previous ... 2 3 4 5 6 ... Next Last
 
 
 = Details =
@@ -65,7 +68,7 @@ def displayTreeBrowser( nbTree, numTree ):
 	i=1
 	while i < (nbTree+1):
 		if numTree == i:
-			output += "<td>"+i+"</td>\n"
+			output += "<td><b>"+i+"</b></td>\n"
 		else:
 			output += "<td><a href='"+htmlPage+"?nb="+nbTree+"&no="+i+"'>Previous</a></td>\n"		
 		i++
