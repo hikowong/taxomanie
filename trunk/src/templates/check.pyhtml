@@ -1,0 +1,62 @@
+<html> <body>
+<ul>
+
+<%
+from phylogenictree import PhylogenicTree
+tree = collection[index]
+if tree:
+    mytree = PhylogenicTree( tree, reference )
+    print mytree.display( target = "html", all_parents = allparents )
+    print "<hr />"
+%>
+
+
+<center>
+<table border='0' cellpadding='2' cellspacing='5'>
+<tr>
+<td>
+
+<%
+if len(collection) > 1:
+    if index > 0:
+%>
+        <%|%>
+        <a href='check?index=<%$ index-1 %>'> Previous </a>
+    <%|%>
+
+    </td>
+    <form>
+    <td>
+    <input type="text" size="1" value="<%$ index+1 %>" name="index"> </input>
+    /<%$ len(collection) %>
+    </td>
+    </form>
+    <td>
+
+<%
+    if index < len(collection)-1:
+%>
+        <%|%>
+        <a href='check?index=<%$ index+1 %>'> Next </a>
+<%|%>
+</td>
+</tr>
+</table>
+</center>
+
+<%
+if mytree.hasparents:
+    if allparents:
+%>
+        <%|%>
+        <a href='check?index=<%$ index %>&allparents=0'> Display only common parents </a>
+<%
+    else:
+%>
+        <%|%>
+        <a href='check?index=<%$ index %>&allparents=1'> Display all parents </a>
+<%|%>
+
+</ul>
+</body> </html>
+
