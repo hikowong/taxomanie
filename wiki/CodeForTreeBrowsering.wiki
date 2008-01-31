@@ -1,0 +1,69 @@
+#The first algo for displaying the tree browser
+
+= Introduction =
+
+_Deux arguments à la fonction_
+le nbr d'arbres (récupéré lors du parsing du fichier newik, *à rajouter*)
+le numéro de page en cours (si c'est la prems fois, alors on passe 1 par defaut)
+
+_Deux parametres_
+"htmlPage" : c'est la page sur laquelle pointer
+"nbDisplayed" : c'est le nombre de page à afficher
+
+_Optimisations_
+"<center>" du tableau ou encore "..." entre les blocs de numéros de page, à voir
+
+_Questions_
+Comment récupérer une variable GET html en python? est ce plus adapté?
+Comment sera placé cette fonction dans l'algo général?
+
+_Lancement par defaut avec un arbre_ 
+displayTreeBrowser(1,1)
+
+
+= Details =
+
+{{{
+def displayTreeBrowser( nbTree, numTree ):
+    """
+    Create a browser for displaying a tree
+
+    @return output : a string which contains a html table
+    """	
+	
+	#if function is not necessary
+	if nbTree < 2:
+		return ""
+		
+	# PARAMETERS
+	nbDisplayed = 5
+	htmlPage = ""
+		
+	#begining of html table
+	output = "<table border='0' cellpadding='2' cellspacing='5'>\n<tr>\n"
+	
+	# First and Previous
+	if numTree > nbDisplayed:
+		output += "<td><a href='"+htmlPage+"?nb="+nbTree+"&no=1'>First</a></td>\n"			
+		output += "<td><a href='"+htmlPage+"?nb="+nbTree+"&no="+(numTree-1)+"'>Previous</a></td>\n"	
+		
+	#Numbers between
+	i=1
+	while i < (nbTree+1):
+		if numTree == i:
+			output += "<td>"+i+"</td>\n"
+		else:
+			output += "<td><a href='"+htmlPage+"?nb="+nbTree+"&no="+i+"'>Previous</a></td>\n"		
+		i++
+		
+	# Next and Last
+	if (numTree+nbDisplayed) > nbTree:
+		output += "<td><a href='"+htmlPage+"?nb="+nbTree+"&no="+(numTree+1)+"'>Next</a></td>\n"
+		output += "<td><a href='"+htmlPage+"?nb="+nbTree+"&no="+nbTree+"'>Last</a></td>\n"	
+		
+	#ending of html table
+	output += "</tr>\n</table>\n"
+	
+	#final return
+	return output
+}}}
