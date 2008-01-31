@@ -2,19 +2,33 @@ from referencetree import ReferenceTree
 from lib.phylogelib import getTaxa
 
 class PhylogenicTree( object ):
+    """
+    This class represente an Phylogenic Tree. It take a newick file in
+    constructor. This class provides all some basis methods to get information
+    of the phylogenic tree.
+    """
     
     NCBI = "http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
     ref_tree = None
 
     def __init__( self, nwk, reference = None ):
+        """
+        @nwk (string): string in newick format
+        @reference (networkx.DiGraph): The reference tree of NCBI database
+        """
         if self.ref_tree is None:
             if reference is None:
                 PhylogenicTree.ref_tree = ReferenceTree()
             else:
                 PhylogenicTree.ref_tree = reference
         self.nwk = nwk
+        self.hasparents = None
 
     def getMissSpelled( self ):
+        """
+        @return (dict): dictionnary of all miss spelled taxon with all related
+            taxon
+        """
         taxa = [taxon.strip().lower() for taxon in getTaxa( self.nwk ) ]
         rel_dict = {}
         for taxon in taxa:
@@ -24,10 +38,21 @@ class PhylogenicTree( object ):
         return rel_dict
 
     def display( self, target = "text", all_parents = False ):
+        """
+        @target (string): the target format (currently: text and html)
+        @all_parents (boolean): show all parents... or just common parents
+        @return (string): the representation of the phylogenic tree in the
+            target format.
+        """
         result = ""
         self.tree, self.root, miss_spelled = self.ref_tree.getArborescence( self.nwk )
         if miss_spelled:
             result += self.__displayMissSpelled( miss_spelled, target )
+        if not self.root:
+            self.hasparents = False
+            return result
+        else:
+            self.hasparents = True
         if not all_parents:
             self.tree = self.__removeSingleParent( self.tree )
         if target == "text":
@@ -57,6 +82,10 @@ class PhylogenicTree( object ):
         return [ item for item in my_list if self.ref_tree.TAXONOMY.has_key( item ) ]
 
     def __displayMissSpelled( self, miss_spelled_dict, target ):
+        """
+        @return (string): display all miss spelled taxon and show all
+            propositions of correct name
+        """
         output = ""
         for i,j in miss_spelled_dict.iteritems():
             try:
@@ -73,7 +102,9 @@ class PhylogenicTree( object ):
         """
         Pretty print of the tree.
 
-        @tree: networkx.DiGraph
+        @root (string): parent name
+        @mydepth (int): depth in the tree
+        @return (string): the display in text format
         """
         result = ""
         if not root:
@@ -97,7 +128,10 @@ class PhylogenicTree( object ):
         """
         Pretty print of the tree.
 
-        @tree: networkx.DiGraph
+
+        @root (string): parent name
+        @mydepth (int): depth in the tree
+        @return (string): the display in html format
         """
         result = ""
         end_ul = False
@@ -124,6 +158,10 @@ class PhylogenicTree( object ):
         return result
 
     def __removeSingleParent( self, tree ):
+        """
+        @tree (networkx.DiGraph): tree where removing parents
+        @return (networkx.DiGraph): the elaged tree
+        """
         for node in tree:
             n = tree.predecessors( node ) + tree.successors(node)
             if len(n) == 2:

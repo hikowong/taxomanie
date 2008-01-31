@@ -69,6 +69,7 @@ class ReferenceTree( NX.DiGraph ):
         """
         from lib.phylogelib import getTaxa
         tree = NX.DiGraph()
+        parent = ""
         taxa = [taxon.lower().strip() for taxon in getTaxa( nwk ) ]
         rel_dict = {}
         for taxon in taxa:

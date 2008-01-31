@@ -1,6 +1,20 @@
+"""
+Preproc.py
 
-NAMES = "../data/taxonomy/names.dmp"
-NODES = "../data/taxonomy/nodes.dmp"
+Preprocess NCBI database and produce and csv file: taxonomy.csv
+
+USAGE:
+    python preproc.py path/to/names.dmp path/to/nodes.dmp
+"""
+import sys
+
+try:
+    NAMES = sys.argv[1]
+    NODES = sys.argv[2]
+except:
+    sys.stderr.write( "Cannot found arguments. Use standard path" )
+    NAMES = "../../data/taxonomy/names.dmp"
+    NODES = "../../data/taxonomy/nodes.dmp"
 
 TBI = {}
 TI = {}

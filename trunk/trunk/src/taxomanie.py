@@ -38,29 +38,27 @@ class Taxomanie(object):
         return self._presentation( "index.html" )
     
     @cherrypy.expose
-    def check(self, myFile):
-        if isinstance( myFile, str ):
-            collection = myFile 
-        else:
-            size = 0
-            collection = ""
-            while True:
-                recv = myFile.file.read(8192)
-                collection += recv
-                if not recv:
-                    break
-                size += len(recv)
-        collection = collection.split( ";" )
-        self.pleet["collection"] = collection
+    def check( self, myFile=None, index=0, allparents=0 ):
+        if myFile:
+            if isinstance( myFile, str ):
+                collection = myFile 
+            else:
+                size = 0
+                collection = ""
+                while True:
+                    recv = myFile.file.read(8192)
+                    collection += recv
+                    if not recv:
+                        break
+                    size += len(recv)
+            self.collection = [col for col in collection.strip().split( ";" ) if col]
+            print self.collection
+        self.pleet["collection"] = self.collection
+        self.pleet["allparents"] = int(allparents)
+        self.pleet["index"] = int(index)
         self.pleet["reference"] = self.reference
         return self._presentation( "check.pyhtml" )
         
-
-    @cherrypy.expose
-    def display( self, id ):
-        # XXX
-        return self._presentation( "display.pyhtml" )
-
     def download(self):
         path = os.path.join(absDir, "pdf_file.pdf")
         return static.serve_file(path, "application/x-download",
