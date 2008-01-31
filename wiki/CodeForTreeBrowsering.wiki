@@ -74,7 +74,7 @@ def displayTreeBrowser( nbTree, numTree ):
 		i++
 		
 	# Next and Last
-	if (numTree+nbDisplayed) > nbTree:
+	if numTree <= (nbTree - nbDisplayed):
 		output += "<td><a href='"+htmlPage+"?nb="+nbTree+"&no="+(numTree+1)+"'>Next</a></td>\n"
 		output += "<td><a href='"+htmlPage+"?nb="+nbTree+"&no="+nbTree+"'>Last</a></td>\n"	
 		
