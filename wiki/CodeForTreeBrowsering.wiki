@@ -2,22 +2,27 @@
 
 = Introduction =
 
-_Deux arguments à la fonction_
+*Deux arguments à la fonction*
+
 le nbr d'arbres (récupéré lors du parsing du fichier newik, *à rajouter*)
 le numéro de page en cours (si c'est la prems fois, alors on passe 1 par defaut)
 
-_Deux parametres_
+*Deux parametres*
+
 "htmlPage" : c'est la page sur laquelle pointer
 "nbDisplayed" : c'est le nombre de page à afficher
 
-_Optimisations_
+*Optimisations*
+
 "<center>" du tableau ou encore "..." entre les blocs de numéros de page, à voir
 
-_Questions_
+*Questions*
+
 Comment récupérer une variable GET html en python? est ce plus adapté?
 Comment sera placé cette fonction dans l'algo général?
 
-_Lancement par defaut avec un arbre_ 
+*Lancement par defaut avec un arbre*
+ 
 displayTreeBrowser(1,1)
 
 
