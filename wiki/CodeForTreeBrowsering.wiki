@@ -1,29 +1,38 @@
 #The first algo for displaying the tree browser
 
+
 = Introduction =
 
 *Deux arguments à la fonction*
 
 le nbr d'arbres (récupéré lors du parsing du fichier newik, *à rajouter*)
+
 le numéro de page en cours (si c'est la prems fois, alors on passe 1 par defaut)
 
 *Deux parametres*
 
 "htmlPage" : c'est la page sur laquelle pointer
+
 "nbDisplayed" : c'est le nombre de page à afficher
 
 *Optimisations*
 
-"<center>" du tableau ou encore "..." entre les blocs de numéros de page, à voir
+"<center>" du tableau 
+
+"... 1 2 3 ..." entre les blocs de numéros de page, à voir
 
 *Questions*
 
-Comment récupérer une variable GET html en python? est ce plus adapté?
+Comment récupérer une variable GET html en python? 
+
+Est ce plus adapté?
+
 Comment sera placé cette fonction dans l'algo général?
 
 *Lancement par defaut avec un arbre*
- 
+
 displayTreeBrowser(1,1)
+
 
 
 = Details =
