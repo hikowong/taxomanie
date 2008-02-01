@@ -4,17 +4,18 @@ Preproc.py
 Preprocess NCBI database and produce and csv file: taxonomy.csv
 
 USAGE:
-    python preproc.py path/to/names.dmp path/to/nodes.dmp
+    python preproc.py
 """
 import sys
+import os
 
-try:
-    NAMES = sys.argv[1]
-    NODES = sys.argv[2]
-except:
-    sys.stderr.write( "Cannot found arguments. Use standard path" )
-    NAMES = "../../data/taxonomy/names.dmp"
-    NODES = "../../data/taxonomy/nodes.dmp"
+print "Downloading NCBI database on the web"
+os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
+print "Extracting database"
+os.system( "tar xf taxdump.tar.gz names.dmp nodes.dmp" )
+
+NAMES = "names.dmp"
+NODES = "nodes.dmp"
 
 TBI = {}
 TI = {}
@@ -97,7 +98,11 @@ for species in TBI.keys():
       "!".join(TBI[species]["common"]) )
     csv.write( line )
 
+os.system( "rm taxdump.tar.gz" )
+os.system( "rm names.dmp nodes.dmp" )
 
 TAXONOMY_BY_ID = TBI
 TAXONOMY_INDEX = TI
 TAXONOMY_BY_NAME = TBN
+
+print "Done"
