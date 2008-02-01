@@ -42,7 +42,7 @@ class Taxomanie(object):
         return self._presentation( "index.html" )
     
     @cherrypy.expose
-    def check( self, myFile=None, index=0, allparents=0 ):
+    def check( self, myFile=None, index=0, allparents=0, target="html" ):
         try:
             if myFile is not None:
                 if isinstance( myFile, str ):
@@ -59,6 +59,7 @@ class Taxomanie(object):
                 self.collection = [col for col in collection.strip().split( ";" ) if col]
             self.pleet["collection"] = self.collection
             self.pleet["allparents"] = int(allparents)
+            self.pleet["target"] = target.strip()
             self.pleet["index"] = int(index)
             self.pleet["reference"] = self.reference
             return self._presentation( "check.pyhtml" )
