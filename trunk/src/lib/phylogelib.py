@@ -10,6 +10,17 @@
 # Nicolas Clairon : clairon [_at_] gmail.com
 #################################################
 """ Pylogenic trees manipulating fonctions """
+def getParent(tree,node):
+  """ Return the parent of the node """
+  if tree == node:
+    return ""
+  for child in getChildren(tree):
+    if child == node:
+      return tree
+    if node in child:
+      parent = getParent(child,node)
+  return parent
+
 def getChildren(tree):
   """ Extract all first child of tree to a list """
   p = 0
@@ -29,6 +40,10 @@ def getChildren(tree):
     chaine += i
   return newarb
 
+def getBrothers( tree, node ):
+  """ return all node brothers in tree """
+  return getChildren( getParent( tree, node ) )
+ 
 def getNodes(tree):
   """ Return the nodes list of tree """
   listNodes = []
@@ -85,17 +100,6 @@ def getTaxa(tree):
   for child in getChildren(tree):
     l.extend(getTaxa(child))
   return l
-
-def getParent(tree,node):
-  """ Return the parent of the node """
-  if tree == node:
-    return ""
-  for child in getChildren(tree):
-    if child == node:
-      return tree
-    if node in child:
-      parent = getParent(child,node)
-  return parent
 
 def getDepth(tree):
   """ Return the depth of the tree """
@@ -196,3 +200,5 @@ b = "((((a,b),c,d),(e,f)),g)"
 c = "(((a,b),c,d),e,f,((g,h),i))"
 d = "(t5:0.004647,t4:0.142159,((t6:0.142159,t1:0.047671)10:0.115,DinosauriaxDinosorus:0.545582)60:0.995353)"
 ####################################################################################################
+
+
