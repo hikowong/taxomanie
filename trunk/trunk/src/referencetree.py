@@ -43,7 +43,6 @@ class ReferenceTree( NX.DiGraph ):
     def getParent( self, name ):
         return self.predecessors( name )[0]
 
-
     def getCommonParent( self, name1, name2 ):
         """
         return the first common parent name of name1 and name2

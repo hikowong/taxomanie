@@ -1,5 +1,5 @@
 from referencetree import ReferenceTree
-from lib.phylogelib import getTaxa
+from lib.phylogelib import getTaxa, getBrothers
 
 class PhylogenicTree( object ):
     """
@@ -23,6 +23,7 @@ class PhylogenicTree( object ):
                 PhylogenicTree.ref_tree = reference
         self.nwk = nwk
         self.hasparents = None
+        self.tree, self.root, self.miss_spelled = self._getArborescence()
 
     def getMissSpelled( self ):
         """
@@ -37,6 +38,61 @@ class PhylogenicTree( object ):
                 rel_dict[taxon] = related_name
         return rel_dict
 
+    def getCommonParent( self, taxa_list ):
+        """
+        return the first common parent of taxa_list
+
+        @taxa_list: list
+        @return: string
+        """
+        dict_parents = {}
+        parents_list1 = self.ref_tree.getParents( taxa_list[0] )
+        parents_list2 = self.ref_tree.getParents( taxa_list[1] )
+        all_common_parents = [parent for parent in parents_list1 if parent in parents_list2]
+        if len( taxa_list ) > 2:
+            for i in range( len( taxa_list) ):
+                for j in range(i, len( taxa_list ) ):
+                    if i == j or (i == 0 and j == 1):
+                        continue
+                    parents_list1 = self.ref_tree.getParents( taxa_list[i] )
+                    parents_list2 = self.ref_tree.getParents( taxa_list[j] )
+                    common_parents = [parent for parent in parents_list1 if parent in parents_list2]
+                    all_common_parents = [parent for parent in common_parents\
+                      if parent in (common_parents and all_common_parents)]
+        return all_common_parents[-1]
+
+    def _getArborescence( self ):
+        """
+        Take a newick string, search in reference all parents names and
+        return the tree and the name of root.
+
+        @return: networkx.DiGraph and string
+        """
+        import networkx as NX
+        tree = NX.DiGraph()
+        parent = ""
+        taxa = [taxon.lower().strip() for taxon in getTaxa( self.nwk ) ]
+        rel_dict = {}
+        already_done = []
+        for taxon in taxa:
+            if taxon not in already_done:
+                already_done.append( taxon )
+                related_name = self.ref_tree.taxoref.correct( taxon )
+                if related_name:
+                    rel_dict[taxon] = related_name
+                    continue
+                brothers = getBrothers( self.nwk, taxon )
+                already_done.extend( brothers )
+                parent = self.getCommonParent( brothers )
+                indice = 0
+                while parent in already_done:
+                    indice += 1
+                    parent = parent + str( indice )
+                for taxon in brothers:
+                    tree.add_edge( parent, taxon )
+                already_done.append( parent )
+        return tree, parent, rel_dict
+
     def display( self, target = "text", all_parents = False ):
         """
         @target (string): the target format (currently: text and html)
@@ -45,9 +101,8 @@ class PhylogenicTree( object ):
             target format.
         """
         result = ""
-        self.tree, self.root, miss_spelled = self.ref_tree.getArborescence( self.nwk )
-        if miss_spelled:
-            result += self.__displayMissSpelled( miss_spelled, target )
+        if self.miss_spelled:
+            result += self.__displayMissSpelled( self.miss_spelled, target )
         if not self.root:
             self.hasparents = False
             return result
