@@ -1,5 +1,5 @@
 from referencetree import ReferenceTree
-from lib.phylogelib import getTaxa, getBrothers
+from lib.phylogelib import getTaxa, getBrothers, getChildren
 
 class PhylogenicTree( object ):
     """
@@ -23,7 +23,9 @@ class PhylogenicTree( object ):
                 PhylogenicTree.ref_tree = reference
         self.nwk = nwk
         self.hasparents = None
-        self.tree, self.root, self.miss_spelled = self._getArborescence()
+        #self.tree, self.root, self.miss_spelled = 
+        self.root = "root"
+        self._getArborescence()
 
     def getMissSpelled( self ):
         """
@@ -61,38 +63,39 @@ class PhylogenicTree( object ):
                       if parent in (common_parents and all_common_parents)]
         return all_common_parents[-1]
 
-    def _getArborescence( self ):
-        """
-        Take a newick string, search in reference all parents names and
-        return the tree and the name of root.
-
-        @return: networkx.DiGraph and string
-        """
-        import networkx as NX
-        tree = NX.DiGraph()
-        parent = ""
-        taxa = [taxon.lower().strip() for taxon in getTaxa( self.nwk ) ]
-        rel_dict = {}
-        already_done = []
-        for taxon in taxa:
-            if taxon not in already_done:
-                already_done.append( taxon )
-                related_name = self.ref_tree.taxoref.correct( taxon )
-                if related_name:
-                    rel_dict[taxon] = related_name
-                    continue
-                brothers = getBrothers( self.nwk, taxon )
-                already_done.extend( brothers )
-                parent = self.getCommonParent( brothers )
-                indice = 0
-                while parent in already_done:
-                    indice += 1
-                    parent = parent + str( indice )
-                for taxon in brothers:
-                    tree.add_edge( parent, taxon )
-                already_done.append( parent )
-        return tree, parent, rel_dict
-
+    def _getArborescence( self, tree=None ):
+        if tree is None:
+            import networkx as NX
+            self.tree = NX.DiGraph()
+            tree = self.nwk
+            self.children_name = []
+            self.last_child = ""
+            self.miss_spelled = {}
+        if getChildren( tree ):
+            for child in getChildren( tree ):
+                if getChildren( child ): # child is a node
+                    try:
+                        child_name = self.getCommonParent(getTaxa(child))
+                    except: # fill miss_spelled dict and stop
+                        for taxon in getTaxa( self.nwk ):
+                            related_name = self.ref_tree.taxoref.correct( taxon )
+                            if related_name:
+                                self.miss_spelled[taxon] = related_name
+                                return
+                    # Rename child_name if already exists
+                    index = 0
+                    while child_name in self.children_name:
+                        index += 1
+                        child_name = child_name+"|"+str(index)
+                    self.children_name.append( child_name )
+                    self.last_child = child_name
+                    # If root
+                    if tree == self.nwk:
+                        self.tree.add_edge( "root", child_name )
+                    self._getArborescence( tree = child )
+                else: # child is a taxon
+                    self.tree.add_edge( self.last_child, child )
+     
     def display( self, target = "text", all_parents = False ):
         """
         @target (string): the target format (currently: text and html)
@@ -102,7 +105,7 @@ class PhylogenicTree( object ):
         """
         result = ""
         if self.miss_spelled:
-            result += self.__displayMissSpelled( self.miss_spelled, target )
+            result = self.__displayMissSpelled( self.miss_spelled, target )
         if not self.root:
             self.hasparents = False
             return result
@@ -173,7 +176,7 @@ class PhylogenicTree( object ):
                 depth += 1
             subnodes = self.tree.successors( node )
             if subnodes:
-                result += "+-"+node+"\n"
+                result += "+-"+node.split("|")[0]+"\n"
                 result += self.__display( node, depth + 1)
             else:
                 result += "+-["+node+"]\n"
@@ -196,16 +199,17 @@ class PhylogenicTree( object ):
             root = self.root
             result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[root]["id"]+"'>"+root+"</a></li>\n"
         for node in self.tree.successors( root ):
+            dispnode = node.split("|")[0]
             depth = 0
             while depth != mydepth :
                 depth += 1
             subnodes = self.tree.successors( node )
             result += "<ul>\n"
             if subnodes:
-                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[node]["id"]+"'>"+node+"</a></li>\n"
+                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode+"</a></li>\n"
                 result += self.__displayHTML( node, depth + 1)
             else:
-                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[node]["id"]+"'>"+node+"</a></li>\n"
+                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode+"</a></li>\n"
             result += "</ul>\n"
         if end_ul:
             result += "</ul>\n"
