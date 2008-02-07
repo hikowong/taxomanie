@@ -1,5 +1,5 @@
 from referencetree import ReferenceTree
-from lib.phylogelib import getTaxa, getBrothers, getChildren
+from lib.phylogelib import getTaxa, getBrothers, getChildren, tidyNwk
 
 class PhylogenicTree( object ):
     """
@@ -21,7 +21,7 @@ class PhylogenicTree( object ):
                 PhylogenicTree.ref_tree = ReferenceTree()
             else:
                 PhylogenicTree.ref_tree = reference
-        self.nwk = nwk
+        self.nwk = tidyNwk(nwk.lower())
         self.hasparents = None
         #self.tree, self.root, self.miss_spelled = 
         self.root = "root"
@@ -65,54 +65,64 @@ class PhylogenicTree( object ):
 
     def _getArborescence( self, tree=None ):
         if tree is None:
+            # Init attributes
             import networkx as NX
             self.tree = NX.DiGraph()
             tree = self.nwk
+            print ">>", tree
             self.children_name = []
             self.last_child = ""
+            self.rel_name = {}
             self.miss_spelled = {}
+            # Check all taxa name
+            bad = False
+            for taxon in getTaxa( self.nwk ):
+                related_name = self.ref_tree.taxoref.correct( taxon )
+                if related_name:
+                    bad = True
+                    self.miss_spelled[taxon] = related_name
+            if bad:
+                return
         if getChildren( tree ):
+            if tree == self.nwk:
+                parent_name = self.root
+            else:
+                if not self.rel_name.has_key( tree ):
+                    parent_name = self.getCommonParent(getTaxa(tree))
+                else:
+                    parent_name = self.rel_name[tree]
             for child in getChildren( tree ):
                 if getChildren( child ): # child is a node
-                    try:
-                        child_name = self.getCommonParent(getTaxa(child))
-                    except: # fill miss_spelled dict and stop
-                        for taxon in getTaxa( self.nwk ):
-                            related_name = self.ref_tree.taxoref.correct( taxon )
-                            if related_name:
-                                self.miss_spelled[taxon] = related_name
-                                return
+                    child_name = self.getCommonParent(getTaxa(child))
+                    if child_name not in self.children_name:
+                        self.children_name.append( parent_name )
                     # Rename child_name if already exists
                     index = 0
                     while child_name in self.children_name:
                         index += 1
                         child_name = child_name+"|"+str(index)
+                    self.rel_name[child] = child_name
                     self.children_name.append( child_name )
                     self.last_child = child_name
-                    # If root
-                    if tree == self.nwk:
-                        self.tree.add_edge( "root", child_name )
+                    self.tree.add_edge( parent_name, child_name )
                     self._getArborescence( tree = child )
                 else: # child is a taxon
-                    self.tree.add_edge( self.last_child, child )
+                    self.tree.add_edge( parent_name, child )
      
-    def display( self, target = "text", all_parents = False ):
+    def display( self, target = "text" ):
         """
         @target (string): the target format (currently: text and html)
-        @all_parents (boolean): show all parents... or just common parents
         @return (string): the representation of the phylogenic tree in the
             target format.
         """
         result = ""
         if self.miss_spelled:
-            result = self.__displayMissSpelled( self.miss_spelled, target )
+            return self.__displayMissSpelled( self.miss_spelled, target )
         if not self.root:
             self.hasparents = False
             return result
         else:
             self.hasparents = True
-        if not all_parents:
-            self.tree = self.__removeSingleParent( self.tree )
         if target == "text":
             result += self.__display()
         elif target == "html":
@@ -197,7 +207,7 @@ class PhylogenicTree( object ):
             result += "<ul>\n"
             end_ul = True
             root = self.root
-            result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[root]["id"]+"'>"+root+"</a></li>\n"
+            result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.upper()+"</a></li>\n"
         for node in self.tree.successors( root ):
             dispnode = node.split("|")[0]
             depth = 0
@@ -206,10 +216,10 @@ class PhylogenicTree( object ):
             subnodes = self.tree.successors( node )
             result += "<ul>\n"
             if subnodes:
-                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode+"</a></li>\n"
+                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.upper()+"</a></li>\n"
                 result += self.__displayHTML( node, depth + 1)
             else:
-                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode+"</a></li>\n"
+                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.upper()+"</a></li>\n"
             result += "</ul>\n"
         if end_ul:
             result += "</ul>\n"
@@ -231,8 +241,15 @@ class PhylogenicTree( object ):
 
 if __name__ == "__main__":
     
-    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Rattus:0.016167):0.055242,Oryctolagus:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelphis:0.093131);"""
+#    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Rattus:0.016167):0.055242,Oryctolagus:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelphis:0.093131);"""
 #    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Ratus:0.016167):0.055242,Oryctolagu:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelph:0.093131);"""
-    ptree = PhylogenicTree( tree )
-    print ptree.display()
- 
+    trees = ["((loxondonta africana,pan),homo)"]#, "((homo,mus),(ratus,pan))", "((mu,ratus),homo)"]
+
+    for tree in trees:
+        ptree = PhylogenicTree( tree )
+        print tree
+        print ptree.tree.edges()
+        print ptree.miss_spelled
+        print ptree.display("html")
+        print "#"*10
+     

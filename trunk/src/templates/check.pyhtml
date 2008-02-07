@@ -53,7 +53,7 @@ from phylogenictree import PhylogenicTree
 tree = collection[index]
 if tree:
     mytree = PhylogenicTree( tree, reference )
-    tree = mytree.display( target = target, all_parents = allparents )
+    tree = mytree.display( target = target )
     tree += "<hr />"
 %>
 
@@ -66,33 +66,17 @@ The sidebar
 <ul>
 <li>
 <%
-if mytree.hasparents:
-    if allparents:
-%>
-        <%|%>
-<a href='check?index=<%$ index %>&allparents=0&target=<%$ target %>'>
-Display only common parents </a>
-<%
-    else:
-%>
-        <%|%>
-<a href='check?index=<%$ index %>&allparents=1&target=<%$ target %>'>
-Display all parents </a>
-<%|%>
-</li>
-<li>
-<%
 if target == "html":
 %>
     <%|%>
-<a href='check?index=<%$ index %>&allparents=<%$ allparents %>&target=text'>
+<a href='check?index=<%$ index %>&target=text'>
 Printable version
 </a>
 <%
 else:
 %>
     <%|%>
-<a href='check?index=<%$ index %>&allparents=<%$ allparents %>&target=html'>
+<a href='check?index=<%$ index %>&target=html'>
 Html version
 </a>
 <%|%>

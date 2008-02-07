@@ -10,6 +10,19 @@
 # Nicolas Clairon : clairon [_at_] gmail.com
 #################################################
 """ Pylogenic trees manipulating fonctions """
+
+def tidyNwk( nwk ):
+    """ Strip all space and backline from newick string """
+    nwk = nwk.replace( "\n", " " )
+    nwk = nwk.replace( "  ", " " )
+    nwk = nwk.replace( ", (", ",(" )
+    nwk = nwk.replace( " ,", "," )
+    nwk = nwk.replace( ", ", "," )
+    nwk = nwk.replace( ") ,", ")," )
+    nwk = nwk.replace( ") )", "))" )
+    nwk = nwk.replace( "( (", "((" )
+    return nwk
+
 def getParent(tree,node):
   """ Return the parent of the node """
   if tree == node:
