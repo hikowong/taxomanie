@@ -8,7 +8,9 @@ Il est donc plus simple de faire un lien rapide à coté du nom de taxon dans l'
 
 et envoyer sur une fiche du taxon où il y a des photographies associées
 
-*Voir* http://species.wikimedia.org/wiki/Accueil
+*Voir* 
+
+http://species.wikimedia.org/wiki/Accueil
 
 où l'on peut ajouter le nom de taxon à la place de "Accueil" dans l'URL
 
@@ -24,15 +26,15 @@ mettre un lien en indice par exemple pour différencier des taxons de l'arbre
 
 ou en css font very small
 
+=:}
+
 
 = Details =
 
 * Root
-  ** Mammals ^see^
-    *** Homo Micro Plus ^see^
-    *** Bosse a la tete ^see^
-  ** Informaticiens ^see^
-    *** Nico ^see^   
+  * Mammals ^see^
+    * Homo Micro Plus ^see^
+    * Bosse a la tete ^see^
+  * Informaticiens ^see^
+    * Nico ^see^   
 
-
-=:}
