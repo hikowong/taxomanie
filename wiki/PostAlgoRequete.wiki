@@ -1,0 +1,113 @@
+Analyse sur les requetes
+
+= Introduction =
+
+*Requete entrée en parametre*
+
+requete = #taxon1>3 +taxon2 -taxon3
+
+_#taxon1>n_ : comparaison du nombre d'iteration du taxon dans chaque arbre de la collection
+
+_+taxon2_ : présence du taxon dans chaque arbre de la collection
+
+_-taxon3_ : abscence du taxon dans chaque arbre de la collection
+
+
+*Exemple des criteres de la requete*
+
+requete = #mammals>3 +mammals -canidae
+
+#Mammals>3 (plus de 3 mammiferes)
+
++Mammals (presence de mammifere)
+
+-canidae (abscence de canidés)
+
+
+*Element en entrée*
+
+collection d'arbres entrée par l'utilisateur
+
+*Element de retour*
+
+collection d'arbres correspondant aux criteres de la requete
+
+*principe de l'algo*
+
+on retire l'arbre de la collection s'il ne correspond pas aux criteres 
+
+a la fin on renvoi cette collectionTriee
+
+
+
+= Details =
+{{{
+#initilisation
+requete
+collectionTriee = collection
+
+#pour avoir chaque critere de la requete
+SPLITER requete par '#', '+' ou '-' 
+
+#boucler sur chaque critere
+TANTQUE critere dans requete ET collectionTriee.length >0
+	
+	#++++++++++++++++++++++++++++++++++++++++++++++++++++
+	#si critere de presence et il reste au moins un arbre pouvant repondre au critere
+	SI critere débute par '+' ET collectionTriee.length >0
+	
+		#boucler sur chaque arbre encore présent dans la collection
+		POUR tree dans collectionTriee 
+		
+			taxon = mot apres '+' dans critere
+			#si le taxon n'est pas present dans l'arbre courant, on supprime cet arbre de la collection
+			SI taxon NOT dans tree
+				suppression de tree dans collectionTriee
+		
+	#-----------------------------------------------------
+	#si critere d'abscence et il reste au moins un arbre pouvant repondre au critere
+	SI critere débute par '-' ET collectionTriee.length >0
+	
+		#boucler sur chaque arbre encore présent dans la collection
+		POUR tree dans collectionTriee 
+		
+			taxon = mot apres '-' dans critere
+			#si le taxon est present dans l'arbre courant, on supprime cet arbre de la collection
+			SI taxon dans tree
+				suppression de tree dans collectionTriee
+		
+	#########################################################
+	#si critere de comparaison et il reste au moins un arbre pouvant repondre au critere
+	SI critere débute par '#' ET collectionTriee.length >0
+	
+		#boucler sur chaque arbre encore présent dans la collection
+		POUR tree dans collectionTriee 
+		
+			taxon 	= mot apres '#' et avant '<', '>', '=', '!' dans critere
+			compare = comparateur '<', '>', '!' ou '='
+			nbr 	= nombre apres '<', '>', '!' ou '='
+			occurrence = Compter occurences du taxon dans arbre
+			
+			#comparaisons :			
+			SI compare == '>'
+				#si le taxon ne correspond pas dans l'arbre courant, on supprime cet arbre de la collection	
+				SI occurence < nbr+1
+					suppression de tree dans collectionTriee
+					
+			ELSE SI compare == '<'
+				#si le taxon ne correspond pas dans l'arbre courant, on supprime cet arbre de la collection	
+				SI occurence+1 > nbr
+					suppression de tree dans collectionTriee
+					
+			ELSE SI compare == '='
+				#si le taxon ne correspond pas dans l'arbre courant, on supprime cet arbre de la collection	
+				SI occurence != nbr
+					suppression de tree dans collectionTriee	
+
+			ELSE SI compare == '!'
+				#si le taxon ne correspond pas dans l'arbre courant, on supprime cet arbre de la collection	
+				SI occurence == nbr
+					suppression de tree dans collectionTriee	
+		
+return collectionTriee
+}}}
