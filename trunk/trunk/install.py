@@ -3,7 +3,7 @@
 import os.path
 
 print "cleaning old version..."
-os.rmdir( "src" )
+os.system( "rm -rf src" )
 print "updating new version..."
 os.system( "svn update" )
 print "generating taxonomy.csv"
