@@ -1,6 +1,6 @@
 from referencetree import ReferenceTree
 from lib.phylogelib import getTaxa, getBrothers, \
-    getChildren, tidyNwk, removeBootStraps
+    getChildren, tidyNwk, removeBootStraps, checkNwk
 
 class PhylogenicTree( object ):
     """
@@ -23,6 +23,7 @@ class PhylogenicTree( object ):
             else:
                 PhylogenicTree.ref_tree = reference
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
+        checkNwk( self.nwk )
         self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
         self.hasparents = None
         self.root = "root"

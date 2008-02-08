@@ -52,9 +52,9 @@ if len(collection) > 1:
 from phylogenictree import PhylogenicTree
 tree = collection[index-1]
 if tree:
+    htmltree = ""
     try:
         mytree = PhylogenicTree( tree, reference )
-        htmltree = ""
         if named_tree:
             htmltree += "<center><h3>"+named_tree[tree]+"</h3></center><hr />"
         htmltree += mytree.display( target = target )

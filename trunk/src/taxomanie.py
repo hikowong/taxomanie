@@ -45,7 +45,7 @@ class Taxomanie(object):
         return self._presentation( "index.html" )
     
     @cherrypy.expose
-    def check( self, myFile=None, index=0, target="html" ):
+    def check( self, myFile=None, index=1, target="html" ):
         # return PhylogenicTree( myFile, self.reference ).display("html")
         try:
             if myFile is not None:
