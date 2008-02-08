@@ -33,10 +33,23 @@ a.species:link
 	color		: darkblue;
 	font-weight	: bold;
     }
+
+a.species:visited
+	{
+	color		: darkblue;
+	font-weight	: bold;
+	}
+
 a.gender:link
     {
 	color		: #66f;
     }
+
+a.gender:visited
+	{
+	color		: #66f;
+	}
+
 
 a:link
 	{
@@ -47,12 +60,13 @@ a:hover
 	{
 	text-decoration	: underline;
 	}
-/*
+
 a:visited
 	{
 	color		: #66f;
+	font-weight	: bold;
 	}
-*/
+
 /* That nice green background on some words and code samples */
 code
 	{
