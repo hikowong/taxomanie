@@ -24,6 +24,13 @@ def tidyNwk( nwk ):
     nwk = nwk.replace( "( (", "((" )
     return nwk.strip()
 
+def checkNwk( nwk ):
+    try:
+        nwk2list( nwk )
+    except:
+        raise ValueError, nwk+" is not correct"
+        
+
 def getParent(tree,node):
   """ Return the parent of the node """
   if tree == node:
