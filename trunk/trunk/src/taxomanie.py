@@ -43,6 +43,7 @@ class Taxomanie(object):
     
     @cherrypy.expose
     def check( self, myFile=None, index=0, target="html" ):
+        #return PhylogenicTree( myFile, self.reference ).display("html")
         try:
             if myFile is not None:
                 if isinstance( myFile, str ):
