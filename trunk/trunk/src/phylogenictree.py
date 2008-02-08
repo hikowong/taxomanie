@@ -186,10 +186,10 @@ class PhylogenicTree( object ):
                 depth += 1
             subnodes = self.tree.successors( node )
             if subnodes:
-                result += "+-"+node.split("|")[0]+"\n"
+                result += "+-"+node.split("|")[0].capitalize()+"\n"
                 result += self.__display( node, depth + 1)
             else:
-                result += "+-["+node+"]\n"
+                result += "+-["+node.capitalize()+"]\n"
         return result
 
     def __displayHTML( self, root = "",  mydepth = 0 ):
@@ -206,7 +206,7 @@ class PhylogenicTree( object ):
             result += "<ul>\n"
             end_ul = True
             root = self.root
-            result += "<li><a class='gender' href='"+self.NCBI+ \
+            result += "<li><a class='genre' href='"+self.NCBI+ \
               self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a></li>\n"
         for node in self.tree.successors( root ):
             dispnode = node.split("|")[0]
@@ -216,7 +216,7 @@ class PhylogenicTree( object ):
             subnodes = self.tree.successors( node )
             result += "<ul>\n"
             if subnodes:
-                result += "<li><a class='gender' href='"+self.NCBI+ \
+                result += "<li><a class='genre' href='"+self.NCBI+ \
                   self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a></li>\n"
                 result += self.__displayHTML( node, depth + 1)
             else:
