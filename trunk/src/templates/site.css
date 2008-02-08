@@ -28,12 +28,12 @@ a
 	{
 	text-decoration	: none;
 	}
-a.species
+a.species:link
     {
-	color		: blue;
+	color		: darkblue;
 	font-weight	: bold;
     }
-a.gender
+a.gender:link
     {
 	color		: #66f;
     }
