@@ -8,7 +8,7 @@ Il est donc plus simple de faire un lien rapide à coté du nom de taxon dans l'
 
 et envoyer sur une fiche du taxon où il y a des photographies associées
 
-*Voir http://species.wikimedia.org/wiki/Accueil*
+*Voir* http://species.wikimedia.org/wiki/Accueil
 
 où l'on peut ajouter le nom de taxon à la place de "Accueil" dans l'URL
 
