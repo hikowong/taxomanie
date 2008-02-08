@@ -53,8 +53,11 @@ from phylogenictree import PhylogenicTree
 tree = collection[index]
 if tree:
     mytree = PhylogenicTree( tree, reference )
-    tree = mytree.display( target = target )
-    tree += "<hr />"
+    htmltree = ""
+    if named_tree:
+        htmltree += "<center><h3>"+named_tree[tree]+"</h3></center><hr />"
+    htmltree += mytree.display( target = target )
+    htmltree += "<hr />"
 %>
 
 <%#
@@ -97,14 +100,14 @@ if target == "html":
 %>
     <%|%>
     <ul>
-    <%$ tree %>
+    <%$ htmltree %>
     </ul>
 <%
 else:
 %>
     <%|%>
 <pre>
-<%$ tree %>
+<%$ htmltree %>
 </pre>
 <%|%>
 
