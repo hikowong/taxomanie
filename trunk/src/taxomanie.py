@@ -20,6 +20,8 @@ class Taxomanie(object):
             from referencetree import ReferenceTree
             Taxomanie.reference = ReferenceTree()
         self.pleet = Pleet()
+        self.collection = []
+        self.named_tree = {}
         self.path = "templates/"
 
     def _presentation( self, file_name ):
@@ -43,9 +45,11 @@ class Taxomanie(object):
     
     @cherrypy.expose
     def check( self, myFile=None, index=0, target="html" ):
-        #return PhylogenicTree( myFile, self.reference ).display("html")
+        # return PhylogenicTree( myFile, self.reference ).display("html")
         try:
             if myFile is not None:
+                self.named_tree = {}
+                self.collection = []
                 if isinstance( myFile, str ):
                     collection = myFile 
                 else:
@@ -57,11 +61,23 @@ class Taxomanie(object):
                         if not recv:
                             break
                         size += len(recv)
-                self.collection = [col for col in collection.strip().split( ";" ) if col]
+                collection = collection.strip()
+                # Nexus collection
+                if collection[:6].lower() == "#nexus":
+                    for tree in collection.split(";")[1:-2]:
+                        tree = tree.strip()
+                        nwktree = tree.split("=")[1]
+                        tree_name = tree.split("=")[0].split()[1]
+                        self.collection.append( nwktree )
+                        self.named_tree[nwktree] = tree_name
+                # Phylip collection
+                else:
+                    self.collection = [col for col in collection.strip().split( ";" ) if col]
             self.pleet["collection"] = self.collection
             self.pleet["target"] = target.strip()
             self.pleet["index"] = int(index)
             self.pleet["reference"] = self.reference
+            self.pleet["named_tree"] = self.named_tree
             return self._presentation( "check.pyhtml" )
         except IndexError:
             return self.index()
