@@ -40,12 +40,12 @@ a.species:visited
 	font-weight	: bold;
 	}
 
-a.gender:link
+a.genre:link
     {
 	color		: #66f;
     }
 
-a.gender:visited
+a.genre:visited
 	{
 	color		: #66f;
 	}

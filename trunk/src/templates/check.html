@@ -21,7 +21,7 @@ Navigation buttons beetween trees
 
 <%
 if len(collection) > 1:
-    if index > 0:
+    if index > 1:
 %>
         <%|%>
         <a href='check?index=<%$ index-1 %>'> Previous </a>
@@ -30,14 +30,14 @@ if len(collection) > 1:
     </td>
     <form>
     <td>
-    <input type="text" size="1" value="<%$ index+1 %>" name="index"> </input>
+    <input type="text" size="1" value="<%$ index %>" name="index"> </input>
     /<%$ len(collection) %>
     </td>
     </form>
     <td>
 
 <%
-    if index < len(collection)-1:
+    if index < len(collection):
 %>
         <%|%>
         <a href='check?index=<%$ index+1 %>'> Next </a>
@@ -50,7 +50,7 @@ if len(collection) > 1:
 
 <%
 from phylogenictree import PhylogenicTree
-tree = collection[index]
+tree = collection[index-1]
 if tree:
     try:
         mytree = PhylogenicTree( tree, reference )
