@@ -52,13 +52,23 @@ if len(collection) > 1:
 from phylogenictree import PhylogenicTree
 tree = collection[index]
 if tree:
-    mytree = PhylogenicTree( tree, reference )
-    htmltree = ""
-    if named_tree:
-        htmltree += "<center><h3>"+named_tree[tree]+"</h3></center><hr />"
-    htmltree += mytree.display( target = target )
-    htmltree += "<hr />"
+    try:
+        mytree = PhylogenicTree( tree, reference )
+        htmltree = ""
+        if named_tree:
+            htmltree += "<center><h3>"+named_tree[tree]+"</h3></center><hr />"
+        htmltree += mytree.display( target = target )
+        htmltree += "<hr />"
+    except:
 %>
+        <%|%>
+<div id="error">
+<center><font color="red"> An error occured with this tree : </font></center>
+<br />
+<%$ tree %>
+</div>
+    <%|%>
+
 
 <%#
 The sidebar
