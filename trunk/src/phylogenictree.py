@@ -23,7 +23,6 @@ class PhylogenicTree( object ):
                 PhylogenicTree.ref_tree = reference
         self.nwk = tidyNwk(nwk.lower())
         self.hasparents = None
-        #self.tree, self.root, self.miss_spelled = 
         self.root = "root"
         self._getArborescence()
 
@@ -69,7 +68,6 @@ class PhylogenicTree( object ):
             import networkx as NX
             self.tree = NX.DiGraph()
             tree = self.nwk
-            print ">>", tree
             self.children_name = []
             self.last_child = ""
             self.rel_name = {}

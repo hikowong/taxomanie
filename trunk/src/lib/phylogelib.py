@@ -14,14 +14,15 @@
 def tidyNwk( nwk ):
     """ Strip all space and backline from newick string """
     nwk = nwk.replace( "\n", " " )
-    nwk = nwk.replace( "  ", " " )
+    while "  " in nwk:
+        nwk = nwk.replace( "  ", " " )
     nwk = nwk.replace( ", (", ",(" )
     nwk = nwk.replace( " ,", "," )
     nwk = nwk.replace( ", ", "," )
     nwk = nwk.replace( ") ,", ")," )
     nwk = nwk.replace( ") )", "))" )
     nwk = nwk.replace( "( (", "((" )
-    return nwk
+    return nwk.strip()
 
 def getParent(tree,node):
   """ Return the parent of the node """
