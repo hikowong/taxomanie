@@ -28,6 +28,16 @@ a
 	{
 	text-decoration	: none;
 	}
+a.species
+    {
+	color		: blue;
+	font-weight	: bold;
+    }
+a.gender
+    {
+	color		: #66f;
+    }
+
 a:link
 	{
 	color		: blue;
@@ -37,11 +47,12 @@ a:hover
 	{
 	text-decoration	: underline;
 	}
+/*
 a:visited
 	{
 	color		: #66f;
 	}
-
+*/
 /* That nice green background on some words and code samples */
 code
 	{

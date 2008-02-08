@@ -23,6 +23,7 @@ class PhylogenicTree( object ):
             else:
                 PhylogenicTree.ref_tree = reference
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
+        self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
         self.hasparents = None
         self.root = "root"
         self._getArborescence()
@@ -193,8 +194,7 @@ class PhylogenicTree( object ):
 
     def __displayHTML( self, root = "",  mydepth = 0 ):
         """
-        Pretty print of the tree.
-
+        Pretty print of the tree in HTML.
 
         @root (string): parent name
         @mydepth (int): depth in the tree
@@ -206,7 +206,8 @@ class PhylogenicTree( object ):
             result += "<ul>\n"
             end_ul = True
             root = self.root
-            result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.upper()+"</a></li>\n"
+            result += "<li><a class='gender' href='"+self.NCBI+ \
+              self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a></li>\n"
         for node in self.tree.successors( root ):
             dispnode = node.split("|")[0]
             depth = 0
@@ -215,10 +216,12 @@ class PhylogenicTree( object ):
             subnodes = self.tree.successors( node )
             result += "<ul>\n"
             if subnodes:
-                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.upper()+"</a></li>\n"
+                result += "<li><a class='gender' href='"+self.NCBI+ \
+                  self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a></li>\n"
                 result += self.__displayHTML( node, depth + 1)
             else:
-                result += "<li><a href='"+self.NCBI+self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.upper()+"</a></li>\n"
+                result += "<li><a class='species' href='"+self.NCBI+ \
+                  self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a></li>\n"
             result += "</ul>\n"
         if end_ul:
             result += "</ul>\n"
