@@ -17,6 +17,15 @@
 </ul>
 </div>
 
+<div id="error">
+<%
+if error:
+%>
+    <%|%>
+    <center><font color="red"> <%$ error %> </font></center>
+<%|%>
+</div>
+
 <div class="body" id="body">
     <fieldset>
         <legend> Your collection file in newick format </legend>

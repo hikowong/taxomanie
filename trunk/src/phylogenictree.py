@@ -1,5 +1,6 @@
 from referencetree import ReferenceTree
-from lib.phylogelib import getTaxa, getBrothers, getChildren, tidyNwk
+from lib.phylogelib import getTaxa, getBrothers, \
+    getChildren, tidyNwk, removeBootStraps
 
 class PhylogenicTree( object ):
     """
@@ -21,7 +22,7 @@ class PhylogenicTree( object ):
                 PhylogenicTree.ref_tree = ReferenceTree()
             else:
                 PhylogenicTree.ref_tree = reference
-        self.nwk = tidyNwk(nwk.lower())
+        self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
         self.hasparents = None
         self.root = "root"
         self._getArborescence()

@@ -24,23 +24,24 @@ class Taxomanie(object):
         self.named_tree = {}
         self.path = "templates/"
 
-    def _presentation( self, file_name ):
+    def _presentation( self, file_name, error="" ):
         full_path = os.path.join( self.path, file_name )
         ext = os.path.splitext( file_name )[1]
-        if ext == ".pyhtml":
-            self.pleet.setTemplate( open(full_path).read() )
-            return self.pleet.render()
-        elif ext in ( ".html", ".htm", ".xhtml" ) :
-            return open( full_path ).read() 
-        else:
-            raise TypeError, "Wrong template type %s" % file_name
+#        if ext == ".pyhtml":
+        self.pleet.setTemplate( open(full_path).read() )
+        self.pleet["error"] = error
+        return self.pleet.render()
+#        elif ext in ( ".html", ".htm", ".xhtml" ) :
+#            return open( full_path ).read() 
+#        else:
+#            raise TypeError, "Wrong template type %s" % file_name
 
     @cherrypy.expose
     def css( self ):
         return open( "templates/site.css" ).read()
 
     @cherrypy.expose
-    def index( self ):
+    def index( self, error = "" ):
         return self._presentation( "index.html" )
     
     @cherrypy.expose
@@ -78,9 +79,9 @@ class Taxomanie(object):
             self.pleet["index"] = int(index)
             self.pleet["reference"] = self.reference
             self.pleet["named_tree"] = self.named_tree
-            return self._presentation( "check.pyhtml" )
+            return self._presentation( "check.html" )
         except IndexError:
-            return self.index()
+            return self._presentation( "index.html", error = "No Phylip or Nexus collection found")
 
         
     def download(self):
