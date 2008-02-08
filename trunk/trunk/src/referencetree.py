@@ -30,15 +30,17 @@ class ReferenceTree( NX.DiGraph ):
         @name: string
         @return: list
         """
-        if not self.parents.has_key( name ):
-            self.parents[name] = []
-            parent = self.predecessors( name )[0]
-            while parent != "root":
-                self.parents[name].append( parent )
-                parent = self.predecessors( parent )[0]
-            self.parents[name].append( "root" )
-            self.parents[name].reverse()
-        return self.parents[name]
+        if name != "root":
+            if not self.parents.has_key( name ):
+                self.parents[name] = []
+                parent = self.predecessors( name )[0]
+                while parent != "root":
+                    self.parents[name].append( parent )
+                    parent = self.predecessors( parent )[0]
+                self.parents[name].append( "root" )
+                self.parents[name].reverse()
+            return self.parents[name]
+        return []
 
     def getParent( self, name ):
         return self.predecessors( name )[0]
