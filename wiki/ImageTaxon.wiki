@@ -32,9 +32,8 @@ ou en css font very small
 = Details =
 
 * Root
-  * Mammals ^see^
-    * Homo Micro Plus ^see^
-    * Bosse a la tete ^see^
-  * Informaticiens ^see^
-    * Nico ^see^   
-
+  * Mammals ^+^
+    * Homo Micro Plus ^+^
+    * Bosse a la tete ^+^
+  * Informaticiens ^+^
+    * Nico ^+^   
