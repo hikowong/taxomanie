@@ -42,6 +42,14 @@ class PhylogenicTree( object ):
                 rel_dict[taxon] = related_name
         return rel_dict
 
+    def __getMissSpelledList( self, taxa_list ):
+        miss_spelled_list = []
+        for taxon in getTaxa( self.nwk ):
+            related_name = self.ref_tree.taxoref.correct( taxon )
+            if related_name:
+                miss_spelled_list.append( taxon ) 
+        return miss_spelled_list
+
     def getCommonParent( self, taxa_list ):
         """
         return the first common parent of taxa_list
@@ -49,21 +57,29 @@ class PhylogenicTree( object ):
         @taxa_list: list
         @return: string
         """
-        dict_parents = {}
-        parents_list1 = self.ref_tree.getParents( taxa_list[0] )
-        parents_list2 = self.ref_tree.getParents( taxa_list[1] )
-        all_common_parents = [parent for parent in parents_list1 if parent in parents_list2]
-        if len( taxa_list ) > 2:
-            for i in range( len( taxa_list) ):
-                for j in range(i, len( taxa_list ) ):
-                    if i == j or (i == 0 and j == 1):
-                        continue
-                    parents_list1 = self.ref_tree.getParents( taxa_list[i] )
-                    parents_list2 = self.ref_tree.getParents( taxa_list[j] )
-                    common_parents = [parent for parent in parents_list1 if parent in parents_list2]
-                    all_common_parents = [parent for parent in common_parents\
-                      if parent in (common_parents and all_common_parents)]
-        return all_common_parents[-1]
+        miss_spelled_list = self.__getMissSpelledList( taxa_list )
+        taxa_list = [taxon for taxon in taxa_list if taxon not in miss_spelled_list]
+        if len( taxa_list ) >= 2:
+            dict_parents = {}
+            parents_list1 = self.ref_tree.getParents( taxa_list[0] )
+            parents_list2 = self.ref_tree.getParents( taxa_list[1] )
+            all_common_parents = [parent for parent in parents_list1 if parent in parents_list2]
+            if len(taxa_list) > 2:
+                for i in range( len( taxa_list) ):
+                    for j in range(i, len( taxa_list ) ):
+                        if i == j or (i == 0 and j == 1):
+                            continue
+                        parents_list1 = self.ref_tree.getParents( taxa_list[i] )
+                        parents_list2 = self.ref_tree.getParents( taxa_list[j] )
+                        common_parents = [parent for parent in parents_list1 if parent in parents_list2]
+                        all_common_parents = [parent for parent in common_parents\
+                          if parent in (common_parents and all_common_parents)]
+            return all_common_parents[-1]
+        elif len( taxa_list ) == 1:
+            return self.ref_tree.getParents( taxa_list[0] )[-1]
+        else:
+            print "taxa_list", taxa_list
+            return "XXX"
 
     def _getArborescence( self, tree=None ):
         if tree is None:
@@ -76,6 +92,7 @@ class PhylogenicTree( object ):
             self.rel_name = {}
             self.miss_spelled = {}
             # Check all taxa name
+            """
             bad = False
             for taxon in getTaxa( self.nwk ):
                 related_name = self.ref_tree.taxoref.correct( taxon )
@@ -84,6 +101,7 @@ class PhylogenicTree( object ):
                     self.miss_spelled[taxon] = related_name
             if bad:
                 return
+            """
         if getChildren( tree ):
             if tree == self.nwk:
                 parent_name = self.root
@@ -108,49 +126,37 @@ class PhylogenicTree( object ):
                     self.tree.add_edge( parent_name, child_name )
                     self._getArborescence( tree = child )
                 else: # child is a taxon
+                    related_name = self.ref_tree.taxoref.correct( child )
+                    if related_name:
+                        child += "|XXX"
                     self.tree.add_edge( parent_name, child )
      
-    def display( self, target = "text" ):
+    def display( self ):
         """
-        @target (string): the target format (currently: text and html)
-        @return (string): the representation of the phylogenic tree in the
-            target format.
+        @return (string): the representation of the phylogenic tree
         """
         result = ""
         if self.miss_spelled:
-            return self.__displayMissSpelled( self.miss_spelled, target )
+            return self.__displayMissSpelled( self.miss_spelled )
         if not self.root:
             self.hasparents = False
             return result
         else:
             self.hasparents = True
-        if target == "text":
-            result += self.__displayTT()
-        elif target == "html":
-            result += self.__displayHTML()
-        else:
-            raise ValueError, "Unknow target %s" % target
+        result += self.__display()
         return result
 
     def __linkList( self, my_list ):
         """
         Link all taxon in list with html
         """
-        my_list = self.__purgeList( my_list )
+        my_list =  [ item for item in my_list if self.ref_tree.TAXONOMY.has_key( item ) ]
         return str( [
           "<a href='"+self.NCBI+self.ref_tree.TAXONOMY[item]["id"]+\
               "'>"+item+"</a>" \
           for item in my_list ] )
 
-    def __purgeList( self, my_list ):
-        """
-        Remove all non-scientific name in list
-
-        @return (list): the purged list
-        """
-        return [ item for item in my_list if self.ref_tree.TAXONOMY.has_key( item ) ]
-
-    def __displayMissSpelled( self, miss_spelled_dict, target ):
+    def __displayMissSpelled( self, miss_spelled_dict ):
         """
         @return (string): display all miss spelled taxon and show all
             propositions of correct name
@@ -158,42 +164,12 @@ class PhylogenicTree( object ):
         output = ""
         for i,j in miss_spelled_dict.iteritems():
             try:
-                if target == "html":
-                    output += "<li>"+i+" not found. Do you mean "+self.__linkList(j)+"</li>\n"
-                else:
-                    output += "* "+i+" not found. Do you mean "+\
-                      str( self.__purgeList( j ) )+"\n"
+                output += "<li>"+i+" not found. Do you mean "+self.__linkList(j)+"</li>\n"
             except KeyError:
                 pass
         return output
 
     def __display( self, root = "",  mydepth = 0 ):
-        """
-        Pretty print of the tree.
-
-        @root (string): parent name
-        @mydepth (int): depth in the tree
-        @return (string): the display in text format
-        """
-        result = ""
-        if not root:
-            root = self.root
-            result += root+"\n"
-            result += "|\n"
-        for node in self.tree.successors( root ):
-            depth = 0
-            while depth != mydepth :
-                result += "| "
-                depth += 1
-            subnodes = self.tree.successors( node )
-            if subnodes:
-                result += "+-"+node.split("|")[0].capitalize()+"\n"
-                result += self.__display( node, depth + 1)
-            else:
-                result += "+-["+node.capitalize()+"]\n"
-        return result
-
-    def __displayTT( self, root = "",  mydepth = 0 ):
         """
         Pretty print of the tree in HTML.
 
@@ -215,50 +191,18 @@ class PhylogenicTree( object ):
                 depth += 1
             subnodes = self.tree.successors( node )
             if subnodes:
-                result += "+-<a class='genre' href='"+self.NCBI+ \
-                  self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a><br />"
-                result += self.__displayTT( node, depth + 1)
+                if "XXX" in node:
+                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />"
+                else:
+                    result += "+-<a class='genre' href='"+self.NCBI+ \
+                      self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a><br />"
+                result += self.__display( node, depth + 1)
             else:
-                result += "+-<a class='species' href='"+self.NCBI+ \
-                  self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a><br />"
-        return result
-
-
-
-    def __displayHTML( self, root = "",  mydepth = 0 ):
-        """
-        Pretty print of the tree in HTML.
-
-        @root (string): parent name
-        @mydepth (int): depth in the tree
-        @return (string): the display in html format
-        """
-        result = ""
-        end_ul = False
-        if not root:
-            result += "<ul>\n"
-            end_ul = True
-            root = self.root
-            result += "<li><a class='genre' href='"+self.NCBI+ \
-              self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a></li>\n"
-        for node in self.tree.successors( root ):
-            dispnode = node.split("|")[0]
-            depth = 0
-            while depth != mydepth :
-                depth += 1
-            subnodes = self.tree.successors( node )
-            result += "<ul>\n"
-            if subnodes:
-                result += "<li><a class='genre' href='"+self.NCBI+ \
-                  self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a></li>\n"
-                result += self.__displayHTML( node, depth + 1)
-            else:
-                result += "<li><a class='species' href='"+self.NCBI+ \
-                  self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a></li>\n"
-            result += "</ul>\n"
-        if end_ul:
-            result += "</ul>\n"
-            end_ul = False
+                if "XXX" in node:
+                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />"
+                else:
+                    result += "+-<a class='species' href='"+self.NCBI+ \
+                      self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a><br />"
         return result
 
     def __removeSingleParent( self, tree ):

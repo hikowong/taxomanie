@@ -52,11 +52,11 @@ if len(_collection_) > 1:
 tree = _collection_[_index_-1]
 if tree:
     htmltree = ""
-    try:
+    if 1:#try:
         htmltree += "<center><h3>"+str(tree["name"])+"</h3></center><hr />"
-        htmltree += tree["tree"].display( target = _target_ )
+        htmltree += tree["tree"].display()
         htmltree += "<hr />"
-    except:
+    else:#except:
 %>
         <%|%>
 <div id="error">
@@ -72,51 +72,15 @@ The sidebar
 #%>
 
 <div id="sidebar">
-<b> Options </b>
-<ul>
-<li>
-<%
-if _target_ == "html":
-%>
-    <%|%>
-<a href='check?index=<%$ _index_ %>&target=text'>
-Printable version
-</a>
-<%
-else:
-%>
-    <%|%>
-<a href='check?index=<%$ _index_ %>&target=html'>
-Html version
-</a>
-<%|%>
-
-</li>
-</ul>
-
-<br />
-
 <b>Menu</b>
 <ul>
 <li><a href="."> Test another collection </a></li>
 </ul>
 </div>
 
-<%
-if _target_ == "html":
-%>
-    <%|%>
-    <ul>
-    <%$ htmltree %>
-    </ul>
-<%
-else:
-%>
-    <%|%>
 <tt>
 <%$ htmltree %>
 </tt>
-<%|%>
 
 </body> </html>
 
