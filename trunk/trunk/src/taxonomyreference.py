@@ -63,7 +63,7 @@ class TaxonomyReference( object ):
         """
         return name.lower() in self.TAXONOMY.iterkeys()
 
-    def correct( self, name ):
+    def correct( self, name, guess = False ):
         """
         - Check if name is a scientific name
         - Check if name is a synonym
@@ -76,6 +76,7 @@ class TaxonomyReference( object ):
         if self.isValid( name ):
             return []
         else:
+#            return [0]
             synonym_list = self.getNameFromSynonym( name )
             if synonym_list:
                 return synonym_list
@@ -83,10 +84,12 @@ class TaxonomyReference( object ):
                 common_list = self.getNameFromCommon( name )
                 if common_list:
                     return common_list
-                else:
+                elif guess:
                     from lib.spellcheck import SpellCheck
                     splchk = SpellCheck( self.TAXONOMY.iterkeys() )
                     return splchk.correct( name )
+                else:
+                    return [0]
 
         
 if __name__ == "__main__":

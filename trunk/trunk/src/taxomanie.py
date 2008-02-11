@@ -23,19 +23,6 @@ class Taxomanie( Taxobject ):
             Taxomanie.reference = ReferenceTree()
         self.collection = []
         self.named_tree = {}
-        self.path = "templates/"
-
-#    def _presentation( self, file_name, error="" ):
-#        full_path = os.path.join( self.path, file_name )
-#        ext = os.path.splitext( file_name )[1]
-##        if ext == ".pyhtml":
-#        self.pleet.setTemplate( open(full_path).read() )
-#        self.pleet["error"] = error
-#        return self.pleet.render()
-##        elif ext in ( ".html", ".htm", ".xhtml" ) :
-##            return open( full_path ).read() 
-#        else:
-#            raise TypeError, "Wrong template type %s" % file_name
 
     @cherrypy.expose
     def css( self ):
@@ -48,7 +35,7 @@ class Taxomanie( Taxobject ):
     @cherrypy.expose
     def check( self, myFile=None, index=1, target="text" ):
         # return PhylogenicTree( myFile, self.reference ).display("html")
-        try:
+        if 1:#try:
             if myFile is not None:
                 self.named_tree = {}
                 self.collection = []
@@ -64,16 +51,16 @@ class Taxomanie( Taxobject ):
                             break
                         size += len(recv)
                 input = input.strip()
-                try:
+                if 1:#try:
                     self.collection = TreeCollection( input, self.reference )
-                except ValueError, e:
+                else:#except ValueError, e:
                     return self._presentation( "index.html", msg = e)
             print self.collection.collection
             self._pleet["_collection_"] = self.collection.collection
             self._pleet["_target_"] = target.strip()
             self._pleet["_index_"] = int(index)
             return self._presentation( "check.html" )
-        except IndexError:
+        else:#except IndexError:
             return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")
 
         
