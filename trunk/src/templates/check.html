@@ -20,27 +20,27 @@ Navigation buttons beetween trees
 <td>
 
 <%
-if len(collection) > 1:
-    if index > 1:
+if len(_collection_) > 1:
+    if _index_ > 1:
 %>
         <%|%>
-        <a href='check?index=<%$ index-1 %>'> Previous </a>
+        <a href='check?index=<%$ _index_-1 %>'> Previous </a>
     <%|%>
 
     </td>
     <form>
     <td>
-    <input type="text" size="1" value="<%$ index %>" name="index"> </input>
-    /<%$ len(collection) %>
+    <input type="text" size="1" value="<%$ _index_ %>" name="index"> </input>
+    /<%$ len(_collection_) %>
     </td>
     </form>
     <td>
 
 <%
-    if index < len(collection):
+    if _index_ < len(_collection_):
 %>
         <%|%>
-        <a href='check?index=<%$ index+1 %>'> Next </a>
+        <a href='check?index=<%$ _index_+1 %>'> Next </a>
 <%|%>
 </td>
 </tr>
@@ -49,15 +49,12 @@ if len(collection) > 1:
 <hr />
 
 <%
-from phylogenictree import PhylogenicTree
-tree = collection[index-1]
+tree = _collection_[_index_-1]
 if tree:
     htmltree = ""
     try:
-        mytree = PhylogenicTree( tree, reference )
-        if named_tree:
-            htmltree += "<center><h3>"+named_tree[tree]+"</h3></center><hr />"
-        htmltree += mytree.display( target = target )
+        htmltree += "<center><h3>"+str(tree["name"])+"</h3></center><hr />"
+        htmltree += tree["tree"].display( target = _target_ )
         htmltree += "<hr />"
     except:
 %>
@@ -79,17 +76,17 @@ The sidebar
 <ul>
 <li>
 <%
-if target == "html":
+if _target_ == "html":
 %>
     <%|%>
-<a href='check?index=<%$ index %>&target=text'>
+<a href='check?index=<%$ _index_ %>&target=text'>
 Printable version
 </a>
 <%
 else:
 %>
     <%|%>
-<a href='check?index=<%$ index %>&target=html'>
+<a href='check?index=<%$ _index_ %>&target=html'>
 Html version
 </a>
 <%|%>
@@ -106,7 +103,7 @@ Html version
 </div>
 
 <%
-if target == "html":
+if _target_ == "html":
 %>
     <%|%>
     <ul>
@@ -116,9 +113,9 @@ if target == "html":
 else:
 %>
     <%|%>
-<pre>
+<tt>
 <%$ htmltree %>
-</pre>
+</tt>
 <%|%>
 
 </body> </html>
