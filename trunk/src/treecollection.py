@@ -65,23 +65,31 @@ class TreeCollection( Taxobject ):
                 if pattern[0] not in ["=", "<", ">"]:
                     index = 0
                     for taxon in tree["tree"].tree.nodes():
-                        taxon = taxon.split("|")[0]
-                        if pattern in tree["tree"].ref_tree.getParents( taxon ):
-                            index += 1
+                        if "XXX" not in taxon:
+                            taxon = taxon.split("|")[0]
+                            if pattern in tree["tree"].ref_tree.getParents( taxon ):
+                                index += 1
                     a.append( "len("+str(range( index ))+")" )
                 else:
                     a.append( pattern )
-            if eval( " ".join( a ) ):
-                new_list.append( tree["tree"] )
+            try:
+                if eval( " ".join( a ) ):
+                    new_list.append( tree )
+            except SyntaxError, e:
+                raise SyntaxError, "bad querry %s" % e
+                
         return new_list
 
 if __name__ == "__main__":
+    from referencetree import ReferenceTree
     col = """
 ((rattus, mus), homo);
-((homo, mus), (pan, rattus));
+((homo, mususus), (pan, rattus));
 (homo, (mus, pan));
 ((mus, rattus),pan);
 """
-    treecol = TreeCollection( col )
-    treecol.display()
-    print treecol.querry( "#murinae#>1" )
+    treecol = TreeCollection( col, ReferenceTree() )
+#    treecol.display()
+    for tree in treecol.collection:
+        print tree["tree"].tree.nodes()
+    print type(treecol.querry( " sdfs#murinae#>1" ))

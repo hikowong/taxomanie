@@ -181,8 +181,8 @@ class PhylogenicTree( object ):
         if not root:
             root = self.root
             result += "<a class='genre' href='"+self.NCBI+ \
-              self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />"
-            result += "|<br />"
+              self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
+            result += "|<br />\n"
         for node in self.tree.successors( root ):
             dispnode = node.split("|")[0]
             depth = 0
@@ -192,17 +192,29 @@ class PhylogenicTree( object ):
             subnodes = self.tree.successors( node )
             if subnodes:
                 if "XXX" in node:
-                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />"
+                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
                 else:
-                    result += "+-<a class='genre' href='"+self.NCBI+ \
-                      self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a><br />"
+                    result += """+-<a id="%s" class="genre" onmouseover="go('%s')"
+                      onmouseout="afficheDescURL('')" href="%s%s"> %s
+                      </a><br />\n""" % (
+                        self.ref_tree.TAXONOMY[dispnode]["id"],
+                        dispnode.capitalize(),
+                        self.NCBI,
+                        self.ref_tree.TAXONOMY[dispnode]["id"],
+                        dispnode.capitalize() )
                 result += self.__display( node, depth + 1)
             else:
                 if "XXX" in node:
-                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />"
+                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
                 else:
-                    result += "+-<a class='species' href='"+self.NCBI+ \
-                      self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a><br />"
+                    result += """+-<a id="%s" class="species" onmouseover="go('%s')"
+                      onmouseout="afficheDescURL('')" href="%s%s"> %s
+                      </a><br />\n""" % (
+                        self.ref_tree.TAXONOMY[dispnode]["id"],
+                        dispnode.capitalize(),
+                        self.NCBI,
+                        self.ref_tree.TAXONOMY[dispnode]["id"],
+                        dispnode.capitalize() )
         return result
 
     def __removeSingleParent( self, tree ):

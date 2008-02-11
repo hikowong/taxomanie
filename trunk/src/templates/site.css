@@ -88,6 +88,17 @@ a:hover.genre span, a:hover.species span {
   padding:2px 4px;
 }
 
+#preview { 
+  position:absolute; 
+  z-index:3; 
+  top:8px; 
+  right:0px; 
+  text-align:left; 
+  border-style:solid;
+  border-width:thin; 
+  background:lightgrey;
+}
+
 /* That nice green background on some words and code samples */
 code
     {
