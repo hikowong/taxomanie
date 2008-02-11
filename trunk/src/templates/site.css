@@ -13,115 +13,136 @@
 /***************************** GLOBAL **************************** 
 / Here are the global rules, used everywhere on the page. */
 body
-	{
-	background-color: white;
-	color		: #444;
-	margin		: 0;
-	padding		: 0;
-	font-family	: sans-serif;
-	overflow	: scroll;  /* Avoids dancing menu */
-	overflow-x	: auto; /* IE: horizontal bar is sooo large */
-	}
+    {
+    background-color: white;
+    color        : #444;
+    margin        : 0;
+    padding        : 0;
+    font-family    : sans-serif;
+    overflow    : scroll;  /* Avoids dancing menu */
+    overflow-x    : auto; /* IE: horizontal bar is sooo large */
+    }
 
 /* Links are underlined only when the cursor is over them */
 a
-	{
-	text-decoration	: none;
-	}
+    {
+    text-decoration    : none;
+    }
 a.species:link
     {
-	color		: darkblue;
-	font-weight	: bold;
+    color        : darkblue;
+    font-weight    : bold;
     }
 
 a.species:visited
-	{
-	color		: darkblue;
-	font-weight	: bold;
-	}
+    {
+    color        : darkblue;
+    font-weight    : bold;
+    }
 
 a.genre:link
     {
-	color		: #66f;
+    color        : #66f;
     }
 
 a.genre:visited
-	{
-	color		: #66f;
-	}
+    {
+    color        : #66f;
+    }
 
 
 a:link
-	{
-	color		: blue;
-	font-weight	: bold;
-	}
+    {
+    color        : blue;
+    font-weight    : bold;
+    }
 a:hover
-	{
-	text-decoration	: underline;
-	}
+    {
+    text-decoration    : underline;
+    }
 
 a:visited
-	{
-	color		: #66f;
-	font-weight	: bold;
-	}
+    {
+    color        : #66f;
+    font-weight    : bold;
+    }
+
+a.genre, a.species {
+  position:relative;
+  border-bottom:1px dashed #808080;
+  text-decoration: none;
+}
+a:hover.genre, a:hover.species {
+  text-decoration: none;
+  background: none;
+}
+a.genre span, a.species span {display: none;}
+
+a:hover.genre span, a:hover.species span {
+  display: inline;
+  position: absolute; 
+  top: -20px;
+  left: 10px;
+  z-index: 20;
+  width:100%;
+  padding:2px 4px;
+}
 
 /* That nice green background on some words and code samples */
 code
-	{
-	background-color: #eee;
-	border		: 1px dotted #ddd;
-	}
+    {
+    background-color: #eee;
+    border        : 1px dotted #ddd;
+    }
 pre
-	{
-	background-color: #eee;
-	margin-left	: 3em;
-	margin-right	: 2em;
-	padding		: 8px;
-	border		: 1px outset gray;
-	}
+    {
+    background-color: #eee;
+    margin-left    : 3em;
+    margin-right    : 2em;
+    padding        : 8px;
+    border        : 1px outset gray;
+    }
 
 /* Tables are used by: docs, sample */
 table
-	{
-	font-size	: 100%; /* Needed to inherit the body font size*/
-	border-color	: #ccc;
-	}
+    {
+    font-size    : 100%; /* Needed to inherit the body font size*/
+    border-color    : #ccc;
+    }
 th
-	{
-	background-color: #ddd;
-	padding		: .5em 0;
-	border-color	: #ccc;
-	border-style	: solid;
-	}
+    {
+    background-color: #ddd;
+    padding        : .5em 0;
+    border-color    : #ccc;
+    border-style    : solid;
+    }
 td
-	{
-	border-style	: none;
-	padding		: .2em .5em;
-	}
+    {
+    border-style    : none;
+    padding        : .2em .5em;
+    }
 
 form
-	{
-	margin-bottom	: 2em;
-	}
+    {
+    margin-bottom    : 2em;
+    }
 
 /* Mark the tooltip'ed texts (underline and highlight) */
 span.tooltip
-	{
-	border-bottom	: 1px dashed #444;
-	}
+    {
+    border-bottom    : 1px dashed #444;
+    }
 span.tooltip:hover
-	{
-	background-color: #cf9;
-	}
+    {
+    background-color: #cf9;
+    }
 a.donate
-	{
-	font-size	: smaller;
-	text-align	: center;
-	margin		: 0;
-	padding		: 0;
-	}
+    {
+    font-size    : smaller;
+    text-align    : center;
+    margin        : 0;
+    padding        : 0;
+    }
 
 /***************************** HEADERS **************************** 
 / Remember that headers are the first three lines of the source file.
@@ -133,20 +154,20 @@ a.donate
 */
 
 #header
-	{
-	background	: #6c6 url(img/t2tgems.png) no-repeat right;
-	color		: white;
-	margin		: 0;
-	padding		: 1em;
-	}
+    {
+    background    : #6c6 url(img/t2tgems.png) no-repeat right;
+    color        : white;
+    margin        : 0;
+    padding        : 1em;
+    }
 #header *
-	{
-	margin		: 0;
-	}
+    {
+    margin        : 0;
+    }
 #header h3
-	{
-	font-weight	: normal;
-	}
+    {
+    font-weight    : normal;
+    }
 
 
 /***************************** CONTENT **************************** 
@@ -161,33 +182,33 @@ a.donate
 */
 
 #body
-	{
-	margin		: 0;
-	padding		: 0 2em 2em 2em;
-	border-top	: 1px solid #6c6; /* Required: Fixes spacing bug */
-	line-height	: 130%;
-	font-size	: 90%;
-	_font-size	: 80%; /* IE: Font becomes ugly with 90% */
-	}
+    {
+    margin        : 0;
+    padding        : 0 2em 2em 2em;
+    border-top    : 1px solid #6c6; /* Required: Fixes spacing bug */
+    line-height    : 130%;
+    font-size    : 90%;
+    _font-size    : 80%; /* IE: Font becomes ugly with 90% */
+    }
 
 /* Normal text is gray, bold is black */
 #body b
-	{
-	font-weight	: normal;
-	color		: black;
-	}
+    {
+    font-weight    : normal;
+    color        : black;
+    }
 
 #body h1
-	{
-	margin-top	: 1.5em;
-	}
+    {
+    margin-top    : 1.5em;
+    }
 #body h2
-	{
-	padding-top	: 1em;
-	color		: #999;
-	font-size	: 150%;
-	font-weight	: normal;
-	}
+    {
+    padding-top    : 1em;
+    color        : #999;
+    font-size    : 150%;
+    font-weight    : normal;
+    }
 
 
 /***************************** SIDEBAR **************************** 
@@ -211,60 +232,60 @@ a.donate
 */
 
 #sidebar
-	{
-	float		: right;
-	width		: 11.5em;
+    {
+    float        : right;
+    width        : 11.5em;
     height     :  50%;
-	background-color: #cf9;
-	color		: #030;
-	border-color	: #fff;
-	border-style	: solid;
-	border-width	: 0 0 1px 1px;
-	margin		: 0 0em 1em 2em;
-	padding		: 1em;
-	z-index		: 1;
-	/* IE: Box model strikes again */
+    background-color: #cf9;
+    color        : #030;
+    border-color    : #fff;
+    border-style    : solid;
+    border-width    : 0 0 1px 1px;
+    margin        : 0 0em 1em 2em;
+    padding        : 1em;
+    z-index        : 1;
+    /* IE: Box model strikes again */
     _height     :  50%;
-	_width		: 11.5em;
-	_margin		: 0 -1em 0 2em;
-	}
+    _width        : 11.5em;
+    _margin        : 0 -1em 0 2em;
+    }
 #sidebar a
-	{
-	display		: block;
-	color		: #363;
-	font-weight	: normal;
-	}
+    {
+    display        : block;
+    color        : #363;
+    font-weight    : normal;
+    }
 #sidebar a:hover
-	{
-	background-color: #ad7;
-	}
+    {
+    background-color: #ad7;
+    }
 #sidebar ul {
-	margin		: 0 0 0 1em;
-	padding		: 0;
+    margin        : 0 0 0 1em;
+    padding        : 0;
 }
 #sidebar ul li {
-	list-style-type	: none;
-	_border		: 1px solid #cf9;  /* IE: fixes spaced items bug */
+    list-style-type    : none;
+    _border        : 1px solid #cf9;  /* IE: fixes spaced items bug */
 }
 #sidebar p
-	{
-	margin		: 0;
-	}
+    {
+    margin        : 0;
+    }
 #sidebar img
-	{
-	display		: block;
-	margin		: 1em auto 0 auto;
-	_text-align	: center; /* IE: margin:auto didn't work */
-	}
+    {
+    display        : block;
+    margin        : 1em auto 0 auto;
+    _text-align    : center; /* IE: margin:auto didn't work */
+    }
 
 /* A special link with the lang ID, placed at the top/right edge */
 #sidebar a#lang
-	{
-	float		: right;
-	margin		: -1em -1em 0 0;
-	_margin-right	: -.5em; /* IE: well... */
-	font-size	: 80%;
-	}
+    {
+    float        : right;
+    margin        : -1em -1em 0 0;
+    _margin-right    : -.5em; /* IE: well... */
+    font-size    : 80%;
+    }
 
 
 
@@ -274,32 +295,32 @@ a.donate
 */
 
 #footer
-	{
-	margin		: 3em 0 0 0;
-	padding		: .3em;
-	border-top	: 1px solid #ccc;
-	font-style	: italic;
-	_font-style	: normal; /* IE: Italic is ugly */
-	font-size	: 80%;
-	}
+    {
+    margin        : 3em 0 0 0;
+    padding        : .3em;
+    border-top    : 1px solid #ccc;
+    font-style    : italic;
+    _font-style    : normal; /* IE: Italic is ugly */
+    font-size    : 80%;
+    }
 #footer p
-	{
-	padding		: 0;
-	margin		: 0;
-	}
+    {
+    padding        : 0;
+    margin        : 0;
+    }
 #footer a
-	{
-	font-weight	: normal;
-	}
+    {
+    font-weight    : normal;
+    }
 #footer #validate
-	{
-	float		: right;
-	}
+    {
+    float        : right;
+    }
 #footer img
-	{
-	float		: right;
-	margin-left	: 5px;
-	}
+    {
+    float        : right;
+    margin-left    : 5px;
+    }
 
 /******* Current menu item detection
 /
@@ -334,9 +355,9 @@ body#comments #sidebar li#menucomments,
 body#team #sidebar li#menuteam,
 body#ml #sidebar li#menuml,
 body#art #sidebar li#menuart
-	{
-	list-style-type	: square;
-	}
+    {
+    list-style-type    : square;
+    }
 
 
 /************************** PAGE SPECIFIC ************************* 
@@ -347,194 +368,194 @@ body#art #sidebar li#menuart
 
 /* Old News: headlines are bigger and dates are tiny */
 body#oldnews dt
-	{
-	margin-top	: 2em;
-	font-size	: 150%;
-	color		: #999;
-	}
+    {
+    margin-top    : 2em;
+    font-size    : 150%;
+    color        : #999;
+    }
 body#oldnews dt i
-	{
-	font-size	: 60%;
-	color		: #aaa;
-	}
+    {
+    font-size    : 60%;
+    color        : #aaa;
+    }
 
 /* Highlight news about releases */
 body#oldnews dd.release
-	{
-	background-color: #eee;
-	border		: 1px solid #ddd;
-	color		: #333;
-	}
+    {
+    background-color: #eee;
+    border        : 1px solid #ddd;
+    color        : #333;
+    }
 
 /* Underline is used to mark people names on the Old News */
 body#oldnews dd u
-	{
-	background-color: #eee;
-	border		: 1px dotted #ddd;
-	text-decoration	: none;
-	}
+    {
+    background-color: #eee;
+    border        : 1px dotted #ddd;
+    text-decoration    : none;
+    }
 
 /* Make the flags table smaller, to fit page width */
 body#docs td
-	{
-	padding		: 0;
-	}
+    {
+    padding        : 0;
+    }
 
 /* Flags are links, make it clear */
 body#docs td img
-	{
-	border		: 1px solid blue;
-	}
+    {
+    border        : 1px solid blue;
+    }
 
 /* Highlight the important parts of source code */
 body#new-target pre b
-	{
-	color:red;
-	}
+    {
+    color:red;
+    }
 
 /* Avoid pre blocks over sidebar */
 body#sample pre,
 body#tips pre
-	{
-	margin-right	: 12em;
-	}
+    {
+    margin-right    : 12em;
+    }
 
 /* Increase the contrast to make it more readable */
 body#shots h2, body#art h2
-	{
-	color		: #666;
-	}
+    {
+    color        : #666;
+    }
 
 /* Tips page gets special formatting */
 body#tips #body h1
-	{
-	padding		: 2em 0 1em 0;
-	}
+    {
+    padding        : 2em 0 1em 0;
+    }
 body#tips #body h2
-	{
-	color		: #000;
-	font-weight	: bold;
-	border-top	: 1px solid #ccc;
-	padding-top	: 1.5em;
-	padding-bottom	: 1em;
-	margin-top	: 1.5em;
-	}
+    {
+    color        : #000;
+    font-weight    : bold;
+    border-top    : 1px solid #ccc;
+    padding-top    : 1.5em;
+    padding-bottom    : 1em;
+    margin-top    : 1.5em;
+    }
 body#tips .toc
-	{
-	margin-top	: 2.5em;
-	line-height	: 1.7em;
-	}
+    {
+    margin-top    : 2.5em;
+    line-height    : 1.7em;
+    }
 
 /* Highlight the catchy terms */
 body#features li b
-	{
-	background-color: #cf9;
-	color		: #444;
-	}
+    {
+    background-color: #cf9;
+    color        : #444;
+    }
 
 /* Highlight the "thanks" messages */
 body#download li em,
 body#changelog li em
-	{
-	color		: #6c6;
-	font-size	: 80%;
-	}
+    {
+    color        : #6c6;
+    font-size    : 80%;
+    }
 
 /* Back to normal bold */
 body#download li b
-	{
-	font-weight	: bold;
-	color		: #444;
-	}
+    {
+    font-weight    : bold;
+    color        : #444;
+    }
 
 /* The sources are preferred */
 body#download a.sources
-	{
-	font-size	: 140%;
-	}
+    {
+    font-size    : 140%;
+    }
 
 /* Markup table is tricky, make it smaller and pretty */
 body#markup table
-	{
-	clear		: right;
-	border-spacing	: 0;
-	}
+    {
+    clear        : right;
+    border-spacing    : 0;
+    }
 body#markup table td
-	{
-	padding		: 2em 0;
-	border-bottom	: 1px solid #ccc;
-	}
+    {
+    padding        : 2em 0;
+    border-bottom    : 1px solid #ccc;
+    }
 body#markup table td h1,
 body#markup table td h2,
 body#markup table td h3
-	{
-	margin		: 0;
-	padding		: 0;
-	}
+    {
+    margin        : 0;
+    padding        : 0;
+    }
 body#markup table td pre
-	{
-	margin		: 0 1.5em 0 0;
-	padding		: 0 .5em 1em .5em;
-	}
+    {
+    margin        : 0 1.5em 0 0;
+    padding        : 0 .5em 1em .5em;
+    }
 body#markup table td dt
-	{
-	font-style	: italic;
-	}
+    {
+    font-style    : italic;
+    }
 body#markup table td table td
-	{
-	border		: 1px solid #ccc;
-	padding		: .5em;
-	}
+    {
+    border        : 1px solid #ccc;
+    padding        : .5em;
+    }
 
 /* The nice testimonials box */
 #testimonials
-	{
-	clear		: right;
-	float		: right;
-	width		: 18em;
-	margin		: 2em 0 0 2em;
-	padding		: 1em;
-	font-family	: serif;
-	color		: #222;
-	/* Tried outset, but the colors change on Opera */
-	border-top	: 1px solid #ccc;
-	border-left	: 1px solid #ccc;
-	border-right	: 2px solid #999;
-	border-bottom	: 2px solid #999;
-	}
+    {
+    clear        : right;
+    float        : right;
+    width        : 18em;
+    margin        : 2em 0 0 2em;
+    padding        : 1em;
+    font-family    : serif;
+    color        : #222;
+    /* Tried outset, but the colors change on Opera */
+    border-top    : 1px solid #ccc;
+    border-left    : 1px solid #ccc;
+    border-right    : 2px solid #999;
+    border-bottom    : 2px solid #999;
+    }
 /* Brighten the names to improve comments readability */
 #testimonials .name
-	{
-	color		: #999;
-	}
+    {
+    color        : #999;
+    }
 
 #donate .ballon
-	{
-	background	: #eee url(img/aurelio.jpg) no-repeat bottom left;
-	padding		: 2em 82px 1em 82px;
-	margin		: 3em 0 2em 1em;
-	width		: 20em;
-	border		: 5px solid #555;
-	}
+    {
+    background    : #eee url(img/aurelio.jpg) no-repeat bottom left;
+    padding        : 2em 82px 1em 82px;
+    margin        : 3em 0 2em 1em;
+    width        : 20em;
+    border        : 5px solid #555;
+    }
 #donate .ballon p
-	{
-	font-family	: skia, sans-serif;
-	text-align	: center;
-	line-height	: 140%;
-	}
+    {
+    font-family    : skia, sans-serif;
+    text-align    : center;
+    line-height    : 140%;
+    }
 #donate .ballon p:hover
-	{
-	color		: black;
-	}
+    {
+    color        : black;
+    }
 
 /* Splash download button */
 body#home img.splashimg
-	{
-	display		: block;
-	margin		: 4em auto;
-	text-align	: center;
-	}
+    {
+    display        : block;
+    margin        : 4em auto;
+    text-align    : center;
+    }
 body#home a:hover img
-	{
-	outline		: 2px dashed #09f;
-	}
+    {
+    outline        : 2px dashed #09f;
+    }
