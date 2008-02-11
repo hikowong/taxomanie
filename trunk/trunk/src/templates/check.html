@@ -3,11 +3,32 @@
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="css">
 <title> Taxonamie </title>
+<script type="text/javascript" src="taxomanie.js"> </script>
+
 
 <body>
 <div class="header" id="header">
 <h1 align="center"> TAXOMANIE </h1>
 <h3 align="center"> Your Collection </h3>
+</div>
+
+<form action="check">
+<center>
+Your querry : <input type="text" name="querry"> <input type="submit">
+</center>
+</form>
+<hr />
+
+
+<%#
+The sidebar
+#%>
+
+<div id="sidebar">
+<b>Menu</b>
+<ul>
+<li><a href="."> Test another collection </a></li>
+</ul>
 </div>
 
 <%#
@@ -28,9 +49,9 @@ if len(_collection_) > 1:
     <%|%>
 
     </td>
-    <form>
+    <form action="check">
     <td>
-    <input type="text" size="1" value="<%$ _index_ %>" name="index"> </input>
+    <input type="text" size="5" value="<%$ _index_ %>" name="index"> </input>
     /<%$ len(_collection_) %>
     </td>
     </form>
@@ -46,16 +67,15 @@ if len(_collection_) > 1:
 </tr>
 </table>
 </center>
-<hr />
+
 
 <%
 tree = _collection_[_index_-1]
 if tree:
     htmltree = ""
     if 1:#try:
-        htmltree += "<center><h3>"+str(tree["name"])+"</h3></center><hr />"
+        htmltree += "<center><h3>"+str(tree["name"])+"</h3></center>"
         htmltree += tree["tree"].display()
-        htmltree += "<hr />"
     else:#except:
 %>
         <%|%>
@@ -67,20 +87,14 @@ if tree:
     <%|%>
 
 
-<%#
-The sidebar
-#%>
 
-<div id="sidebar">
-<b>Menu</b>
-<ul>
-<li><a href="."> Test another collection </a></li>
-</ul>
-</div>
-
+<hr />
 <tt>
 <%$ htmltree %>
 </tt>
+<hr />
+<div id="preview"> </div>
+
 
 </body> </html>
 
