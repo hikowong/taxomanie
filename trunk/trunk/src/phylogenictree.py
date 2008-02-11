@@ -125,7 +125,7 @@ class PhylogenicTree( object ):
         else:
             self.hasparents = True
         if target == "text":
-            result += self.__display()
+            result += self.__displayTT()
         elif target == "html":
             result += self.__displayHTML()
         else:
@@ -192,6 +192,38 @@ class PhylogenicTree( object ):
             else:
                 result += "+-["+node.capitalize()+"]\n"
         return result
+
+    def __displayTT( self, root = "",  mydepth = 0 ):
+        """
+        Pretty print of the tree in HTML.
+
+        @root (string): parent name
+        @mydepth (int): depth in the tree
+        @return (string): the display in html format
+        """
+        result = ""
+        if not root:
+            root = self.root
+            result += "<a class='genre' href='"+self.NCBI+ \
+              self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />"
+            result += "|<br />"
+        for node in self.tree.successors( root ):
+            dispnode = node.split("|")[0]
+            depth = 0
+            while depth != mydepth :
+                result += "| "
+                depth += 1
+            subnodes = self.tree.successors( node )
+            if subnodes:
+                result += "+-<a class='genre' href='"+self.NCBI+ \
+                  self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a><br />"
+                result += self.__displayTT( node, depth + 1)
+            else:
+                result += "+-<a class='species' href='"+self.NCBI+ \
+                  self.ref_tree.TAXONOMY[dispnode]["id"]+"'>"+dispnode.capitalize()+"</a><br />"
+        return result
+
+
 
     def __displayHTML( self, root = "",  mydepth = 0 ):
         """

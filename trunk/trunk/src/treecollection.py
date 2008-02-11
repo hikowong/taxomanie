@@ -1,7 +1,8 @@
 
 from phylogenictree import PhylogenicTree
+from taxobject import Taxobject
 
-class TreeCollection( object ):
+class TreeCollection( Taxobject ):
     """
     Manipulate phylogenic tree collection:
         - filtering
@@ -10,31 +11,35 @@ class TreeCollection( object ):
         ...
     """
     
-    def __init__( self, collection ):
+    def __init__( self, collection, reference ):
         """
         @collection (string): collection in phylip or nexus format
         """
+        #super( TreeCollection, self ).__init__()
+        self.reference = reference
+        self.collection = []
         # Nexus collection
         if collection[:6].lower() == "#nexus":
             for tree in collection.split(";")[1:-2]:
                 tree = tree.strip()
-                nwktree = tree.split("=")[1]
-                tree_name = tree.split("=")[0].split()[1]
-                self.collection.append( nwktree )
-                self.named_tree[nwktree] = tree_name
+                nwktree = tree.split("=")[1].strip()
+                tree_name = tree.split("=")[0].split()[1].strip()
+                self.collection.append( {
+                    "name": tree_name,
+                    "tree": PhylogenicTree(nwktree, self.reference)
+                  })
         # Phylip collection
         else:
-            self.collection = [col for col in collection.strip().split( ";" ) if col]
-            self.named_tree = range(1, len(self.collection)+1 )
-        self.phylogenictree_collection = [ PhylogenicTree( tree ) for tree in self.collection ]
-#        self.phylogenictree_collection = {}
-#        for tree in self.collection: 
-#           self.phylogenictree_collection = PhylogenicTree( tree ) 
-#
-    def display( self ):
-        for tree in self.phylogenictree_collection:
-            print tree.display()
-
+            index = 0
+            for nwktree in collection.strip().split(";"):
+                nwktree = nwktree.strip()
+                if nwktree:
+                    index += 1
+                    self.collection.append( {
+                      "name": index,
+                      "tree":PhylogenicTree(nwktree, self.reference)
+                    } )
+ 
     def __eval_querry( self, querry ):
         a = []
         for i in [i.strip() for i in querry.split("#") if i]:
@@ -54,21 +59,20 @@ class TreeCollection( object ):
         @new_list (list): the filtered collection
         """
         new_list = []
-        for tree in self.phylogenictree_collection:
+        for tree in self.collection:
             a = []
             for pattern  in [i.strip() for i in querry.split("#") if i]:
                 if pattern[0] not in ["=", "<", ">"]:
                     index = 0
-                    for taxon in tree.tree.nodes():
+                    for taxon in tree["tree"].tree.nodes():
                         taxon = taxon.split("|")[0]
-                        print "+++", taxon
-                        if pattern in tree.ref_tree.getParents( taxon ):
+                        if pattern in tree["tree"].ref_tree.getParents( taxon ):
                             index += 1
                     a.append( "len("+str(range( index ))+")" )
                 else:
                     a.append( pattern )
             if eval( " ".join( a ) ):
-                new_list.append( tree )
+                new_list.append( tree["tree"] )
         return new_list
 
 if __name__ == "__main__":
