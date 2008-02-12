@@ -11,7 +11,6 @@ from lib import phylogelib
 from phylogenictree import PhylogenicTree
 from treecollection import TreeCollection
 from taxobject import Taxobject 
-# from pleet.pleet import Pleet
 
 class Taxomanie( Taxobject ):
     
@@ -35,11 +34,12 @@ class Taxomanie( Taxobject ):
         return self._presentation( "index.html", msg )
     
     @cherrypy.expose
-    def check( self, myFile=None, index=1, querry=None ):
+    def check( self, myFile=None, index=1, query=None, clear_query=False ):
         # return PhylogenicTree( myFile, self.reference ).display("html")
         index = int( index )
         if 1:#try:
             if myFile is not None:
+                self.query = None
                 self.named_tree = {}
                 self.collection = []
                 if isinstance( myFile, str ):
@@ -58,19 +58,24 @@ class Taxomanie( Taxobject ):
                     self.collection = TreeCollection( input, self.reference )
                 else:#except ValueError, e:
                     return self._presentation( "index.html", msg = e)
-            if querry is not None:
+            if query:
+                self.query = query
+            if not clear_query:
                 try:
-                    self._pleet["_collection_"] = self.collection.querry( querry )
+                    self._pleet["_collection_"] = self.collection.query( self.query )
                 except:
                     self._pleet["_collection_"] = self.collection.collection
                     self._pleet["_msg_"] = "arf"
             else:
+                self.query = None
                 self._pleet["_collection_"] = self.collection.collection
             if index > len(self.collection.collection):
                 index = len(self.collection.collection)
             elif index < 1:
                 index = 1
             self._pleet["_index_"] = index
+            self._pleet["_query_"] = self.query
+            self._pleet["_clearquery_"] = clear_query
             return self._presentation( "check.html" )
         else:#except IndexError:
             return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")
@@ -90,7 +95,7 @@ class Taxomanie( Taxobject ):
                 self.conn.close()    
                 return """<img src="%s" />""" % url_img
         self.conn.close()    
-        return ""
+        return "Image not found"
         
     def download(self):
         path = os.path.join(absDir, "pdf_file.pdf")

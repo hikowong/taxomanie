@@ -54,11 +54,33 @@ function afficheDescURL(toThis){
 <h3 align="center"> Your Collection </h3>
 </div>
 
-<form action="check">
 <center>
-Your querry : <input type="text" name="querry"> <input type="submit">
-</center>
+<form action="check">
+<input size="60" type="text" value="
+<%
+if _query_:
+%>
+    <%|%>
+<%$ _query_ %>
+<%
+else:
+%>
+    <%|%>
+Your query
+<%|%>
+" name="query"> <input type="submit" value="Search">
 </form>
+<%
+if _query_:
+%>
+    <%|%>
+    <%$ _query_ %> <a href=check?clear_query=1> back </a>
+<%
+else:
+    _query_ = ""
+#
+%>
+</center>
 <hr />
 
 
@@ -112,32 +134,35 @@ if len(_collection_) > 1:
 
 
 <%
-tree = _collection_[_index_-1]
-if tree:
-    htmltree = ""
-    if 1:#try:
-        htmltree += "<center><h3>"+str(tree["name"])+"</h3></center>"
-        htmltree += tree["tree"].display()
-    else:#except:
+if len( _collection_ ) == 0:
 %>
-        <%|%>
-<div id="error">
-<center><font color="red"> An error occured with this tree : </font></center>
-<br />
-<%$ tree %>
-</div>
     <%|%>
+   <div class="info">  Empty collection </div>
+<%
+else:
+    tree = _collection_[_index_-1]
+    if tree:
+        htmltree = ""
+        if 1:#try:
+            htmltree += "<center><h3>"+str(tree["name"])+"</h3></center>"
+            htmltree += tree["tree"].display()
+        else:#except:
+%>
+            <%|%>
+            <div id="error">
+            <center><font color="red"> An error occured with this tree : </font></center>
+            <br />
+            <%$ tree %>
+            </div>
+        <%|%>
+    <hr />
+    <tt>
+    <%$ htmltree %>
+    </tt>
+    <hr />
 
-
-
-<hr />
-<tt>
-<%$ htmltree %>
-</tt>
-<hr />
-
-<div id="preview"> </div>
-
+    <div id="preview"> </div>
+<%|%>
 
 </body> </html>
 
