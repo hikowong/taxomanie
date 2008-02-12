@@ -33,9 +33,9 @@ function go(taxon){
 }
 function afficheDescURL(toThis){
     if (document.getElementById){
-        document.getElementById("preview").innerHTML = toThis;
+        document.getElementById('preview').innerHTML = toThis;
     }
     else if (document.all){
-        document.all["preview"].innerHTML = toThis;
+        document.all['preview'].innerHTML = toThis;
     }
 }
