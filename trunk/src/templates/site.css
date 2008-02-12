@@ -89,7 +89,7 @@ a:hover.genre span, a:hover.species span {
 }
 
 #preview { 
-  position:absolute; 
+  position:fixed; 
   z-index:3; 
   float:bottom;
 /*  top:8px; */
