@@ -88,7 +88,7 @@ class Taxomanie( Taxobject ):
             if "thumbinner" in line:
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
                 self.conn.close()    
-                return url_img
+                return """<img src="%s" />""" % url_img
         self.conn.close()    
         return ""
         
