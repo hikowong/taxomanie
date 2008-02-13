@@ -1,17 +1,13 @@
 import httplib
 
 conn = httplib.HTTP('www.info-ufr.univ-montp2.fr:3128')
-
 conn.putrequest('GET',"http://species.wikimedia.org/wiki/Pan")
-
 conn.putheader('Accept', 'text/html')
 conn.putheader('Accept', 'text/plain')
-
 
 conn.endheaders()
 
 errcode, errmsg, headers = conn.getreply()
-
 
 f=conn.getfile()
 
