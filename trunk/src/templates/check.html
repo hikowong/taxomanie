@@ -2,7 +2,7 @@
 
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="css">
-<title> Taxonamie </title>
+<title> Taxomanie </title>
 <script language="javascript" type="text/javascript">
 function getXhr(){
     var xhr = null; 
@@ -111,8 +111,8 @@ Navigation buttons beetween trees
 <%
 if len(_collection_) > 1:
     if _index_ > 1:
+        #
 %>
-        <%|%>
         <a href='check?index=<%$ _index_-1 %>'> Previous </a>
     <%|%>
 
@@ -127,8 +127,8 @@ if len(_collection_) > 1:
 
 <%
     if _index_ < len(_collection_):
+        #
 %>
-        <%|%>
         <a href='check?index=<%$ _index_+1 %>'> Next </a>
 <%|%>
 </td>
@@ -139,8 +139,8 @@ if len(_collection_) > 1:
 
 <%
 if len( _collection_ ) == 0:
+    #
 %>
-    <%|%>
    <div class="info">  Empty collection </div>
 <%
 else:
@@ -154,12 +154,12 @@ else:
                 _cache_[tree["name"]] = PhylogenicTree( tree["tree"], _reference_ ).display()
             htmltree += _cache_[tree["name"]]
         else:#except:
+            #
 %>
-            <%|%>
             <div id="error">
             <center><font color="red"> An error occured with this tree : </font></center>
             <br />
-            <%$ tree %>
+            <%$ tree["tree"] %>
             </div>
         <%|%>
     <hr />
@@ -170,6 +170,10 @@ else:
 
     <div id="preview"> </div>
 <%|%>
+
+<center>
+<a href="/downloadCollection?col=<%$ _collection_ %>"> Download the filtered collection </a>
+</center>
 
 </body> </html>
 

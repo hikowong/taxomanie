@@ -52,6 +52,10 @@ class TaxonomyReference( DiGraph ):
             parent = self.TAXONOMY[taxon]["parent"]
             self.add_edge( parent, taxon )
 
+    def stripTaxonName( self, taxon_name, delimiter="_" ):
+        new_name = " ".join( taxon_name.replace(delimiter," ").split()[:2] )
+        return new_name
+ 
     def getNameFromCommon( self, common_name ):
         """
         @return (list): all scientific names which is related with this common name
@@ -92,7 +96,6 @@ class TaxonomyReference( DiGraph ):
         if self.isValid( name ):
             return []
         else:
-#            return [0]
             synonym_list = self.getNameFromSynonym( name )
             if synonym_list:
                 return synonym_list
@@ -148,7 +151,7 @@ class TaxonomyReference( DiGraph ):
     def __getMissSpelledList( self, taxa_list ):
         miss_spelled_list = []
         for taxon in taxa_list:
-            related_name = self.correct( taxon )
+            related_name = self.correct( self.stripTaxonName(taxon) )
             if related_name:
                 miss_spelled_list.append( taxon ) 
         return miss_spelled_list
@@ -161,7 +164,7 @@ class TaxonomyReference( DiGraph ):
         @return: string
         """
         miss_spelled_list = self.__getMissSpelledList( taxa_list )
-        taxa_list = [taxon for taxon in taxa_list if taxon not in miss_spelled_list]
+        taxa_list = [self.stripTaxonName(taxon) for taxon in taxa_list if taxon not in miss_spelled_list]
         if len( taxa_list ) >= 2:
             dict_parents = {}
             parents_list1 = self.getParents( taxa_list[0] )
@@ -181,7 +184,6 @@ class TaxonomyReference( DiGraph ):
         elif len( taxa_list ) == 1:
             return self.getParents( taxa_list[0] )[-1]
         else:
-            print "taxa_list", taxa_list
             return "XXX"
 
     """

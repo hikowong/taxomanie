@@ -25,10 +25,10 @@ class PhylogenicTree( object ):
                 PhylogenicTree.ref_tree = reference
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
         checkNwk( self.nwk )
-        self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
+#        self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
         self.root = "root"
         self._getArborescence()
-
+        
     def _getArborescence( self, tree=None ):
         if tree is None:
             # Init attributes
@@ -39,17 +39,6 @@ class PhylogenicTree( object ):
             self.last_child = ""
             self.rel_name = {}
             self.miss_spelled = {}
-            # Check all taxa name
-            """
-            bad = False
-            for taxon in getTaxa( self.nwk ):
-                related_name = self.ref_tree.correct( taxon )
-                if related_name:
-                    bad = True
-                    self.miss_spelled[taxon] = related_name
-            if bad:
-                return
-            """
         if getChildren( tree ):
             if tree == self.nwk:
                 parent_name = self.root
@@ -74,8 +63,7 @@ class PhylogenicTree( object ):
                     self.tree.add_edge( parent_name, child_name )
                     self._getArborescence( tree = child )
                 else: # child is a taxon
-                    related_name = self.ref_tree.correct( child )
-                    if related_name:
+                    if not self.ref_tree.isValid( self.ref_tree.stripTaxonName(child) ):
                         child += "|XXX"
                     self.tree.add_edge( parent_name, child )
 
@@ -116,6 +104,7 @@ class PhylogenicTree( object ):
             result += "|<br />\n"
         for node in self.tree.successors( root ):
             dispnode = node.split("|")[0]
+            bdnode = self.ref_tree.stripTaxonName( dispnode )
             depth = 0
             while depth != mydepth :
                 result += "| "
@@ -128,10 +117,10 @@ class PhylogenicTree( object ):
                     result += """+-<a id="%s" class="genre" onmouseover="go('%s')"
                       onmouseout="afficheDescURL('')" href="%s%s"> %s
                       </a><br />\n""" % (
-                        self.ref_tree.TAXONOMY[dispnode]["id"],
-                        dispnode.capitalize(),
+                        self.ref_tree.TAXONOMY[bdnode]["id"],
+                        bdnode.capitalize(),
                         self.NCBI,
-                        self.ref_tree.TAXONOMY[dispnode]["id"],
+                        self.ref_tree.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
                 result += self.__display( node, depth + 1)
             else:
@@ -141,10 +130,10 @@ class PhylogenicTree( object ):
                     result += """+-<a id="%s" class="species" onmouseover="go('%s')"
                       onmouseout="afficheDescURL('')" href="%s%s"> %s
                       </a><br />\n""" % (
-                        self.ref_tree.TAXONOMY[dispnode]["id"],
-                        dispnode.capitalize(),
+                        self.ref_tree.TAXONOMY[bdnode]["id"],
+                        bdnode.capitalize(),
                         self.NCBI,
-                        self.ref_tree.TAXONOMY[dispnode]["id"],
+                        self.ref_tree.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
         return result
 

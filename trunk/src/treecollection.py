@@ -29,7 +29,6 @@ class TreeCollection( Taxobject ):
                 self.collection.append( {
                     "name": tree_name,
                     "tree": self.__tagBadTaxon(nwktree),
-                    #"tree": PhylogenicTree(nwktree, self.reference)
                   })
         # Phylip collection
         else:
@@ -41,7 +40,6 @@ class TreeCollection( Taxobject ):
                     self.collection.append( {
                       "name": index,
                       "tree": self.__tagBadTaxon(nwktree),
-                      #"tree":PhylogenicTree(nwktree, self.reference)
                     } )
 
     def __tagBadTaxon( self, nwk ):
