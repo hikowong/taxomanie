@@ -18,8 +18,8 @@ class Taxomanie( Taxobject ):
 
     def __init__( self ):
         if self.reference is None:
-            from referencetree import ReferenceTree
-            Taxomanie.reference = ReferenceTree()
+            from taxonomyreference import TaxonomyReference
+            Taxomanie.reference = TaxonomyReference()
             import httplib
             self.conn = httplib.HTTP('www.info-ufr.univ-montp2.fr:3128')
         self.collection = []
@@ -58,6 +58,7 @@ class Taxomanie( Taxobject ):
                     self.collection = TreeCollection( input, self.reference )
                 else:#except ValueError, e:
                     return self._presentation( "index.html", msg = e)
+            self._pleet["_msg_"] = ""
             if query:
                 self.query = query
             if not clear_query:
@@ -75,7 +76,10 @@ class Taxomanie( Taxobject ):
                 index = 1
             self._pleet["_index_"] = index
             self._pleet["_query_"] = self.query
+            print self.query
+            print self.collection.collection
             self._pleet["_clearquery_"] = clear_query
+            self._pleet["_reference_"] = self.reference
             return self._presentation( "check.html" )
         else:#except IndexError:
             return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")
