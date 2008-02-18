@@ -40,6 +40,7 @@ class Taxomanie( Taxobject ):
         if 1:#try:
             if myFile is not None:
                 self.query = None
+                self.cache = {}
                 self.named_tree = {}
                 self.collection = []
                 if isinstance( myFile, str ):
@@ -79,6 +80,7 @@ class Taxomanie( Taxobject ):
             print self.query
             print self.collection.collection
             self._pleet["_clearquery_"] = clear_query
+            self._pleet["_cache_"] = self.cache
             self._pleet["_reference_"] = self.reference
             return self._presentation( "check.html" )
         else:#except IndexError:
