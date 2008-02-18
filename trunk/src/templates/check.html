@@ -56,24 +56,28 @@ function afficheDescURL(toThis){
 
 <center>
 <form action="check">
-<input size="60" type="text" value="
+
+<input size=60  type=text 
+onfocus="if(this.value==\'Your query\'){this.value=\'\';}"
+onblur="if(this.value==\'\'){this.value=\'Your query\';}" 
 <%
 if _query_:
+    #
 %>
-    <%|%>
-<%$ _query_ %>
+value="<%$ _query_ %>"
 <%
 else:
+    #
 %>
-    <%|%>
-Your query
+value="Your query"
 <%|%>
-" name="query"> <input type="submit" value="Search">
+name="query"> 
+<input type="submit" value="Search">
 </form>
 <%
 if _query_:
+    #
 %>
-    <%|%>
     <%$ _query_ %> <a href=check?clear_query=1> back </a>
 <%
 else:
@@ -146,7 +150,9 @@ else:
         if 1:#try:
             from phylogenictree import PhylogenicTree
             htmltree += "<center><h3>"+str(tree["name"])+"</h3></center>"
-            htmltree += PhylogenicTree( tree["tree"], _reference_ ).display()
+            if not _cache_.has_key( tree["name"] ):
+                _cache_[tree["name"]] = PhylogenicTree( tree["tree"], _reference_ ).display()
+            htmltree += _cache_[tree["name"]]
         else:#except:
 %>
             <%|%>
