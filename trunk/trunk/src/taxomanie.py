@@ -12,16 +12,18 @@ from phylogenictree import PhylogenicTree
 from treecollection import TreeCollection
 from taxobject import Taxobject 
 
+import httplib
+
 class Taxomanie( Taxobject ):
     
     reference = None
 
     def __init__( self ):
         if self.reference is None:
-            from taxonomyreference import TaxonomyReference
-            Taxomanie.reference = TaxonomyReference()
-            import httplib
-            self.conn = httplib.HTTP('www.info-ufr.univ-montp2.fr:3128')
+            from referencetree import ReferenceTree
+            Taxomanie.reference = ReferenceTree()
+            #self.conn = httplib.HTTP('www.info-ufr.univ-montp2.fr:3128')
+
         self.collection = []
         self.named_tree = {}
 
@@ -34,14 +36,12 @@ class Taxomanie( Taxobject ):
         return self._presentation( "index.html", msg )
     
     @cherrypy.expose
-    def check( self, myFile=None, index=1, query=None, clear_query=False, delimit="" ):
+    def check( self, myFile=None, index=1, query=None, clear_query=False ):
         # return PhylogenicTree( myFile, self.reference ).display("html")
         index = int( index )
         if 1:#try:
             if myFile is not None:
                 self.query = None
-                self.col_query = []
-                self.cache = {}
                 self.named_tree = {}
                 self.collection = []
                 if isinstance( myFile, str ):
@@ -60,21 +60,17 @@ class Taxomanie( Taxobject ):
                     self.collection = TreeCollection( input, self.reference )
                 else:#except ValueError, e:
                     return self._presentation( "index.html", msg = e)
-            self._pleet["_msg_"] = ""
             if query:
                 self.query = query
             if not clear_query:
                 try:
-                    self.col_query = self.collection.query( self.query )
-                    self._pleet["_collection_"] = self.col_query
+                    self._pleet["_collection_"] = self.collection.query( self.query )
                 except:
-                    self.col_query = self.collection.collection
-                    self._pleet["_collection_"] = self.col_query
+                    self._pleet["_collection_"] = self.collection.collection
                     self._pleet["_msg_"] = "arf"
             else:
                 self.query = None
-                self.col_query = self.collection.collection
-                self._pleet["_collection_"] = self.col_query
+                self._pleet["_collection_"] = self.collection.collection
             if index > len(self.collection.collection):
                 index = len(self.collection.collection)
             elif index < 1:
@@ -82,45 +78,57 @@ class Taxomanie( Taxobject ):
             self._pleet["_index_"] = index
             self._pleet["_query_"] = self.query
             self._pleet["_clearquery_"] = clear_query
-            self._pleet["_cache_"] = self.cache
-            self._pleet["_reference_"] = self.reference
-            self._pleet["_delimit_"] = delimit
             return self._presentation( "check.html" )
         else:#except IndexError:
             return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")
 
     @cherrypy.expose
+#    def getImgUrl( self, taxon ):
+#        taxon = taxon.split()[0].strip().capitalize()
+#        self.conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
+#        self.conn.putheader('Accept', 'text/html')
+#        self.conn.putheader('Accept', 'text/plain')
+#        self.conn.endheaders()
+#        errcode, errmsg, headers = self.conn.getreply()
+#        f=self.conn.getfile()
+#        for line in f.readlines():
+#            if "thumbinner" in line:
+#                url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
+#                self.conn.close()    
+#                #return """<img src="%s" />""" % url_img
+#        self.conn.close()    
+#        return "Image not found"
+       
     def getImgUrl( self, taxon ):
         taxon = taxon.split()[0].strip().capitalize()
-        self.conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
-        self.conn.putheader('Accept', 'text/html')
-        self.conn.putheader('Accept', 'text/plain')
-        self.conn.endheaders()
-        errcode, errmsg, headers = self.conn.getreply()
-        f=self.conn.getfile()
-        for line in f.readlines():
+        self.conn = httplib.HTTPConnection("species.wikimedia.org")
+        self.conn.request("GET", "/wiki/"+taxon)
+        r1 = self.conn.getresponse()
+        f = r1.read()
+        for line in f.split("\n"):
             if "thumbinner" in line:
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
                 self.conn.close()    
                 return """<img src="%s" />""" % url_img
+
+        self.conn = httplib.HTTPConnection("en.wikipedia.org")
+        self.conn.request("GET", "/wiki/"+taxon)
+        r1 = self.conn.getresponse()
+        f = r1.read()
+        for line in f.split("\n"):
+            if "class=\"image\"" in line:
+                url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
+                self.conn.close()    
+                return """<img src="%s" />""" % url_img
+
         self.conn.close()    
         return "Image not found"
-        
-    @cherrypy.expose
-    def downloadCollection(self, col, target="nexus"):
-        cherrypy.response.headers['Content-Type'] = 'application/x-download'
-        if target == "nexus":
-            body = "#nexus\nbegin trees;\n"
-            for tree in self.col_query:
-                body += "%s = %s;\n" % (tree["name"], tree["tree"].replace("|XXX", ""))
-            body += "end;\n"
-        else:
-            body = ";\n".join( tree["tree"] for tree in self.col_query )
-        cherrypy.response.headers['Content-Length'] = len(body)
-        cherrypy.response.headers['Content-Disposition'] = \
-          'attachment; filename=filtered-collection.nwk'
-        cherrypy.response.body = body 
-        return cherrypy.response.body
+    
+    def download(self):
+        path = os.path.join(absDir, "pdf_file.pdf")
+        return static.serve_file(path, "application/x-download",
+                                 "attachment", os.path.basename(path))
+    download.exposed = True
 
     @cherrypy.expose
     def about( self ):
