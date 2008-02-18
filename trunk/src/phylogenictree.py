@@ -1,4 +1,5 @@
-from referencetree import ReferenceTree
+
+from taxonomyreference import TaxonomyReference
 from lib.phylogelib import getTaxa, getBrothers, \
     getChildren, tidyNwk, removeBootStraps, checkNwk
 
@@ -19,67 +20,14 @@ class PhylogenicTree( object ):
         """
         if self.ref_tree is None:
             if reference is None:
-                PhylogenicTree.ref_tree = ReferenceTree()
+                PhylogenicTree.ref_tree = TaxonomyReference()
             else:
                 PhylogenicTree.ref_tree = reference
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
         checkNwk( self.nwk )
         self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
-        self.hasparents = None
         self.root = "root"
         self._getArborescence()
-
-    def getMissSpelled( self ):
-        """
-        @return (dict): dictionnary of all miss spelled taxon with all related
-            taxon
-        """
-        taxa = [taxon.strip().lower() for taxon in getTaxa( self.nwk ) ]
-        rel_dict = {}
-        for taxon in taxa:
-            related_name = self.ref_tree.taxoref.correct( taxon )
-            if related_name:
-                rel_dict[taxon] = related_name
-        return rel_dict
-
-    def __getMissSpelledList( self, taxa_list ):
-        miss_spelled_list = []
-        for taxon in getTaxa( self.nwk ):
-            related_name = self.ref_tree.taxoref.correct( taxon )
-            if related_name:
-                miss_spelled_list.append( taxon ) 
-        return miss_spelled_list
-
-    def getCommonParent( self, taxa_list ):
-        """
-        return the first common parent of taxa_list
-
-        @taxa_list: list
-        @return: string
-        """
-        miss_spelled_list = self.__getMissSpelledList( taxa_list )
-        taxa_list = [taxon for taxon in taxa_list if taxon not in miss_spelled_list]
-        if len( taxa_list ) >= 2:
-            dict_parents = {}
-            parents_list1 = self.ref_tree.getParents( taxa_list[0] )
-            parents_list2 = self.ref_tree.getParents( taxa_list[1] )
-            all_common_parents = [parent for parent in parents_list1 if parent in parents_list2]
-            if len(taxa_list) > 2:
-                for i in range( len( taxa_list) ):
-                    for j in range(i, len( taxa_list ) ):
-                        if i == j or (i == 0 and j == 1):
-                            continue
-                        parents_list1 = self.ref_tree.getParents( taxa_list[i] )
-                        parents_list2 = self.ref_tree.getParents( taxa_list[j] )
-                        common_parents = [parent for parent in parents_list1 if parent in parents_list2]
-                        all_common_parents = [parent for parent in common_parents\
-                          if parent in (common_parents and all_common_parents)]
-            return all_common_parents[-1]
-        elif len( taxa_list ) == 1:
-            return self.ref_tree.getParents( taxa_list[0] )[-1]
-        else:
-            print "taxa_list", taxa_list
-            return "XXX"
 
     def _getArborescence( self, tree=None ):
         if tree is None:
@@ -95,7 +43,7 @@ class PhylogenicTree( object ):
             """
             bad = False
             for taxon in getTaxa( self.nwk ):
-                related_name = self.ref_tree.taxoref.correct( taxon )
+                related_name = self.ref_tree.correct( taxon )
                 if related_name:
                     bad = True
                     self.miss_spelled[taxon] = related_name
@@ -107,12 +55,12 @@ class PhylogenicTree( object ):
                 parent_name = self.root
             else:
                 if not self.rel_name.has_key( tree ):
-                    parent_name = self.getCommonParent(getTaxa(tree))
+                    parent_name = self.ref_tree.getCommonParent(getTaxa(tree))
                 else:
                     parent_name = self.rel_name[tree]
             for child in getChildren( tree ):
                 if getChildren( child ): # child is a node
-                    child_name = self.getCommonParent(getTaxa(child))
+                    child_name = self.ref_tree.getCommonParent(getTaxa(child))
                     if child_name not in self.children_name:
                         self.children_name.append( parent_name )
                     # Rename child_name if already exists
@@ -126,23 +74,19 @@ class PhylogenicTree( object ):
                     self.tree.add_edge( parent_name, child_name )
                     self._getArborescence( tree = child )
                 else: # child is a taxon
-                    related_name = self.ref_tree.taxoref.correct( child )
+                    related_name = self.ref_tree.correct( child )
                     if related_name:
                         child += "|XXX"
                     self.tree.add_edge( parent_name, child )
-     
+
+
     def display( self ):
         """
         @return (string): the representation of the phylogenic tree
         """
         result = ""
-        if self.miss_spelled:
-            return self.__displayMissSpelled( self.miss_spelled )
         if not self.root:
-            self.hasparents = False
             return result
-        else:
-            self.hasparents = True
         result += self.__display()
         return result
 
@@ -155,19 +99,6 @@ class PhylogenicTree( object ):
           "<a href='"+self.NCBI+self.ref_tree.TAXONOMY[item]["id"]+\
               "'>"+item+"</a>" \
           for item in my_list ] )
-
-    def __displayMissSpelled( self, miss_spelled_dict ):
-        """
-        @return (string): display all miss spelled taxon and show all
-            propositions of correct name
-        """
-        output = ""
-        for i,j in miss_spelled_dict.iteritems():
-            try:
-                output += "<li>"+i+" not found. Do you mean "+self.__linkList(j)+"</li>\n"
-            except KeyError:
-                pass
-        return output
 
     def __display( self, root = "",  mydepth = 0 ):
         """
@@ -216,19 +147,6 @@ class PhylogenicTree( object ):
                         self.ref_tree.TAXONOMY[dispnode]["id"],
                         dispnode.capitalize() )
         return result
-
-    def __removeSingleParent( self, tree ):
-        """
-        @tree (networkx.DiGraph): tree where removing parents
-        @return (networkx.DiGraph): the elaged tree
-        """
-        for node in tree:
-            n = tree.predecessors( node ) + tree.successors(node)
-            if len(n) == 2:
-                tree.delete_edge( n[0], node )
-                tree.delete_edge( node, n[1] )
-                tree.add_edge( n[0], n[1] )
-        return tree
 
 if __name__ == "__main__":
     

@@ -144,8 +144,9 @@ else:
     if tree:
         htmltree = ""
         if 1:#try:
+            from phylogenictree import PhylogenicTree
             htmltree += "<center><h3>"+str(tree["name"])+"</h3></center>"
-            htmltree += tree["tree"].display()
+            htmltree += PhylogenicTree( tree["tree"], _reference_ ).display()
         else:#except:
 %>
             <%|%>

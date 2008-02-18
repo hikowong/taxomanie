@@ -53,7 +53,7 @@ def getChildren(tree):
     if i == ")":
       p -= 1
     if (i == "," and p == 1) or (i == ")" and p == 0):
-      newarb.append(chaine)
+      newarb.append(chaine.strip())
       chaine = ""
       continue
     if i == "(" and p == 1:
@@ -114,7 +114,7 @@ def removeBootStraps(tree):
 
 def getTaxa(tree):
   """ Return the taxas list """
-  tree = removeBootStraps(tree)
+  tree = removeBootStraps(tree).strip()
   if len(getChildren(tree)) == 0:
     return [tree]
   l = []

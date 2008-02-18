@@ -1,6 +1,8 @@
 
 from phylogenictree import PhylogenicTree
 from taxobject import Taxobject
+from lib.phylogelib import getTaxa
+import re
 
 class TreeCollection( Taxobject ):
     """
@@ -11,44 +13,57 @@ class TreeCollection( Taxobject ):
         ...
     """
     
-    def __init__( self, collection, reference ):
+    def __init__( self, nwk_collection, reference ):
         """
-        @collection (string): collection in phylip or nexus format
+        @nwk_collection (string): collection in phylip or nexus format
         """
         #super( TreeCollection, self ).__init__()
         self.reference = reference
         self.collection = []
         # Nexus collection
-        if collection[:6].lower() == "#nexus":
-            for tree in collection.split(";")[1:-2]:
+        if nwk_collection[:6].lower() == "#nexus":
+            for tree in nwk_collection.split(";")[1:-2]:
                 tree = tree.strip()
                 nwktree = tree.split("=")[1].strip()
                 tree_name = tree.split("=")[0].split()[1].strip()
                 self.collection.append( {
                     "name": tree_name,
-                    "tree": PhylogenicTree(nwktree, self.reference)
+                    "tree": self.__tagBadTaxon(nwktree),
+                    #"tree": PhylogenicTree(nwktree, self.reference)
                   })
         # Phylip collection
         else:
             index = 0
-            for nwktree in collection.strip().split(";"):
+            for nwktree in nwk_collection.strip().split(";"):
                 nwktree = nwktree.strip()
                 if nwktree:
                     index += 1
                     self.collection.append( {
                       "name": index,
-                      "tree":PhylogenicTree(nwktree, self.reference)
+                      "tree": self.__tagBadTaxon(nwktree),
+                      #"tree":PhylogenicTree(nwktree, self.reference)
                     } )
+
+    def __tagBadTaxon( self, nwk ):
+        taxa_list = getTaxa( nwk )[:]
+        for taxon in taxa_list:
+            if not self.reference.isValid( taxon ):
+                nwk = nwk.replace( taxon, taxon+"|XXX" )
+        return nwk
  
-    def __eval_query( self, query ):
-        a = []
-        for i in [i.strip() for i in query.split("#") if i]:
-            if i[0] not in ["=", "<", ">"]:
-                a.append( "len("+i+")" )
-            else:
-                a.append(i)
-        print " ".join(a)
-        return eval( " ".join( a ) )
+    def __eval_query( self, query, tree ):
+        res = ""
+        for pattern in re.findall("{([^}]+)}", query):
+            index = 0
+            for taxon in getTaxa(tree["tree"]):
+                if "XXX" not in taxon:
+                    taxon = taxon.split("|")[0].strip()
+                    if pattern in self.reference.getParents( taxon ):
+                        index += 1
+            res = query.replace("{"+pattern+"}", str(index) )
+        if res:
+            return eval( res )
+        raise SyntaxError, "bad query %s" % query
 
     def query( self, query ):
         """
@@ -61,36 +76,25 @@ class TreeCollection( Taxobject ):
         """
         new_list = []
         for tree in self.collection:
-            a = []
-            for pattern  in [i.strip() for i in query.split("#") if i]:
-                if pattern[0] not in ["=", "<", ">"]:
-                    index = 0
-                    for taxon in tree["tree"].tree.nodes():
-                        if "XXX" not in taxon:
-                            taxon = taxon.split("|")[0]
-                            if pattern in tree["tree"].ref_tree.getParents( taxon ):
-                                index += 1
-                    a.append( "len("+str(range( index ))+")" )
-                else:
-                    a.append( pattern )
             try:
-                if eval( " ".join( a ) ):
+                if self.__eval_query( query, tree ):
                     new_list.append( tree )
             except SyntaxError, e:
                 raise SyntaxError, "bad query %s" % e
-                
         return new_list
 
 if __name__ == "__main__":
-    from referencetree import ReferenceTree
+    from taxonomyreference import TaxonomyReference
     col = """
-((rattus, mus), homo);
+((rattus, pan), homo);
 ((homo, mususus), (pan, rattus));
-(homo, (mus, pan));
+(homo, (bos, pan));
 ((mus, rattus),pan);
 """
-    treecol = TreeCollection( col, ReferenceTree() )
+    treecol = TreeCollection( col, TaxonomyReference() )
+    print len(treecol.collection), treecol.collection
 #    treecol.display()
     for tree in treecol.collection:
-        print tree["tree"].tree.nodes()
-    print type(treecol.query( " sdfs#murinae#>1" ))
+        print tree["tree"]
+    col = treecol.query( "{murinae}>1" )
+    print len(col), col
