@@ -34,7 +34,7 @@ class Taxomanie( Taxobject ):
         return self._presentation( "index.html", msg )
     
     @cherrypy.expose
-    def check( self, myFile=None, index=1, query=None, clear_query=False ):
+    def check( self, myFile=None, index=1, query=None, clear_query=False, delimit="" ):
         # return PhylogenicTree( myFile, self.reference ).display("html")
         index = int( index )
         if 1:#try:
@@ -84,6 +84,7 @@ class Taxomanie( Taxobject ):
             self._pleet["_clearquery_"] = clear_query
             self._pleet["_cache_"] = self.cache
             self._pleet["_reference_"] = self.reference
+            self._pleet["_delimit_"] = delimit
             return self._presentation( "check.html" )
         else:#except IndexError:
             return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")

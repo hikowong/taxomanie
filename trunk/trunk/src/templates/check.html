@@ -151,7 +151,7 @@ else:
             from phylogenictree import PhylogenicTree
             htmltree += "<center><h3>"+str(tree["name"])+"</h3></center>"
             if not _cache_.has_key( tree["name"] ):
-                _cache_[tree["name"]] = PhylogenicTree( tree["tree"], _reference_ ).display()
+                _cache_[tree["name"]] = PhylogenicTree( tree["tree"], _delimit_, _reference_ ).display()
             htmltree += _cache_[tree["name"]]
         else:#except:
             #
