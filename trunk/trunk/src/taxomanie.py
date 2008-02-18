@@ -40,6 +40,7 @@ class Taxomanie( Taxobject ):
         if 1:#try:
             if myFile is not None:
                 self.query = None
+                self.col_query = []
                 self.cache = {}
                 self.named_tree = {}
                 self.collection = []
@@ -64,21 +65,22 @@ class Taxomanie( Taxobject ):
                 self.query = query
             if not clear_query:
                 try:
-                    self._pleet["_collection_"] = self.collection.query( self.query )
+                    self.col_query = self.collection.query( self.query )
+                    self._pleet["_collection_"] = self.col_query
                 except:
-                    self._pleet["_collection_"] = self.collection.collection
+                    self.col_query = self.collection.collection
+                    self._pleet["_collection_"] = self.col_query
                     self._pleet["_msg_"] = "arf"
             else:
                 self.query = None
-                self._pleet["_collection_"] = self.collection.collection
+                self.col_query = self.collection.collection
+                self._pleet["_collection_"] = self.col_query
             if index > len(self.collection.collection):
                 index = len(self.collection.collection)
             elif index < 1:
                 index = 1
             self._pleet["_index_"] = index
             self._pleet["_query_"] = self.query
-            print self.query
-            print self.collection.collection
             self._pleet["_clearquery_"] = clear_query
             self._pleet["_cache_"] = self.cache
             self._pleet["_reference_"] = self.reference
@@ -103,11 +105,21 @@ class Taxomanie( Taxobject ):
         self.conn.close()    
         return "Image not found"
         
-    def download(self):
-        path = os.path.join(absDir, "pdf_file.pdf")
-        return static.serve_file(path, "application/x-download",
-                                 "attachment", os.path.basename(path))
-    download.exposed = True
+    @cherrypy.expose
+    def downloadCollection(self, col, target="nexus"):
+        cherrypy.response.headers['Content-Type'] = 'application/x-download'
+        if target == "nexus":
+            body = "#nexus\nbegin trees;\n"
+            for tree in self.col_query:
+                body += "%s = %s;\n" % (tree["name"], tree["tree"].replace("|XXX", ""))
+            body += "end;\n"
+        else:
+            body = ";\n".join( tree["tree"] for tree in self.col_query )
+        cherrypy.response.headers['Content-Length'] = len(body)
+        cherrypy.response.headers['Content-Disposition'] = \
+          'attachment; filename=filtered-collection.nwk'
+        cherrypy.response.body = body 
+        return cherrypy.response.body
 
     @cherrypy.expose
     def about( self ):
