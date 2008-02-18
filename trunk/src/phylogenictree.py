@@ -13,7 +13,7 @@ class PhylogenicTree( object ):
     NCBI = "http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
     ref_tree = None
 
-    def __init__( self, nwk, reference = None ):
+    def __init__( self, nwk, delimit, reference = None ):
         """
         @nwk (string): string in newick format
         @reference (networkx.DiGraph): The reference tree of NCBI database
@@ -23,6 +23,7 @@ class PhylogenicTree( object ):
                 PhylogenicTree.ref_tree = TaxonomyReference()
             else:
                 PhylogenicTree.ref_tree = reference
+        self.delimit = delimit
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
         checkNwk( self.nwk )
 #        self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
@@ -63,7 +64,7 @@ class PhylogenicTree( object ):
                     self.tree.add_edge( parent_name, child_name )
                     self._getArborescence( tree = child )
                 else: # child is a taxon
-                    if not self.ref_tree.isValid( self.ref_tree.stripTaxonName(child) ):
+                    if not self.ref_tree.isValid( self.ref_tree.stripTaxonName(child, self.delimit) ):
                         child += "|XXX"
                     self.tree.add_edge( parent_name, child )
 
@@ -103,8 +104,8 @@ class PhylogenicTree( object ):
               self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
             result += "|<br />\n"
         for node in self.tree.successors( root ):
-            dispnode = node.split("|")[0]
-            bdnode = self.ref_tree.stripTaxonName( dispnode )
+            dispnode = node.split("|")[0].replace( self.delimit, " " )
+            bdnode = self.ref_tree.stripTaxonName( dispnode, self.delimit )
             depth = 0
             while depth != mydepth :
                 result += "| "
