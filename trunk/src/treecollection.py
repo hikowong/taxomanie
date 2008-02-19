@@ -57,7 +57,6 @@ class TreeCollection( Taxobject ):
             for taxon in getTaxa(tree["tree"]):
                 if "XXX" not in taxon:
                     taxon = taxon.split("|")[0].strip()
-                    print ">",taxon, ":"
                     if pattern in self.reference.getParents(
                       self.reference.stripTaxonName(taxon) ) or \
                       pattern == self.reference.stripTaxonName(
