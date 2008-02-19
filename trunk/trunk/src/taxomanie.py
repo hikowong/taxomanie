@@ -11,6 +11,8 @@ from lib import phylogelib
 from phylogenictree import PhylogenicTree
 from treecollection import TreeCollection
 from taxobject import Taxobject 
+import ConfigParser
+import httplib
 
 class Taxomanie( Taxobject ):
     
@@ -20,10 +22,17 @@ class Taxomanie( Taxobject ):
         if self.reference is None:
             from taxonomyreference import TaxonomyReference
             Taxomanie.reference = TaxonomyReference()
-            import httplib
-            self.conn = httplib.HTTP('www.info-ufr.univ-montp2.fr:3128')
         self.collection = []
         self.named_tree = {}
+        self.__loadProxy()
+
+    def __loadProxy( self ):
+        config = ConfigParser.ConfigParser()
+        config.read("taxomanie.conf")
+        try:
+            self.proxy = config.get("global","proxy").strip("\"")
+        except:
+            self.proxy = ""
 
     @cherrypy.expose
     def css( self ):
@@ -91,7 +100,14 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def getImgUrl( self, taxon ):
+        if self.proxy:
+            return self.__getImageUrlProxy( taxon )
+        else:
+            return self.__getImageUrl( taxon )
+
+    def __getImageUrlProxy( self, taxon ):
         taxon = taxon.split()[0].strip().capitalize()
+        self.conn = httplib.HTTP( self.proxy )
         self.conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
         self.conn.putheader('Accept', 'text/html')
         self.conn.putheader('Accept', 'text/plain')
@@ -103,9 +119,42 @@ class Taxomanie( Taxobject ):
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
                 self.conn.close()    
                 return """<img src="%s" />""" % url_img
+        self.conn.putrequest( 'GET',"http://en.wikipedia.org/wiki/"+taxon )
+        self.conn.putheader('Accept', 'text/html')
+        self.conn.putheader('Accept', 'text/plain')
+        self.conn.endheaders()
+        errcode, errmsg, headers = self.conn.getreply()
+        f=self.conn.getfile()
+        for line in f.readlines():
+            if "class=\"image\"" in line:
+                url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
+                self.conn.close()    
+                return """<img src="%s" />""" % url_img
         self.conn.close()    
         return "Image not found"
-        
+
+    def __getImageUrl( self, taxon ):
+        taxon = taxon.split()[0].strip().capitalize()
+        self.conn = httplib.HTTPConnection("species.wikimedia.org")
+        self.conn.request("GET", "/wiki/"+taxon)
+        f = self.conn.getresponse().read()
+        for line in f.split("\n"):
+            if "thumbinner" in line:
+                url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
+                self.conn.close()    
+                return """<img src="%s" />""" % url_img
+        self.conn.close()    
+        self.conn = httplib.HTTPConnection("en.wikipedia.org")
+        self.conn.request("GET", "/wiki/"+taxon)
+        f = self.conn.getresponse().read()
+        for line in f.split("\n"):
+            if "class=\"image\"" in line:
+                url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
+                self.conn.close()    
+                return """<img src="%s" />""" % url_img
+        self.conn.close()    
+        return "Image not found"
+
     @cherrypy.expose
     def downloadCollection(self, col, target="nexus"):
         cherrypy.response.headers['Content-Type'] = 'application/x-download'
@@ -134,7 +183,25 @@ cherrypy.tree.mount(Taxomanie())
 
 if __name__ == '__main__':
     import os.path
+    import ConfigParser
+    ## Open and parse config file
+    config = ConfigParser.ConfigParser()
+    config.read("taxomanie.conf")
+    ## Fill variables
+    try:
+        log_screen = bool(config.get("global","log.screen"))
+    except:
+        log_screen = True
+    ip = config.get("global","server.socket_host").strip("\"")
+    port = int(config.get("global","server.socket_port"))
+    thread_pool = int(config.get("global","server.thread_pool"))
+    # Fill cherrypy configuration
+    cherrypy.config.update({
+          "log.screen": log_screen,
+          "server.socket_host": ip,
+          "server.socket_port": port,
+          "server.thread_pool": thread_pool 
+        })
     # Start the CherryPy server.
-    cherrypy.config.update(os.path.join(os.path.dirname(__file__), 'taxomanie.conf'))
     cherrypy.server.quickstart()
     cherrypy.engine.start()
