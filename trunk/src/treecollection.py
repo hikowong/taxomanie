@@ -45,20 +45,25 @@ class TreeCollection( Taxobject ):
     def __tagBadTaxon( self, nwk ):
         taxa_list = getTaxa( nwk )[:]
         for taxon in taxa_list:
-            if not self.reference.isValid( taxon ):
+            if not self.reference.isValid( self.reference.stripTaxonName(taxon) ):
                 nwk = nwk.replace( taxon, taxon+"|XXX" )
         return nwk
  
     def __eval_query( self, query, tree ):
-        res = ""
+        res = query 
         for pattern in re.findall("{([^}]+)}", query):
             index = 0
+            pattern = pattern.lower()
             for taxon in getTaxa(tree["tree"]):
                 if "XXX" not in taxon:
                     taxon = taxon.split("|")[0].strip()
-                    if pattern in self.reference.getParents( taxon ):
+                    print ">",taxon, ":"
+                    if pattern in self.reference.getParents(
+                      self.reference.stripTaxonName(taxon) ) or \
+                      pattern == self.reference.stripTaxonName(
+                      self.reference.stripTaxonName(taxon)).lower():
                         index += 1
-            res = query.replace("{"+pattern+"}", str(index) )
+            res = res.replace("{"+pattern+"}", str(index) )
         if res:
             return eval( res )
         raise SyntaxError, "bad query %s" % query
@@ -85,7 +90,7 @@ if __name__ == "__main__":
     from taxonomyreference import TaxonomyReference
     col = """
 ((rattus, pan), homo);
-((homo, mususus), (pan, rattus));
+((homo_sapiens, mususus), (pan, rattus));
 (homo, (bos, pan));
 ((mus, rattus),pan);
 """
@@ -94,5 +99,5 @@ if __name__ == "__main__":
 #    treecol.display()
     for tree in treecol.collection:
         print tree["tree"]
-    col = treecol.query( "{murinae}>1" )
+    col = treecol.query( "{homo}" )
     print len(col), col

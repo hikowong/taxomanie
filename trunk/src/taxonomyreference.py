@@ -51,10 +51,10 @@ class TaxonomyReference( DiGraph ):
         for taxon in self.TAXONOMY.iterkeys():
             parent = self.TAXONOMY[taxon]["parent"]
             self.add_edge( parent, taxon )
+        self.delimiter = "_"
 
-    def stripTaxonName( self, taxon_name, delimiter="_" ):
-        new_name = " ".join( taxon_name.replace(delimiter," ").split()[:2] )
-        return new_name
+    def stripTaxonName( self, taxon_name ):
+        return " ".join( taxon_name.replace(self.delimiter," ").split()[:2] )
  
     def getNameFromCommon( self, common_name ):
         """
@@ -132,21 +132,6 @@ class TaxonomyReference( DiGraph ):
 
     def getParent( self, name ):
         return self.predecessors( name )[0]
-
-    def getCommonParent( self, name1, name2 ):
-        """
-        return the first common parent name of name1 and name2
-
-        @name1: string
-        @name2: string
-        @return: string
-        """
-        parents_list1 = self.getParents( name1 )[:]
-        parents_list1.reverse()
-        parents_list2 = self.getParents( name2 )
-        for parent1 in parents_list1:
-            if parent1 in parents_list2:
-                return parent1
 
     def __getMissSpelledList( self, taxa_list ):
         miss_spelled_list = []
