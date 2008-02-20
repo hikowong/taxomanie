@@ -147,13 +147,13 @@ else:
     tree = _collection_[_index_-1]
     if tree:
         htmltree = ""
-        if 1:#try:
+        try:
             from phylogenictree import PhylogenicTree
             htmltree += "<center><h3>"+str(tree["name"])+"</h3></center>"
             if not _cache_.has_key( tree["name"] ):
                 _cache_[tree["name"]] = PhylogenicTree( tree["tree"], _reference_ ).display()
             htmltree += _cache_[tree["name"]]
-        else:#except:
+        except:
             #
 %>
             <div id="error">
