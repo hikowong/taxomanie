@@ -7,7 +7,7 @@ Image1
 http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2728.jpg
 
 Image2
-[Im2]
+[http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2729.jpg Image2]
 http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2729.jpg
 
 Image3
