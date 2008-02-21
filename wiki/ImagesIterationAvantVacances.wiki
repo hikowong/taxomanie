@@ -1,3 +1,5 @@
+= Images =
+
 [http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2728.jpg]
 
 [http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2729.jpg]
