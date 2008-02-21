@@ -2,20 +2,12 @@ _Images_:
 
 Image1
 [http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2728.jpg]
-http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2728.jpg
 
 Image2
 [http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2729.jpg Image2]
-http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2729.jpg
 
 Image3
 [http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2730.jpg]
 
 Image4
 [http://code.google.com/p/taxomanie/source/browse/trunk/trunk/doc/cimg2731.jpg]
-
-_exemple de rendu 3d a partir de la vue 2d_ :
-
-[http://pompitheque.googlecode.com/svn/trunk/Groupe4/ImagesWiki/grille_vue_perso2d.jpg]
-
-[http://pompitheque.googlecode.com/svn/trunk/Groupe4/ImagesWiki/grille_vue_perso3d.jpg]
