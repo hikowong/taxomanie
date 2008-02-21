@@ -1,22 +1,18 @@
 <html><body>
-
+<a name="top"></a>
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="css">
 <title> Taxonamie </title>
-
-<div class="header" id="header">
-<h1 align="center"> Welcome in Taxomanie </h1>
-<h3 align="center"> Phylogenic Tree Checker </h3>
-</div>
-
-<div id="sidebar">
-<b>Menu<b>
-<ul>
-<li><a href="about"> About </a></li>
-<li><a href="help"> Help </a></li>
-</ul>
-</div>
-
+<table class="body" border="0" cellpadding="0" cellspacing="0" width="100%">
+	<tr class="header" valign="bottom">
+		<td class="header1" width="15%"><img src="spc.gif" alt="" height="1" width="1"></td>
+		<td class="header2" width="85%"><h1>Taxomanie</h1><h2>((Phylogenic, Tree, Checker))</h2></td>	
+	</tr>
+	<tr class="crumbs">
+		<td class="crumbs1"><img src="spc.gif" alt="" height="1" width="1"></td> 
+		<td class="crumbs2">
+<!-- PAGE DEF : BEGINNING_________________________________________________________________ -->
+Home > Import collection page
 <div id="error">
 <%
 if _msg_:
@@ -25,7 +21,19 @@ if _msg_:
     <center><font color="red"> <%$ _msg_ %> </font></center>
 <%|%>
 </div>
-
+<!-- PAGE DEF : END -->
+		</td>
+	</tr>
+	<tr class="content" valign="top">
+		<td class="links">
+<!-- MENU : BEGINNING______________________________________________________________________ -->
+<a href="." class="path" title="Return to Import collection page"> Import Collection </a>
+<a href="help" class="path" title="(?) Help Contents"> Help Contents </a>
+<a href="about" class="path" title="About the Taxomanie project"> About </a>  
+<!-- MENU : END -->
+	 </td>
+     		 <td class="content">
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
 <div class="body" id="body">
     <fieldset>
         <legend> Your collection file in newick format </legend>
@@ -48,6 +56,12 @@ if _msg_:
         </form>
     </fieldset>
 </div>
+<!-- CONTENT : END -->
+			<p><a href="#top"><B>Top .:.</B></a></p>
+		</td>
+	</tr>
+</table>
 
-</body></html>
+</body>
+</html>
 
