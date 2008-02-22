@@ -112,15 +112,18 @@ def removeBootStraps(tree):
       chaine += i
   return chaine
 
-def getTaxa(tree):
-  """ Return the taxas list """
-  tree = removeBootStraps(tree).strip()
-  if len(getChildren(tree)) == 0:
-    return [tree]
-  l = []
-  for child in getChildren(tree):
-    l.extend(getTaxa(child))
-  return l
+#def getTaxa(tree):
+#  """ Return the taxas list """
+#  tree = removeBootStraps(tree).strip()
+#  if len(getChildren(tree)) == 0:
+#    return [tree]
+#  l = []
+#  for child in getChildren(tree):
+#    l.extend(getTaxa(child))
+#  return l
+
+def getTaxa( tree ):
+    return removeBootStraps(tree.strip()).replace(" ","").replace("(","").replace(")","").split(",")
 
 def getDepth(tree):
   """ Return the depth of the tree """
