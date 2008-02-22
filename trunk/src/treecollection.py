@@ -41,7 +41,8 @@ class TreeCollection( Taxobject ):
                       "name": index,
                       "tree": nwktree,
                     } )
-        self.misspelled_taxa = None
+        self.__misspelled_taxa = None
+        self.__all_parents = {}
         print "++++++++__init__ fini"
 
     def __listTaxon( self ):
@@ -64,18 +65,25 @@ class TreeCollection( Taxobject ):
             if not self.reference.isValid(self.reference.stripTaxonName(taxon)):
                 bad_taxa.add( taxon )
         return bad_taxa
+
+    def getAllParents( self ):
+        all_parents = {}
+        for tree in self.collection:
+            pl = set()
+            for taxon in getTaxa( tree["tree"] ):
+                taxon = self.reference.stripTaxonName(taxon.lower())
+                if taxon not in self.__misspelled_taxa:
+                    pl = pl.union( set( self.reference.getParents( taxon )))
+                    pl.add( taxon )
+            all_parents[tree["tree"]] = pl
+        return all_parents
  
     def __eval_query( self, query, tree ):
         res = query 
         for pattern in re.findall("{([^}]+)}", query):
             index = 0
-            pattern = pattern.lower()
-            for taxon in getTaxa(tree):
-                taxon = self.reference.stripTaxonName(taxon.strip().lower())
-                if taxon not in self.misspelled_taxa:
-                    if pattern in self.reference.getParents(taxon) or \
-                      pattern == taxon:
-                        index += 1
+            if pattern.strip().lower() in self.__all_parents[tree]:
+                index += 1
             res = res.replace("{"+pattern+"}", str(index) )
         if res:
             return eval( res )
@@ -93,9 +101,10 @@ class TreeCollection( Taxobject ):
         new_list = []
         for i in xrange( len(self.collection) ):
             tree = self.collection[i]
-            if self.misspelled_taxa is None:
-                self.misspelled_taxa = self.__getMisSpelledTaxa(self.__listTaxon())
-                print self.misspelled_taxa
+            if self.__misspelled_taxa is None:
+                self.__misspelled_taxa = self.__getMisSpelledTaxa(self.__listTaxon())
+                print self.__misspelled_taxa
+                self.__all_parents = self.getAllParents()
             try:
                 if self.__eval_query( query, tree["tree"] ):
                     new_list.append( tree )
@@ -115,7 +124,6 @@ end;
 """
     treecol = TreeCollection( col, TaxonomyReference() )
     print len(treecol.collection), treecol.collection
-#    treecol.display()
     for tree in treecol.collection:
         print tree["tree"]
     col = treecol.query( "{homo}" )
