@@ -22,8 +22,6 @@ class Taxomanie( Taxobject ):
         if self.reference is None:
             from taxonomyreference import TaxonomyReference
             Taxomanie.reference = TaxonomyReference()
-#        self.collection = []
-#        self.named_tree = {}
         self.__loadProxy()
 
     def __loadProxy( self ):
@@ -79,7 +77,6 @@ class Taxomanie( Taxobject ):
                 try:
                     if self.query:
                         self.col_query = self.collection.query( self.query )
-                        print "col_query>", self.col_query
                         self._pleet["_collection_"] = self.col_query
                     else:
                         self.col_query = self.collection.collection
@@ -168,8 +165,9 @@ class Taxomanie( Taxobject ):
         cherrypy.response.headers['Content-Type'] = 'application/x-download'
         if target == "nexus":
             body = "#nexus\nbegin trees;\n"
-            for tree in self.col_query:
-                body += "Tree %s = %s;\n" % (tree["name"], tree["tree"].replace("|XXX", ""))
+            for i in xrange( len(self.col_query) ):
+                tree = self.col_query[i]
+                body += "Tree %s = %s;\n" % (tree["name"], tree["tree"])#.replace("|XXX", ""))
             body += "end;\n"
         else:
             body = ";\n".join( tree["tree"] for tree in self.col_query )

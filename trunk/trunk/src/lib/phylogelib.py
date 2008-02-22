@@ -123,7 +123,7 @@ def removeBootStraps(tree):
 #  return l
 
 def getTaxa( tree ):
-    return removeBootStraps(tree.strip()).replace(" ","").replace("(","").replace(")","").split(",")
+    return [i.strip() for i in removeBootStraps(tree.strip()).replace("(","").replace(")","").split(",")]
 
 def getDepth(tree):
   """ Return the depth of the tree """
