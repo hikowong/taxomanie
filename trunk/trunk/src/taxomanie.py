@@ -22,8 +22,8 @@ class Taxomanie( Taxobject ):
         if self.reference is None:
             from taxonomyreference import TaxonomyReference
             Taxomanie.reference = TaxonomyReference()
-        self.collection = []
-        self.named_tree = {}
+#        self.collection = []
+#        self.named_tree = {}
         self.__loadProxy()
 
     def __loadProxy( self ):
@@ -67,7 +67,9 @@ class Taxomanie( Taxobject ):
                         size += len(recv)
                 input = input.strip()
                 if 1:#try:
+                    print "=======avant treecollection========="
                     self.collection = TreeCollection( input, self.reference )
+                    print "=======apres treecollection========="
                 else:#except ValueError, e:
                     return self._presentation( "index.html", msg = e)
             self._pleet["_msg_"] = ""
@@ -75,9 +77,14 @@ class Taxomanie( Taxobject ):
                 self.query = query
             if not clear_query:
                 try:
-                    self.col_query = self.collection.query( self.query )
-                    self._pleet["_collection_"] = self.col_query
-                except:
+                    if self.query:
+                        self.col_query = self.collection.query( self.query )
+                        print "col_query>", self.col_query
+                        self._pleet["_collection_"] = self.col_query
+                    else:
+                        self.col_query = self.collection.collection
+                        self._pleet["_collection_"] = self.col_query
+                except SyntaxError, e :
                     self.col_query = self.collection.collection
                     self._pleet["_collection_"] = self.col_query
                     self._pleet["_msg_"] = "arf"
@@ -85,6 +92,7 @@ class Taxomanie( Taxobject ):
                 self.query = None
                 self.col_query = self.collection.collection
                 self._pleet["_collection_"] = self.col_query
+            print "========+++index+++========="
             if index > len(self.collection.collection):
                 index = len(self.collection.collection)
             elif index < 1:
@@ -161,7 +169,7 @@ class Taxomanie( Taxobject ):
         if target == "nexus":
             body = "#nexus\nbegin trees;\n"
             for tree in self.col_query:
-                body += "%s = %s;\n" % (tree["name"], tree["tree"].replace("|XXX", ""))
+                body += "Tree %s = %s;\n" % (tree["name"], tree["tree"].replace("|XXX", ""))
             body += "end;\n"
         else:
             body = ";\n".join( tree["tree"] for tree in self.col_query )
@@ -189,7 +197,7 @@ if __name__ == '__main__':
     config.read("taxomanie.conf")
     ## Fill variables
     try:
-        log_screen = bool(config.get("global","log.screen"))
+        log_screen = bool(int(config.get("global","log.screen")))
     except:
         log_screen = True
     ip = config.get("global","server.socket_host").strip("\"")
