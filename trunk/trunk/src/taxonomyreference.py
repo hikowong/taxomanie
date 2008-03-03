@@ -15,12 +15,12 @@ class TaxonomyReference( DiGraph ):
           name in relation
 
     You must provide a csv file which has the bellowed structure:
-        id|name|parent_name|synonyms_list|common_name_list
+        id|name|first_parent|list_parents|synonyms_list|common_name_list
 
     all without spaces.
 
-    synonyms_list and common_name_list must have this structure:
-        first_synonym!second_synonym!...!...
+    list_parents, synonyms_list and common_name_list must have this structure:
+        first_item!second_item!...!...
 
 
     This class provides also methods to create Digraph 
@@ -35,15 +35,18 @@ class TaxonomyReference( DiGraph ):
         # taxonomy reference generation
         self.TAXONOMY = {}
         for species in taxonomy.readlines():
-            id, name, parent, synonym, common = species.split("|")
+            id, name, parent, list_parents, synonym, common = species.split("|")
             common = common.strip()
             if synonym:
                 synonym = synonym.split("!")
             if common:
                 common = common.split("!")
+            if list_parents:
+                list_parents = list_parents.split("!")
             self.TAXONOMY[name] = {
                 "id": id,
                 "parent": parent,
+                "parents": list_parents,
                 "synonym": synonym,
                 "common": common
             }
@@ -117,6 +120,11 @@ class TaxonomyReference( DiGraph ):
         @name: string
         @return: list
         """
+        if name != "root":
+            lp = self.TAXONOMY[name]["parents"]
+            return lp
+        return []
+        """
         parents_dict = {}
         if name != "root":
             if not parents_dict.has_key( name ):
@@ -129,6 +137,7 @@ class TaxonomyReference( DiGraph ):
                 parents_dict[name].reverse()
             return parents_dict[name]
         return [] 
+        """
 
     def getParent( self, name ):
         return self.predecessors( name )[0]
