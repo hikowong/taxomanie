@@ -43,6 +43,7 @@ for line in file( NAMES ).readlines():
         TBI[id]["common"] = []
         TBI[id]["synonym"] = []
         TBI[id]["parent"] = []
+        TBI[id]["parents"] = []
         # Creating TAXONOMY_BY_NAME
         TBN[name] = {}
         TBN[name]["id"] = id
@@ -72,7 +73,8 @@ for line in file( NAMES ).readlines():
             TBN[base_name]["common"].append( name )
             TBI[id]["common"].append( name )
 
-print "Creating parents..."
+
+print "Extracting parents..."
 for node in file( NODES ).readlines():
     id = node.split("|")[0].strip()
     parent = node.split("|")[1].strip()
@@ -85,15 +87,33 @@ for node in file( NODES ).readlines():
         TBN[name] = {}
     TBN[name]["parent"] = parent
 
+
+def getParents( id ):
+    global TBN, TBI
+    lp = []
+    while id != "1":
+        id_parent = TBI[id]["parent"]
+        lp.append( TBI[id_parent]["name"] )
+        id = id_parent
+    lp.reverse()
+    return lp
+
+    
+print "Filling parents..."
+for node in file( NODES ).readlines():
+    id = node.split("|")[0].strip()
+    TBI[id]["parents"] = getParents( id )
+
 print "Generating csv file..."
 import os
 open( "taxonomy.csv", "w" ).write("")
 csv = open( "taxonomy.csv", "a" )
 for species in TBI.keys():
-    line = "%s|%s|%s|%s|%s\n" % ( 
+    line = "%s|%s|%s|%s|%s|%s\n" % ( 
       species,
       TBI[species]["name"],
       TBI[TBI[species]["parent"]]["name"],
+      "!".join(TBI[species]["parents"]),
       "!".join(TBI[species]["synonym"]),
       "!".join(TBI[species]["common"]) )
     csv.write( line )
