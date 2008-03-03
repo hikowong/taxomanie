@@ -73,12 +73,13 @@ value="Your query"
 <%|%>
 name="query" /> 
 <input type="submit" value="Search">
+<input type="hidden" name="id" value="<%$ _id_ %>" />
 </form>
 <%
 if _query_:
     #
 %>
-    <%$ _query_ %> <a href=check?clear_query=1> back </a>
+    <%$ _query_ %> <a href=check?id=<%$ _id_ %>&clear_query=1> back </a>
 <%
 else:
     _query_ = ""
@@ -87,6 +88,12 @@ else:
 </center>
 <hr />
 
+<%
+if _msg_:
+    #
+%>
+    <%$ _msg_ %>
+<%|%>
 
 <%#
 The sidebar
@@ -113,7 +120,7 @@ if len(_collection_) > 1:
     if _index_ > 1:
         #
 %>
-        <a href='check?index=<%$ _index_-1 %>'> Previous </a>
+        <a href='check?id=<%$ _id_ %>&index=<%$ _index_-1 %>'> Previous </a>
     <%|%>
 
     </td>
@@ -122,6 +129,7 @@ if len(_collection_) > 1:
     <input type="text" size="5" value="<%$ _index_ %>" name="index"> </input>
     /<%$ len(_collection_) %>
     </td>
+    <input type="hidden" name="id" value="<%$ _id_ %>" />
     </form>
     <td>
 
@@ -129,7 +137,7 @@ if len(_collection_) > 1:
     if _index_ < len(_collection_):
         #
 %>
-        <a href='check?index=<%$ _index_+1 %>'> Next </a>
+        <a href='check?id=<%$ _id_ %>&index=<%$ _index_+1 %>'> Next </a>
 <%|%>
 </td>
 </tr>
@@ -172,7 +180,7 @@ else:
 <%|%>
 
 <center>
-<a href="/downloadCollection?col=<%$ _collection_ %>"> Download the filtered collection </a>
+<a href="/downloadCollection?id=<%$ _id_ %>"> Download the filtered collection </a>
 </center>
 
 </body> </html>

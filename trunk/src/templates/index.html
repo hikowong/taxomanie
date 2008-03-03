@@ -31,6 +31,7 @@ if _msg_:
         <legend> Your collection file in newick format </legend>
         <form action="check" method="post" enctype="multipart/form-data">
             filename: <input type="file" name="myFile" /><br />
+            <input type="hidden" name="id" value="<%$ _id_ %>" />
             <input type="reset" />
             <input type="submit" />
         </form>
@@ -45,6 +46,7 @@ if _msg_:
             Enter your delimiter (ex: "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
             <input type="submit" />
+            <input type="hidden" name="id" value="<%$ _id_ %>" />
         </form>
     </fieldset>
 </div>

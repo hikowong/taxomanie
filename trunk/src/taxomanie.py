@@ -22,6 +22,8 @@ class Taxomanie( Taxobject ):
         if self.reference is None:
             from taxonomyreference import TaxonomyReference
             Taxomanie.reference = TaxonomyReference()
+        self.session = {}
+        self.id = 0
         self.__loadProxy()
 
     def __loadProxy( self ):
@@ -38,19 +40,23 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def index( self, msg = "" ):
+        self.id += 1
+        self._pleet["_id_"] = self.id
         return self._presentation( "index.html", msg )
     
     @cherrypy.expose
-    def check( self, myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
+    def check( self, id,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
         # return PhylogenicTree( myFile, self.reference ).display("html")
         index = int( index )
+        id = int(id)
         if 1:#try:
             if myFile is not None:
-                self.query = None
-                self.col_query = []
-                self.cache = {}
-                self.named_tree = {}
-                self.collection = []
+                self.session[id] = {}
+                self.session[id]["query"] = None
+                self.session[id]["col_query"] = []
+                self.session[id]["cache"] = {}
+                self.session[id]["named_tree"] = {}
+                self.session[id]["collection"] = []
                 self.reference.delimiter = delimiter
                 if isinstance( myFile, str ):
                     input = myFile 
@@ -65,40 +71,39 @@ class Taxomanie( Taxobject ):
                         size += len(recv)
                 input = input.strip()
                 if 1:#try:
-                    print "=======avant treecollection========="
-                    self.collection = TreeCollection( input, self.reference )
-                    print "=======apres treecollection========="
+                    self.session[id]["collection"] = TreeCollection( input, self.reference )
                 else:#except ValueError, e:
                     return self._presentation( "index.html", msg = e)
             self._pleet["_msg_"] = ""
             if query:
-                self.query = query
+                self.session[id]["query"] = query
             if not clear_query:
-                try:
-                    if self.query:
-                        self.col_query = self.collection.query( self.query )
-                        self._pleet["_collection_"] = self.col_query
-                    else:
-                        self.col_query = self.collection.collection
-                        self._pleet["_collection_"] = self.col_query
-                except SyntaxError, e :
-                    self.col_query = self.collection.collection
-                    self._pleet["_collection_"] = self.col_query
-                    self._pleet["_msg_"] = "arf"
+                if self.session[id]["query"]:
+                    try:
+                        self.session[id]["col_query"] = self.session[id][
+                          "collection"].query( self.session[id]["query"] )
+                        self._pleet["_collection_"] = self.session[id]["col_query"]
+                    except NameError:
+                        self.session[id]["col_query"] = self.session[id]["collection"].collection
+                        self._pleet["_collection_"] = self.session[id]["col_query"]
+                        self._pleet["_msg_"] = "bouhouhouh"
+                else:
+                    self.session[id]["col_query"] = self.session[id]["collection"].collection
+                    self._pleet["_collection_"] = self.session[id]["col_query"]
             else:
-                self.query = None
-                self.col_query = self.collection.collection
-                self._pleet["_collection_"] = self.col_query
-            print "========+++index+++========="
-            if index > len(self.collection.collection):
-                index = len(self.collection.collection)
+                self.session[id]["query"] = None
+                self.session[id]["col_query"] = self.session[id]["collection"].collection
+                self._pleet["_collection_"] = self.session[id]["col_query"]
+            if index > len(self.session[id]["collection"].collection):
+                index = len(self.session[id]["collection"].collection)
             elif index < 1:
                 index = 1
             self._pleet["_index_"] = index
-            self._pleet["_query_"] = self.query
+            self._pleet["_query_"] = self.session[id]["query"]
             self._pleet["_clearquery_"] = clear_query
-            self._pleet["_cache_"] = self.cache
+            self._pleet["_cache_"] = self.session[id]["cache"]
             self._pleet["_reference_"] = self.reference
+            self._pleet["_id_"] = id
             return self._presentation( "check.html" )
         else:#except IndexError:
             return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")
@@ -112,65 +117,66 @@ class Taxomanie( Taxobject ):
 
     def __getImageUrlProxy( self, taxon ):
         taxon = taxon.split()[0].strip().capitalize()
-        self.conn = httplib.HTTP( self.proxy )
-        self.conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
-        self.conn.putheader('Accept', 'text/html')
-        self.conn.putheader('Accept', 'text/plain')
-        self.conn.endheaders()
-        errcode, errmsg, headers = self.conn.getreply()
-        f=self.conn.getfile()
+        conn = httplib.HTTP( self.proxy )
+        conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
+        conn.putheader('Accept', 'text/html')
+        conn.putheader('Accept', 'text/plain')
+        conn.endheaders()
+        errcode, errmsg, headers = conn.getreply()
+        f=conn.getfile()
         for line in f.readlines():
             if "thumbinner" in line:
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
-                self.conn.close()    
+                conn.close()    
                 return """<img src="%s" />""" % url_img
-        self.conn.putrequest( 'GET',"http://en.wikipedia.org/wiki/"+taxon )
-        self.conn.putheader('Accept', 'text/html')
-        self.conn.putheader('Accept', 'text/plain')
-        self.conn.endheaders()
-        errcode, errmsg, headers = self.conn.getreply()
-        f=self.conn.getfile()
+        conn.putrequest( 'GET',"http://en.wikipedia.org/wiki/"+taxon )
+        conn.putheader('Accept', 'text/html')
+        conn.putheader('Accept', 'text/plain')
+        conn.endheaders()
+        errcode, errmsg, headers = conn.getreply()
+        f=conn.getfile()
         for line in f.readlines():
             if "class=\"image\"" in line:
                 url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
-                self.conn.close()    
+                conn.close()    
                 return """<img src="%s" />""" % url_img
-        self.conn.close()    
+        conn.close()    
         return "Image not found"
 
     def __getImageUrl( self, taxon ):
         taxon = taxon.split()[0].strip().capitalize()
-        self.conn = httplib.HTTPConnection("species.wikimedia.org")
-        self.conn.request("GET", "/wiki/"+taxon)
-        f = self.conn.getresponse().read()
+        conn = httplib.HTTPConnection("species.wikimedia.org")
+        conn.request("GET", "/wiki/"+taxon)
+        f = conn.getresponse().read()
         for line in f.split("\n"):
             if "thumbinner" in line:
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
-                self.conn.close()    
+                conn.close()    
                 return """<img src="%s" />""" % url_img
-        self.conn.close()    
-        self.conn = httplib.HTTPConnection("en.wikipedia.org")
-        self.conn.request("GET", "/wiki/"+taxon)
-        f = self.conn.getresponse().read()
+        conn.close()    
+        conn = httplib.HTTPConnection("en.wikipedia.org")
+        conn.request("GET", "/wiki/"+taxon)
+        f = conn.getresponse().read()
         for line in f.split("\n"):
             if "class=\"image\"" in line:
                 url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
-                self.conn.close()    
+                conn.close()    
                 return """<img src="%s" />""" % url_img
-        self.conn.close()    
+        conn.close()    
         return "Image not found"
 
     @cherrypy.expose
-    def downloadCollection(self, col, target="nexus"):
+    def downloadCollection(self, id, target="nexus"):
         cherrypy.response.headers['Content-Type'] = 'application/x-download'
-        if target == "nexus":
+        id = int(id)
+        if 0:#target == "nexus":
             body = "#nexus\nbegin trees;\n"
-            for i in xrange( len(self.col_query) ):
-                tree = self.col_query[i]
+            for i in xrange( len(self.session[id]["col_query"]) ):
+                tree = self.session[id]["col_query"][i]
                 body += "Tree %s = %s;\n" % (tree["name"], tree["tree"])#.replace("|XXX", ""))
             body += "end;\n"
         else:
-            body = ";\n".join( tree["tree"] for tree in self.col_query )
+            body = ";\n".join( tree["tree"] for tree in self.session[id]["col_query"] )
         cherrypy.response.headers['Content-Length'] = len(body)
         cherrypy.response.headers['Content-Disposition'] = \
           'attachment; filename=filtered-collection.nwk'
@@ -197,7 +203,7 @@ if __name__ == '__main__':
     try:
         log_screen = bool(int(config.get("global","log.screen")))
     except:
-        log_screen = True
+        log_screen = False
     ip = config.get("global","server.socket_host").strip("\"")
     port = int(config.get("global","server.socket_port"))
     thread_pool = int(config.get("global","server.thread_pool"))

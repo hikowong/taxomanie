@@ -43,7 +43,6 @@ class TreeCollection( Taxobject ):
                     } )
         self.__misspelled_taxa = None
         self.__all_parents = {}
-        print "++++++++__init__ fini"
 
     def __listTaxon( self ):
         """
@@ -103,7 +102,6 @@ class TreeCollection( Taxobject ):
             tree = self.collection[i]
             if self.__misspelled_taxa is None:
                 self.__misspelled_taxa = self.__getMisSpelledTaxa(self.__listTaxon())
-                print self.__misspelled_taxa
                 self.__all_parents = self.getAllParents()
             try:
                 if self.__eval_query( query, tree["tree"] ):
