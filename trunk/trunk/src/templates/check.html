@@ -1,8 +1,8 @@
 <html>
-
+<head>
+<title> Taxonamie </title>
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="css">
-<title> Taxomanie </title>
 <script language="javascript" type="text/javascript">
 function getXhr(){
     var xhr = null; 
@@ -31,35 +31,54 @@ function go(taxon){
     xhr.onreadystatechange = function(){
         // On ne fait quelque chose que si on a tout recu et que le serveur est ok
         if(xhr.readyState == 4 && xhr.status == 200){
-            afficheDescURL(xhr.responseText);
+            afficheDescURL(taxon,xhr.responseText);
         }
     }
     xhr.open("GET","getImgUrl?taxon="+taxon,true);
     xhr.send(null);
 }
-function afficheDescURL(toThis){
+function afficheDescURL(taxon,toThis){
     if (document.getElementById){
-        document.getElementById('preview').innerHTML = toThis;
+        document.getElementById('preview').innerHTML = "<div class='nameTaxa'>"+taxon+"</div>"+toThis;
     }
     else if (document.all){
-        document.all['preview'].innerHTML = toThis;
+        document.all['preview'].innerHTML = "<div class='nameTaxa'>"+taxon+"</div>"+toThis;
     }
 }
 </script>
-
-
+</head>
 <body>
-<div class="header" id="header">
-<h1 align="center"> TAXOMANIE </h1>
-<h3 align="center"> Your Collection </h3>
-</div>
-
-<center>
-<form action="check">
-
+<a name="top"></a>
+<table class="body" border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr class="header1" valign="bottom">
+        <td class="header1" width="15%"><img src="spc.gif" alt="" height="1" width="1"></td>
+        <td class="header2" width="85%"><h1>Taxomanie</h1><h2>((Phylogenic, Tree, Checker))</h2></td>   
+    </tr>
+    <tr class="crumbs1">
+        <td class="crumbs1"><img src="spc.gif" alt="" height="1" width="1"></td> 
+        <td class="crumbs2">
+<!-- PAGE DEF : BEGINNING_________________________________________________________________ -->
+Home > Import Collection > Collection visualization
+<!-- PAGE DEF : END -->
+        </td>
+    </tr>
+    <tr class="content" valign="top">
+        <td class="links">
+<!-- MENU : BEGINNING______________________________________________________________________ -->
+<a href="home" class="path" title="Go home"> Home </a>
+<a href="." class="path" title="Go to import collection page"> Import Collection </a>
+<a href="help" class="path" title="(?) Help contents"> Help Contents </a>
+<a href="about" class="path" title="About Taxomanie project..."> About </a>  
+<!-- MENU : END -->
+     </td>
+             <td class="content">
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
+<!-- query panel -->
+<div class="query">
+<form action="check" class="nopadding">
 <input size=60  type=text 
 onfocus="if(this.value=='Your query'){this.value='';}" 
-onblur="if(this.value==''){this.value='Your query';}" 
+onblur="if(this.value==''){this.value='Your query';}"
 <%
 if _query_:
     #
@@ -72,84 +91,62 @@ else:
 value="Your query"
 <%|%>
 name="query" /> 
-<input type="submit" value="Search">
+<input type="submit" value="Search" class="button">
 <input type="hidden" name="id" value="<%$ _id_ %>" />
 </form>
 <%
 if _query_:
     #
 %>
-    <%$ _query_ %> <a href=check?id=<%$ _id_ %>&clear_query=1> back </a>
+    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a href=check?id=<%$ _id_ %>&clear_query=1>Back to full collection</a>&nbsp;|&nbsp;
 <%
 else:
     _query_ = ""
 #
 %>
-</center>
-<hr />
+<a href="/downloadCollection?id=<%$ _id_ %>">Download filtered collection</a>
+</div>
 
 <%
 if _msg_:
     #
 %>
-    <%$ _msg_ %>
+    <div  class="error"><%$ _msg_ %></div>
 <%|%>
-
-<%#
-The sidebar
-#%>
-
-<div id="sidebar">
-<b>Menu</b>
-<ul>
-<li><a href="."> Test another collection </a></li>
-</ul>
-</div>
 
 <%#
 Navigation buttons beetween trees
 #%>
 
-<center>
-<table border='0' cellpadding='2' cellspacing='5'>
-<tr>
-<td>
+<!-- tree browser -->
+<form action="check" class="browser">
 
 <%
 if len(_collection_) > 1:
     if _index_ > 1:
         #
 %>
-        <a href='check?id=<%$ _id_ %>&index=<%$ _index_-1 %>'> Previous </a>
+        &nbsp;<a href='check?id=<%$ _id_ %>&index=<%$ _index_-1 %>'>Previous</a>&nbsp;
     <%|%>
 
-    </td>
-    <form action="check">
-    <td>
-    <input type="text" size="5" value="<%$ _index_ %>" name="index"> </input>
-    /<%$ len(_collection_) %>
-    </td>
     <input type="hidden" name="id" value="<%$ _id_ %>" />
-    </form>
-    <td>
+    <input type="text" size="5" value="<%$ _index_ %>" name="index" />
+    /<%$ len(_collection_) %>
 
 <%
     if _index_ < len(_collection_):
         #
 %>
-        <a href='check?id=<%$ _id_ %>&index=<%$ _index_+1 %>'> Next </a>
+        &nbsp;<a href='check?id=<%$ _id_ %>&index=<%$ _index_+1 %>'>Next</a>&nbsp;
 <%|%>
-</td>
-</tr>
-</table>
-</center>
-
+</form>
+<!-- tree or not -->
 
 <%
 if len( _collection_ ) == 0:
     #
 %>
-   <div class="info">  Empty collection </div>
+   <div class="error">Empty collection</div>
 <%
 else:
     tree = _collection_[_index_-1]
@@ -157,31 +154,37 @@ else:
         htmltree = ""
         try:
             from phylogenictree import PhylogenicTree
-            htmltree += "<center><h3>"+str(tree["name"])+"</h3></center>"
+            htmltree += "<div class='treeName'>Tree Name : "+str(tree["name"])+"</div><br>"
             if not _cache_.has_key( tree["name"] ):
                 _cache_[tree["name"]] = PhylogenicTree( tree["tree"], _reference_ ).display()
             htmltree += _cache_[tree["name"]]
         except:
             #
 %>
-            <div id="error">
-            <center><font color="red"> An error occured with this tree : </font></center>
-            <br />
-            <%$ tree["tree"] %>
-            </div>
+            <!-- error in the tree -->
+            <div id="error" class="error"> An error occured with this tree : <%$ tree["tree"] %> </div><br />
         <%|%>
-    <hr />
+
+    <a href="#bottom" class="posPage">Go to bottom</a>
+    <!-- Tree visualization -->
+    <div class="tree">
+    <br />
     <tt>
     <%$ htmltree %>
     </tt>
-    <hr />
+    <br />
+    </div>
+    <a href="#top" class="posPage">Go to top</a>
 
-    <div id="preview"> </div>
+    <!-- div preview -->
+    <div id="preview"></div>
 <%|%>
-
-<center>
-<a href="/downloadCollection?id=<%$ _id_ %>"> Download the filtered collection </a>
-</center>
-
-</body> </html>
+<!-- CONTENT : END -->
+            <br />
+        </td>
+    </tr>
+</table>
+<a name="bottom"></a>
+</body>
+</html>
 
