@@ -46,7 +46,7 @@ class TaxonomyReference( DiGraph ):
             self.TAXONOMY[name] = {
                 "id": id,
                 "parent": parent,
-                "parents": list_parents,
+#                "parents": list_parents,
                 "synonym": synonym,
                 "common": common
             }
@@ -120,6 +120,7 @@ class TaxonomyReference( DiGraph ):
         @name: string
         @return: list
         """
+        """
         if name != "root":
             lp = self.TAXONOMY[name]["parents"]
             return lp
@@ -137,7 +138,6 @@ class TaxonomyReference( DiGraph ):
                 parents_dict[name].reverse()
             return parents_dict[name]
         return [] 
-        """
 
     def getParent( self, name ):
         return self.predecessors( name )[0]
@@ -179,6 +179,26 @@ class TaxonomyReference( DiGraph ):
             return self.getParents( taxa_list[0] )[-1]
         else:
             return "XXX"
+
+    def getNCBIArborescence( self, taxa_list ):
+        """
+        Take a taxa list, search in reference all parents names and
+        return the tree.
+
+        @nwk : string
+        @return: networkx.DiGraph
+        """
+        import networkx as NX
+        tree = NX.DiGraph()
+        for taxon in taxa_list:
+            taxon = self.stripTaxonName( taxon )
+            if self.isValid( taxon ):
+                parents = self.getParents( taxon )[:]
+                parents.reverse()
+                for parent in parents:
+                    tree.add_edge( parent, taxon )
+                    taxon = parent
+        return tree
 
     """
     def getCorrectedTaxa( self, nwk ):

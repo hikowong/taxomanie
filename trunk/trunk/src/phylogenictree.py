@@ -67,7 +67,6 @@ class PhylogenicTree( object ):
                         child += "|XXX"
                     self.tree.add_edge( parent_name, child )
 
-
     def display( self ):
         """
         @return (string): the representation of the phylogenic tree

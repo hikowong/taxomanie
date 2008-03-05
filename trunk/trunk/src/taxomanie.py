@@ -87,6 +87,10 @@ class Taxomanie( Taxobject ):
                         self.session[id]["col_query"] = self.session[id]["collection"].collection
                         self._pleet["_collection_"] = self.session[id]["col_query"]
                         self._pleet["_msg_"] = "bouhouhouh"
+                    except SyntaxError:
+                        self.session[id]["col_query"] = self.session[id]["collection"].collection
+                        self._pleet["_collection_"] = self.session[id]["col_query"]
+                        self._pleet["_msg_"] = "bouhouhouh"
                 else:
                     self.session[id]["col_query"] = self.session[id]["collection"].collection
                     self._pleet["_collection_"] = self.session[id]["col_query"]
