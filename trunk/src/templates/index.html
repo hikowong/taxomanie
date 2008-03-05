@@ -1,55 +1,65 @@
-<html><body>
-
+<html>
+<head>
+<title>Taxonamie</title>
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="css">
-<title> Taxonamie </title>
-
-<div class="header" id="header">
-<h1 align="center"> Welcome in Taxomanie </h1>
-<h3 align="center"> Phylogenic Tree Checker </h3>
-</div>
-
-<div id="sidebar">
-<b>Menu<b>
-<ul>
-<li><a href="about"> About </a></li>
-<li><a href="help"> Help </a></li>
-</ul>
-</div>
-
-<div id="error">
+</head>
+<body>
+<a name="top"></a>
+<table class="body" border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr class="header1" valign="bottom">
+        <td class="header1" width="15%"><img src="spc.gif" alt="" height="1" width="1"></td>
+        <td class="header2" width="85%"><h1>Taxomanie</h1><h2>((Phylogenic, Tree, Checker))</h2></td>
+    </tr>
+    <tr class="crumbs1">
+        <td class="crumbs1"><img src="spc.gif" alt="" height="1" width="1"></td> 
+        <td class="crumbs2">
+<!-- PAGE DEF : BEGINNING_________________________________________________________________ -->
+Home > Import Collection
+<!-- PAGE DEF : END -->
+        </td>
+    </tr>
+    <tr class="content" valign="top">
+        <td class="links">
+<!-- MENU : BEGINNING______________________________________________________________________ -->
+<a href="home" class="path" title="Go home">Home</a>
+<a href="." class="path" title="Go to import collection page">Import Collection</a>
+<a href="help" class="path" title="(?) Help contents">Help Contents</a>
+<a href="about" class="path" title="About Taxomanie project...">About</a>
+<!-- MENU : END -->
+     </td>
+             <td class="content">
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
 <%
 if _msg_:
 %>
     <%|%>
-    <center><font color="red"> <%$ _msg_ %> </font></center>
+    <div id="error" class="error"><center><%$ _msg_ %></center></div>
 <%|%>
-</div>
-
-<div class="body" id="body">
     <fieldset>
         <legend> Your collection file in newick format </legend>
         <form action="check" method="post" enctype="multipart/form-data">
-            filename: <input type="file" name="myFile" /><br />
+            Filename: <input type="file" name="myFile" class="button" />
             <input type="hidden" name="id" value="<%$ _id_ %>" />
-            <input type="reset" />
-            <input type="submit" />
+            <input type="submit" class="button" id="send" value="Send" /><br /><br />
+            <input type="reset" class="button" value="clear" />
         </form>
     </fieldset>
     or
     <fieldset>
         <legend> Your string in newick format </legend>
         <form action="check" method="post" enctype="multipart/form-data">
-            <table>
-            <textarea rows="10" cols="60" name="myFile"></textarea><br />
-            <input type="reset" />
+            <textarea rows="10" cols="80" name="myFile"></textarea><br />
+            <input type="reset" class="button" value="clear" />
             Enter your delimiter (ex: "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
-            <input type="submit" />
             <input type="hidden" name="id" value="<%$ _id_ %>" />
+            <input type="submit" class="button" id="send" value="Send" />
         </form>
     </fieldset>
-</div>
-
-</body></html>
-
+<!-- CONTENT : END -->
+        </td>
+    </tr>
+</table>
+</body>
+</html>

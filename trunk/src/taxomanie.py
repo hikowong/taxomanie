@@ -132,7 +132,7 @@ class Taxomanie( Taxobject ):
             if "thumbinner" in line:
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
                 conn.close()    
-                return """<img src="%s" />""" % url_img
+                return """<img src="%s" class="imgTaxa" />""" % url_img
         conn.putrequest( 'GET',"http://en.wikipedia.org/wiki/"+taxon )
         conn.putheader('Accept', 'text/html')
         conn.putheader('Accept', 'text/plain')
@@ -143,8 +143,8 @@ class Taxomanie( Taxobject ):
             if "class=\"image\"" in line:
                 url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
                 conn.close()    
-                return """<img src="%s" />""" % url_img
-        conn.close()    
+                return """<img src="%s" class="imgTaxa" />""" % url_img
+        conn.close() 
         return "Image not found"
 
     def __getImageUrl( self, taxon ):
@@ -156,7 +156,7 @@ class Taxomanie( Taxobject ):
             if "thumbinner" in line:
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
                 conn.close()    
-                return """<img src="%s" />""" % url_img
+                return """<img src="%s" class="imgTaxa" />""" % url_img
         conn.close()    
         conn = httplib.HTTPConnection("en.wikipedia.org")
         conn.request("GET", "/wiki/"+taxon)
@@ -165,7 +165,7 @@ class Taxomanie( Taxobject ):
             if "class=\"image\"" in line:
                 url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
                 conn.close()    
-                return """<img src="%s" />""" % url_img
+                return """<img src="%s" class="imgTaxa" />""" % url_img
         conn.close()    
         return "Image not found"
 
