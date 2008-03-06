@@ -82,6 +82,8 @@ class TreeCollection( Taxobject ):
         res = query 
         for pattern in re.findall("{([^}]+)}", query):
             striped_pattern = pattern.strip().lower()
+            if not self.reference.isValid( striped_pattern ):
+                raise NameError, striped_pattern
             if not self.species_count[tree["name"]].has_key( striped_pattern ):
                 index = 0
             else:
@@ -107,7 +109,7 @@ class TreeCollection( Taxobject ):
                 if self.__eval_query( query, tree ):
                     new_list.append( tree )
             except SyntaxError, e:
-                raise SyntaxError, "bad query %s" % e
+                raise SyntaxError, e
         return new_list
 
     def stat1( self, pattern ):
