@@ -65,7 +65,13 @@ Home > Import Collection > Collection visualization
     <tr class="content" valign="top">
         <td class="links">
 <!-- MENU : BEGINNING______________________________________________________________________ -->
-<a href="home" class="path" title="Go home"> Home </a>
+<center> <b>Current collection</b> </center>
+<a href="statistics?id=<%$ _id_ %>" class="path" title="Display statistics of collection"> Statistics </a>
+<a href="/downloadCollection?id=<%$ _id_ %>" class="path" title="Download the (full or filtered) collection">Download collection</a>
+<br />
+<br />
+<!-- <a href="home" class="path" title="Go home"> Home </a> -->
+<center> <b> Home </b> </center>
 <a href="." class="path" title="Go to import collection page"> Import Collection </a>
 <a href="help" class="path" title="(?) Help contents"> Help Contents </a>
 <a href="about" class="path" title="About Taxomanie project..."> About </a>  
@@ -104,7 +110,6 @@ else:
     _query_ = ""
 #
 %>
-<a href="/downloadCollection?id=<%$ _id_ %>">Download filtered collection</a>
 </div>
 
 <%
