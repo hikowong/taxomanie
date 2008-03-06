@@ -74,7 +74,7 @@ class Taxomanie( Taxobject ):
                     self.session[id]["collection"] = TreeCollection( input, self.reference )
                 else:#except ValueError, e:
                     return self._presentation( "index.html", msg = e)
-            self._pleet["_msg_"] = ""
+            _msg_ = ""
             if query:
                 self.session[id]["query"] = query
             if not clear_query:
@@ -83,14 +83,14 @@ class Taxomanie( Taxobject ):
                         self.session[id]["col_query"] = self.session[id][
                           "collection"].query( self.session[id]["query"] )
                         self._pleet["_collection_"] = self.session[id]["col_query"]
-                    except NameError:
+                    except NameError, e:
                         self.session[id]["col_query"] = self.session[id]["collection"].collection
                         self._pleet["_collection_"] = self.session[id]["col_query"]
-                        self._pleet["_msg_"] = "bouhouhouh"
-                    except SyntaxError:
+                        _msg_ = "Bad taxon name : %s" % e
+                    except SyntaxError, e:
+                        _msg_ = "Bad query : %s" % query
                         self.session[id]["col_query"] = self.session[id]["collection"].collection
                         self._pleet["_collection_"] = self.session[id]["col_query"]
-                        self._pleet["_msg_"] = "bouhouhouh"
                 else:
                     self.session[id]["col_query"] = self.session[id]["collection"].collection
                     self._pleet["_collection_"] = self.session[id]["col_query"]
@@ -108,7 +108,7 @@ class Taxomanie( Taxobject ):
             self._pleet["_cache_"] = self.session[id]["cache"]
             self._pleet["_reference_"] = self.reference
             self._pleet["_id_"] = id
-            return self._presentation( "check.html" )
+            return self._presentation( "check.html", msg = _msg_ )
         else:#except IndexError:
             return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")
 
