@@ -22,6 +22,9 @@ Home > Import Collection
     <tr class="content" valign="top">
         <td class="links">
 <!-- MENU : BEGINNING______________________________________________________________________ -->
+<a href="/check?id=<%$ _id_ %>" class="path" title="Go back to collection"> Back to collection </a>
+<br />
+<br />
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to import collection page">Import Collection</a>
@@ -31,32 +34,9 @@ Home > Import Collection
      </td>
              <td class="content">
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
-<%
-if _msg_:
-%>
-    <%|%>
-    <div id="error" class="error"><center><%$ _msg_ %></center></div>
-<%|%>
     <fieldset>
-        <legend> Your collection file in newick format </legend>
-        <form action="check" method="post" enctype="multipart/form-data">
-            Filename: <input type="file" name="myFile" class="button" />
-            <input type="hidden" name="id" value="<%$ _id_ %>" />
-            <input type="submit" class="button" id="send" value="Send" /><br /><br />
-            <input type="reset" class="button" value="clear" />
-        </form>
-    </fieldset>
-    or
-    <fieldset>
-        <legend> Your string in newick format </legend>
-        <form action="check" method="post" enctype="multipart/form-data">
-            <textarea rows="10" cols="80" name="myFile"></textarea><br />
-            <input type="reset" class="button" value="clear" />
-            Enter your delimiter (ex: "_" or "$" )
-            <input type="text" size="1px" name="delimiter" value="_" />
-            <input type="hidden" name="id" value="<%$ _id_ %>" />
-            <input type="submit" class="button" id="send" value="Send" />
-        </form>
+        <legend> Number of trees with number of taxa (<%$ len(_collection_) %> trees)</legend>
+        <img src="/getStatImg?id=<%$ _id_ %>" />
     </fieldset>
 <!-- CONTENT : END -->
         </td>

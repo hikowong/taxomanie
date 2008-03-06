@@ -194,11 +194,13 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def statistics( self, id ):
-        return """<img src="/getStatImg?id=%s" />""" % id
+        self._pleet["_id_"] = id
+        self._pleet["_collection_"] = self.session[int(id)]["col_query"] 
+        return self._presentation( "statistics.html" )
 
     @cherrypy.expose
     def about( self ):
-        pass
+        return "not yet"
 
     @cherrypy.expose
     def getImage( self, imagename ):
