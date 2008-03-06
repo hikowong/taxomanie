@@ -121,8 +121,23 @@ class TreeCollection( Taxobject ):
         """
         pass
     
-    def statNbNodesTree( self ):
-        pass
+    def statNbTreeWithNode( self ):
+        """
+        return the number of tree for each taxon
+        """
+        d_tree_taxon = {}
+        l_taxa = []
+        for tree in self.collection:
+            for taxon in getTaxa( tree["tree"] ):
+                if self.reference.isValid( taxon ):
+                    if taxon not in l_taxa: l_taxa.append( taxon )
+                    if not d_tree_taxon.has_key( taxon ):
+                        d_tree_taxon[l_taxa.index(taxon)] = 0
+                    d_tree_taxon[l_taxa.index(taxon)] += 1
+        result_list = []
+        for i, j in d_tree_taxon.iteritems():
+            result_list.append( (i,j) )
+        return result_list
 
     def statNbTreeWithNbNodes( self ):
         """
@@ -188,3 +203,4 @@ end;
     print len(col)
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr
+    print treecol.statNbTreeWithNode()
