@@ -1,0 +1,12 @@
+<%
+from pychart import area, bar_plot, axis, theme
+theme.output_format = "png"
+theme.reinitialize()
+
+ar = area.T( size=(500,500),
+  x_axis= axis.X(label="Number of taxa"),
+  y_axis = axis.Y(label="Number of trees")
+)
+ar.add_plot(bar_plot.T(data=_resultlist_))
+ar.draw()
+%>
