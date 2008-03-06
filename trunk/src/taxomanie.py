@@ -188,9 +188,14 @@ class Taxomanie( Taxobject ):
         return cherrypy.response.body
 
     @cherrypy.expose
-    def getStatImg( self, id ):
+    def getStatImg1( self, id ):
         resultlist = self.session[int(id)]["collection"].statNbTreeWithNbNodes()
-        return os.popen( 'python stat.py "%s"' % resultlist ).read()
+        return os.popen( 'python stat1.py "%s"' % resultlist ).read()
+
+    @cherrypy.expose
+    def getStatImg2( self, id ):
+        resultlist = self.session[int(id)]["collection"].statNbTreeWithNode()
+        return os.popen( 'python stat2.py "%s"' % resultlist ).read()
 
     @cherrypy.expose
     def statistics( self, id ):
