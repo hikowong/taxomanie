@@ -204,19 +204,29 @@ class Taxomanie( Taxobject ):
         return self._presentation( "statistics.html" )
 
     @cherrypy.expose
-    def about( self ):
-        return "not yet"
+    def about( self, id ):
+        self._pleet["_id_"] = id
+        try:
+            self._pleet["_collection_"] = self.session[int(id)]["collection"]
+        except:
+            self._pleet["_collection_"] = []
+        return self._presentation( "about.html" )
 
     @cherrypy.expose
-    def getImage( self, imagename ):
+    def help( self, id ):
+        self._pleet["_id_"] = id
+        try:
+            self._pleet["_collection_"] = self.session[int(id)]["collection"]
+        except:
+            self._pleet["_collection_"] = []
+        return self._presentation( "help.html" )
+
+    @cherrypy.expose
+    def getImage( self, imagename ): #XXX not used
         return open( imagename, "rb").read()
-        
-
-    @cherrypy.expose
-    def help( self ):
-        return "not yet"
 
 cherrypy.tree.mount(Taxomanie())
+
 
 if __name__ == '__main__':
     import os.path

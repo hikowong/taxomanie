@@ -15,17 +15,22 @@
         <td class="crumbs1"><img src="spc.gif" alt="" height="1" width="1"></td> 
         <td class="crumbs2">
 <!-- PAGE DEF : BEGINNING_________________________________________________________________ -->
-Home > Import Collection
+Home > About
 <!-- PAGE DEF : END -->
         </td>
     </tr>
     <tr class="content" valign="top">
         <td class="links">
 <!-- MENU : BEGINNING______________________________________________________________________ -->
-<a href="/check?id=<%$ _id_ %>" class="path" title="Go back to collection"> Back to collection </a>
-<br />
-<br />
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
+<%
+if _collection_:
+    #
+%>
+    <a href="/check?id=<%$ _id_ %>" class="path" title="Go back to collection"> Back to collection </a>
+<%|%>
+<br />
+<br />
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to import collection page">Import Collection</a>
 <a href="help?id=<%$_id_%>" class="path" title="(?) Help contents">Help Contents</a>
@@ -34,14 +39,22 @@ Home > Import Collection
      </td>
              <td class="content">
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
-    <fieldset>
-        <legend> Number of trees with number of taxa (<%$ len(_collection_) %> trees)</legend>
-        <img src="/getStatImg1?id=<%$ _id_ %>" />
-    </fieldset>
-    <fieldset>
-        <legend> Number of trees wich has this taxon (<%$ len(_collection_) %> trees)</legend>
-        <img src="/getStatImg2?id=<%$ _id_ %>" />
-    </fieldset>
+<h3> What is it ? </h3>
+TaxoManie is a free, simple to use web service dedicated to check taxa's
+names and to give statistic of phylogeny trees.
+
+You can use filter and query in order to extract usefull informations of your
+phylogenetic trees.
+
+<h3> Authors </h3>
+This application was created by
+<ul>
+<li> Auberval Nicolas </li>
+<li> Clairon Nicolas </li>
+<li> Diser Sorel </li>
+</ul>
+
+
 <!-- CONTENT : END -->
         </td>
     </tr>
