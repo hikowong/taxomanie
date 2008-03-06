@@ -189,7 +189,12 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def about( self ):
-        return "not yet"
+        return """<img src="/getImage?imagename=image.png" />"""
+
+    @cherrypy.expose
+    def getImage( self, imagename ):
+        return open( imagename, "rb").read()
+        
 
     @cherrypy.expose
     def help( self ):

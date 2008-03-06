@@ -46,7 +46,7 @@ class TaxonomyReference( DiGraph ):
             self.TAXONOMY[name] = {
                 "id": id,
                 "parent": parent,
-#                "parents": list_parents,
+                "parents": list_parents,
                 "synonym": synonym,
                 "common": common
             }
@@ -120,7 +120,6 @@ class TaxonomyReference( DiGraph ):
         @name: string
         @return: list
         """
-        """
         if name != "root":
             lp = self.TAXONOMY[name]["parents"]
             return lp
@@ -138,6 +137,18 @@ class TaxonomyReference( DiGraph ):
                 parents_dict[name].reverse()
             return parents_dict[name]
         return [] 
+        """
+
+    def getIntervalParents( self, name1, name2 ):
+        """
+        return parents list beetween 2 taxons.
+
+        Exemple:
+            >>> self.getIntervalParents( "murinae", "eutheria" )
+            ['euarchontoglires', 'glires', 'rodentia', 'sciurognathi', 'muroidea']
+        """
+        parents_list = self.getParents( name2 )
+        return parents_list[parents_list.index( name1 )+1:]
 
     def getParent( self, name ):
         return self.predecessors( name )[0]
@@ -212,8 +223,10 @@ class TaxonomyReference( DiGraph ):
         return rel_dict
     """     
 if __name__ == "__main__":
-    ref = TaxonomyReference( "taxonomy.csv" )
+    ref = TaxonomyReference()
     print "rattus>", ref.correct( "rattus" )
     print "rats>", ref.correct( "rats" )
     print "ratus>", ref.correct( "ratus" )
+    print ref.getParents( "murinae" )
+    print ref.getIntervalParents( "eutheria", "murinae" )
 
