@@ -188,15 +188,17 @@ class Taxomanie( Taxobject ):
         return cherrypy.response.body
 
     @cherrypy.expose
-    def stat( self, id ):
-        print self.session.keys()
-        print self.session[int(id)]
-        self._pleet["_resultlist_"] = self.session[int(id)]["collection"].statNbTreeWithNbNodes()
-        return self._presentation( "stat.html" )
+    def getStatImg( self, id ):
+        resultlist = self.session[int(id)]["collection"].statNbTreeWithNbNodes()
+        return os.popen( 'python stat.py "%s"' % resultlist ).read()
+
+    @cherrypy.expose
+    def statistics( self, id ):
+        return """<img src="/getStatImg?id=%s" />""" % id
 
     @cherrypy.expose
     def about( self ):
-        return """<img src="/stat?id=1" />"""
+        pass
 
     @cherrypy.expose
     def getImage( self, imagename ):
