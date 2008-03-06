@@ -128,19 +128,14 @@ class TreeCollection( Taxobject ):
         """
         d_tree_nodes = {}
         for tree in self.collection:
-            taxa_len = len( getTaxa( tree ) )
+            taxa_len = len( getTaxa( tree["tree"] ) )
             if not d_tree_nodes.has_key( taxa_len ):
                 d_tree_nodes[taxa_len] = 0
-            d_tree_node[taxa_len] += 1
+            d_tree_nodes[taxa_len] += 1
         result_list = []
-        for i, j in d_tree_node.iteritems():
+        for i, j in d_tree_nodes.iteritems():
             result_list.append( (i,j) )
-        ar = PC.area.T( size=(500,500),
-          x_axis= PC.axis.X(label="Number of taxa"),
-          y_axis = PC.axis.Y(label="Number of trees")
-        )
-        ar.add_plot(PC.bar_plot.T(data=data))
-        ar.draw()
+        return result_list
 
 if __name__ == "__main__":
     from taxonomyreference import TaxonomyReference
@@ -176,14 +171,18 @@ tree ENm001.mcs1005.merge20.443262.6.mfa =
 (Pan,Hylobates,Colobus,Chlorocebus,Papio,Callicebus,Aotus,Callithrix,Saimiri,Microcebus,Otolemur,Rattus,Mus,Cavia,Spermophilus,Oryctolagus,Bos,Felis,Canis,Equus,Chiroptera,Myotis,Sorex,Dasypus,Loxodonta,Procavia);
 end;
 """
+    import time
+    col = open( "../data/omm_cds_nex.tre" ).read()
+    d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
-#    print len(treecol.collection), treecol.collection
+    f = time.time()
+    print len(treecol.collection)
 #    for tree in treecol.collection:
 #        print tree["tree"]
-    print len(col.split(";")[1:-1]), col.split(";")[1:-1]
-    import time
-    d = time.time()
+#    print len(col.split(";")[1:-1]), col.split(";")[1:-1]
+    dr = time.time()
     col = treecol.query( "{murinae}>1" )
-    f = time.time()
-    print len(col), col
-    print "generee en ", f-d
+    fr = time.time()
+    print len(col)
+    print "collection generee en ", f-d
+    print "requete generee en ", fr-dr

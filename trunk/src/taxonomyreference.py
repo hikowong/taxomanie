@@ -84,7 +84,7 @@ class TaxonomyReference( DiGraph ):
         return (bool): True if name is a scientific name
             return False otherwise
         """
-        return name.lower() in self.TAXONOMY.iterkeys()
+        return self.TAXONOMY.has_key( name.lower() )
 
     def correct( self, name, guess = False ):
         """
@@ -120,9 +120,8 @@ class TaxonomyReference( DiGraph ):
         @name: string
         @return: list
         """
-        if name != "root":
-            lp = self.TAXONOMY[name]["parents"]
-            return lp
+        if name != "root" and self.isValid( name ):
+            return self.TAXONOMY[name]["parents"]
         return []
         """
         parents_dict = {}
@@ -227,6 +226,9 @@ if __name__ == "__main__":
     print "rattus>", ref.correct( "rattus" )
     print "rats>", ref.correct( "rats" )
     print "ratus>", ref.correct( "ratus" )
-    print ref.getParents( "murinae" )
+    print ref.getParents( "canis familiaris" )
     print ref.getIntervalParents( "eutheria", "murinae" )
+
+
+
 
