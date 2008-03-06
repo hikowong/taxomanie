@@ -67,14 +67,17 @@ class PhylogenicTree( object ):
                         child += "|XXX"
                     self.tree.add_edge( parent_name, child )
 
-    def display( self ):
+    def display( self, tree = None ):
         """
         @return (string): the representation of the phylogenic tree
         """
         result = ""
         if not self.root:
             return result
-        result += self.__display()
+        if tree:
+            result += self.__display( tree = tree )
+        else:
+            result += self.__display( tree = self.tree )
         return result
 
     def __linkList( self, my_list ):
@@ -87,7 +90,7 @@ class PhylogenicTree( object ):
               "'>"+item+"</a>" \
           for item in my_list ] )
 
-    def __display( self, root = "",  mydepth = 0 ):
+    def __display( self, tree, root = "",  mydepth = 0 ):
         """
         Pretty print of the tree in HTML.
 
@@ -101,14 +104,14 @@ class PhylogenicTree( object ):
             result += "<a class='genre' href='"+self.NCBI+ \
               self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
             result += "|<br />\n"
-        for node in self.tree.successors( root ):
+        for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.ref_tree.delimiter, " ")
             bdnode = self.ref_tree.stripTaxonName( node.split("|")[0] )
             depth = 0
             while depth != mydepth :
                 result += "| "
                 depth += 1
-            subnodes = self.tree.successors( node )
+            subnodes = tree.successors( node )
             if subnodes:
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
@@ -121,7 +124,7 @@ class PhylogenicTree( object ):
                         self.NCBI,
                         self.ref_tree.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
-                result += self.__display( node, depth + 1)
+                result += self.__display( tree,  node, depth + 1)
             else:
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
@@ -142,11 +145,21 @@ if __name__ == "__main__":
 #    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Ratus:0.016167):0.055242,Oryctolagu:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelph:0.093131);"""
     trees = ["((loxondonta africana,pan),homo)"]#, "((homo,mus),(ratus,pan))", "((mu,ratus),homo)"]
 
-    for tree in trees:
-        ptree = PhylogenicTree( tree )
-        print tree
-        print ptree.tree.edges()
-        print ptree.miss_spelled
-        print ptree.display("html")
-        print "#"*10
+    tree = PhylogenicTree( "((mus, rattus), pan, (bos, canis))" )
+    print tree.display()
+
+    print "<hr />"
+    xtree = tree.ref_tree.getNCBIArborescence( ["mus", "rattus", "bos", "canis" ])
+    #print type( xtree )
+    print tree.display( xtree )
+
+#    for tree in trees:
+#        ptree = PhylogenicTree( tree )
+#        print tree
+#        print ptree.tree.edges()
+#        print ptree.miss_spelled
+#        print ptree.display()
+#        print "#"*10
+#    
+
      
