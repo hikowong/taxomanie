@@ -170,6 +170,14 @@ else:
             <div id="error" class="error"> An error occured with this tree : <%$ tree["tree"] %> </div><br />
         <%|%>
 
+<%
+if _nbbadtaxa_:
+    #
+%>
+    <center>
+    <font color="red"> <%$ _nbbadtaxa_ %> bad taxa in this collection </font><br />
+    </center>
+<%|%>
     <a href="#bottom" class="posPage">Go to bottom</a>
     <!-- Tree visualization -->
     <div class="tree">
