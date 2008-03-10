@@ -210,6 +210,7 @@ class TaxonomyReference( DiGraph ):
                     taxon = parent
         return tree
 
+
     """
     def getCorrectedTaxa( self, nwk ):
         from lib.phylogelib import getTaxa
