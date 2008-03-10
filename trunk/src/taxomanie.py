@@ -57,6 +57,7 @@ class Taxomanie( Taxobject ):
                 self.session[id]["cache"] = {}
                 self.session[id]["named_tree"] = {}
                 self.session[id]["collection"] = []
+                self.session[id]["nbbadtaxa"] = 0
                 self.reference.delimiter = delimiter
                 if isinstance( myFile, str ):
                     input = myFile 
@@ -72,6 +73,7 @@ class Taxomanie( Taxobject ):
                 input = input.strip()
                 if 1:#try:
                     self.session[id]["collection"] = TreeCollection( input, self.reference )
+                    self.session[id]["nbbadtaxa"] = self.session[id]["collection"].species_count["XXX"]
                 else:#except ValueError, e:
                     return self._presentation( "index.html", msg = e)
             _msg_ = ""
@@ -108,6 +110,7 @@ class Taxomanie( Taxobject ):
             self._pleet["_cache_"] = self.session[id]["cache"]
             self._pleet["_reference_"] = self.reference
             self._pleet["_id_"] = id
+            self._pleet["_nbbadtaxa_"] = self.session[id]["nbbadtaxa"]
             return self._presentation( "check.html", msg = _msg_ )
         else:#except IndexError:
             return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")
@@ -173,7 +176,7 @@ class Taxomanie( Taxobject ):
     def downloadCollection(self, id, target="nexus"):
         cherrypy.response.headers['Content-Type'] = 'application/x-download'
         id = int(id)
-        if 0:#target == "nexus":
+        if target == "nexus":
             body = "#nexus\nbegin trees;\n"
             for i in xrange( len(self.session[id]["col_query"]) ):
                 tree = self.session[id]["col_query"][i]
@@ -183,7 +186,7 @@ class Taxomanie( Taxobject ):
             body = ";\n".join( tree["tree"] for tree in self.session[id]["col_query"] )
         cherrypy.response.headers['Content-Length'] = len(body)
         cherrypy.response.headers['Content-Disposition'] = \
-          'attachment; filename=filtered-collection.nwk'
+          'attachment; filename=filtered-collection-%s.nwk' % str(id)
         cherrypy.response.body = body 
         return cherrypy.response.body
 

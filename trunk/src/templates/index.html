@@ -40,10 +40,12 @@ if _msg_:
     <fieldset>
         <legend> Your collection file in newick format </legend>
         <form action="check" method="post" enctype="multipart/form-data">
-            Filename: <input type="file" name="myFile" class="button" />
+            Filename: <input type="file" name="myFile" class="button" /><br /><br />
             <input type="hidden" name="id" value="<%$ _id_ %>" />
-            <input type="submit" class="button" id="send" value="Send" /><br /><br />
             <input type="reset" class="button" value="clear" />
+            Enter your delimiter (ex: "_" or "$" )
+            <input type="text" size="1px" name="delimiter" value="_" />
+            <input type="submit" class="button" id="send" value="Send" /><br />
         </form>
     </fieldset>
     or

@@ -47,18 +47,22 @@ class TreeCollection( Taxobject ):
         """
         Return the number of each species in the collection for each tree
         """
-        d_genre = {}
+        d_genre = {"XXX":0}
         for tree in self.collection:
             if not d_genre.has_key( tree["name"] ):
                 d_genre[tree["name"]] = {}
             for taxon in getTaxa( tree["tree"] ):
-                if not d_genre[tree["name"]].has_key( taxon ):
-                    d_genre[tree["name"]][taxon] = 0
-                d_genre[tree["name"]][taxon] += 1
-                for parent in self.reference.getParents( taxon ):
-                    if not d_genre[tree["name"]].has_key( parent ):
-                        d_genre[tree["name"]][parent] = 0
-                    d_genre[tree["name"]][parent] += 1
+                taxon = self.reference.stripTaxonName(taxon)
+                if self.reference.isValid( taxon ):
+                    if not d_genre[tree["name"]].has_key( taxon ):
+                        d_genre[tree["name"]][taxon] = 0
+                    d_genre[tree["name"]][taxon] += 1
+                    for parent in self.reference.getParents( taxon ):
+                        if not d_genre[tree["name"]].has_key( parent ):
+                            d_genre[tree["name"]][parent] = 0
+                        d_genre[tree["name"]][parent] += 1
+                else:
+                    d_genre["XXX"] += 1
         return d_genre
 
     def countNbSpecies( self ):
@@ -190,6 +194,7 @@ end;
 """
     import time
     col = open( "../data/omm_cds_nex.tre" ).read()
+    col = "(Echinops_telfairi);"
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
@@ -197,6 +202,7 @@ end;
 #    for tree in treecol.collection:
 #        print tree["tree"]
 #    print len(col.split(";")[1:-1]), col.split(";")[1:-1]
+    print treecol.species_count
     dr = time.time()
     col = treecol.query( "{murinae}>1" )
     fr = time.time()

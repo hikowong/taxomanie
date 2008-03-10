@@ -226,7 +226,7 @@ if __name__ == "__main__":
     print "rattus>", ref.correct( "rattus" )
     print "rats>", ref.correct( "rats" )
     print "ratus>", ref.correct( "ratus" )
-    print ref.getParents( "canis familiaris" )
+    print ref.getParents( "echinops telfairi" )
     print ref.getIntervalParents( "eutheria", "murinae" )
 
 
