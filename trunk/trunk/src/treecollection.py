@@ -12,6 +12,8 @@ class TreeCollection( Taxobject ):
         - diplay
         ...
     """
+
+    NCBI = "http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
     
     def __init__( self, nwk_collection, reference ):
         """
@@ -41,29 +43,46 @@ class TreeCollection( Taxobject ):
                       "name": index,
                       "tree": nwktree,
                     } )
-        self.species_count = self.countNbSpeciesByTree()
+        self.taxa_list = set()
+        self.species_count = {"XXX":0}
+        self._d_taxonlist = {}
+        self.__init()
 
-    def countNbSpeciesByTree( self ):
+    def __init( self ):
         """
-        Return the number of each species in the collection for each tree
+        - count the number of species by tree
+        - fill the taxa list
         """
-        d_genre = {"XXX":0}
         for tree in self.collection:
-            if not d_genre.has_key( tree["name"] ):
-                d_genre[tree["name"]] = {}
+            if not self.species_count.has_key( tree["name"] ):
+                self.species_count[tree["name"]] = {}
+                self._d_taxonlist[tree["name"]] = set()
             for taxon in getTaxa( tree["tree"] ):
                 taxon = self.reference.stripTaxonName(taxon)
                 if self.reference.isValid( taxon ):
-                    if not d_genre[tree["name"]].has_key( taxon ):
-                        d_genre[tree["name"]][taxon] = 0
-                    d_genre[tree["name"]][taxon] += 1
+                    for tax in self.reference.getParents( taxon ):
+                        self.taxa_list.add( tax )
+                        self._d_taxonlist[tree["name"]].add( tax )
+                    if not self.species_count[tree["name"]].has_key( taxon ):
+                        self.species_count[tree["name"]][taxon] = 0
+                    self.species_count[tree["name"]][taxon] += 1
                     for parent in self.reference.getParents( taxon ):
-                        if not d_genre[tree["name"]].has_key( parent ):
-                            d_genre[tree["name"]][parent] = 0
-                        d_genre[tree["name"]][parent] += 1
+                        if not self.species_count[tree["name"]].has_key( parent ):
+                            self.species_count[tree["name"]][parent] = 0
+                        self.species_count[tree["name"]][parent] += 1
                 else:
-                    d_genre["XXX"] += 1
-        return d_genre
+                    self.species_count["XXX"] += 1
+        self.taxa_list = list( self.taxa_list )
+
+    def getNbTrees( self, taxon ):
+        """
+        return the number of trees where taxon is
+        """
+        nb = 0
+        for tree, taxa_list in self._d_taxonlist.iteritems():
+            if taxon in taxa_list:
+                nb += 1
+        return nb
 
     def countNbSpecies( self ):
         #XXX Not used
@@ -116,15 +135,6 @@ class TreeCollection( Taxobject ):
                 raise SyntaxError, e
         return new_list
 
-    def stat1( self, pattern ):
-        """
-        for taxon in 
-            for taxon in getTaxa( tree ):
-                taxon = self.reference.stripTaxonName( taxon )
-        return {"name1":3, "name2":4}
-        """
-        pass
-    
     def statNbTreeWithNode( self ):
         """
         return the number of tree for each taxon
@@ -157,6 +167,81 @@ class TreeCollection( Taxobject ):
         for i, j in d_tree_nodes.iteritems():
             result_list.append( (i,j) )
         return result_list
+
+    def displayStats( self, id, allparents = False ):
+        """
+        Display NCBI arborescence with stats
+        """
+        tree = self.reference.getNCBIArborescence( self.taxa_list )
+        if not allparents:
+            tree = self.__removeSingleParent( tree )
+        return self.__display( tree, id )
+
+    def __removeSingleParent( self, tree ):
+        for node in tree:
+            n = tree.predecessors( node ) + tree.successors(node)
+            if len(n) == 2:
+                tree.delete_edge( n[0], node )
+                tree.delete_edge( node, n[1] )
+                tree.add_edge( n[0], n[1] )
+        return tree
+
+    def __display( self, tree, id, root = "",  mydepth = 0 ):
+        """
+        Pretty print of the tree in HTML.
+
+        @root (string): parent name
+        @mydepth (int): depth in the tree
+        @return (string): the display in html format
+        """
+        result = ""
+        if not root:
+            root = "root"
+            result += "<a class='genre' href='"+self.NCBI+ \
+              self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
+            result += "|<br />\n"
+        for node in tree.successors( root ):
+            dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
+            bdnode = self.reference.stripTaxonName( node.split("|")[0] )
+            depth = 0
+            while depth != mydepth :
+                result += "| "
+                depth += 1
+            subnodes = tree.successors( node )
+            if subnodes:
+                if "XXX" in node:
+                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
+                else:
+                    result += """+-<a id="%s" class="genre" onmouseover="go('%s')"
+                      onmouseout="afficheDescURL('')" href="%s%s"> %s
+                      </a>"""% (
+                        self.reference.TAXONOMY[bdnode]["id"],
+                        bdnode.capitalize(),
+                        self.NCBI,
+                        self.reference.TAXONOMY[bdnode]["id"],
+                        dispnode.capitalize() )
+                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>) <br />\n""" % (
+                      bdnode,
+                      str(id),
+                      self.getNbTrees( bdnode ) )
+                result += self.__display( tree, id, node, depth + 1)
+            else:
+                if "XXX" in node:
+                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
+                else:
+                    result += """+-<a id="%s" class="species" onmouseover="go('%s')"
+                      onmouseout="afficheDescURL('')" href="%s%s"> %s
+                      </a>""" % (
+                        self.reference.TAXONOMY[bdnode]["id"],
+                        bdnode.capitalize(),
+                        self.NCBI,
+                        self.reference.TAXONOMY[bdnode]["id"],
+                        dispnode.capitalize() )
+                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>) <br />\n""" % (
+                      bdnode,
+                      str(id),
+                      self.getNbTrees( bdnode ) )
+        return result
 
 if __name__ == "__main__":
     from taxonomyreference import TaxonomyReference

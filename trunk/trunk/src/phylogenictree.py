@@ -11,18 +11,18 @@ class PhylogenicTree( object ):
     """
     
     NCBI = "http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
-    ref_tree = None
+    reference = None
 
     def __init__( self, nwk, reference = None ):
         """
         @nwk (string): string in newick format
         @reference (networkx.DiGraph): The reference tree of NCBI database
         """
-        if self.ref_tree is None:
+        if self.reference is None:
             if reference is None:
-                PhylogenicTree.ref_tree = TaxonomyReference()
+                PhylogenicTree.reference = TaxonomyReference()
             else:
-                PhylogenicTree.ref_tree = reference
+                PhylogenicTree.reference = reference
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
         checkNwk( self.nwk )
 #        self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
@@ -44,12 +44,12 @@ class PhylogenicTree( object ):
                 parent_name = self.root
             else:
                 if not self.rel_name.has_key( tree ):
-                    parent_name = self.ref_tree.getCommonParent(getTaxa(tree))
+                    parent_name = self.reference.getCommonParent(getTaxa(tree))
                 else:
                     parent_name = self.rel_name[tree]
             for child in getChildren( tree ):
                 if getChildren( child ): # child is a node
-                    child_name = self.ref_tree.getCommonParent(getTaxa(child))
+                    child_name = self.reference.getCommonParent(getTaxa(child))
                     if child_name not in self.children_name:
                         self.children_name.append( parent_name )
                     # Rename child_name if already exists
@@ -63,7 +63,7 @@ class PhylogenicTree( object ):
                     self.tree.add_edge( parent_name, child_name )
                     self._getArborescence( tree = child )
                 else: # child is a taxon
-                    if not self.ref_tree.isValid( self.ref_tree.stripTaxonName(child) ):
+                    if not self.reference.isValid( self.reference.stripTaxonName(child) ):
                         child += "|XXX"
                     self.tree.add_edge( parent_name, child )
 
@@ -84,9 +84,9 @@ class PhylogenicTree( object ):
         """
         Link all taxon in list with html
         """
-        my_list =  [ item for item in my_list if self.ref_tree.TAXONOMY.has_key( item ) ]
+        my_list =  [ item for item in my_list if self.reference.TAXONOMY.has_key( item ) ]
         return str( [
-          "<a href='"+self.NCBI+self.ref_tree.TAXONOMY[item]["id"]+\
+          "<a href='"+self.NCBI+self.reference.TAXONOMY[item]["id"]+\
               "'>"+item+"</a>" \
           for item in my_list ] )
 
@@ -102,11 +102,11 @@ class PhylogenicTree( object ):
         if not root:
             root = self.root
             result += "<a class='genre' href='"+self.NCBI+ \
-              self.ref_tree.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
+              self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
             result += "|<br />\n"
         for node in tree.successors( root ):
-            dispnode = node.split("|")[0].replace(self.ref_tree.delimiter, " ")
-            bdnode = self.ref_tree.stripTaxonName( node.split("|")[0] )
+            dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
+            bdnode = self.reference.stripTaxonName( node.split("|")[0] )
             depth = 0
             while depth != mydepth :
                 result += "| "
@@ -119,10 +119,10 @@ class PhylogenicTree( object ):
                     result += """+-<a id="%s" class="genre" onmouseover="go('%s')"
                       onmouseout="afficheDescURL('')" href="%s%s"> %s
                       </a><br />\n""" % (
-                        self.ref_tree.TAXONOMY[bdnode]["id"],
+                        self.reference.TAXONOMY[bdnode]["id"],
                         bdnode.capitalize(),
                         self.NCBI,
-                        self.ref_tree.TAXONOMY[bdnode]["id"],
+                        self.reference.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
                 result += self.__display( tree,  node, depth + 1)
             else:
@@ -132,12 +132,13 @@ class PhylogenicTree( object ):
                     result += """+-<a id="%s" class="species" onmouseover="go('%s')"
                       onmouseout="afficheDescURL('')" href="%s%s"> %s
                       </a><br />\n""" % (
-                        self.ref_tree.TAXONOMY[bdnode]["id"],
+                        self.reference.TAXONOMY[bdnode]["id"],
                         bdnode.capitalize(),
                         self.NCBI,
-                        self.ref_tree.TAXONOMY[bdnode]["id"],
+                        self.reference.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
         return result
+
 
 if __name__ == "__main__":
     
@@ -149,7 +150,7 @@ if __name__ == "__main__":
     print tree.display()
 
     print "<hr />"
-    xtree = tree.ref_tree.getNCBIArborescence( ["mus", "rattus", "bos", "canis" ])
+    xtree = tree.reference.getNCBIArborescence( ["mus", "rattus", "bos", "canis" ])
     #print type( xtree )
     print tree.display( xtree )
 
