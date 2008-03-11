@@ -22,38 +22,62 @@ Home > Import Collection
     <tr class="content" valign="top">
         <td class="links">
 <!-- MENU : BEGINNING______________________________________________________________________ -->
-<a href="/check?id=<%$ _id_ %>" class="path" title="Go back to collection"> Back to collection </a>
-<br />
-<br />
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to import collection page">Import Collection</a>
 <a href="help?id=<%$_id_%>" class="path" title="(?) Help contents">Help Contents</a>
 <a href="about?id=<%$_id_%>" class="path" title="About Taxomanie project...">About</a>
+<br />
+<center> <b>Current collection</b> </center>
+<a href="/check?id=<%$ _id_ %>" class="path" title="Go back to collection"> Back to collection </a>
+<br />
 <!-- MENU : END -->
      </td>
              <td class="content">
-<!-- CONTENU : BEGINNING____________________________________________________________________ -->
 <!--
-    <fieldset>
-        <legend> Number of trees with number of taxa (<%$ len(_collection_) %> trees)</legend>
-        <img src="/getStatImg1?id=<%$ _id_ %>" />
-    </fieldset>
-    <fieldset>
-        <legend> Number of trees wich has this taxon (<%$ len(_collection_) %> trees)</legend>
-        <img src="/getStatImg2?id=<%$ _id_ %>" />
-    </fieldset>
+            <a href="#chart1" class="posPage">&nbsp;Go to chart1&nbsp;</a>
+            <a href="#chart2" class="posPage">&nbsp;Go to chart2&nbsp;</a>
+            <a href="#arbo" class="posPage">&nbsp;Go to reference tree&nbsp;</a>
 -->
+            <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+            <br />
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
+<div class="stat">
+    <br />
+<!--
+    <a name="chart1"></a>
+    <fieldset>
+        <legend> Chart1 : Number of trees with number of taxa (<%$ len(_collection_) %> trees)</legend>
+        <img src="/getStatImg1?id=<%$ _id_ %>" />
+    </fieldset><br />
+    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+    <br /><br />
+
+    <a name="chart2"></a>
+    <fieldset>
+        <legend> Chart2 : Number of trees wich has this taxon (<%$ len(_collection_) %> trees)</legend>
+        <img src="/getStatImg2?id=<%$ _id_ %>" />
+    </fieldset><br />
+    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+    <br /><br />
+-->
+    <a name="arbo"></a>
     <fieldset>
         <legend> NCBI arborescence</legend>
-        <tt>
         <%$ _ncbitree_ %>
-        </tt>
-    </fieldset>
-
+    </fieldset><br />
+</div>
 <!-- CONTENT : END -->
+            <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+<!--
+
+            <a href="#chart1" class="posPage">&nbsp;Go to chart1&nbsp;</a>
+            <a href="#chart2" class="posPage">&nbsp;Go to chart2&nbsp;</a>
+            <a href="#arbo" class="posPage">&nbsp;Go to reference tree&nbsp;</a>
+-->
         </td>
     </tr>
 </table>
+<a name="bottom"></a>
 </body>
 </html>

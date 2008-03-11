@@ -83,15 +83,17 @@ a:hover.genre span, a:hover.species span
     { 
     font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
     font-size: 12px;
-    color: #000;
     font-weight: normal;
     position:fixed; 
     z-index:3; 
     float:bottom;
-    bottom:0px;
-    right:0px; 
+    bottom:10px;
+    right:10px; 
     text-align:left; 
-    /* background: #fff; */
+    color: #fff;
+    /*background: #000; éviter à cause des images png, ex: homo */
+    /*width: 200px;*/
+    /*height: 200px;*/
     }
 
 .nameTaxa 
@@ -330,17 +332,41 @@ legend
 	text-align: center;
     }
 
-a.posPage 
+a.posPage, a.posPage:visited, a.posPage:link
     {
     font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
 	font-size: 10px;
-    color: #666;
-	font-weight: normal;
+    color: grey;
+	font-weight: bold;
 	text-decoration: none;
     font-style: italic;
+    /*background-color: silver;*/
     }
 
-a.posPage:visited, a.posPage:hover, a.posPage:link {}
+a.posPage:hover  {
+    /*background-color: grey;
+    font-weight: bold;*/
+    color: #000;
+}
+
+
+a#iNode
+    {
+    font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
+    font-size: 10px;
+    color: grey;
+    font-weight: bold;
+    text-decoration: none;
+    font-style: italic;
+    border: 0px;
+    /*background-color: silver;*/
+    }
+
+a#iNode:hover  {
+    /*background-color: grey;
+    font-weight: bold;*/
+    color: #000;
+}
 
 .button
     {
@@ -382,87 +408,13 @@ a.posPage:visited, a.posPage:hover, a.posPage:link {}
     border-bottom: 1px solid #CCC;
     }
 
+.stat 
+    {
+    border-top: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+    }
+
 .nopadding 
     {
     padding: 0px 0px;
-    }
-
-
-
-
-
-/************************* USELESS PART ***************************
-/ The sidebar is a DIV made "by hand", inserting custom HTML code
-/ on the page with %!postproc filters.
-/
-/ Yes, it is that green strip at the right with the menu links.
-/ This is the most tricky part of the CSS, some magic was necessary.
-/
-/ The sidebar is floated right with its width set in EMs, so it scales
-/ with the text size, not window. Cute.
-/
-/ The right margin is negative so the sidebar can "escape" the #body
-/ box padding and stick with the right border of the window.
-/
-/ The menu links are defined as block so you can click outside the
-/ text and it will work. And they're *always* the same color, visited
-/ or not.
-/
-/ Images are showed as blocks with auto margins, to get centered.
-*/
-
-#sidebar
-    {
-    float        : right;
-    width        : 11.5em;
-    height     :  50%;
-    background-color: #cf9;
-    color        : #030;
-    border-color    : #fff;
-    border-style    : solid;
-    border-width    : 0 0 1px 1px;
-    margin        : 0 0em 1em 2em;
-    padding        : 1em;
-    z-index        : 1;
-    /* IE: Box model strikes again */
-    _height     :  50%;
-    _width        : 11.5em;
-    _margin        : 0 -1em 0 2em;
-    }
-#sidebar a
-    {
-    display        : block;
-    color        : #363;
-    font-weight    : normal;
-    }
-#sidebar a:hover
-    {
-    background-color: #ad7;
-    }
-#sidebar ul {
-    margin        : 0 0 0 1em;
-    padding        : 0;
-}
-#sidebar ul li {
-    list-style-type    : none;
-    _border        : 1px solid #cf9;  /* IE: fixes spaced items bug */
-}
-#sidebar p
-    {
-    margin        : 0;
-    }
-#sidebar img
-    {
-    display        : block;
-    margin        : 1em auto 0 auto;
-    _text-align    : center; /* IE: margin:auto didn't work */
-    }
-
-/* A special link with the lang ID, placed at the top/right edge */
-#sidebar a#lang
-    {
-    float        : right;
-    margin        : -1em -1em 0 0;
-    _margin-right    : -.5em; /* IE: well... */
-    font-size    : 80%;
     }
