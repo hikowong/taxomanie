@@ -46,25 +46,30 @@ class TreeCollection( Taxobject ):
         self.taxa_list = set()
         self.species_count = {"XXX":0}
         self._d_taxonlist = {}
+        self._d_reprtaxon = {}
         self.__init()
 
     def __init( self ):
         """
-        - count the number of species by tree
-        - fill the taxa list
+        count the number of species by tree
         """
         for tree in self.collection:
             if not self.species_count.has_key( tree["name"] ):
                 self.species_count[tree["name"]] = {}
-                self._d_taxonlist[tree["name"]] = set()
+                self._d_taxonlist[tree["name"]] = set()#stats
             for taxon in getTaxa( tree["tree"] ):
+                old_taxon_name = taxon
                 taxon = self.reference.stripTaxonName(taxon)
                 if self.reference.isValid( taxon ):
-                    for tax in self.reference.getParents( taxon ):
-                        self.taxa_list.add( tax )
-                        self._d_taxonlist[tree["name"]].add( tax )
+                    self.taxa_list.add( taxon )#stats
+                    self._d_taxonlist[tree["name"]].add( taxon )#stats
+                    for tax in self.reference.getParents( taxon ):#stats
+                        self._d_taxonlist[tree["name"]].add( tax )#stats
                     if not self.species_count[tree["name"]].has_key( taxon ):
                         self.species_count[tree["name"]][taxon] = 0
+                    if not self._d_reprtaxon.has_key( taxon ):#stats
+                        self._d_reprtaxon[taxon] = set()#stats
+                    self._d_reprtaxon[taxon].add( old_taxon_name )#stats
                     self.species_count[tree["name"]][taxon] += 1
                     for parent in self.reference.getParents( taxon ):
                         if not self.species_count[tree["name"]].has_key( parent ):
@@ -72,7 +77,28 @@ class TreeCollection( Taxobject ):
                         self.species_count[tree["name"]][parent] += 1
                 else:
                     self.species_count["XXX"] += 1
+        self.taxa_list = list( self.taxa_list )#stats
+
+    def __initStats( self ):
+        """
+        - fill the taxa list
+        """
+        for tree in self.collection:
+            if not self._d_taxonlist.has_key( tree["name"] ):
+                self._d_taxonlist[tree["name"]] = set()
+            for taxon in getTaxa( tree["tree"] ):
+                old_taxon_name = taxon
+                taxon = self.reference.stripTaxonName(taxon)
+                if self.reference.isValid( taxon ):
+                    self.taxa_list.add( taxon )
+                    self._d_taxonlist[tree["name"]].add( taxon )
+                    for tax in self.reference.getParents( taxon ):
+                        self._d_taxonlist[tree["name"]].add( tax )
+                    if not self._d_reprtaxon.has_key( taxon ):
+                        self._d_reprtaxon[taxon] = set()
+                    self._d_reprtaxon[taxon].add( old_taxon_name )
         self.taxa_list = list( self.taxa_list )
+ 
 
     def getNbTrees( self, taxon ):
         """
@@ -172,6 +198,7 @@ class TreeCollection( Taxobject ):
         """
         Display NCBI arborescence with stats
         """
+        #self.__initStats()
         tree = self.reference.getNCBIArborescence( self.taxa_list )
         if not allparents:
             tree = self.__removeSingleParent( tree )
@@ -223,7 +250,7 @@ class TreeCollection( Taxobject ):
                     result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>) <br />\n""" % (
                       bdnode,
                       str(id),
-                      self.getNbTrees( bdnode ) )
+                      self.getNbTrees( bdnode ))
                 result += self.__display( tree, id, node, depth + 1)
             else:
                 if "XXX" in node:
@@ -237,10 +264,12 @@ class TreeCollection( Taxobject ):
                         self.NCBI,
                         self.reference.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
-                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>) <br />\n""" % (
+                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>,<a title='%s'>%s</a>) <br />\n""" % (
                       bdnode,
                       str(id),
-                      self.getNbTrees( bdnode ) )
+                      self.getNbTrees( bdnode ),
+                      ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
+                      str(len(self._d_reprtaxon[bdnode])))
         return result
 
 if __name__ == "__main__":
@@ -279,7 +308,7 @@ end;
 """
     import time
     col = open( "../data/omm_cds_nex.tre" ).read()
-    col = "(Echinops_telfairi);"
+    col = open("../data/tree.nwk").read()
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
@@ -287,11 +316,9 @@ end;
 #    for tree in treecol.collection:
 #        print tree["tree"]
 #    print len(col.split(";")[1:-1]), col.split(";")[1:-1]
-    print treecol.species_count
     dr = time.time()
     col = treecol.query( "{murinae}>1" )
     fr = time.time()
     print len(col)
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr
-    print treecol.statNbTreeWithNode()

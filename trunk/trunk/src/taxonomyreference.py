@@ -57,7 +57,11 @@ class TaxonomyReference( DiGraph ):
         self.delimiter = "_"
 
     def stripTaxonName( self, taxon_name ):
-        return " ".join( taxon_name.replace(self.delimiter," ").split()[:2] )
+        name = " ".join( taxon_name.replace(self.delimiter," ").split()[:2] )
+        if not self.isValid( name ):
+            return name.split()[0]
+        return name
+            
  
     def getNameFromCommon( self, common_name ):
         """
@@ -224,11 +228,16 @@ class TaxonomyReference( DiGraph ):
     """     
 if __name__ == "__main__":
     ref = TaxonomyReference()
-    print "rattus>", ref.correct( "rattus" )
-    print "rats>", ref.correct( "rats" )
-    print "ratus>", ref.correct( "ratus" )
-    print ref.getParents( "echinops telfairi" )
-    print ref.getIntervalParents( "eutheria", "murinae" )
+#    print "rattus>", ref.correct( "rattus" )
+#    print "rats>", ref.correct( "rats" )
+#    print "ratus>", ref.correct( "ratus" )
+#    print ref.getParents( "echinops telfairi" )
+#    print ref.getIntervalParents( "eutheria", "murinae" )
+    print ref.stripTaxonName( "mus_mus_france" )
+    print ref.stripTaxonName( "echinops" )
+    print ref.stripTaxonName( "rattus_rattus" )
+    print ref.stripTaxonName( "mus_france" )
+    print ref.stripTaxonName("macropus_eugenii")
 
 
 
