@@ -38,13 +38,55 @@ function go(taxon){
     xhr.send(null);
 }
 function afficheDescURL(taxon,toThis){
+    if(taxon!=''){
     if (document.getElementById){
         document.getElementById('preview').innerHTML = "<div class='nameTaxa'>"+taxon+"</div>"+toThis;
     }
     else if (document.all){
         document.all['preview'].innerHTML = "<div class='nameTaxa'>"+taxon+"</div>"+toThis;
     }
+    }
 }
+
+/*
+ * show/hide intern node
+ */
+function iNode(){
+    var visible = '#66f';
+    var txtVisible = '&nbsp;Show intern nodes&nbsp;';
+    var hidden = '#fff';
+    var txtHidden = '&nbsp;Hide intern nodes&nbsp;';
+    var idButton = 'iNode';
+    var toLookFor = 'genre';
+
+    //// Firefox and others
+    if (document.getElementById){
+        var obj = document.getElementById(idButton);
+        var elem = document.getElementsByName(toLookFor);
+            if (obj.innerHTML == txtVisible){
+                for (i=0; i<elem.length; i++){elem[i].style.color = visible;}
+               obj.innerHTML = txtHidden;
+            }
+            else {
+                for (i=0; i<elem.length; i++){elem[i].style.color = hidden;}
+                obj.innerHTML = txtVisible;
+            }
+    }
+    //IE
+    else if (document.all){
+        var obj = document.all[idButton];
+        var elem = document.getElementsByTagName(toLookFor);
+            if (obj.innerHTML == txtVisible){
+                for (i=0; i<elem.length; i++){elem[i].style.color = visible;}
+                obj.innerHTML = txtHidden;
+            }
+            else{
+                for (i=0; i<elem.length; i++){elem[i].style.color = hidden;}
+                obj.innerHTML = txtVisible;
+            }
+    }
+}
+
 </script>
 </head>
 <body>
@@ -65,16 +107,15 @@ Home > Import Collection > Collection visualization
     <tr class="content" valign="top">
         <td class="links">
 <!-- MENU : BEGINNING______________________________________________________________________ -->
+<center> <b> Home </b> </center>
+<a href="." class="path" title="Go to import collection page"> Import Collection </a>
+<a href="help?id=<%$_id_%>" class="path" title="(?) Help contents"> Help Contents </a>
+<a href="about?id=<%$_id_%>" class="path" title="About Taxomanie project..."> About </a>
+<br />
 <center> <b>Current collection</b> </center>
 <a href="statistics?id=<%$ _id_ %>" class="path" title="Display statistics of collection"> Statistics </a>
 <a href="/downloadCollection?id=<%$ _id_ %>" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
-<br />
-<!-- <a href="home" class="path" title="Go home"> Home </a> -->
-<center> <b> Home </b> </center>
-<a href="." class="path" title="Go to import collection page"> Import Collection </a>
-<a href="help?id=<%$_id_%>" class="path" title="(?) Help contents"> Help Contents </a>
-<a href="about?id=<%$_id_%>" class="path" title="About Taxomanie project..."> About </a>  
 <!-- MENU : END -->
      </td>
              <td class="content">
@@ -104,7 +145,7 @@ name="query" />
 if _query_:
     #
 %>
-    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a href=check?id=<%$ _id_ %>&clear_query=1>Back to full collection</a>&nbsp;|&nbsp;
+    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a href=check?id=<%$ _id_ %>&clear_query=1>Back to full collection</a>
 <%
 else:
     _query_ = ""
@@ -175,10 +216,10 @@ if _nbbadtaxa_:
     #
 %>
     <center>
-    <font color="red"> <%$ _nbbadtaxa_ %> bad taxa in this collection </font><br />
+    <font color="red"> <%$ _nbbadtaxa_ %> bad taxa in this collection </font><br /><br />
     </center>
 <%|%>
-    <a href="#bottom" class="posPage">Go to bottom</a>
+    <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>&nbsp;<a href="#top" id="iNode" onClick="javascript:iNode();">&nbsp;Hide intern nodes&nbsp;</a>
     <!-- Tree visualization -->
     <div class="tree">
     <br />
@@ -187,7 +228,7 @@ if _nbbadtaxa_:
     </tt>
     <br />
     </div>
-    <a href="#top" class="posPage">Go to top</a>
+    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
 
     <!-- div preview -->
     <div id="preview"></div>
