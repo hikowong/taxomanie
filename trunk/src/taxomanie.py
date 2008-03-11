@@ -123,7 +123,8 @@ class Taxomanie( Taxobject ):
             return self.__getImageUrl( taxon )
 
     def __getImageUrlProxy( self, taxon ):
-        taxon = taxon.split()[0].strip().capitalize()
+        #taxon = taxon.split()[0].strip().capitalize()
+        taxon = "_".join(taxon.split()).strip().capitalize()
         conn = httplib.HTTP( self.proxy )
         conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
         conn.putheader('Accept', 'text/html')
@@ -151,7 +152,7 @@ class Taxomanie( Taxobject ):
         return "Image not found"
 
     def __getImageUrl( self, taxon ):
-        taxon = taxon.split()[0].strip().capitalize()
+        taxon = "_".join(taxon.split()).strip().capitalize()
         conn = httplib.HTTPConnection("species.wikimedia.org")
         conn.request("GET", "/wiki/"+taxon)
         f = conn.getresponse().read()
