@@ -22,7 +22,6 @@ class Taxomanie( Taxobject ):
         if self.reference is None:
             from taxonomyreference import TaxonomyReference
             Taxomanie.reference = TaxonomyReference()
-        self.session = {}
         self.id = 0
         self.__loadProxy()
 
@@ -46,74 +45,69 @@ class Taxomanie( Taxobject ):
     
     @cherrypy.expose
     def check( self, id,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
-        # return PhylogenicTree( myFile, self.reference ).display("html")
         index = int( index )
         id = int(id)
-        if 1:#try:
-            if myFile is not None:
-                self.session[id] = {}
-                self.session[id]["query"] = None
-                self.session[id]["col_query"] = []
-                self.session[id]["cache"] = {}
-                self.session[id]["named_tree"] = {}
-                self.session[id]["collection"] = []
-                self.session[id]["nbbadtaxa"] = 0
-                self.reference.delimiter = delimiter
-                if isinstance( myFile, str ):
-                    input = myFile 
-                else:
-                    size = 0
-                    input = ""
-                    while True:
-                        recv = myFile.file.read(8192)
-                        input += recv
-                        if not recv:
-                            break
-                        size += len(recv)
-                input = input.strip()
-                if 1:#try:
-                    self.session[id]["collection"] = TreeCollection( input, self.reference )
-                    self.session[id]["nbbadtaxa"] = self.session[id]["collection"].species_count["XXX"]
-                else:#except ValueError, e:
-                    return self._presentation( "index.html", msg = e)
-            _msg_ = ""
-            if query:
-                self.session[id]["query"] = query
-            if not clear_query:
-                if self.session[id]["query"]:
-                    try:
-                        self.session[id]["col_query"] = self.session[id][
-                          "collection"].query( self.session[id]["query"] )
-                        self._pleet["_collection_"] = self.session[id]["col_query"]
-                    except NameError, e:
-                        self.session[id]["col_query"] = self.session[id]["collection"].collection
-                        self._pleet["_collection_"] = self.session[id]["col_query"]
-                        _msg_ = "Bad taxon name : %s" % e
-                    except SyntaxError, e:
-                        _msg_ = "Bad query : %s" % query
-                        self.session[id]["col_query"] = self.session[id]["collection"].collection
-                        self._pleet["_collection_"] = self.session[id]["col_query"]
-                else:
-                    self.session[id]["col_query"] = self.session[id]["collection"].collection
-                    self._pleet["_collection_"] = self.session[id]["col_query"]
+        if myFile is not None:
+            print cherrypy.session.keys()
+            cherrypy.session.clear()
+            print cherrypy.session.keys()
+            cherrypy.session["query"] = None
+            cherrypy.session["col_query"] = []
+            cherrypy.session["cache"] = {}
+            cherrypy.session["named_tree"] = {}
+            cherrypy.session["collection"] = []
+            cherrypy.session["nbbadtaxa"] = 0
+            self.reference.delimiter = delimiter
+            if isinstance( myFile, str ):
+                input = myFile 
             else:
-                self.session[id]["query"] = None
-                self.session[id]["col_query"] = self.session[id]["collection"].collection
-                self._pleet["_collection_"] = self.session[id]["col_query"]
-            if index > len(self.session[id]["collection"].collection):
-                index = len(self.session[id]["collection"].collection)
-            elif index < 1:
-                index = 1
-            self._pleet["_index_"] = index
-            self._pleet["_query_"] = self.session[id]["query"]
-            self._pleet["_clearquery_"] = clear_query
-            self._pleet["_cache_"] = self.session[id]["cache"]
-            self._pleet["_reference_"] = self.reference
-            self._pleet["_id_"] = id
-            self._pleet["_nbbadtaxa_"] = self.session[id]["nbbadtaxa"]
-            return self._presentation( "check.html", msg = _msg_ )
-        else:#except IndexError:
-            return self._presentation( "index.html", msg = "No Phylip or Nexus collection found")
+                size = 0
+                input = ""
+                while True:
+                    recv = myFile.file.read(8192)
+                    input += recv
+                    if not recv:
+                        break
+                    size += len(recv)
+            input = input.strip()
+            cherrypy.session["collection"] = TreeCollection( input, self.reference )
+            cherrypy.session["nbbadtaxa"] = cherrypy.session.get("collection").species_count["XXX"]
+        _msg_ = ""
+        if query:
+            cherrypy.session["query"] = query
+        if not clear_query:
+            if cherrypy.session.get("query"):
+                try:
+                    cherrypy.session["col_query"] = cherrypy.session.get(
+                      "collection").query( cherrypy.session.get("query") )
+                    self._pleet["_collection_"] = cherrypy.session.get("col_query")
+                except NameError, e:
+                    cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
+                    self._pleet["_collection_"] = cherrypy.session.get("col_query")
+                    _msg_ = "Bad taxon name : %s" % e
+                except SyntaxError, e:
+                    _msg_ = "Bad query : %s" % query
+                    cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
+                    self._pleet["_collection_"] = cherrypy.session.get("col_query")
+            else:
+                cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
+                self._pleet["_collection_"] = cherrypy.session.get("col_query")
+        else:
+            cherrypy.session["query"] = None
+            cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
+            self._pleet["_collection_"] = cherrypy.session.get("col_query")
+        if index > len(cherrypy.session.get("collection").collection):
+            index = len(cherrypy.session.get("collection").collection)
+        elif index < 1:
+            index = 1
+        self._pleet["_index_"] = index
+        self._pleet["_query_"] = cherrypy.session.get("query")
+        self._pleet["_clearquery_"] = clear_query
+        self._pleet["_cache_"] = cherrypy.session.get("cache")
+        self._pleet["_reference_"] = self.reference
+        self._pleet["_id_"] = id
+        self._pleet["_nbbadtaxa_"] = cherrypy.session.get("nbbadtaxa")
+        return self._presentation( "check.html", msg = _msg_ )
 
     @cherrypy.expose
     def getImgUrl( self, taxon ):
@@ -123,7 +117,6 @@ class Taxomanie( Taxobject ):
             return self.__getImageUrl( taxon )
 
     def __getImageUrlProxy( self, taxon ):
-        #taxon = taxon.split()[0].strip().capitalize()
         taxon = "_".join(taxon.split()).strip().capitalize()
         conn = httplib.HTTP( self.proxy )
         conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
@@ -179,12 +172,12 @@ class Taxomanie( Taxobject ):
         id = int(id)
         if target == "nexus":
             body = "#nexus\nbegin trees;\n"
-            for i in xrange( len(self.session[id]["col_query"]) ):
-                tree = self.session[id]["col_query"][i]
-                body += "Tree %s = %s;\n" % (tree["name"], tree["tree"])#.replace("|XXX", ""))
+            for i in xrange( len(cherrypy.session.get("col_query")) ):
+                tree = cherrypy.session.get("col_query")[i]
+                body += "Tree %s = %s;\n" % (tree["name"], tree["tree"])
             body += "end;\n"
         else:
-            body = ";\n".join( tree["tree"] for tree in self.session[id]["col_query"] )
+            body = ";\n".join( tree["tree"] for tree in cherrypy.session.get("col_query") )
         cherrypy.response.headers['Content-Length'] = len(body)
         cherrypy.response.headers['Content-Disposition'] = \
           'attachment; filename=filtered-collection-%s.nwk' % str(id)
@@ -193,26 +186,26 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def getStatImg1( self, id ):
-        resultlist = self.session[int(id)]["collection"].statNbTreeWithNbNodes()
+        resultlist = cherrypy.session.get("collection").statNbTreeWithNbNodes()
         return os.popen( 'python stat1.py "%s"' % resultlist ).read()
 
     @cherrypy.expose
     def getStatImg2( self, id ):
-        resultlist = self.session[int(id)]["collection"].statNbTreeWithNode()
+        resultlist = cherrypy.session.get("collection").statNbTreeWithNode()
         return os.popen( 'python stat2.py "%s"' % resultlist ).read()
 
     @cherrypy.expose
     def statistics( self, id ):
         self._pleet["_id_"] = id
-        self._pleet["_collection_"] = self.session[int(id)]["col_query"] 
-        self._pleet["_ncbitree_"] = self.session[int(id)]["collection"].displayStats(id)
+        self._pleet["_collection_"] = cherrypy.session.get("col_query") 
+        self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats(id)
         return self._presentation( "statistics.html" )
 
     @cherrypy.expose
     def about( self, id ):
         self._pleet["_id_"] = id
         try:
-            self._pleet["_collection_"] = self.session[int(id)]["collection"]
+            self._pleet["_collection_"] = cherrypy.session.get("collection")
         except:
             self._pleet["_collection_"] = []
         return self._presentation( "about.html" )
@@ -221,7 +214,7 @@ class Taxomanie( Taxobject ):
     def help( self, id ):
         self._pleet["_id_"] = id
         try:
-            self._pleet["_collection_"] = self.session[int(id)]["collection"]
+            self._pleet["_collection_"] = cherrypy.session.get("collection")
         except:
             self._pleet["_collection_"] = []
         return self._presentation( "help.html" )
@@ -250,6 +243,8 @@ if __name__ == '__main__':
     # Fill cherrypy configuration
     cherrypy.config.update({
           "log.screen": log_screen,
+          "tools.sessions.timeout" : 21600, #6 hours
+          "tools.sessions.on" : True,
           "server.socket_host": ip,
           "server.socket_port": port,
           "server.thread_pool": thread_pool 

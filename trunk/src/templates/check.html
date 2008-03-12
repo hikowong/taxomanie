@@ -189,6 +189,7 @@ if len(_collection_) > 1:
 <!-- tree or not -->
 
 <%
+htmltree = ""
 if len( _collection_ ) == 0:
     #
 %>
@@ -197,7 +198,6 @@ if len( _collection_ ) == 0:
 else:
     tree = _collection_[_index_-1]
     if tree:
-        htmltree = ""
         try:
             from phylogenictree import PhylogenicTree
             htmltree += "<div class='treeName'>Tree Name : "+str(tree["name"])+"</div><br>"
