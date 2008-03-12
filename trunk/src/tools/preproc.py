@@ -41,6 +41,7 @@ for line in file( NAMES ).readlines():
         TBI[id] = {}
         TBI[id]["name"] = name
         TBI[id]["common"] = []
+        TBI[id]["homonym"] = []
         TBI[id]["synonym"] = []
         TBI[id]["parent"] = []
         TBI[id]["parents"] = []
@@ -48,12 +49,13 @@ for line in file( NAMES ).readlines():
         TBN[name] = {}
         TBN[name]["id"] = id
 
-print "Adding synonyms and common names..."
-# Adding synonyms, and common names
+print "Adding synonyms, homonym and common names..."
+# Adding synonyms, homonym and common names
 for line in file( NAMES ).readlines():
     type_name = line.split("|")[3].strip()
     synonym = "synonym" in type_name
     common = "common name" in type_name
+    homonym = line.split("|")[2].strip()
     if synonym or common:
         id = line.split("|")[0].strip()
         name = line.split("|")[1].strip().lower()
@@ -72,6 +74,8 @@ for line in file( NAMES ).readlines():
                 TBI[id]["common"] = []
             TBN[base_name]["common"].append( name )
             TBI[id]["common"].append( name )
+    if homonym:
+        TBI[id]["homonym"].append( homonym )
 
 
 print "Extracting parents..."
@@ -109,11 +113,12 @@ import os
 open( "taxonomy.csv", "w" ).write("")
 csv = open( "taxonomy.csv", "a" )
 for species in TBI.keys():
-    line = "%s|%s|%s|%s|%s|%s\n" % ( 
+    line = "%s|%s|%s|%s|%s|%s|%s\n" % ( 
       species,
       TBI[species]["name"],
       TBI[TBI[species]["parent"]]["name"],
       "!".join(TBI[species]["parents"]),
+      "!".join(TBI[species]["homonym"]),
       "!".join(TBI[species]["synonym"]),
       "!".join(TBI[species]["common"]) )
     csv.write( line )

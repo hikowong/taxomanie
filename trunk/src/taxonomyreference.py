@@ -35,18 +35,21 @@ class TaxonomyReference( DiGraph ):
         # taxonomy reference generation
         self.TAXONOMY = {}
         for species in taxonomy.readlines():
-            id, name, parent, list_parents, synonym, common = species.split("|")
+            id, name, parent, list_parents,homonym, synonym, common = species.split("|")
             common = common.strip()
             if synonym:
                 synonym = synonym.split("!")
             if common:
                 common = common.split("!")
+            if homonym:
+                homonym = homonym.split("!")
             if list_parents:
                 list_parents = list_parents.split("!")
             self.TAXONOMY[name] = {
                 "id": id,
                 "parent": parent,
                 "parents": list_parents,
+                "homonym": homonym,
                 "synonym": synonym,
                 "common": common
             }
@@ -82,6 +85,10 @@ class TaxonomyReference( DiGraph ):
             if synonym in body["common"]:
                 species_list.append( name )
         return species_list
+
+    def isHomonym( self, name ):
+        """ return True if name is an homonym """
+        return self.TAXONOMY.has_key( name.lower() )
 
     def isValid( self, name ):
         """
