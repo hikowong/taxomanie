@@ -53,63 +53,38 @@ function afficheDescURL(taxon,toThis){
  * show/hide intern node
  */
 function setNode(){
-    var appear = '#6666ff';
-    var txtVisible = 'Show intern nodes';
-    var disappear = '#ffffff';
-    var txtHidden = 'Hide intern nodes';
-    var idButton = 'iNode';
-    var toLookFor = 'genre';
-
-    //// Firefox and others
-    if (document.getElementById){
-        var obj = document.getElementById(idButton);
-        var elem = document.getElementsByName(toLookFor);
-    }
-    //IE
-    else if (document.all){
-        var obj = document.all[idButton];
-        var elem = document.getElementsByTagName(toLookFor);
-    }
-
-    //traitement
-    if (obj.innerHTML == txtVisible){
-        for (i=0; i<elem.length; i++){elem[i].style.color = appear;}
-        obj.innerHTML = txtHidden;
-    }
-    else{
-        for (i=0; i<elem.length; i++){elem[i].style.color = disappear;}
-         obj.innerHTML = txtVisible;
-    }
+    $(document).ready(function(){
+         $("a.genre").toggle();
+         $("a.showparents").toggle();
+    });
 }
 
 /*
  * Develop/hide intern node
  */
+$(document).ready(function(){
+    $("div.interparents").hide();
+});
+
 function setInternNode(idNode){
     $(document).ready(function(){
-         $("#"+idNode).click(function() {
-            alert( "coucou" );
-         });
+         $("#"+idNode).slideToggle(500,function () {
+             if ($("#a-"+idNode).text() == "hide" ){
+                 $("#a-"+idNode).text("show parents");
+             }
+             else{
+                 $("#a-"+idNode).text("hide");
+             }
+           });
     });
 }
 
-function setInternNode2(idNode){
-
-    //// Firefox and others
-    if (document.getElementById){var obj = document.getElementById(idNode);}
-    //IE
-    else if (document.all){var obj = document.all[idNode];}
-
-    //traitement
-    if (idNode.style.visibility == 'hidden'){
-        idNode.style.visibility = 'visible';
-    }
-    else {
-        //idNode.style.visibility = 'hidden';
-        old_id = idNode;
-        idNode.innerHTML = "";
-    }
+function toggleInternNode(){
+    $(document).ready(function(){
+         $("div.interparents").slideToggle(60);
+    });
 }
+
 
 </script>
 </head>
@@ -246,8 +221,15 @@ if _nbbadtaxa_:
     <font color="red"> <%$ _nbbadtaxa_ %> bad taxa in this collection </font><br /><br />
     </center>
 <%|%>
-    <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>&nbsp;
-    <a id="iNode" onClick="javascript:setNode();" title="Click to show/hide intern node">Hide intern nodes</a>
+    <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+    &nbsp;
+    &nbsp;
+    &nbsp;
+    <a id="iNode" onClick="javascript:setNode();" 
+      title="Click to show/hide intern node">Show/Hide intern nodes</a>
+    &nbsp;
+    <a id="toggleallparents" class="posPage" onClick="javascript:toggleInternNode();" 
+      title="Click to show/hide all parents">Show/Hide all parents</a>
     <!-- Tree visualization -->
     <div class="tree">
     <br />
