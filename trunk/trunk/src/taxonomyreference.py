@@ -35,21 +35,20 @@ class TaxonomyReference( DiGraph ):
         # taxonomy reference generation
         self.TAXONOMY = {}
         for species in taxonomy.readlines():
-            id, name, parent, list_parents,homonym, synonym, common = species.split("|")
+            id, name, parent, homonym, list_parents, synonym, common = species.split("|")
             common = common.strip()
             if synonym:
                 synonym = synonym.split("!")
             if common:
                 common = common.split("!")
-            if homonym:
-                homonym = homonym.split("!")
+            homonym = homonym.strip()
             if list_parents:
                 list_parents = list_parents.split("!")
             self.TAXONOMY[name] = {
                 "id": id,
                 "parent": parent,
-                "parents": list_parents,
                 "homonym": homonym,
+                "parents": list_parents,
                 "synonym": synonym,
                 "common": common
             }
@@ -64,7 +63,6 @@ class TaxonomyReference( DiGraph ):
         if not self.isValid( name ):
             return name.split()[0]
         return name
-            
  
     def getNameFromCommon( self, common_name ):
         """
@@ -88,7 +86,17 @@ class TaxonomyReference( DiGraph ):
 
     def isHomonym( self, name ):
         """ return True if name is an homonym """
-        return self.TAXONOMY.has_key( name.lower() )
+        if self.isValid( name ):
+            if self.TAXONOMY[name.lower()]["homonym"]:
+                return True
+        return False
+
+    def getHomonym( self, name ):
+        """ return True if name is an homonym """
+        if self.isValid( name ):
+            homonym = self.TAXONOMY[name.lower()]["homonym"]
+            return homonym
+        raise NameError, "%s not valid" % name
 
     def isValid( self, name ):
         """
@@ -245,7 +253,11 @@ if __name__ == "__main__":
     print ref.stripTaxonName( "rattus_rattus" )
     print ref.stripTaxonName( "mus_france" )
     print ref.stripTaxonName("macropus_eugenii")
-
+    print ref.isHomonym( "echinops" )
+    print ref.isHomonym( "mus" )
+    print ref.isHomonym( "bos" )
+    print ref.isHomonym( "rattus" )
+    print ref.TAXONOMY["rattus"]
 
 
 

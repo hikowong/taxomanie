@@ -63,27 +63,27 @@ function iNode(){
     if (document.getElementById){
         var obj = document.getElementById(idButton);
         var elem = document.getElementsByName(toLookFor);
-            if (obj.innerHTML == txtVisible){
-                for (i=0; i<elem.length; i++){elem[i].style.color = visible;}
-               obj.innerHTML = txtHidden;
-            }
-            else {
-                for (i=0; i<elem.length; i++){elem[i].style.color = hidden;}
-                obj.innerHTML = txtVisible;
-            }
-    }
+        if (obj.innerHTML == txtVisible){
+            for (i=0; i<elem.length; i++){elem[i].style.color = visible;}
+           obj.innerHTML = txtHidden;
+        }
+        else {
+            for (i=0; i<elem.length; i++){elem[i].style.color = hidden;}
+            obj.innerHTML = txtVisible;
+        }
+}
     //IE
     else if (document.all){
         var obj = document.all[idButton];
         var elem = document.getElementsByTagName(toLookFor);
-            if (obj.innerHTML == txtVisible){
-                for (i=0; i<elem.length; i++){elem[i].style.color = visible;}
-                obj.innerHTML = txtHidden;
-            }
-            else{
-                for (i=0; i<elem.length; i++){elem[i].style.color = hidden;}
-                obj.innerHTML = txtVisible;
-            }
+        if (obj.innerHTML == txtVisible){
+            for (i=0; i<elem.length; i++){elem[i].style.color = visible;}
+            obj.innerHTML = txtHidden;
+        }
+        else{
+            for (i=0; i<elem.length; i++){elem[i].style.color = hidden;}
+            obj.innerHTML = txtVisible;
+        }
     }
 }
 
@@ -219,7 +219,8 @@ if _nbbadtaxa_:
     <font color="red"> <%$ _nbbadtaxa_ %> bad taxa in this collection </font><br /><br />
     </center>
 <%|%>
-    <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>&nbsp;<a href="#top" id="iNode" onClick="javascript:iNode();">&nbsp;Hide intern nodes&nbsp;</a>
+    <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>&nbsp;
+    <a id="iNode" onClick="javascript:iNode();">&nbsp;Hide intern nodes&nbsp;</a>
     <!-- Tree visualization -->
     <div class="tree">
     <br />

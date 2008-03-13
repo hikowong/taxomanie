@@ -39,6 +39,16 @@ a.species:visited
     color: darkblue;
     }
 
+a.species_homonym:link
+    {
+    color: orange
+    }
+
+a.species_homonym:visited 
+    {
+    color: orange;
+    }
+
 a.genre:link 
     {
     color: #66f;
