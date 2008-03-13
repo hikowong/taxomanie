@@ -359,6 +359,23 @@ a.posPage:hover  {
     color: #000;
 }
 
+a.showparents, a.showparents:visited, a.showparents:link
+    {
+    font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
+	font-size: 8px;
+    color: grey;
+	font-weight: bold;
+	text-decoration: none;
+    font-style: italic;
+    /*background-color: silver;*/
+    }
+
+a.showparents:hover  {
+    /*background-color: grey;
+    font-weight: bold;*/
+    color: #000;
+}
+
 
 a#iNode
     {
