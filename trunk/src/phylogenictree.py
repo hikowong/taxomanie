@@ -27,8 +27,8 @@ class PhylogenicTree( object ):
         checkNwk( self.nwk )
 #        self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
         self.root = "root"
+        self.nb_taxa = 0
         self._getArborescence()
-        self.nb_taxa = len( self.tree.nodes() )
         
     def _getArborescence( self, tree=None ):
         if tree is None:
@@ -66,6 +66,7 @@ class PhylogenicTree( object ):
                 else: # child is a taxon
                     if not self.reference.isValid( self.reference.stripTaxonName(child) ):
                         child += "|XXX"
+                    self.nb_taxa += 1
                     self.tree.add_edge( parent_name, child )
 
     def display( self, tree = None ):
@@ -81,7 +82,7 @@ class PhylogenicTree( object ):
             result += self.__display( tree = self.tree )
         return result
 
-    def __display( self, tree, root = "",  mydepth = 0, lastnode = None, blockname = "" ):
+    def __display( self, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
         """
         Pretty print of the tree in HTML.
 
@@ -99,11 +100,12 @@ class PhylogenicTree( object ):
         for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
             bdnode = self.reference.stripTaxonName( node.split("|")[0] )
+#            if lastnode is None: lastnode = "root"
             if lastnode is not None and lastnode in self.reference.getParents( bdnode ):
                 inter_parents = self.reference.getIntervalParents( lastnode, bdnode )
                 blocknum += 1
                 blockname += str( blocknum )
-                result += "<div id='%s'><tt>" % blockname
+                result += "<div id='%s' class='interparents'><tt>" % blockname
                 if len( inter_parents ):
                     result += "| "*mydepth
                     result +=  ("<br />"+"| "*mydepth).join( inter_parents ) 
@@ -121,34 +123,39 @@ class PhylogenicTree( object ):
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
                 else:
-                    result += self.__linkSpecies( dispnode, bdnode )
+                    result += self.__linkSpecies( dispnode, bdnode, blockname )
         return result
 
-    def __linkSpecies( self, dispnode, bdnode ):
+
+    def __linkSpecies( self, dispnode, bdnode, blockname ):
         result = ""
         if self.reference.isHomonym( bdnode ):
             style = 'class="species_homonym" title="%s"' % self.reference.getHomonym( bdnode )
         else:
             style = 'class="species"'
-        result += """+-<a id="%s" %s onmouseover="go('%s');" href="%s%s"> %s</a><br />\n""" % (
+        result += """+-<a id="%s" %s onmouseover="go('%s');" href="%s%s"> %s</a>
+        <a id="a-%s" class='showparents' onClick="setInternNode('%s');">show parents</a><br />\n""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,                        
           bdnode.capitalize(),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
-          dispnode.capitalize() )
+          dispnode.capitalize(), 
+          blockname,
+          blockname )
         return result
 
     def __linkGenre( self, dispnode, bdnode, blockname ):
         result = ""
-        result += """-<a id="%s" class="genre" name="genre"
+        result += """+-<a id="%s" class="genre" name="genre"
         onmouseover="go('%s')" href="%s%s"> %s </a>
-        <a onClick='setInternNode(%s);'>show parents</a><br />\n""" % (
+        <a id="a-%s" class='showparents' onClick="setInternNode('%s');">show parents</a><br />\n""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           bdnode.capitalize(),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize(),
+          blockname,
           blockname )
         return result
  
