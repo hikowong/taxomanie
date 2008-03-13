@@ -40,8 +40,60 @@ if _collection_:
      </td>
              <td class="content">
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
-<h3> User Guide </h3>
-... comming soon !
+<h3>Example of Tree</h3>
+<ul><pre>
+#nexus
+begin trees;
+tree aa = ((rattus, pan), homo);
+tree bb = ((homo_sapiens, mus_france), (pan, rattus));
+tree cc = (homo, (bos, pan));
+tree dd = ((mus, rattus),pan);
+end;
+</pre></ul>
+
+<h3> What can I do with Taxomanie ? </h3>
+<ul><b>You can check phylogenetic trees (on the Homepage):</b>
+<pre>
+- by uploading a Newick or simple Nexus format file
+- by entering a Newick or simple Nexus format tree in the textfield
+
+</pre>
+</ul>
+
+<ul><b>You can see a picture of a taxon when you put the mouse over its name</b>
+<pre>
+- Pictures are taken from WikiSpecies and/or WikiPedia
+</pre>
+</ul>
+
+<ul><b>You can query the collection</b>
+<pre>
+- To search a taxon or node in the collection
+- Example of query: {catarrhini}>3 and {murinae} and {bos} and not {glires}
+  Get every tree where "murinae" and "bos" are, but not "glires" and where the number of "catarrhini" is up to 3
+</pre>
+</ul>
+
+<ul><b>You can get statistics about your collection of trees:</b>
+<pre>
+- Just clic the "Statistics" button.
+- Every node of the whole collection are displayed with the NCBI arborescence
+- Every node has 2 numbers --> ( number of its representatives, number of trees in which it is  )
+</pre>
+</ul>
+
+<ul><b>You can filter a tree</b>
+<pre>
+- Just clic the "Hide intern nodes"/"Show intern nodes" button above the Tree Name
+- The tree will be displayed with/without the intern nodes
+</pre>
+</ul>
+
+<ul><b>You can download your filtered collection</b>
+<pre>
+- Just clic the "Download collection" button
+</pre>
+</ul>
 <!-- CONTENT : END -->
         </td>
     </tr>
