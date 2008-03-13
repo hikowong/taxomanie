@@ -28,6 +28,7 @@ class PhylogenicTree( object ):
 #        self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
         self.root = "root"
         self._getArborescence()
+        self.nb_taxa = len( self.tree.nodes() )
         
     def _getArborescence( self, tree=None ):
         if tree is None:
