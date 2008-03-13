@@ -129,10 +129,14 @@ class PhylogenicTree( object ):
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
                 else:
-                    result += """+-<a id="%s" class="species" onmouseover="go('%s')"
-                      onmouseout="afficheDescURL('')" href="%s%s"> %s
-                      </a><br />\n""" % (
+                    if self.reference.isHomonym( bdnode ):
+                        style = 'class="species_homonym" title="%s"' % self.reference.getHomonym( bdnode )
+                    else:
+                        style = 'class="species"'
+                    result += """+-<a id="%s" %s onmouseover="go('%s')"
+                      onmouseout="afficheDescURL('')" href="%s%s"> %s</a><br />\n""" % (
                         self.reference.TAXONOMY[bdnode]["id"],
+                        style,                        
                         bdnode.capitalize(),
                         self.NCBI,
                         self.reference.TAXONOMY[bdnode]["id"],

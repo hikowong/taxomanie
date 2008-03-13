@@ -55,9 +55,9 @@ for line in file( NAMES ).readlines():
     type_name = line.split("|")[3].strip()
     synonym = "synonym" in type_name
     common = "common name" in type_name
-    homonym = line.split("|")[2].strip()
+    homonym = line.split("|")[2].strip().lower()
+    id = line.split("|")[0].strip()
     if synonym or common:
-        id = line.split("|")[0].strip()
         name = line.split("|")[1].strip().lower()
         base_name = TBI[id]["name"]
         if synonym:
@@ -74,7 +74,7 @@ for line in file( NAMES ).readlines():
                 TBI[id]["common"] = []
             TBN[base_name]["common"].append( name )
             TBI[id]["common"].append( name )
-    if homonym:
+    if type_name == "scientific name" and homonym:
         TBI[id]["homonym"].append( homonym )
 
 
@@ -117,8 +117,8 @@ for species in TBI.keys():
       species,
       TBI[species]["name"],
       TBI[TBI[species]["parent"]]["name"],
-      "!".join(TBI[species]["parents"]),
       "!".join(TBI[species]["homonym"]),
+      "!".join(TBI[species]["parents"]),
       "!".join(TBI[species]["synonym"]),
       "!".join(TBI[species]["common"]) )
     csv.write( line )
