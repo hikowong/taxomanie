@@ -23,6 +23,7 @@ class Taxomanie( Taxobject ):
             from taxonomyreference import TaxonomyReference
             Taxomanie.reference = TaxonomyReference()
         self.id = 0
+        self._taximage_url = {}
         self.__loadProxy()
 
     def __loadProxy( self ):
@@ -118,53 +119,61 @@ class Taxomanie( Taxobject ):
 
     def __getImageUrlProxy( self, taxon ):
         taxon = "_".join(taxon.split()).strip().capitalize()
-        conn = httplib.HTTP( self.proxy )
-        conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
-        conn.putheader('Accept', 'text/html')
-        conn.putheader('Accept', 'text/plain')
-        conn.endheaders()
-        errcode, errmsg, headers = conn.getreply()
-        f=conn.getfile()
-        for line in f.readlines():
-            if "thumbinner" in line:
-                url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
-                conn.close()    
-                return """<img src="%s" class="imgTaxa" />""" % url_img
-        conn.putrequest( 'GET',"http://en.wikipedia.org/wiki/"+taxon )
-        conn.putheader('Accept', 'text/html')
-        conn.putheader('Accept', 'text/plain')
-        conn.endheaders()
-        errcode, errmsg, headers = conn.getreply()
-        f=conn.getfile()
-        for line in f.readlines():
-            if "class=\"image\"" in line:
-                url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
-                conn.close()    
-                return """<img src="%s" class="imgTaxa" />""" % url_img
-        conn.close() 
-        return "Image not found"
+        if not self._taximage_url.has_key( taxon ):
+            conn = httplib.HTTP( self.proxy )
+            conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
+            conn.putheader('Accept', 'text/html')
+            conn.putheader('Accept', 'text/plain')
+            conn.endheaders()
+            errcode, errmsg, headers = conn.getreply()
+            f=conn.getfile()
+            for line in f.readlines():
+                if "thumbinner" in line:
+                    url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
+                    conn.close()    
+                    self._taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
+                    return self._taximage_url[taxon]
+            conn.putrequest( 'GET',"http://en.wikipedia.org/wiki/"+taxon )
+            conn.putheader('Accept', 'text/html')
+            conn.putheader('Accept', 'text/plain')
+            conn.endheaders()
+            errcode, errmsg, headers = conn.getreply()
+            f=conn.getfile()
+            for line in f.readlines():
+                if "class=\"image\"" in line:
+                    url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
+                    conn.close()    
+                    self._taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
+                    return self._taximage_url[taxon]
+            conn.close() 
+            self._taximage_url[taxon] = "Image not found"
+        return self._taximage_url[taxon]
 
     def __getImageUrl( self, taxon ):
         taxon = "_".join(taxon.split()).strip().capitalize()
-        conn = httplib.HTTPConnection("species.wikimedia.org")
-        conn.request("GET", "/wiki/"+taxon)
-        f = conn.getresponse().read()
-        for line in f.split("\n"):
-            if "thumbinner" in line:
-                url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
-                conn.close()    
-                return """<img src="%s" class="imgTaxa" />""" % url_img
-        conn.close()    
-        conn = httplib.HTTPConnection("en.wikipedia.org")
-        conn.request("GET", "/wiki/"+taxon)
-        f = conn.getresponse().read()
-        for line in f.split("\n"):
-            if "class=\"image\"" in line:
-                url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
-                conn.close()    
-                return """<img src="%s" class="imgTaxa" />""" % url_img
-        conn.close()    
-        return "Image not found"
+        if not self._taximage_url.has_key( taxon ):
+            conn = httplib.HTTPConnection("species.wikimedia.org")
+            conn.request("GET", "/wiki/"+taxon)
+            f = conn.getresponse().read()
+            for line in f.split("\n"):
+                if "thumbinner" in line:
+                    url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
+                    conn.close()    
+                    self._taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
+                    return self._taximage_url[taxon]
+            conn.close()    
+            conn = httplib.HTTPConnection("en.wikipedia.org")
+            conn.request("GET", "/wiki/"+taxon)
+            f = conn.getresponse().read()
+            for line in f.split("\n"):
+                if "class=\"image\"" in line:
+                    url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
+                    conn.close()    
+                    self._taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
+                    return self._taximage_url[taxon]
+            conn.close()    
+            self._taximage_url[taxon] = "Image not found"
+        return self._taximage_url[taxon]
 
     @cherrypy.expose
     def downloadCollection(self, id, target="nexus"):
