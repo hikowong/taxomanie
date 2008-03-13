@@ -51,11 +51,11 @@ function afficheDescURL(taxon,toThis){
 /*
  * show/hide intern node
  */
-function iNode(){
-    var visible = '#66f';
-    var txtVisible = '&nbsp;Show intern nodes&nbsp;';
-    var hidden = '#fff';
-    var txtHidden = '&nbsp;Hide intern nodes&nbsp;';
+function setNode(){
+    var appear = '#6666ff';
+    var txtVisible = 'Show intern nodes';
+    var disappear = '#ffffff';
+    var txtHidden = 'Hide intern nodes';
     var idButton = 'iNode';
     var toLookFor = 'genre';
 
@@ -63,27 +63,40 @@ function iNode(){
     if (document.getElementById){
         var obj = document.getElementById(idButton);
         var elem = document.getElementsByName(toLookFor);
-        if (obj.innerHTML == txtVisible){
-            for (i=0; i<elem.length; i++){elem[i].style.color = visible;}
-           obj.innerHTML = txtHidden;
-        }
-        else {
-            for (i=0; i<elem.length; i++){elem[i].style.color = hidden;}
-            obj.innerHTML = txtVisible;
-        }
-}
+    }
     //IE
     else if (document.all){
         var obj = document.all[idButton];
         var elem = document.getElementsByTagName(toLookFor);
-        if (obj.innerHTML == txtVisible){
-            for (i=0; i<elem.length; i++){elem[i].style.color = visible;}
-            obj.innerHTML = txtHidden;
-        }
-        else{
-            for (i=0; i<elem.length; i++){elem[i].style.color = hidden;}
-            obj.innerHTML = txtVisible;
-        }
+    }
+
+    //traitement
+    if (obj.innerHTML == txtVisible){
+        for (i=0; i<elem.length; i++){elem[i].style.color = appear;}
+        obj.innerHTML = txtHidden;
+    }
+    else{
+        for (i=0; i<elem.length; i++){elem[i].style.color = disappear;}
+         obj.innerHTML = txtVisible;
+    }
+}
+
+/*
+ * Develop/hide intern node
+ */
+function setInternNode(idNode){
+
+    //// Firefox and others
+    if (document.getElementById){var obj = document.getElementById(idNode);}
+    //IE
+    else if (document.all){var obj = document.all[idNode];}
+
+    //traitement
+    if (obj.style.visibility == 'hidden'){
+        obj.style.visibility = 'visible';
+    }
+    else {
+        obj.style.visibility = 'hidden';
     }
 }
 
@@ -223,7 +236,7 @@ if _nbbadtaxa_:
     </center>
 <%|%>
     <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>&nbsp;
-    <a id="iNode" onClick="javascript:iNode();">&nbsp;Hide intern nodes&nbsp;</a>
+    <a id="iNode" onClick="javascript:setNode();" title="Click to show/hide intern node">Hide intern nodes</a>
     <!-- Tree visualization -->
     <div class="tree">
     <br />
