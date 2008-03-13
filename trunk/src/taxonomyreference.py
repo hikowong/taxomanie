@@ -59,6 +59,15 @@ class TaxonomyReference( DiGraph ):
         self.delimiter = "_"
 
     def stripTaxonName( self, taxon_name ):
+        """
+        Strip Taxon name in order to keep the scientifique name and to remove
+        all user staff.
+
+        Exemple:
+            stripTaxonName( "rattus" ) -> "rattus"
+            stripTaxonName( "rattus_france" ) -> "rattus"
+            stripTaxonName( "rattus_rattus_france" ) -> "rattus_rattus"
+        """
         name = " ".join( taxon_name.replace(self.delimiter," ").split()[:2] )
         if not self.isValid( name ):
             return name.split()[0]
@@ -92,7 +101,12 @@ class TaxonomyReference( DiGraph ):
         return False
 
     def getHomonym( self, name ):
-        """ return True if name is an homonym """
+        """
+        return the homonym of name.
+
+        Exemple:
+            getHomonym( "echinops" ) -> "echinops <plant>"
+        """
         if self.isValid( name ):
             homonym = self.TAXONOMY[name.lower()]["homonym"]
             return homonym
@@ -162,11 +176,16 @@ class TaxonomyReference( DiGraph ):
         return parents list beetween 2 taxons.
 
         Exemple:
-            >>> self.getIntervalParents( "murinae", "eutheria" )
+            >>> self.getIntervalParents( "eukaryota", "eutheria" )
             ['euarchontoglires', 'glires', 'rodentia', 'sciurognathi', 'muroidea']
+            >>> self.getIntervalParents( "murinae", "eutheria" )
         """
         parents_list = self.getParents( name2 )
-        return parents_list[parents_list.index( name1 )+1:]
+        try:
+            return parents_list[parents_list.index( name1 )+1:]
+        except ValueError:
+            raise NameError, "%s is not a parent of %s" % (name1, name2) 
+            
 
     def getParent( self, name ):
         return self.predecessors( name )[0]
@@ -257,7 +276,9 @@ if __name__ == "__main__":
     print ref.isHomonym( "mus" )
     print ref.isHomonym( "bos" )
     print ref.isHomonym( "rattus" )
-    print ref.TAXONOMY["rattus"]
+    print ref.getParents( "eutheria" )
+    print ref.getIntervalParents( "eukaryota", "eutheria" )
+    print ref.getIntervalParents( "murinae", "eutheria" )
 
 
 

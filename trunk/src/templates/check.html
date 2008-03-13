@@ -3,6 +3,7 @@
 <title> PhyloExplorer </title>
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <link rel="stylesheet" type="text/css" href="css">
+<script type="text/javascript" src="getJs"></script>
 <script language="javascript" type="text/javascript">
 function getXhr(){
     var xhr = null; 
@@ -85,6 +86,14 @@ function setNode(){
  * Develop/hide intern node
  */
 function setInternNode(idNode){
+    $(document).ready(function(){
+         $("#"+idNode).click(function() {
+            alert( "coucou" );
+         });
+    });
+}
+
+function setInternNode2(idNode){
 
     //// Firefox and others
     if (document.getElementById){var obj = document.getElementById(idNode);}
@@ -92,11 +101,13 @@ function setInternNode(idNode){
     else if (document.all){var obj = document.all[idNode];}
 
     //traitement
-    if (obj.style.visibility == 'hidden'){
-        obj.style.visibility = 'visible';
+    if (idNode.style.visibility == 'hidden'){
+        idNode.style.visibility = 'visible';
     }
     else {
-        obj.style.visibility = 'hidden';
+        //idNode.style.visibility = 'hidden';
+        old_id = idNode;
+        idNode.innerHTML = "";
     }
 }
 
@@ -211,7 +222,7 @@ if len( _collection_ ) == 0:
 else:
     tree = _collection_[_index_-1]
     if tree:
-        try:
+        if 1:#try:
             from phylogenictree import PhylogenicTree
             htmltree += "<div class='treeName'>Tree Name : "+str(tree["name"])
             if not _cache_.has_key( tree["name"] ):
@@ -220,7 +231,7 @@ else:
                 _cache_[tree["name"]] = ptree.display()
             htmltree += "  ("+str(_cache_["nbtaxa"])+" taxa)</div><br />"
             htmltree += _cache_[tree["name"]]
-        except:
+        else:#except:
             #
 %>
             <!-- error in the tree -->

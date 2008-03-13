@@ -81,17 +81,7 @@ class PhylogenicTree( object ):
             result += self.__display( tree = self.tree )
         return result
 
-    def __linkList( self, my_list ):
-        """
-        Link all taxon in list with html
-        """
-        my_list =  [ item for item in my_list if self.reference.TAXONOMY.has_key( item ) ]
-        return str( [
-          "<a href='"+self.NCBI+self.reference.TAXONOMY[item]["id"]+\
-              "'>"+item+"</a>" \
-          for item in my_list ] )
-
-    def __display( self, tree, root = "",  mydepth = 0 ):
+    def __display( self, tree, root = "",  mydepth = 0, lastnode = None, blockname = "" ):
         """
         Pretty print of the tree in HTML.
 
@@ -100,50 +90,68 @@ class PhylogenicTree( object ):
         @return (string): the display in html format
         """
         result = ""
+        blocknum = 0
         if not root:
             root = self.root
-            result += "<a class='genre' href='"+self.NCBI+ \
+            result += "<a class='genre' name='genre' href='"+self.NCBI+ \
               self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
             result += "|<br />\n"
         for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
             bdnode = self.reference.stripTaxonName( node.split("|")[0] )
+            if lastnode is not None and lastnode in self.reference.getParents( bdnode ):
+                inter_parents = self.reference.getIntervalParents( lastnode, bdnode )
+                blocknum += 1
+                blockname += str( blocknum )
+                result += "<div id='%s'><tt>" % blockname
+                if len( inter_parents ):
+                    result += "| "*mydepth
+                    result +=  ("<br />"+"| "*mydepth).join( inter_parents ) 
+                result += "</tt></div>" 
             depth = 0
             while depth != mydepth :
                 result += "| "
                 depth += 1
             subnodes = tree.successors( node )
-            if subnodes:
+            if subnodes: # it's a genre
+                result += self.__linkGenre( dispnode, bdnode, blockname )
+                result += self.__display( tree,  node, depth + 1, 
+                  lastnode = bdnode, blockname = blockname+"a")
+            else: # it's a species (ie taxon)
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
                 else:
-                    result += """+-<a id="%s" class="genre" onmouseover="go('%s')"
-                      onmouseout="afficheDescURL('')" href="%s%s"> %s
-                      </a><br />\n""" % (
-                        self.reference.TAXONOMY[bdnode]["id"],
-                        bdnode.capitalize(),
-                        self.NCBI,
-                        self.reference.TAXONOMY[bdnode]["id"],
-                        dispnode.capitalize() )
-                result += self.__display( tree,  node, depth + 1)
-            else:
-                if "XXX" in node:
-                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
-                else:
-                    if self.reference.isHomonym( bdnode ):
-                        style = 'class="species_homonym" title="%s"' % self.reference.getHomonym( bdnode )
-                    else:
-                        style = 'class="species"'
-                    result += """+-<a id="%s" %s onmouseover="go('%s')"
-                      onmouseout="afficheDescURL('')" href="%s%s"> %s</a><br />\n""" % (
-                        self.reference.TAXONOMY[bdnode]["id"],
-                        style,                        
-                        bdnode.capitalize(),
-                        self.NCBI,
-                        self.reference.TAXONOMY[bdnode]["id"],
-                        dispnode.capitalize() )
+                    result += self.__linkSpecies( dispnode, bdnode )
         return result
 
+    def __linkSpecies( self, dispnode, bdnode ):
+        result = ""
+        if self.reference.isHomonym( bdnode ):
+            style = 'class="species_homonym" title="%s"' % self.reference.getHomonym( bdnode )
+        else:
+            style = 'class="species"'
+        result += """+-<a id="%s" %s onmouseover="go('%s');" href="%s%s"> %s</a><br />\n""" % (
+          self.reference.TAXONOMY[bdnode]["id"],
+          style,                        
+          bdnode.capitalize(),
+          self.NCBI,
+          self.reference.TAXONOMY[bdnode]["id"],
+          dispnode.capitalize() )
+        return result
+
+    def __linkGenre( self, dispnode, bdnode, blockname ):
+        result = ""
+        result += """-<a id="%s" class="genre" name="genre"
+        onmouseover="go('%s')" href="%s%s"> %s </a>
+        <a onClick='setInternNode(%s);'>show parents</a><br />\n""" % (
+          self.reference.TAXONOMY[bdnode]["id"],
+          bdnode.capitalize(),
+          self.NCBI,
+          self.reference.TAXONOMY[bdnode]["id"],
+          dispnode.capitalize(),
+          blockname )
+        return result
+ 
 
 if __name__ == "__main__":
     
