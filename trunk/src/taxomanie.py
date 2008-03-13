@@ -206,7 +206,7 @@ class Taxomanie( Taxobject ):
     @cherrypy.expose
     def statistics( self, id ):
         self._pleet["_id_"] = id
-        self._pleet["_collection_"] = cherrypy.session.get("col_query") 
+        #self._pleet["_collection_"] = cherrypy.session.get("col_query") 
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats(id)
         return self._presentation( "statistics.html" )
 
