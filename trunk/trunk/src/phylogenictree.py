@@ -100,15 +100,17 @@ class PhylogenicTree( object ):
         for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
             bdnode = self.reference.stripTaxonName( node.split("|")[0] )
-#            if lastnode is None: lastnode = "root"
-            if lastnode is not None and lastnode in self.reference.getParents( bdnode ):
+            nb_inter_parents = 0
+            if lastnode in self.reference.getParents( bdnode ):
                 inter_parents = self.reference.getIntervalParents( lastnode, bdnode )
+                nb_inter_parents = len( inter_parents )
                 blocknum += 1
                 blockname += str( blocknum )
                 result += "<div id='%s' class='interparents'><tt>" % blockname
                 if len( inter_parents ):
                     result += "| "*mydepth
-                    result +=  ("<br />"+"| "*mydepth).join( inter_parents ) 
+                    result +=  ("| "*mydepth).join(
+                      self.__linkGenre(i,i,blockname) for i in inter_parents ) 
                 result += "</tt></div>" 
             depth = 0
             while depth != mydepth :
@@ -116,47 +118,55 @@ class PhylogenicTree( object ):
                 depth += 1
             subnodes = tree.successors( node )
             if subnodes: # it's a genre
-                result += self.__linkGenre( dispnode, bdnode, blockname )
+                result += self.__linkGenre( dispnode, bdnode, blockname, True, nb_inter_parents)
                 result += self.__display( tree,  node, depth + 1, 
                   lastnode = bdnode, blockname = blockname+"a")
             else: # it's a species (ie taxon)
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
                 else:
-                    result += self.__linkSpecies( dispnode, bdnode, blockname )
+                    result += self.__linkSpecies( dispnode, bdnode, blockname, nb_inter_parents)
         return result
 
 
-    def __linkSpecies( self, dispnode, bdnode, blockname ):
+    def __linkSpecies( self, dispnode, bdnode, blockname, nb_inter_parents ):
         result = ""
         if self.reference.isHomonym( bdnode ):
             style = 'class="species_homonym" title="%s"' % self.reference.getHomonym( bdnode )
         else:
             style = 'class="species"'
-        result += """+-<a id="%s" %s onmouseover="go('%s');" href="%s%s"> %s</a>
-        <a id="a-%s" class='showparents' onClick="setInternNode('%s');">show parents</a><br />\n""" % (
+        result += """+-<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s</a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,                        
           bdnode.capitalize(),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
-          dispnode.capitalize(), 
-          blockname,
-          blockname )
+          dispnode.capitalize() )
+        if nb_inter_parents:
+            result += """<a id="a-%s" class='showparents'
+              onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
+                blockname,
+                blockname )
+        else:
+            result += "<br />\n"
         return result
 
-    def __linkGenre( self, dispnode, bdnode, blockname ):
+    def __linkGenre( self, dispnode, bdnode, blockname, isinterparent=False, nb_inter_parents=0 ):
         result = ""
-        result += """+-<a id="%s" class="genre" name="genre"
-        onmouseover="go('%s')" href="%s%s"> %s </a>
-        <a id="a-%s" class='showparents' onClick="setInternNode('%s');">show parents</a><br />\n""" % (
+        result += """+-<a id="%s" class="genre" name="genre" onmouseover="go('%s')" 
+          href="%s%s" target='_blank'> %s </a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           bdnode.capitalize(),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
-          dispnode.capitalize(),
-          blockname,
-          blockname )
+          dispnode.capitalize())
+        if isinterparent and nb_inter_parents:
+            result += """<a id="a-%s" class='showparents'
+              onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
+                blockname,
+                blockname )
+        else:
+            result += "<br />\n"
         return result
  
 

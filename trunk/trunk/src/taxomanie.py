@@ -140,7 +140,7 @@ class Taxomanie( Taxobject ):
             errcode, errmsg, headers = conn.getreply()
             f=conn.getfile()
             for line in f.readlines():
-                if "class=\"image\"" in line:
+                if "class=\"image\"" in line and not "<img alt=\"\"" in line:
                     url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
                     conn.close()    
                     self._taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
@@ -166,7 +166,7 @@ class Taxomanie( Taxobject ):
             conn.request("GET", "/wiki/"+taxon)
             f = conn.getresponse().read()
             for line in f.split("\n"):
-                if "class=\"image\"" in line:
+                if "class=\"image\"" in line and not "<img alt=\"\"" in line:
                     url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
                     conn.close()    
                     self._taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img

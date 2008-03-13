@@ -70,10 +70,12 @@ function setInternNode(idNode){
     $(document).ready(function(){
          $("#"+idNode).slideToggle(500,function () {
              if ($("#a-"+idNode).text() == "hide" ){
+                 $("#a-"+idNode).attr( "style", "color:grey" );
                  $("#a-"+idNode).text("show parents");
              }
              else{
                  $("#a-"+idNode).text("hide");
+                 $("#a-"+idNode).attr( "style", "color:red" );
              }
            });
     });
@@ -82,6 +84,14 @@ function setInternNode(idNode){
 function toggleInternNode(){
     $(document).ready(function(){
          $("div.interparents").slideToggle(60);
+         if ("hide" in $("a.showparents").text() ){
+             $("a.showparents").attr("style", "color:grey" );
+             $("a.showparents").text("show parents");
+         }
+         else{
+             $("a.showparents").attr("style", "color:red" );
+             $("a.showparents").text("hide");
+         }
     });
 }
 
@@ -123,8 +133,8 @@ Home > Upload Collection > Collection visualization
 <div class="query">
 <form action="check" class="nopadding">
 <input size=60  type=text 
-onfocus="if(this.value=='Your query'){this.value='';}" 
-onblur="if(this.value==''){this.value='Your query';}"
+onfocus="if(this.value=='YOUR QUERY... (You can download your result)'){this.value='';}" 
+onblur="if(this.value==''){this.value='YOUR QUERY... (You can download your result)';}"
 <%
 if _query_:
     #
@@ -134,7 +144,7 @@ value="<%$ _query_ %>"
 else:
     #
 %>
-value="Your query"
+value="YOUR QUERY... (You can download your result)"
 <%|%>
 name="query" /> 
 <input type="submit" value="Search" class="button">

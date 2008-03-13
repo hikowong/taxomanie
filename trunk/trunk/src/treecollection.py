@@ -225,7 +225,7 @@ class TreeCollection( Taxobject ):
         if not root:
             root = "root"
             result += "<a class='genre' href='"+self.NCBI+ \
-              self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
+              self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a> (6/7)=6 species in 7 trees)<br />\n"
             result += "|<br />\n"
         for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
@@ -264,7 +264,7 @@ class TreeCollection( Taxobject ):
                         self.NCBI,
                         self.reference.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
-                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>,<a title='%s'>%s</a>) <br />\n""" % (
+                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>/<a title='%s'>%s</a>) <br />\n""" % (
                       bdnode,
                       str(id),
                       self.getNbTrees( bdnode ),
