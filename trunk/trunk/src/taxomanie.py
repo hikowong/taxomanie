@@ -232,6 +232,10 @@ class Taxomanie( Taxobject ):
     def getImage( self, imagename ): #XXX not used
         return open( imagename, "rb").read()
 
+    @cherrypy.expose
+    def getJs( self ):
+        return open( "templates/jquery-1.2.3.js").read()
+
 cherrypy.tree.mount(Taxomanie())
 
 
