@@ -30,6 +30,13 @@ def checkNwk( nwk ):
     except:
         raise ValueError, nwk+" is not correct"
         
+def removeNexusComments( nex ):
+    """ remove all nexus comments """
+    nwk_without_comment = ""
+    for i in nex.split("["):
+        if len(i.split("]")) > 1:
+                nwk_without_comment += "".join( i.split("]")[1] )
+    return nwk_without_comment
 
 def getParent(tree,node):
   """ Return the parent of the node """
