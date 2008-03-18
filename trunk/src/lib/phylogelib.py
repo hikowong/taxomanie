@@ -35,7 +35,9 @@ def removeNexusComments( nex ):
     nwk_without_comment = ""
     for i in nex.split("["):
         if len(i.split("]")) > 1:
-                nwk_without_comment += "".join( i.split("]")[1] )
+            nwk_without_comment += "".join( i.split("]")[1] )
+        else:
+            nwk_without_comment += i 
     return nwk_without_comment
 
 def getParent(tree,node):
