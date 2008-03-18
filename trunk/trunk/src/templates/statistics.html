@@ -15,7 +15,7 @@
         <td class="crumbs1"><img src="spc.gif" alt="" height="1" width="1"></td> 
         <td class="crumbs2">
 <!-- PAGE DEF : BEGINNING_________________________________________________________________ -->
-Home > Import Collection
+Home > Import Collection > Statistics
 <!-- PAGE DEF : END -->
         </td>
     </tr>
@@ -63,11 +63,33 @@ Home > Import Collection
 -->
     <a name="arbo"></a>
     <fieldset>
+        <legend> <%$ len( _badtaxalist_)%> bad taxa </legend>
+<%
+for taxon in _badtaxalist_:
+    #
+%>
+    <font color='red'>
+    <%$ taxon %> <br />
+    </font>
+<%|%>
+    </fieldset><br />
+    <fieldset>
+        <legend> <%$ len( _homonymlist_)%> homonym(s) </legend>
+<%
+for homonym in _homonymlist_:
+    #
+%>
+    <font color='orange'>
+    <%$ homonym %> <br />
+    </font>
+<%|%>
+    </fieldset><br />    <fieldset>
         <legend> NCBI taxomany</legend>
         <tt>
         <%$ _ncbitree_ %>
         </tt>
     </fieldset><br />
+
 </div>
 <!-- CONTENT : END -->
             <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>

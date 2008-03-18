@@ -207,6 +207,8 @@ class Taxomanie( Taxobject ):
     def statistics( self, id ):
         self._pleet["_id_"] = id
         #self._pleet["_collection_"] = cherrypy.session.get("col_query") 
+        self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
+        self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonym_list
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats(id)
         return self._presentation( "statistics.html" )
 
