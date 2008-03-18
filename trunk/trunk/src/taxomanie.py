@@ -26,6 +26,15 @@ class Taxomanie( Taxobject ):
         self._taximage_url = {}
         self.__loadProxy()
 
+    def header( self ):
+        #self._pleet["_pagedef_"] = pagedef
+        #self._pleet.setTemplate( open( "templates/header.html" ).read() )
+        #return self._pleet.render()
+        return open( "templates/header.html" ).read()
+
+    def footer( self ):
+        return open( "templates/footer.html" ).read()
+
     def __loadProxy( self ):
         config = ConfigParser.ConfigParser()
         config.read("taxomanie.conf")
@@ -42,7 +51,7 @@ class Taxomanie( Taxobject ):
     def index( self, msg = "" ):
         self.id += 1
         self._pleet["_id_"] = self.id
-        return self._presentation( "index.html", msg )
+        return self._presentation( "index.html", msg, pagedef = "Home > Upload Collection")
     
     @cherrypy.expose
     def check( self, id,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
@@ -108,7 +117,8 @@ class Taxomanie( Taxobject ):
         self._pleet["_reference_"] = self.reference
         self._pleet["_id_"] = id
         self._pleet["_nbbadtaxa_"] = cherrypy.session.get("nbbadtaxa")
-        return self._presentation( "check.html", msg = _msg_ )
+        pagedef = "Home > Upload Collection > Collection visualization"
+        return self._presentation( "check.html", msg = _msg_, pagedef=pagedef)
 
     @cherrypy.expose
     def getImgUrl( self, taxon ):
@@ -210,7 +220,8 @@ class Taxomanie( Taxobject ):
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonym_list
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats(id)
-        return self._presentation( "statistics.html" )
+        pagedef = "Home > Upload Collection > Statistics"
+        return self._presentation( "statistics.html", pagedef = pagedef)
 
     @cherrypy.expose
     def about( self, id ):
@@ -219,7 +230,7 @@ class Taxomanie( Taxobject ):
             self._pleet["_collection_"] = cherrypy.session.get("collection")
         except:
             self._pleet["_collection_"] = []
-        return self._presentation( "about.html" )
+        return self._presentation( "about.html", pagedef = "Home > About" )
 
     @cherrypy.expose
     def help( self, id ):
@@ -228,15 +239,19 @@ class Taxomanie( Taxobject ):
             self._pleet["_collection_"] = cherrypy.session.get("collection")
         except:
             self._pleet["_collection_"] = []
-        return self._presentation( "help.html" )
+        return self._presentation( "help.html", pagedef = "Home > Help" )
 
     @cherrypy.expose
     def getImage( self, imagename ): #XXX not used
         return open( imagename, "rb").read()
 
     @cherrypy.expose
-    def getJs( self ):
+    def getJquery( self ):
         return open( "templates/jquery-1.2.3.js").read()
+
+    @cherrypy.expose
+    def getJavascript( self ):
+        return open( "templates/phyloexplorer.js").read()
 
 cherrypy.tree.mount(Taxomanie())
 
