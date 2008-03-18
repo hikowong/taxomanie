@@ -69,7 +69,6 @@ class TreeCollection( Taxobject ):
                         self._d_taxonlist[tree["name"]].add( tax )#stats
                         if not self._d_reprtaxon.has_key( tax ): #
                             self._d_reprtaxon[tax] = set()#
-                        print "adding", tax
                         self._d_reprtaxon[tax].add( taxon )#
                     if not self.species_count[tree["name"]].has_key( taxon ):
                         self.species_count[tree["name"]][taxon] = 0
@@ -85,7 +84,7 @@ class TreeCollection( Taxobject ):
                     self.species_count["XXX"] += 1
         self.taxa_list = list( self.taxa_list )#stats
 
-    def __initStats( self ):
+    def __initStats( self ):#XXX not used
         """
         - fill the taxa list
         """
@@ -103,7 +102,6 @@ class TreeCollection( Taxobject ):
                         self._d_taxonlist[tree["name"]].add( tax )
                         if not self._d_reprtaxon.has_key( tax ): #
                             self._d_reprtaxon[tax] = set()#
-                        print "adding", tax
                         self._d_reprtaxon[tax].add( taxon )#
                     if not self._d_reprtaxon.has_key( taxon ):
                         self._d_reprtaxon[taxon] = set()
@@ -235,7 +233,7 @@ class TreeCollection( Taxobject ):
         if not root:
             root = "root"
             result += "<a class='genre' href='"+self.NCBI+ \
-              self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a> (6/7)=6 species in 7 trees)<br />\n"
+              self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a> Exemple:(6/7) = (6 species in 7 trees)<br />\n"
             result += "|<br />\n"
         for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
@@ -323,7 +321,7 @@ end;
 """
     import time
     col = open( "../data/omm_cds_nex.tre" ).read()
-    col = open("../data/tree.nwk").read()
+#    col = open("../data/tree.nwk").read()
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
@@ -337,5 +335,3 @@ end;
     print len(col)
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr
-    print treecol._d_reprtaxon
-    print treecol._d_reprtaxon['eukaryota']
