@@ -67,6 +67,10 @@ class TreeCollection( Taxobject ):
                     self._d_taxonlist[tree["name"]].add( taxon )#stats
                     for tax in self.reference.getParents( taxon ):#stats
                         self._d_taxonlist[tree["name"]].add( tax )#stats
+                        if not self._d_reprtaxon.has_key( tax ): #
+                            self._d_reprtaxon[tax] = set()#
+                        print "adding", tax
+                        self._d_reprtaxon[tax].add( taxon )#
                     if not self.species_count[tree["name"]].has_key( taxon ):
                         self.species_count[tree["name"]][taxon] = 0
                     if not self._d_reprtaxon.has_key( taxon ):#stats
@@ -89,6 +93,7 @@ class TreeCollection( Taxobject ):
             if not self._d_taxonlist.has_key( tree["name"] ):
                 self._d_taxonlist[tree["name"]] = set()
             for taxon in getTaxa( tree["tree"] ):
+                print "taxon>", taxon
                 old_taxon_name = taxon
                 taxon = self.reference.stripTaxonName(taxon)
                 if self.reference.isValid( taxon ):
@@ -96,12 +101,15 @@ class TreeCollection( Taxobject ):
                     self._d_taxonlist[tree["name"]].add( taxon )
                     for tax in self.reference.getParents( taxon ):
                         self._d_taxonlist[tree["name"]].add( tax )
+                        if not self._d_reprtaxon.has_key( tax ): #
+                            self._d_reprtaxon[tax] = set()#
+                        print "adding", tax
+                        self._d_reprtaxon[tax].add( taxon )#
                     if not self._d_reprtaxon.has_key( taxon ):
                         self._d_reprtaxon[taxon] = set()
                     self._d_reprtaxon[taxon].add( old_taxon_name )
         self.taxa_list = list( self.taxa_list )
  
-
     def getNbTrees( self, taxon ):
         """
         return the number of trees where taxon is
@@ -204,7 +212,7 @@ class TreeCollection( Taxobject ):
         tree = self.reference.getNCBIArborescence( self.taxa_list )
         if not allparents:
             tree = self.__removeSingleParent( tree )
-        return self.__display( tree, id )
+        return self.__displayStat( tree, id )
 
     def __removeSingleParent( self, tree ):
         for node in tree:
@@ -215,7 +223,7 @@ class TreeCollection( Taxobject ):
                 tree.add_edge( n[0], n[1] )
         return tree
 
-    def __display( self, tree, id, root = "",  mydepth = 0 ):
+    def __displayStat( self, tree, id, root = "",  mydepth = 0 ):
         """
         Pretty print of the tree in HTML.
 
@@ -249,11 +257,13 @@ class TreeCollection( Taxobject ):
                         self.NCBI,
                         self.reference.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
-                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>) <br />\n""" % (
+                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>/<a title='%s'>%s</a>) <br />\n""" % (
                       bdnode,
                       str(id),
-                      self.getNbTrees( bdnode ))
-                result += self.__display( tree, id, node, depth + 1)
+                      self.getNbTrees( bdnode ),
+                      ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
+                      str(len(self._d_reprtaxon[bdnode])))
+                result += self.__displayStat( tree, id, node, depth + 1)
             else:
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
@@ -327,3 +337,5 @@ end;
     print len(col)
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr
+    print treecol._d_reprtaxon
+    print treecol._d_reprtaxon['eukaryota']
