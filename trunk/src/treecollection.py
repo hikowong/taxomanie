@@ -49,6 +49,8 @@ class TreeCollection( Taxobject ):
         self.species_count = {"XXX":0}
         self._d_taxonlist = {}
         self._d_reprtaxon = {}
+        self.bad_taxa_list = set()
+        self.homonym_list = set()
         self.__init()
 
     def __init( self ):
@@ -63,6 +65,8 @@ class TreeCollection( Taxobject ):
                 old_taxon_name = taxon
                 taxon = self.reference.stripTaxonName(taxon)
                 if self.reference.isValid( taxon ):
+                    if self.reference.isHomonym( taxon ):
+                        self.homonym_list.add( taxon )
                     self.taxa_list.add( taxon )#stats
                     self._d_taxonlist[tree["name"]].add( taxon )#stats
                     for tax in self.reference.getParents( taxon ):#stats
@@ -82,6 +86,7 @@ class TreeCollection( Taxobject ):
                         self.species_count[tree["name"]][parent] += 1
                 else:
                     self.species_count["XXX"] += 1
+                    self.bad_taxa_list.add( taxon )
         self.taxa_list = list( self.taxa_list )#stats
 
     def __initStats( self ):#XXX not used
