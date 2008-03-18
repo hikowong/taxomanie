@@ -2,11 +2,11 @@
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to upload collection page">Upload Collection</a>
-<a href="help?id=<%$_id_%>" class="path" title="(?) Help contents">Help Contents</a>
-<a href="about?id=<%$_id_%>" class="path" title="About PhyloExplorer project...">About</a>
+<a href="help" class="path" title="(?) Help contents">Help Contents</a>
+<a href="about" class="path" title="About PhyloExplorer project...">About</a>
 <br />
 <center> <b>Current collection</b> </center>
-<a href="/check?id=<%$ _id_ %>" class="path" title="Go back to collection"> Back to collection </a>
+<a href="/check" class="path" title="Go back to collection"> Back to collection </a>
 <br />
 <!-- MENU : END -->
      </td>
@@ -20,7 +20,7 @@
     <a name="chart1"></a>
     <fieldset>
         <legend> Chart1 : Number of trees with number of taxa (<%$ len(_collection_) %> trees)</legend>
-        <img src="/getStatImg1?id=<%$ _id_ %>" />
+        <img src="/getStatImg1" />
     </fieldset><br />
     <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
     <br /><br />
@@ -28,7 +28,7 @@
     <a name="chart2"></a>
     <fieldset>
         <legend> Chart2 : Number of trees wich has this taxon (<%$ len(_collection_) %> trees)</legend>
-        <img src="/getStatImg2?id=<%$ _id_ %>" />
+        <img src="/getStatImg2" />
     </fieldset><br />
     <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
     <br /><br />

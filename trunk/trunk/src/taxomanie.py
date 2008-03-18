@@ -22,14 +22,10 @@ class Taxomanie( Taxobject ):
         if self.reference is None:
             from taxonomyreference import TaxonomyReference
             Taxomanie.reference = TaxonomyReference()
-        self.id = 0
         self._taximage_url = {}
         self.__loadProxy()
 
     def header( self ):
-        #self._pleet["_pagedef_"] = pagedef
-        #self._pleet.setTemplate( open( "templates/header.html" ).read() )
-        #return self._pleet.render()
         return open( "templates/header.html" ).read()
 
     def footer( self ):
@@ -49,14 +45,11 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def index( self, msg = "" ):
-        self.id += 1
-        self._pleet["_id_"] = self.id
         return self._presentation( "index.html", msg, pagedef = "Home > Upload Collection")
     
     @cherrypy.expose
-    def check( self, id,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
+    def check( self,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
         index = int( index )
-        id = int(id)
         if myFile is not None:
             print cherrypy.session.keys()
             cherrypy.session.clear()
@@ -67,6 +60,7 @@ class Taxomanie( Taxobject ):
             cherrypy.session["named_tree"] = {}
             cherrypy.session["collection"] = []
             cherrypy.session["nbbadtaxa"] = 0
+            cherrypy.session["id_download"] = 0
             self.reference.delimiter = delimiter
             if isinstance( myFile, str ):
                 input = myFile 
@@ -115,7 +109,6 @@ class Taxomanie( Taxobject ):
         self._pleet["_clearquery_"] = clear_query
         self._pleet["_cache_"] = cherrypy.session.get("cache")
         self._pleet["_reference_"] = self.reference
-        self._pleet["_id_"] = id
         self._pleet["_nbbadtaxa_"] = cherrypy.session.get("nbbadtaxa")
         pagedef = "Home > Upload Collection > Collection visualization"
         return self._presentation( "check.html", msg = _msg_, pagedef=pagedef)
@@ -186,9 +179,9 @@ class Taxomanie( Taxobject ):
         return self._taximage_url[taxon]
 
     @cherrypy.expose
-    def downloadCollection(self, id, target="nexus"):
+    def downloadCollection(self, target="nexus"):
+        cherrypy.session["id_download"] += 1
         cherrypy.response.headers['Content-Type'] = 'application/x-download'
-        id = int(id)
         if target == "nexus":
             body = "#nexus\nbegin trees;\n"
             for i in xrange( len(cherrypy.session.get("col_query")) ):
@@ -199,33 +192,34 @@ class Taxomanie( Taxobject ):
             body = ";\n".join( tree["tree"] for tree in cherrypy.session.get("col_query") )
         cherrypy.response.headers['Content-Length'] = len(body)
         cherrypy.response.headers['Content-Disposition'] = \
-          'attachment; filename=filtered-collection-%s.nwk' % str(id)
+          'attachment; filename=filtered_tree_collection-%s.nwk' % (
+            cherrypy.session.get('id_download') )
         cherrypy.response.body = body 
         return cherrypy.response.body
 
+    """
     @cherrypy.expose
-    def getStatImg1( self, id ):
+    def getStatImg1( self ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNbNodes()
         return os.popen( 'python stat1.py "%s"' % resultlist ).read()
 
     @cherrypy.expose
-    def getStatImg2( self, id ):
+    def getStatImg2( self ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNode()
         return os.popen( 'python stat2.py "%s"' % resultlist ).read()
+    """
 
     @cherrypy.expose
-    def statistics( self, id ):
-        self._pleet["_id_"] = id
+    def statistics( self ):
         #self._pleet["_collection_"] = cherrypy.session.get("col_query") 
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonym_list
-        self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats(id)
+        self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
         pagedef = "Home > Upload Collection > Statistics"
         return self._presentation( "statistics.html", pagedef = pagedef)
 
     @cherrypy.expose
-    def about( self, id ):
-        self._pleet["_id_"] = id
+    def about( self ):
         try:
             self._pleet["_collection_"] = cherrypy.session.get("collection")
         except:
@@ -233,8 +227,7 @@ class Taxomanie( Taxobject ):
         return self._presentation( "about.html", pagedef = "Home > About" )
 
     @cherrypy.expose
-    def help( self, id ):
-        self._pleet["_id_"] = id
+    def help( self ):
         try:
             self._pleet["_collection_"] = cherrypy.session.get("collection")
         except:

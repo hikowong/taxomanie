@@ -207,7 +207,7 @@ class TreeCollection( Taxobject ):
             result_list.append( (i,j) )
         return result_list
 
-    def displayStats( self, id, allparents = False ):
+    def displayStats( self, allparents = False ):
         """
         Display NCBI arborescence with stats
         """
@@ -215,7 +215,7 @@ class TreeCollection( Taxobject ):
         tree = self.reference.getNCBIArborescence( self.taxa_list )
         if not allparents:
             tree = self.__removeSingleParent( tree )
-        return self.__displayStat( tree, id )
+        return self.__displayStat( tree )
 
     def __removeSingleParent( self, tree ):
         for node in tree:
@@ -226,7 +226,7 @@ class TreeCollection( Taxobject ):
                 tree.add_edge( n[0], n[1] )
         return tree
 
-    def __displayStat( self, tree, id, root = "",  mydepth = 0 ):
+    def __displayStat( self, tree, root = "",  mydepth = 0 ):
         """
         Pretty print of the tree in HTML.
 
@@ -260,13 +260,12 @@ class TreeCollection( Taxobject ):
                         self.NCBI,
                         self.reference.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
-                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>/<a title='%s'>%s</a>) <br />\n""" % (
+                    result += """ (<a href="check?query=%%7B%s%%7D">%s</a>/<a title='%s'>%s</a>) <br />\n""" % (
                       bdnode,
-                      str(id),
                       self.getNbTrees( bdnode ),
                       ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
                       str(len(self._d_reprtaxon[bdnode])))
-                result += self.__displayStat( tree, id, node, depth + 1)
+                result += self.__displayStat( tree, node, depth + 1)
             else:
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
@@ -279,9 +278,8 @@ class TreeCollection( Taxobject ):
                         self.NCBI,
                         self.reference.TAXONOMY[bdnode]["id"],
                         dispnode.capitalize() )
-                    result += """ (<a href="check?query=%%7B%s%%7D&id=%s">%s</a>/<a title='%s'>%s</a>) <br />\n""" % (
+                    result += """ (<a href="check?query=%%7B%s%%7D">%s</a>/<a title='%s'>%s</a>) <br />\n""" % (
                       bdnode,
-                      str(id),
                       self.getNbTrees( bdnode ),
                       ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
                       str(len(self._d_reprtaxon[bdnode])))

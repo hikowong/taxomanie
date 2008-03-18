@@ -1,12 +1,12 @@
 <!-- MENU : BEGINNING______________________________________________________________________ -->
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to import collection page"> Upload Collection </a>
-<a href="help?id=<%$_id_%>" class="path" title="(?) Help contents"> Help Contents </a>
-<a href="about?id=<%$_id_%>" class="path" title="About PhyloExplorer project..."> About </a>
+<a href="help" class="path" title="(?) Help contents"> Help Contents </a>
+<a href="about" class="path" title="About PhyloExplorer project..."> About </a>
 <br />
 <center> <b>Current collection</b> </center>
-<a href="statistics?id=<%$ _id_ %>" class="path" title="Display statistics of collection"> Statistics </a>
-<a href="/downloadCollection?id=<%$ _id_ %>" class="path" title="Download the (full or filtered) collection">Download collection</a>
+<a href="statistics" class="path" title="Display statistics of collection"> Statistics </a>
+<a href="/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
 <!-- MENU : END -->
      </td>
@@ -31,13 +31,12 @@ value="YOUR QUERY... (You can download your result)"
 <%|%>
 name="query" /> 
 <input type="submit" value="Search" class="button">
-<input type="hidden" name="id" value="<%$ _id_ %>" />
 </form>
 <%
 if _query_:
     #
 %>
-    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a href=check?id=<%$ _id_ %>&clear_query=1>Back to full collection</a>
+    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a href=check?clear_query=1>Back to full collection</a>
 <%
 else:
     _query_ = ""
@@ -64,10 +63,9 @@ if len(_collection_) > 1:
     if _index_ > 1:
         #
 %>
-        &nbsp;<a href='check?id=<%$ _id_ %>&index=<%$ _index_-1 %>'>Previous</a>&nbsp;
+        &nbsp;<a href='check?index=<%$ _index_-1 %>'>Previous</a>&nbsp;
     <%|%>
 
-    <input type="hidden" name="id" value="<%$ _id_ %>" />
     <input type="text" size="5" value="<%$ _index_ %>" name="index" />
     /<%$ len(_collection_) %>
 
@@ -75,7 +73,7 @@ if len(_collection_) > 1:
     if _index_ < len(_collection_):
         #
 %>
-        &nbsp;<a href='check?id=<%$ _id_ %>&index=<%$ _index_+1 %>'>Next</a>&nbsp;
+        &nbsp;<a href='check?index=<%$ _index_+1 %>'>Next</a>&nbsp;
 <%|%>
 </form>
 <!-- tree or not -->

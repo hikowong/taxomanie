@@ -2,8 +2,8 @@
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to import collection page">Upload Collection</a>
-<a href="help?id=<%$_id_%>" class="path" title="(?) Help contents">Help Contents</a>
-<a href="about?id=<%$_id_%>" class="path" title="About PhyloExplorer project...">About</a>
+<a href="help" class="path" title="(?) Help contents">Help Contents</a>
+<a href="about" class="path" title="About PhyloExplorer project...">About</a>
 <!-- MENU : END -->
      </td>
              <td class="content">
@@ -18,7 +18,6 @@ if _msg_:
         <legend> Your collection file in newick format </legend>
         <form action="check" method="post" enctype="multipart/form-data">
             Filename: <input type="file" name="myFile" class="button" /><br /><br />
-            <input type="hidden" name="id" value="<%$ _id_ %>" />
             <input type="reset" class="button" value="clear" />
             Enter your delimiter (ex: "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
@@ -33,7 +32,6 @@ if _msg_:
             <input type="reset" class="button" value="clear" />
             Enter your delimiter (ex: "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
-            <input type="hidden" name="id" value="<%$ _id_ %>" />
             <input type="submit" class="button" id="send" value="Send" />
         </form>
     </fieldset>
