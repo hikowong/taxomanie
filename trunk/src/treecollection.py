@@ -1,7 +1,8 @@
 
 from phylogenictree import PhylogenicTree
 from taxobject import Taxobject
-from lib.phylogelib import getTaxa, tidyNwk, removeBootStraps
+from lib.phylogelib import getTaxa, tidyNwk, removeBootStraps, \
+  removeNexusComments
 import re
 
 class TreeCollection( Taxobject ):
@@ -24,6 +25,7 @@ class TreeCollection( Taxobject ):
         self.collection = []
         # Nexus collection
         if nwk_collection[:6].lower().strip() == "#nexus":
+            nwk_collection = removeNexusComments( nwk_collection )
             for tree in nwk_collection.split(";")[1:-2]:
                 tree = tree.strip()
                 nwktree = removeBootStraps( tidyNwk( tree.split("=")[1].strip().lower() ) )
@@ -286,8 +288,11 @@ end;
 
     col = """#nexus
 begin trees;
-tree ENm001.mcs1.merge20.2758.22.mfa =
+[balblabla des commentaires]
+tree ENm001.mcs1.merge20.2758.22.mfa = [arf arf arf]
 (Pan,Pongo,Hylobates,Colobus,Papio,Macaca,Callicebus,Aotus,Callithrix,Saimiri,Microcebus,Otolemur,Tupaia,Rattus,Mus,Spermophilus,Oryctolagus,Bos,Felis,Canis,Equus,Pteropus,Chiroptera,Myotis,Sorex,Dasypus,Echinops,Loxodonta,Monodelphis);
+[enocdfks fklsdfj skldfj sdkf
+skfjs dklfjsdklf]
 tree ENm001.mcs10.merge20.22980.53.mfa =
 (Pan,Pongo,Hylobates,Colobus,Chlorocebus,Papio,Macaca,Callicebus,Aotus,Callithrix,Saimiri,Microcebus,Otolemur,Tupaia,Rattus,Mus,Cavia,Spermophilus,Oryctolagus,Bos,Felis,Canis,Equus,Pteropus,Chiroptera,Myotis,Sorex,Dasypus,Echinops,Loxodonta,Monodelphis);
 tree ENm001.mcs100.merge20.57317.211.mfa =
