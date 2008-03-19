@@ -122,6 +122,7 @@ class Taxomanie( Taxobject ):
 
     def __getImageUrlProxy( self, taxon ):
         taxon = "_".join(taxon.split()).strip().capitalize()
+        print "displaying>>>", "http://en.wikipedia.org/wiki/"+taxon
         if not self._taximage_url.has_key( taxon ):
             conn = httplib.HTTP( self.proxy )
             conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
@@ -266,7 +267,7 @@ if __name__ == '__main__':
     # Fill cherrypy configuration
     cherrypy.config.update({
           "log.screen": log_screen,
-          "tools.sessions.timeout" : 21600, #6 hours
+          "tools.sessions.timeout" : 1800 , #30 minutes
           "tools.sessions.on" : True,
           "server.socket_host": ip,
           "server.socket_port": port,

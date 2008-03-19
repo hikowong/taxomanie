@@ -140,7 +140,7 @@ class PhylogenicTree( object ):
         result += """+-<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s</a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,                        
-          bdnode.capitalize(),
+          bdnode,#.capitalize().replace(" ", "_"),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize() )
@@ -158,10 +158,10 @@ class PhylogenicTree( object ):
         result += """+-<a id="%s" class="genre" name="genre" onmouseover="go('%s')" 
           href="%s%s" target='_blank'> %s </a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
-          bdnode.capitalize(),
+          bdnode.capitalize().replace(" ", "_"),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
-          dispnode.capitalize())
+          dispnode)#.capitalize())
         if isinterparent and nb_inter_parents:
             result += """<a id="a-%s" class='showparents'
               onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
