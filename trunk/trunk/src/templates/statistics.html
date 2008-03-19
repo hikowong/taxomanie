@@ -45,18 +45,11 @@ for taxon in _badtaxalist_:
     </font>
 <%|%>
     </fieldset><br />
-    <fieldset>
-        <legend> <%$ len( _homonymlist_)%> homonym(s) </legend>
-<%
-for homonym in _homonymlist_:
-    #
-%>
-    <font color='orange'>
-    <%$ homonym %> <br />
-    </font>
-<%|%>
+
+    <%$ _homonymlist_ %>
+
     </fieldset><br />    <fieldset>
-        <legend> NCBI taxomany</legend>
+        <legend> NCBI taxonomy</legend>
         <tt>
         <%$ _ncbitree_ %>
         </tt>

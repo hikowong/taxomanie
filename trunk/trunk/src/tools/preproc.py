@@ -11,14 +11,13 @@ import os
 
 print "Downloading NCBI database on the web"
 os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
-print "Extracting database"
+print "Extracting database... please wait"
 os.system( "tar xf taxdump.tar.gz names.dmp nodes.dmp" )
 
 NAMES = "names.dmp"
 NODES = "nodes.dmp"
 
 TBI = {}
-TI = {}
 TBN = {}
 
 print "Generating structure..."
@@ -26,31 +25,33 @@ print "Generating structure..."
 for line in file( NAMES ).readlines():
     id = line.split("|")[0].strip()
     name = line.split("|")[1].strip().lower()
+    homonym = line.split("|")[2].strip().lower()
     type_name = line.split("|")[3].strip()
     synonym = "synonym" in type_name
     common = "common name" in type_name
     if type_name == "scientific name":
-        # Creating TAXONOMY_INDEX
-        if not TI.has_key( int(id) ):
-            TI[int(id)] = []
-        TI[int(id)].append( name )
-        if not TI.has_key( name ):
-            TI[name] = []
-        TI[name].append( id )
         # Creating TAXONOMY_BY_ID
         TBI[id] = {}
-        TBI[id]["name"] = name
+        if homonym:
+            TBI[id]["name"] = homonym
+        else:
+            TBI[id]["name"] = name
         TBI[id]["common"] = []
         TBI[id]["homonym"] = []
         TBI[id]["synonym"] = []
         TBI[id]["parent"] = []
         TBI[id]["parents"] = []
         # Creating TAXONOMY_BY_NAME
-        TBN[name] = {}
-        TBN[name]["id"] = id
+        if homonym:
+            TBN[homonym] = {}
+            TBN[homonym]["id"] = id
+            TBN[homonym]["homonym"] = name
+        else:
+            TBN[name] = {}
+            TBN[name]["id"] = id
 
-print "Adding synonyms, homonym and common names..."
-# Adding synonyms, homonym and common names
+print "Adding synonyms, homonyms and common names..."
+# Adding synonyms, homonyms and common names
 for line in file( NAMES ).readlines():
     type_name = line.split("|")[3].strip()
     synonym = "synonym" in type_name
@@ -75,7 +76,8 @@ for line in file( NAMES ).readlines():
             TBN[base_name]["common"].append( name )
             TBI[id]["common"].append( name )
     if type_name == "scientific name" and homonym:
-        TBI[id]["homonym"].append( homonym )
+        name = line.split("|")[1].strip().lower()
+        TBI[id]["homonym"].append( name )
 
 
 print "Extracting parents..."
@@ -114,7 +116,7 @@ open( "taxonomy.csv", "w" ).write("")
 csv = open( "taxonomy.csv", "a" )
 for species in TBI.keys():
     line = "%s|%s|%s|%s|%s|%s|%s\n" % ( 
-      species,
+      species, #id
       TBI[species]["name"],
       TBI[TBI[species]["parent"]]["name"],
       "!".join(TBI[species]["homonym"]),
@@ -127,7 +129,6 @@ os.system( "rm taxdump.tar.gz" )
 os.system( "rm names.dmp nodes.dmp" )
 
 TAXONOMY_BY_ID = TBI
-TAXONOMY_INDEX = TI
 TAXONOMY_BY_NAME = TBN
 
 print "Done"

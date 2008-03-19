@@ -213,7 +213,7 @@ class Taxomanie( Taxobject ):
     def statistics( self ):
         #self._pleet["_collection_"] = cherrypy.session.get("col_query") 
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
-        self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonym_list
+        self._pleet["_homonymlist_"] = cherrypy.session.get("collection").displayHomonymList()
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
         pagedef = "Home > Upload Collection > Statistics"
         return self._presentation( "statistics.html", pagedef = pagedef)
