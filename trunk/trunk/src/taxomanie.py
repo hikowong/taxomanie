@@ -245,7 +245,11 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def getJavascript( self ):
-        return open( "templates/phyloexplorer.js").read()
+        result =  open( "templates/jquery-1.2.3.js").read()
+        result +=  open( "templates/jquery.blockUI.js").read()
+        result += open( "templates/phyloexplorer.js").read()
+        #return open( "templates/phyloexplorer.js").read()
+        return result
 
 cherrypy.tree.mount(Taxomanie())
 
