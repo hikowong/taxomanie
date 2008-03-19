@@ -3,7 +3,10 @@
 * Please wait on submit
 **/
 $(document).ready(function() { 
-    $('#send').click(function() { 
+    $('#wait').click(function() { 
+        $.blockUI(); 
+    }); 
+    $('#wait2').click(function() { 
         $.blockUI(); 
     }); 
 }); 
