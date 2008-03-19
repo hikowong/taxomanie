@@ -1,4 +1,16 @@
 
+/**
+* Please wait on submit
+**/
+$(document).ready(function() { 
+    $('#send').click(function() { 
+        $.blockUI(); 
+    }); 
+}); 
+
+/**
+* Images
+**/
 function getXhr(){
     var xhr = null; 
     if(window.XMLHttpRequest) // Firefox et autres
