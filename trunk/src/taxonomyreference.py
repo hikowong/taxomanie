@@ -34,14 +34,28 @@ class TaxonomyReference( DiGraph ):
             taxonomy = open( "tools/taxonomy.csv" )
         # taxonomy reference generation
         self.TAXONOMY = {}
+        self._homonym_by_name = {}
+        self._homonym_by_id = {}
         for species in taxonomy.readlines():
             id, name, parent, homonym, list_parents, synonym, common = species.split("|")
+            # Striping...
+            id = id.strip()
+            name = name.strip()
+            parent = parent.strip()
+            homonym = homonym.strip()
+            list_parents = list_parents.strip()
+            synonym = synonym.strip()
             common = common.strip()
+            # Filling TAXONOMY
             if synonym:
                 synonym = synonym.split("!")
             if common:
                 common = common.split("!")
-            homonym = homonym.strip()
+            if homonym:
+                if not self._homonym_by_name.has_key( homonym ):
+                    self._homonym_by_name[homonym] = set()
+                self._homonym_by_name[homonym].add( name )
+            self._homonym_by_id[id] = homonym
             if list_parents:
                 list_parents = list_parents.split("!")
             self.TAXONOMY[name] = {
@@ -95,22 +109,19 @@ class TaxonomyReference( DiGraph ):
 
     def isHomonym( self, name ):
         """ return True if name is an homonym """
-        if self.isValid( name ):
-            if self.TAXONOMY[name.lower()]["homonym"]:
-                return True
+        name = name.lower().strip()
+        if self._homonym_by_name.has_key( name ):
+            return True
         return False
 
-    def getHomonym( self, name ):
+    def getHomonyms( self, name ):
         """
-        return the homonym of name.
-
-        Exemple:
-            getHomonym( "echinops" ) -> "echinops <plant>"
+        return the homonyms list of a taxon.
         """
-        if self.isValid( name ):
-            homonym = self.TAXONOMY[name.lower()]["homonym"]
-            return homonym
-        raise NameError, "%s not valid" % name
+        name = name.lower().strip()
+        if self._homonym_by_name.has_key( name ):
+            return self._homonym_by_name[name]
+        raise ValueError, "%s is not an homonym" % name
 
     def isValid( self, name ):
         """
@@ -156,20 +167,6 @@ class TaxonomyReference( DiGraph ):
         if name != "root" and self.isValid( name ):
             return self.TAXONOMY[name]["parents"]
         return []
-        """
-        parents_dict = {}
-        if name != "root":
-            if not parents_dict.has_key( name ):
-                parents_dict[name] = []
-                parent = self.predecessors( name )[0]
-                while parent != "root":
-                    parents_dict[name].append( parent )
-                    parent = self.predecessors( parent )[0]
-                parents_dict[name].append( "root" )
-                parents_dict[name].reverse()
-            return parents_dict[name]
-        return [] 
-        """
 
     def getIntervalParents( self, name1, name2 ):
         """
@@ -267,18 +264,26 @@ if __name__ == "__main__":
 #    print "ratus>", ref.correct( "ratus" )
 #    print ref.getParents( "echinops telfairi" )
 #    print ref.getIntervalParents( "eutheria", "murinae" )
-    print ref.stripTaxonName( "mus_mus_france" )
-    print ref.stripTaxonName( "echinops" )
-    print ref.stripTaxonName( "rattus_rattus" )
-    print ref.stripTaxonName( "mus_france" )
-    print ref.stripTaxonName("macropus_eugenii")
-    print ref.isHomonym( "echinops" )
-    print ref.isHomonym( "mus" )
-    print ref.isHomonym( "bos" )
-    print ref.isHomonym( "rattus" )
-    print ref.getParents( "eutheria" )
-    print ref.getIntervalParents( "eukaryota", "eutheria" )
-    print ref.getIntervalParents( "murinae", "eutheria" )
+#    print ref.stripTaxonName( "mus_mus_france" )
+#    print ref.stripTaxonName( "echinops" )
+#    print ref.stripTaxonName( "rattus_rattus" )
+#    print ref.stripTaxonName( "mus_france" )
+#    print ref.stripTaxonName("macropus_eugenii")
+#    print ref.isHomonym( "echinops" )
+#    print ref.isHomonym( "mus" )
+#    print ref.isHomonym( "bos" )
+#    print ref.isHomonym( "rattus" )
+#    print ref.getParents( "eutheria" )
+#    print ref.getIntervalParents( "eukaryota", "eutheria" )
+#    print ref.getIntervalParents( "murinae", "eutheria" )
+#    print
+#    print 
+    print "echinops>", ref.getParents( "echinops" )
+    print "echinops telfairi>", ref.getParents( "echinops telfairi" )
+#    print ref.getNCBIArborescence( ["echinops telfairi", "mus"] ).edges()
+#    print ref._homonym_by_name["echinops"]
+#    print ref.isHomonym( "echinops" )
+    print ref.getHomonyms( "echinops" )
 
 
 

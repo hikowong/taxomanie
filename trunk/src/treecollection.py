@@ -286,6 +286,8 @@ class TreeCollection( Taxobject ):
 
     def __linkSpecies( self, dispnode, bdnode, stat=False, blockname="", nb_inter_parents=0 ):
         result = ""
+        dispnode = dispnode.replace( "<", "&lt;" )
+        dispnode = dispnode.replace( ">", "&gt;" )
         if self.reference.isHomonym( bdnode ):
             style = 'class="species_homonym"'
         else:
@@ -295,7 +297,7 @@ class TreeCollection( Taxobject ):
         result += """<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s</a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,                        
-          bdnode.capitalize(),
+          bdnode,#.capitalize().replace(" ", "_"),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize() )
@@ -316,6 +318,8 @@ class TreeCollection( Taxobject ):
 
     def __linkGenre( self, dispnode, bdnode, blockname, isinterparent=False, nb_inter_parents=0 ):
         result = ""
+        dispnode = dispnode.replace( "<", "&lt;" )
+        dispnode = dispnode.replace( ">", "&gt;" )
         if self.reference.isHomonym( bdnode ):
             style = 'class="genre_homonym"'
         else:
@@ -324,7 +328,7 @@ class TreeCollection( Taxobject ):
           href="%s%s" target='_blank'> %s </a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,
-          bdnode.capitalize(),
+          bdnode,#.capitalize().replace(" ", "_"),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize())
