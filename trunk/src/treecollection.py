@@ -50,7 +50,7 @@ class TreeCollection( Taxobject ):
         self._d_taxonlist = {}
         self._d_reprtaxon = {}
         self.bad_taxa_list = set()
-        self.homonym_list = set()
+        self.homonyms = {}
         self.__init()
 
     def __init( self ):
@@ -64,9 +64,10 @@ class TreeCollection( Taxobject ):
             for taxon in getTaxa( tree["tree"] ):
                 old_taxon_name = taxon
                 taxon = self.reference.stripTaxonName(taxon)
+                if self.reference.isHomonym( taxon ):
+                    if not self.homonyms.has_key( taxon ):
+                        self.homonyms[taxon] =  self.reference.getHomonyms( taxon )
                 if self.reference.isValid( taxon ):
-                    if self.reference.isHomonym( taxon ):
-                        self.homonym_list.add( taxon )
                     self.taxa_list.add( taxon )#stats
                     self._d_taxonlist[tree["name"]].add( taxon )#stats
                     for tax in self.reference.getParents( taxon ):#stats
@@ -84,7 +85,8 @@ class TreeCollection( Taxobject ):
                         if not self.species_count[tree["name"]].has_key( parent ):
                             self.species_count[tree["name"]][parent] = 0
                         self.species_count[tree["name"]][parent] += 1
-                else:
+                elif not self.reference.isHomonym( taxon ):
+#                else:
                     self.species_count["XXX"] += 1
                     self.bad_taxa_list.add( taxon )
         self.taxa_list = list( self.taxa_list )#stats
@@ -213,9 +215,10 @@ class TreeCollection( Taxobject ):
         """
         #self.__initStats()
         tree = self.reference.getNCBIArborescence( self.taxa_list )
+        #print tree.edges()
         if not allparents:
             tree = self.__removeSingleParent( tree )
-        return self.__displayStat( tree )
+        return self.__displayStat( tree, root="root" )
 
     def __removeSingleParent( self, tree ):
         for node in tree:
@@ -226,7 +229,7 @@ class TreeCollection( Taxobject ):
                 tree.add_edge( n[0], n[1] )
         return tree
 
-    def __displayStat( self, tree, root = "",  mydepth = 0 ):
+    def __displayStat( self, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
         """
         Pretty print of the tree in HTML.
 
@@ -235,55 +238,124 @@ class TreeCollection( Taxobject ):
         @return (string): the display in html format
         """
         result = ""
-        if not root:
-            root = "root"
+        blocknum = 0
+        # Create root node display
+        if root == "root":
             result += "<a class='genre' href='"+self.NCBI+ \
-              self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a> Exemple:(6/7) = (6 species in 7 trees)<br />\n"
+              self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+ \
+                "</a> Exemple:(6/7) = (6 species in 7 trees)<br />\n"
             result += "|<br />\n"
+        # Create tree display
         for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
+            dispnode = dispnode.replace( "<", "&lt;" )
+            dispnode = dispnode.replace( ">", "&gt;" )
             bdnode = self.reference.stripTaxonName( node.split("|")[0] )
+            print "node>", node
+            print "bdnode>", bdnode
+            print "dispnode>", dispnode
+            nb_inter_parents = 0
+            # Create div for interparents (parents beetween nodes)
+            if lastnode in self.reference.getParents( bdnode ):
+                inter_parents = self.reference.getIntervalParents( lastnode, bdnode )
+                nb_inter_parents = len( inter_parents )
+                blocknum += 1
+                blockname += str( blocknum )
+                result += "<div id='%s' class='interparents'><tt>" % blockname
+                if len( inter_parents ):
+                    result += "| "*mydepth
+                    result +=  ("| "*mydepth).join(
+                      self.__linkGenre(i,i,blockname) for i in inter_parents ) 
+                result += "</tt></div>" 
+            # Create arborescence display
             depth = 0
             while depth != mydepth :
                 result += "| "
                 depth += 1
             subnodes = tree.successors( node )
-            if subnodes:
+            if subnodes: # it's a genre
+                result += self.__linkGenre( dispnode, bdnode, blockname, True, nb_inter_parents )
+                result += self.__displayStat( tree,  node, depth + 1, 
+                  lastnode = bdnode, blockname = blockname+"a")
+            else: # it's a species (ie taxon)
                 if "XXX" in node:
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
                 else:
-                    result += """+-<a id="%s" class="genre" onmouseover="go('%s')"
-                      onmouseout="afficheDescURL('')" href="%s%s"> %s
-                      </a>"""% (
-                        self.reference.TAXONOMY[bdnode]["id"],
-                        bdnode.capitalize(),
-                        self.NCBI,
-                        self.reference.TAXONOMY[bdnode]["id"],
-                        dispnode.capitalize() )
-                    result += """ (<a href="check?query=%%7B%s%%7D">%s</a>/<a title='%s'>%s</a>) <br />\n""" % (
-                      bdnode,
-                      self.getNbTrees( bdnode ),
-                      ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
-                      str(len(self._d_reprtaxon[bdnode])))
-                result += self.__displayStat( tree, node, depth + 1)
-            else:
-                if "XXX" in node:
-                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
-                else:
-                    result += """+-<a id="%s" class="species" onmouseover="go('%s')"
-                      onmouseout="afficheDescURL('')" href="%s%s"> %s
-                      </a>""" % (
-                        self.reference.TAXONOMY[bdnode]["id"],
-                        bdnode.capitalize(),
-                        self.NCBI,
-                        self.reference.TAXONOMY[bdnode]["id"],
-                        dispnode.capitalize() )
-                    result += """ (<a href="check?query=%%7B%s%%7D">%s</a>/<a title='%s'>%s</a>) <br />\n""" % (
-                      bdnode,
-                      self.getNbTrees( bdnode ),
-                      ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
-                      str(len(self._d_reprtaxon[bdnode])))
+                    result += self.__linkSpecies( dispnode, bdnode, True, blockname, nb_inter_parents)
         return result
+
+    def __linkSpecies( self, dispnode, bdnode, stat=False, blockname="", nb_inter_parents=0 ):
+        result = ""
+        if self.reference.isHomonym( bdnode ):
+            style = 'class="species_homonym"'
+        else:
+            style = 'class="species"'
+        if stat:
+            result += "+-"
+        result += """<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s</a>""" % (
+          self.reference.TAXONOMY[bdnode]["id"],
+          style,                        
+          bdnode.capitalize(),
+          self.NCBI,
+          self.reference.TAXONOMY[bdnode]["id"],
+          dispnode.capitalize() )
+        if stat:
+            result += """ (<a href="check?query=%%7B%s%%7D">%s</a>/<a title='%s'>%s</a>)\n""" % (
+              bdnode,
+              self.getNbTrees( bdnode ),
+              ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
+              str(len(self._d_reprtaxon[bdnode])))
+        if nb_inter_parents:
+            result += """<a id="a-%s" class='showparents'
+              onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
+                blockname,
+                blockname )
+        elif stat:
+            result += "<br />\n"
+        return result
+
+    def __linkGenre( self, dispnode, bdnode, blockname, isinterparent=False, nb_inter_parents=0 ):
+        result = ""
+        if self.reference.isHomonym( bdnode ):
+            style = 'class="genre_homonym"'
+        else:
+            style = 'class="genre"'
+        result += """+-<a id="%s" %s name="genre" onmouseover="go('%s')" 
+          href="%s%s" target='_blank'> %s </a>""" % (
+          self.reference.TAXONOMY[bdnode]["id"],
+          style,
+          bdnode.capitalize(),
+          self.NCBI,
+          self.reference.TAXONOMY[bdnode]["id"],
+          dispnode.capitalize())
+        result += """ (<a href="check?query=%%7B%s%%7D">%s</a>/<a title='%s'>%s</a>)\n""" % (
+          bdnode,
+          self.getNbTrees( bdnode ),
+          ",".join( [i for i in self._d_reprtaxon[bdnode]]),
+          str(len(self._d_reprtaxon[bdnode])))
+        if isinterparent and nb_inter_parents:
+            result += """<a id="a-%s" class='showparents'
+              onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
+                blockname,
+                blockname )
+        else:
+            result += "<br />\n"
+        return result
+    
+    def displayHomonymList( self ):
+        result = """<fieldset>
+        <legend> %s homonym(s) </legend>\n""" % len(self.homonyms.keys())
+        for homonym, taxa in self.homonyms.iteritems():
+            result += """<font color="orange">%s</font> : """ % homonym
+            for taxon in taxa:
+                dispnode = taxon.split("|")[0].replace(self.reference.delimiter, " ")
+                dispnode = dispnode.replace( "<", "&lt;" )
+                dispnode = dispnode.replace( ">", "&gt;" )
+                result += """%s """ % self.__linkSpecies( dispnode, taxon )
+            result += "<br />\n"
+        result += "</fieldset>\n"
+        return result
+            
 
 if __name__ == "__main__":
     from taxonomyreference import TaxonomyReference
@@ -324,7 +396,7 @@ end;
 """
     import time
     col = open( "../data/omm_cds_nex.tre" ).read()
-#    col = open("../data/tree.nwk").read()
+    col = open("../data/tree.nwk").read()
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
@@ -336,5 +408,7 @@ end;
     col = treecol.query( "{murinae}>1" )
     fr = time.time()
     print len(col)
+    print treecol.homonyms
+    print treecol.displayHomonymList()
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr

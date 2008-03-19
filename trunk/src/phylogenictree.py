@@ -122,8 +122,10 @@ class PhylogenicTree( object ):
                 result += self.__display( tree,  node, depth + 1, 
                   lastnode = bdnode, blockname = blockname+"a")
             else: # it's a species (ie taxon)
-                if "XXX" in node:
+                if "XXX" in node and not self.reference.isHomonym( bdnode ):
                     result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
+                elif self.reference.isHomonym( bdnode ):
+                    result += "+-<font color='orange'><b>"+dispnode.capitalize()+"</b></font><br />\n"
                 else:
                     result += self.__linkSpecies( dispnode, bdnode, blockname, nb_inter_parents)
         return result
@@ -132,7 +134,7 @@ class PhylogenicTree( object ):
     def __linkSpecies( self, dispnode, bdnode, blockname, nb_inter_parents ):
         result = ""
         if self.reference.isHomonym( bdnode ):
-            style = 'class="species_homonym" title="%s"' % self.reference.getHomonym( bdnode )
+            style = 'class="species_homonym"'
         else:
             style = 'class="species"'
         result += """+-<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s</a>""" % (
