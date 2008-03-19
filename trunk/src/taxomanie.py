@@ -39,21 +39,8 @@ class Taxomanie( Taxobject ):
         except:
             self.proxy = ""
 
-    @cherrypy.expose
-    def css( self ):
-        return open( "templates/site.css" ).read()
-
-    @cherrypy.expose
-    def index( self, msg = "" ):
-        return self._presentation( "index.html", msg, pagedef = "Home > Upload Collection")
-    
-    @cherrypy.expose
-    def check( self,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
-        index = int( index )
+    def __initCollection( self, myFile=None, query=None, clear_query=False, delimiter="_" ):
         if myFile is not None:
-            print cherrypy.session.keys()
-            cherrypy.session.clear()
-            print cherrypy.session.keys()
             cherrypy.session["query"] = None
             cherrypy.session["col_query"] = []
             cherrypy.session["cache"] = {}
@@ -75,7 +62,6 @@ class Taxomanie( Taxobject ):
                     size += len(recv)
             input = input.strip()
             cherrypy.session["collection"] = TreeCollection( input, self.reference )
-            cherrypy.session["nbbadtaxa"] = cherrypy.session.get("collection").species_count["XXX"]
         _msg_ = ""
         if query:
             cherrypy.session["query"] = query
@@ -100,6 +86,25 @@ class Taxomanie( Taxobject ):
             cherrypy.session["query"] = None
             cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
             self._pleet["_collection_"] = cherrypy.session.get("col_query")
+        return _msg_
+
+    @cherrypy.expose
+    def css( self ):
+        return open( "templates/site.css" ).read()
+
+    @cherrypy.expose
+    def index( self, msg = "" ):
+        print cherrypy.session.keys()
+        cherrypy.session.clear()
+        print cherrypy.session.keys()
+        return self._presentation( "index.html", msg, pagedef = "Home > Upload Collection")
+    
+
+    @cherrypy.expose
+    def check( self,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
+        _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
+        index = int( index )
+        cherrypy.session["nbbadtaxa"] = cherrypy.session.get("collection").species_count["XXX"]
         if index > len(cherrypy.session.get("collection").collection):
             index = len(cherrypy.session.get("collection").collection)
         elif index < 1:
@@ -107,7 +112,7 @@ class Taxomanie( Taxobject ):
         self._pleet["_index_"] = index
         self._pleet["_query_"] = cherrypy.session.get("query")
         self._pleet["_clearquery_"] = clear_query
-        self._pleet["_cache_"] = cherrypy.session.get("cache")
+        self._pleet["_cache_"] = cherrypy.session.get("cache")#TODO in use? 
         self._pleet["_reference_"] = self.reference
         self._pleet["_nbbadtaxa_"] = cherrypy.session.get("nbbadtaxa")
         pagedef = "Home > Upload Collection > Collection visualization"
@@ -211,8 +216,8 @@ class Taxomanie( Taxobject ):
     """
 
     @cherrypy.expose
-    def statistics( self ):
-        #self._pleet["_collection_"] = cherrypy.session.get("col_query") 
+    def statistics( self, myFile=None, query=None, clear_query=False, delimiter="_" ):
+        self.__initCollection( myFile, query, clear_query, delimiter )
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").displayHomonymList()
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
