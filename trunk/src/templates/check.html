@@ -16,8 +16,8 @@
 <div class="query">
 <form action="check" class="nopadding">
 <input size=60  type=text 
-onfocus="if(this.value=='YOUR QUERY... (You can download your result)'){this.value='';}" 
-onblur="if(this.value==''){this.value='YOUR QUERY... (You can download your result)';}"
+onfocus="if(this.value=='Your query...'){this.value='';}" 
+onblur="if(this.value==''){this.value='Your query...';}"
 <%
 if _query_:
     #
@@ -27,10 +27,12 @@ value="<%$ _query_ %>"
 else:
     #
 %>
-value="YOUR QUERY... (You can download your result)"
+value="Your query..."
 <%|%>
 name="query" /> 
 <input type="submit" value="Search" class="button" id="wait2">
+<br><tt> e.g: <b> {murinae} > 2 and {carnivora} and not ({primates} or {laurasiatheria} < 4) </b><br>
+<i>You can download your result after your query</i></tt>
 </form>
 <%
 if _query_:
