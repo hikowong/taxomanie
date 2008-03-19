@@ -84,7 +84,8 @@ class Taxomanie( Taxobject ):
                 self._pleet["_collection_"] = cherrypy.session.get("col_query")
         else:
             cherrypy.session["query"] = None
-            cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
+            cherrypy.session.get("collection").clearQuery()
+            cherrypy.session["col_query"] = cherrypy.session.get("collection").getCollection()
             self._pleet["_collection_"] = cherrypy.session.get("col_query")
         return _msg_
 
@@ -102,6 +103,7 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def check( self,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
+        pagedef = "Home > Upload Collection > Collection visualization"
         _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
         index = int( index )
         cherrypy.session["nbbadtaxa"] = cherrypy.session.get("collection").species_count["XXX"]
@@ -115,7 +117,6 @@ class Taxomanie( Taxobject ):
         self._pleet["_cache_"] = cherrypy.session.get("cache")#TODO in use? 
         self._pleet["_reference_"] = self.reference
         self._pleet["_nbbadtaxa_"] = cherrypy.session.get("nbbadtaxa")
-        pagedef = "Home > Upload Collection > Collection visualization"
         return self._presentation( "check.html", msg = _msg_, pagedef=pagedef)
 
     @cherrypy.expose
@@ -127,7 +128,6 @@ class Taxomanie( Taxobject ):
 
     def __getImageUrlProxy( self, taxon ):
         taxon = "_".join(taxon.split()).strip().capitalize()
-        print "displaying>>>", "http://en.wikipedia.org/wiki/"+taxon
         if not self._taximage_url.has_key( taxon ):
             conn = httplib.HTTP( self.proxy )
             conn.putrequest( 'GET',"http://species.wikimedia.org/wiki/"+taxon )
@@ -217,12 +217,14 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def statistics( self, myFile=None, query=None, clear_query=False, delimiter="_" ):
-        self.__initCollection( myFile, query, clear_query, delimiter )
+        _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
+        self._pleet["_query_"] = cherrypy.session.get("query")
+        self._pleet["_clearquery_"] = clear_query
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").displayHomonymList()
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
         pagedef = "Home > Upload Collection > Statistics"
-        return self._presentation( "statistics.html", pagedef = pagedef)
+        return self._presentation( "statistics.html", msg = _msg_, pagedef = pagedef)
 
     @cherrypy.expose
     def about( self ):

@@ -23,6 +23,7 @@ class TreeCollection( Taxobject ):
         #super( TreeCollection, self ).__init__()
         self.reference = reference
         self.collection = []
+        self.query_collection = []
         # Nexus collection
         if nwk_collection[:6].lower().strip() == "#nexus":
             nwk_collection = removeNexusComments( nwk_collection )
@@ -45,19 +46,19 @@ class TreeCollection( Taxobject ):
                       "name": index,
                       "tree": nwktree,
                     } )
-        self.taxa_list = set()
-        self.species_count = {"XXX":0}
-        self._d_taxonlist = {}
-        self._d_reprtaxon = {}
-        self.bad_taxa_list = set()
-        self.homonyms = {}
         self.__init()
 
     def __init( self ):
         """
         count the number of species by tree
         """
-        for tree in self.collection:
+        self.taxa_list = set()
+        self.species_count = {"XXX":0}
+        self._d_taxonlist = {}
+        self._d_reprtaxon = {}
+        self.bad_taxa_list = set()
+        self.homonyms = {}
+        for tree in self.getCollection():
             if not self.species_count.has_key( tree["name"] ):
                 self.species_count[tree["name"]] = {}
                 self._d_taxonlist[tree["name"]] = set()#stats
@@ -86,35 +87,10 @@ class TreeCollection( Taxobject ):
                             self.species_count[tree["name"]][parent] = 0
                         self.species_count[tree["name"]][parent] += 1
                 elif not self.reference.isHomonym( taxon ):
-#                else:
                     self.species_count["XXX"] += 1
                     self.bad_taxa_list.add( taxon )
-        self.taxa_list = list( self.taxa_list )#stats
+        #self.taxa_list = list( self.taxa_list )#stats
 
-    def __initStats( self ):#XXX not used
-        """
-        - fill the taxa list
-        """
-        for tree in self.collection:
-            if not self._d_taxonlist.has_key( tree["name"] ):
-                self._d_taxonlist[tree["name"]] = set()
-            for taxon in getTaxa( tree["tree"] ):
-                print "taxon>", taxon
-                old_taxon_name = taxon
-                taxon = self.reference.stripTaxonName(taxon)
-                if self.reference.isValid( taxon ):
-                    self.taxa_list.add( taxon )
-                    self._d_taxonlist[tree["name"]].add( taxon )
-                    for tax in self.reference.getParents( taxon ):
-                        self._d_taxonlist[tree["name"]].add( tax )
-                        if not self._d_reprtaxon.has_key( tax ): #
-                            self._d_reprtaxon[tax] = set()#
-                        self._d_reprtaxon[tax].add( taxon )#
-                    if not self._d_reprtaxon.has_key( taxon ):
-                        self._d_reprtaxon[taxon] = set()
-                    self._d_reprtaxon[taxon].add( old_taxon_name )
-        self.taxa_list = list( self.taxa_list )
- 
     def getNbTrees( self, taxon ):
         """
         return the number of trees where taxon is
@@ -125,23 +101,21 @@ class TreeCollection( Taxobject ):
                 nb += 1
         return nb
 
-    def countNbSpecies( self ):
-        #XXX Not used
+    def getCollection( self ):
         """
-        Return the number of each species in the collection
-
-        exemple : (mus, rattus);(mus, canis);(rattus, bos);
-        will return {'murinae':4, 'phasianinae': 1 ...}
+        return the query collection if there was a query
+        return the complete collection otherwise
         """
-        d_genre = {}
-        for tree in self.collection:
-            for taxon in getTaxa( tree["tree"] ):
-                for parent in self.reference.getParents( taxon ):
-                    if not d_genre.has_key( parent ):
-                        d_genre[parent] = 0
-                    d_genre[parent] += 1
-        return d_genre
+        if self.query_collection:
+            return self.query_collection
+        return self.collection
 
+    def clearQuery( self ):
+        """
+        clear the query collection
+        """
+        self.query_collection = []
+    
     def __eval_query( self, query, tree ):
         res = query 
         for pattern in re.findall("{([^}]+)}", query):
@@ -167,13 +141,14 @@ class TreeCollection( Taxobject ):
         @new_list (list): the filtered collection
         """
         new_list = []
-        for i in xrange( len(self.collection) ):
-            tree = self.collection[i]
+        for i in xrange( len(self.getCollection()) ):
+            tree = self.getCollection()[i]
             try:
                 if self.__eval_query( query, tree ):
                     new_list.append( tree )
             except SyntaxError, e:
                 raise SyntaxError, e
+        self.query_collection = new_list
         return new_list
 
     def statNbTreeWithNode( self ):
@@ -213,9 +188,8 @@ class TreeCollection( Taxobject ):
         """
         Display NCBI arborescence with stats
         """
-        #self.__initStats()
+        self.__init()
         tree = self.reference.getNCBIArborescence( self.taxa_list )
-        #print tree.edges()
         if not allparents:
             tree = self.__removeSingleParent( tree )
         return self.__displayStat( tree, root="root" )
@@ -251,9 +225,6 @@ class TreeCollection( Taxobject ):
             dispnode = dispnode.replace( "<", "&lt;" )
             dispnode = dispnode.replace( ">", "&gt;" )
             bdnode = self.reference.stripTaxonName( node.split("|")[0] )
-            print "node>", node
-            print "bdnode>", bdnode
-            print "dispnode>", dispnode
             nb_inter_parents = 0
             # Create div for interparents (parents beetween nodes)
             if lastnode in self.reference.getParents( bdnode ):
