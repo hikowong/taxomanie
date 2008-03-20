@@ -199,6 +199,18 @@ class Taxomanie( Taxobject ):
         cherrypy.response.body = body 
         return cherrypy.response.body
 
+    @cherrypy.expose
+    def downloadNCBITree( self ):
+        cherrypy.session["id_download"] += 1
+        body = cherrypy.session.get("collection").getNCBITreeAsNwk()
+        cherrypy.response.headers['Content-Length'] = len(body)
+        cherrypy.response.headers['Content-Disposition'] = \
+          'attachment; filename=filtered_tree_collection-%s.nwk' % (
+            cherrypy.session.get('id_download') )
+        cherrypy.response.body = body 
+        return cherrypy.response.body
+
+
     """
     @cherrypy.expose
     def getStatImg1( self ):
