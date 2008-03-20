@@ -96,11 +96,15 @@ class PhylogenicTree( object ):
             root = self.root
             result += "<a class='genre' name='genre' href='"+self.NCBI+ \
               self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+"</a><br />\n"
-            result += "|<br />\n"
+            result += """<span class="treeline">|</span><br />\n"""
+        # Create tree display
         for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
+            dispnode = dispnode.replace( "<", "&lt;" )
+            dispnode = dispnode.replace( ">", "&gt;" )
             bdnode = self.reference.stripTaxonName( node.split("|")[0] )
             nb_inter_parents = 0
+            # Create div for interparents (parents beetween nodes)
             if lastnode in self.reference.getParents( bdnode ):
                 inter_parents = self.reference.getIntervalParents( lastnode, bdnode )
                 nb_inter_parents = len( inter_parents )
@@ -108,13 +112,14 @@ class PhylogenicTree( object ):
                 blockname += str( blocknum )
                 result += "<div id='%s' class='interparents'><tt>" % blockname
                 if len( inter_parents ):
-                    result += "| "*mydepth
-                    result +=  ("| "*mydepth).join(
+                    result += """<span class="treeline">|</span> """*mydepth
+                    result +=  ("""<span class="treeline">|</span> """*mydepth).join(
                       self.__linkGenre(i,i,blockname) for i in inter_parents ) 
                 result += "</tt></div>" 
+            # Create arborescence display
             depth = 0
             while depth != mydepth :
-                result += "| "
+                result += """<span class="treeline">|</span> """
                 depth += 1
             subnodes = tree.successors( node )
             if subnodes: # it's a genre
@@ -137,7 +142,7 @@ class PhylogenicTree( object ):
             style = 'class="species_homonym"'
         else:
             style = 'class="species"'
-        result += """+-<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s</a>""" % (
+        result += """+-<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s </a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,                        
           bdnode,#.capitalize().replace(" ", "_"),
@@ -161,7 +166,7 @@ class PhylogenicTree( object ):
           bdnode.capitalize().replace(" ", "_"),
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
-          dispnode)#.capitalize())
+          dispnode.capitalize())
         if isinterparent and nb_inter_parents:
             result += """<a id="a-%s" class='showparents'
               onClick="setInternNode('%s');"> show parents</a><br />\n""" % (

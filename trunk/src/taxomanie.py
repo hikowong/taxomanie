@@ -205,15 +205,52 @@ class Taxomanie( Taxobject ):
         body = cherrypy.session.get("collection").getNCBITreeAsNwk()
         cherrypy.response.headers['Content-Length'] = len(body)
         cherrypy.response.headers['Content-Disposition'] = \
-          'attachment; filename=filtered_tree_collection-%s.nwk' % (
+          'attachment; filename=NCBI_taxonomy_tree_of_your_species-%s.nwk' % (
             cherrypy.session.get('id_download') )
         cherrypy.response.body = body 
         return cherrypy.response.body
 
+    def __didYouMean( self, name ):
+        name = "+".join(name.strip().split() )
+        conn = httplib.HTTP( self.proxy )
+        conn.putrequest( 'GET',"http://www.ncbi.nlm.nih.gov//Taxonomy/Browser/wwwtax.cgi?name="+name )
+        conn.putheader('Accept', 'text/html')
+        conn.putheader('Accept', 'text/plain')
+        conn.endheaders()
+        errcode, errmsg, headers = conn.getreply()
+        print errcode, errmsg, headers
+        f=conn.getfile()
+        contenu = f.read()
+        conn.close()    
+        print "http://www.ncbi.nlm.nih.gov//Taxonomy/Browser/wwwtax.cgi?name="+name
+        print
+        print
+        contenu = contenu.split( "<!--  the contents   -->" )[1]
+        contenu = contenu.split( "<!--  end of content  -->" )[0]
+        contenu = contenu.split( "<a " )[1:]
+        my_meaning_list = []
+        for i in contenu:
+            my_meaning_list.append( """<a class="species" """+i.split( "</a>" )[0]+"</a>" )
+        return ", ".join( my_meaning_list)
+
+    @cherrypy.expose
+    def getAllSugestions( self ):
+        bad_taxa_list = cherrypy.session.get("collection").bad_taxa_list
+        result = ""
+        if bad_taxa_list:
+            for badtaxon in bad_taxa_list:
+                result += """<font color='red'>
+                  <b>%s</b> 
+                  <span class="didyoumean"> 
+                  <i> Did you mean</i> : %s <br />
+                  </span>
+                  </font>
+                  """ % (badtaxon, self.__didYouMean( badtaxon ) )
+        return result
 
     """
     @cherrypy.expose
-    def getStatImg1( self ):
+    def  getStatImg1( self ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNbNodes()
         return os.popen( 'python stat1.py "%s"' % resultlist ).read()
 

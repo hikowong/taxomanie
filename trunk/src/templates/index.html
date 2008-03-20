@@ -15,7 +15,7 @@ if _msg_:
     <div id="error" class="error"><center><%$ _msg_ %></center></div>
 <%|%>
     <fieldset>
-        <legend> Your collection file in newick format </legend>
+        <legend>Choose the file containing your tree collection in newick or nexus...</legend>
         <form action="statistics" method="post" enctype="multipart/form-data">
             Filename: <input type="file" name="myFile" class="button" /><br /><br />
             <input type="reset" class="button" value="clear" />
@@ -26,7 +26,7 @@ if _msg_:
     </fieldset>
     or
     <fieldset>
-        <legend> Your string in newick format </legend>
+        <legend>... or paste your collection</legend>
         <form action="statistics" method="post" enctype="multipart/form-data">
             <textarea rows="10" cols="80" name="myFile"></textarea><br />
             <input type="reset" class="button" value="clear" />

@@ -24,6 +24,7 @@ class TreeCollection( Taxobject ):
         self.reference = reference
         self.collection = []
         self.query_collection = None
+        self.last_query = ""
         # Nexus collection
         if nwk_collection[:6].lower().strip() == "#nexus":
             nwk_collection = removeNexusComments( nwk_collection )
@@ -175,6 +176,14 @@ class TreeCollection( Taxobject ):
             except SyntaxError, e:
                 raise SyntaxError, e
         self.query_collection = new_list
+        self.last_query = "+and+"+query 
+        # transform query to html
+        self.last_query = self.last_query.replace("{", "%7B" )
+        self.last_query = self.last_query.replace("}", "%7D" )
+        self.last_query = self.last_query.replace(" ", "+" )
+        self.last_query = self.last_query.replace("<", "&lt;" )
+        self.last_query = self.last_query.replace(">", "&gt;" )
+        self.last_query = self.last_query.replace("=", "%3D" )
         return new_list
 
     def statNbTreeWithNode( self ):
@@ -277,10 +286,10 @@ class TreeCollection( Taxobject ):
                 result += self.__displayStat( tree,  node, depth + 1, 
                   lastnode = bdnode, blockname = blockname+"a")
             else: # it's a species (ie taxon)
-                if "XXX" in node:
-                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
-                else:
-                    result += self.__linkSpecies( dispnode, bdnode, True, blockname, nb_inter_parents)
+#                if "XXX" in node:
+#                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
+#                else:
+                result += self.__linkSpecies( dispnode, bdnode, True, blockname, nb_inter_parents)
         return result
 
     def __linkSpecies( self, dispnode, bdnode, stat=False, blockname="", nb_inter_parents=0 ):
@@ -301,8 +310,11 @@ class TreeCollection( Taxobject ):
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize() )
         if stat:
-            result += """ (<a href="check?query=%%7B%s%%7D">%s</a>/<a title='%s'>%s</a>)\n""" % (
+            result += """ (<a title='%s' href="statistics?query=%%7B%s%%7D%s">%s</a>/<a
+              class="nolink" title='%s'>%s</a>)\n""" % (
+              "Restrict your collection to these trees",
               bdnode,
+              self.last_query,
               self.getNbTrees( bdnode ),
               ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
               str(len(self._d_reprtaxon[bdnode])))
@@ -331,8 +343,11 @@ class TreeCollection( Taxobject ):
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize())
-        result += """ (<a href="check?query=%%7B%s%%7D">%s</a>/<a title='%s'>%s</a>)\n""" % (
+        result += """ (<a title="%s" href="statistics?query=%%7B%s%%7D%s">%s</a>/<a
+          class="nolink" title='%s'>%s</a>)\n""" % (
+          "Restrict your collection to these trees",
           bdnode,
+          self.last_query,
           self.getNbTrees( bdnode ),
           ",".join( [i for i in self._d_reprtaxon[bdnode]]),
           str(len(self._d_reprtaxon[bdnode])))
@@ -386,7 +401,7 @@ class TreeCollection( Taxobject ):
 
     def _nxgraph2nwk( self, tree, root ):
         l = self._nxgraph2list( tree, root )
-        return self._list2nwk( l )
+        return self._list2nwk( l )+";"
         
     def getNCBITreeAsNwk( self ):
         """
