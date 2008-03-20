@@ -78,6 +78,11 @@ class Taxomanie( Taxobject ):
         return _msg_
 
     @cherrypy.expose
+    def sessionexpired( self ):
+        pagedef = "Home > Expired session"
+        return self._presentation( "sessionexpired.html", pagedef = pagedef )
+
+    @cherrypy.expose
     def css( self ):
         return open( "templates/site.css" ).read()
 
@@ -92,17 +97,20 @@ class Taxomanie( Taxobject ):
     @cherrypy.expose
     def check( self,  myFile=None, index=1, query=None, clear_query=False, delimiter="_" ):
         pagedef = "Home > Upload Collection > Collection visualization"
-        _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
+        try:
+            _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
+        except AttributeError: # if session expired
+            return self.sessionexpired()
         index = int( index )
         cherrypy.session["nbbadtaxa"] = cherrypy.session.get("collection").species_count["XXX"]
-        if index > len(cherrypy.session.get("collection").collection):
-            index = len(cherrypy.session.get("collection").collection)
+        if index > len(cherrypy.session.get("collection").getCollection()):
+            index = len(cherrypy.session.get("collection").getCollection())
         elif index < 1:
             index = 1
         self._pleet["_index_"] = index
         self._pleet["_query_"] = cherrypy.session.get("query")
         self._pleet["_clearquery_"] = clear_query
-        self._pleet["_cache_"] = cherrypy.session.get("cache")#TODO in use? 
+        self._pleet["_cache_"] = cherrypy.session.get("cache")
         self._pleet["_reference_"] = self.reference
         self._pleet["_nbbadtaxa_"] = cherrypy.session.get("nbbadtaxa")
         return self._presentation( "check.html", msg = _msg_, pagedef=pagedef)
@@ -205,12 +213,18 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def statistics( self, myFile=None, query=None, clear_query=False, delimiter="_" ):
-        _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
+        try:
+            _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
+        except AttributeError: # if session expired
+            return self.sessionexpired()
         self._pleet["_query_"] = cherrypy.session.get("query")
         self._pleet["_clearquery_"] = clear_query
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
+        self._pleet["_nbtaxa_"] = len(cherrypy.session.get("collection").taxa_list)
+        self._pleet["_nbtree_"] = len( cherrypy.session.get("collection").getCollection() )
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
-        self._pleet["_homonymlist_"] = cherrypy.session.get("collection").displayHomonymList()
+        self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonyms.keys()
+        self._pleet["_disphomonym_"] = cherrypy.session.get("collection").displayHomonymList()
         pagedef = "Home > Upload Collection > Statistics"
         return self._presentation( "statistics.html", msg = _msg_, pagedef = pagedef)
 

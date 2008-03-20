@@ -61,7 +61,10 @@ if len( _collection_ ) == 0:
     #
 %>
    <div class="error">Empty collection</div>
-<%|%>
+<%
+else:
+    #
+%>
 <!-- end query panel -->
     <br />
 <!--
@@ -83,26 +86,41 @@ if len( _collection_ ) == 0:
 -->
     <a name="arbo"></a>
     <fieldset>
+        <legend> General informations of the collection </legend>
+        <%$ _nbtaxa_ %> taxa <br />
+        <%$ _nbtree_ %> trees <br />
+        <font color="red"> <%$ len(_badtaxalist_)%> bad taxa </font><br />
+        <font color="orange"><%$ len(_homonymlist_)%> homonyms </font><br />
+    </fieldset>
+<%
+    if len(_badtaxalist_):
+        #
+%>
+    <fieldset>
         <legend> <%$ len( _badtaxalist_)%> bad taxa </legend>
 <%
-for taxon in _badtaxalist_:
-    #
+        for taxon in _badtaxalist_:
+            #
 %>
     <font color='red'>
     <%$ taxon %> <br />
     </font>
-<%|%>
-    </fieldset><br />
-
-    <%$ _homonymlist_ %>
-
-    </fieldset><br />    <fieldset>
+        <%|%>
+    </fieldset>
+    <%|%>
+<%
+    if len(_homonymlist_):
+        #
+%>
+    <%$ _disphomonym_ %>
+    <%|%>
+    <fieldset>
         <legend> NCBI taxonomy</legend>
         <tt>
         <%$ _ncbitree_ %>
         </tt>
     </fieldset><br />
-
+<%|%>
 </div>
             <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
     <!-- div preview -->
