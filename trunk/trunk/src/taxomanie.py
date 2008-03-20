@@ -65,28 +65,16 @@ class Taxomanie( Taxobject ):
         _msg_ = ""
         if query:
             cherrypy.session["query"] = query
-        if not clear_query:
-            if cherrypy.session.get("query"):
-                try:
-                    cherrypy.session["col_query"] = cherrypy.session.get(
-                      "collection").query( cherrypy.session.get("query") )
-                    self._pleet["_collection_"] = cherrypy.session.get("col_query")
-                except NameError, e:
-                    cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
-                    self._pleet["_collection_"] = cherrypy.session.get("col_query")
-                    _msg_ = "Bad taxon name : %s" % e
-                except SyntaxError, e:
-                    _msg_ = "Bad query : %s" % query
-                    cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
-                    self._pleet["_collection_"] = cherrypy.session.get("col_query")
-            else:
-                cherrypy.session["col_query"] = cherrypy.session.get("collection").collection
-                self._pleet["_collection_"] = cherrypy.session.get("col_query")
-        else:
+            try:
+                cherrypy.session.get("collection").query( query )
+            except NameError, e:
+                _msg_ = "Bad taxon name : %s" % e
+            except SyntaxError, e:
+                _msg_ = "Bad query : %s" % query
+        if clear_query:
             cherrypy.session["query"] = None
             cherrypy.session.get("collection").clearQuery()
-            cherrypy.session["col_query"] = cherrypy.session.get("collection").getCollection()
-            self._pleet["_collection_"] = cherrypy.session.get("col_query")
+        self._pleet["_collection_"] = cherrypy.session.get("collection").getCollection()
         return _msg_
 
     @cherrypy.expose
@@ -220,9 +208,9 @@ class Taxomanie( Taxobject ):
         _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
         self._pleet["_query_"] = cherrypy.session.get("query")
         self._pleet["_clearquery_"] = clear_query
+        self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").displayHomonymList()
-        self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
         pagedef = "Home > Upload Collection > Statistics"
         return self._presentation( "statistics.html", msg = _msg_, pagedef = pagedef)
 
