@@ -1,0 +1,17 @@
+balise
+
+= Introduction =
+
+stat balise
+
+
+= Details =
+
+{{{
+<div class="statBar"><? for($i=0; $i<16; $i++){echo '<span class="statMetric">&nbsp;&nbsp;|</span>'; } echo '16%';?></div><br>
+<div class="statBar"><? for($i=0; $i<70; $i++){echo '<span class="statMetric">&nbsp;&nbsp;|</span>'; } echo '70%';?></div><br>
+<div class="statBar"><? for($i=0; $i<100; $i++){echo '<span class="statMetric">&nbsp;&nbsp;|</span>'; } echo '100%';?></div><br>
+<div class="statBar"><? for($i=0; $i<65; $i++){echo '<span class="statMetric">&nbsp;&nbsp;|</span>'; } echo '65%';?></div><br>
+<div class="statBar"><? for($i=0; $i<33; $i++){echo '<span class="statMetric">&nbsp;&nbsp;|</span>'; } echo '33%';?></div><br>
+<div class="statBar"><? for($i=0; $i<100; $i++){echo '#';}echo '100%'; ?></div>
+}}}
