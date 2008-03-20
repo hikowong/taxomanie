@@ -263,17 +263,27 @@ class Taxomanie( Taxobject ):
                   """ % (badtaxon, did_you_mean_result )
         return result
 
-    """
-    @cherrypy.expose
-    def  getStatImg1( self ):
+    def getStat1( self ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNbNodes()
-        return os.popen( 'python stat1.py "%s"' % resultlist ).read()
+        result = ""
+        resultlist.reverse()
+        nbtaxa_max, nop = max( resultlist ) 
+        for res in resultlist:
+            nbtree, nbtaxon = res
+            nbtreepourcent = nbtree*100/nbtaxa_max
+            result += "["+str(nbtaxon)+"]"+"#"*nbtreepourcent+"("+str(nbtree)+","+str(nbtreepourcent)+"%)<br />"
+        return result
 
-    @cherrypy.expose
-    def getStatImg2( self ):
+    def getStat2( self ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNode()
-        return os.popen( 'python stat2.py "%s"' % resultlist ).read()
-    """
+        result = ""
+        resultlist.reverse()
+        nbtaxa_max, nop = max( resultlist ) 
+        for res in resultlist:
+            nbtree, taxon = res
+            nbtreepourcent = nbtree*100/nbtaxa_max
+            result += "["+taxon+"]"+"#"*nbtreepourcent+"("+str(nbtree)+","+str(nbtreepourcent)+"%)<br />"
+        return result
 
     @cherrypy.expose
     def statistics( self, myFile=None, query=None, clear_query=False, delimiter="_" ):
@@ -289,8 +299,11 @@ class Taxomanie( Taxobject ):
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonyms.keys()
         self._pleet["_disphomonym_"] = cherrypy.session.get("collection").displayHomonymList()
+        self._pleet["_stat1_"] = self.getStat1()
+        self._pleet["_stat2_"] = self.getStat2()
         pagedef = "Home > Upload Collection > Statistics"
         return self._presentation( "statistics.html", msg = _msg_, pagedef = pagedef)
+
 
     @cherrypy.expose
     def about( self ):

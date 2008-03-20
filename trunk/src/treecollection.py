@@ -197,11 +197,11 @@ class TreeCollection( Taxobject ):
                 if self.reference.isValid( taxon ):
                     if taxon not in l_taxa: l_taxa.append( taxon )
                     if not d_tree_taxon.has_key( taxon ):
-                        d_tree_taxon[l_taxa.index(taxon)] = 0
-                    d_tree_taxon[l_taxa.index(taxon)] += 1
+                        d_tree_taxon[taxon] = 0
+                    d_tree_taxon[taxon] += 1
         result_list = []
         for i, j in d_tree_taxon.iteritems():
-            result_list.append( (i,j) )
+            result_list.append( (j,i) )
         return result_list
 
     def statNbTreeWithNbNodes( self ):
@@ -209,14 +209,14 @@ class TreeCollection( Taxobject ):
         return the number of tree for each number of taxa
         """
         d_tree_nodes = {}
-        for tree in self.collection:
+        for tree in self.getCollection():
             taxa_len = len( getTaxa( tree["tree"] ) )
             if not d_tree_nodes.has_key( taxa_len ):
                 d_tree_nodes[taxa_len] = 0
             d_tree_nodes[taxa_len] += 1
         result_list = []
         for i, j in d_tree_nodes.iteritems():
-            result_list.append( (i,j) )
+            result_list.append( (j,i) )
         return result_list
 
     def displayStats( self, allparents = False ):
@@ -458,10 +458,11 @@ end;
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
     dr = time.time()
-    print ">>>>>", treecol.getNCBITreeAsNwk()
-    col = treecol.query( "{murinae}>2" )
+    print len(treecol.getCollection())
+    col = treecol.query( "{murinae}>1" )
     fr = time.time()
-#    print treecol.getCollection()
+    print len(treecol.getCollection())
+    print treecol.statNbTreeWithNbNodes()
 #    print treecol.bad_taxa_list
 #    print treecol.displayStats()
 #    print treecol.getCollection()
