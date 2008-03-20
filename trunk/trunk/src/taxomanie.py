@@ -210,7 +210,7 @@ class Taxomanie( Taxobject ):
         cherrypy.response.body = body 
         return cherrypy.response.body
 
-    def __didYouMean( self, name ):
+    def __didYouMeanProxy( self, name ):
         name = "+".join(name.strip().split() )
         conn = httplib.HTTP( self.proxy )
         conn.putrequest( 'GET',"http://www.ncbi.nlm.nih.gov//Taxonomy/Browser/wwwtax.cgi?name="+name )
@@ -218,13 +218,9 @@ class Taxomanie( Taxobject ):
         conn.putheader('Accept', 'text/plain')
         conn.endheaders()
         errcode, errmsg, headers = conn.getreply()
-        print errcode, errmsg, headers
         f=conn.getfile()
         contenu = f.read()
         conn.close()    
-        print "http://www.ncbi.nlm.nih.gov//Taxonomy/Browser/wwwtax.cgi?name="+name
-        print
-        print
         contenu = contenu.split( "<!--  the contents   -->" )[1]
         contenu = contenu.split( "<!--  end of content  -->" )[0]
         contenu = contenu.split( "<a " )[1:]
@@ -233,19 +229,38 @@ class Taxomanie( Taxobject ):
             my_meaning_list.append( """<a class="species" """+i.split( "</a>" )[0]+"</a>" )
         return ", ".join( my_meaning_list)
 
+    def __didYouMean( self, name ):
+        name = "+".join(name.strip().split() )
+        conn = httplib.HTTPConnection("www.ncbi.nlm.nih.gov")
+        conn.request("GET", "/Taxonomy/Browser/wwwtax.cgi?name="+name)
+        contenu = conn.getresponse().read()
+        conn.close()    
+        contenu = contenu.split( "<!--  the contents   -->" )[1]
+        contenu = contenu.split( "<!--  end of content  -->" )[0]
+        contenu = contenu.split( "<a " )[1:]
+        my_meaning_list = []
+        for i in contenu:
+            my_meaning_list.append( """<a class="species" """+i.split( "</a>" )[0]+"</a>" )
+        return ", ".join( my_meaning_list)
+
+
     @cherrypy.expose
     def getAllSugestions( self ):
         bad_taxa_list = cherrypy.session.get("collection").bad_taxa_list
         result = ""
         if bad_taxa_list:
             for badtaxon in bad_taxa_list:
+                if self.proxy:
+                    did_you_mean_result = self.__didYouMeanProxy( badtaxon )
+                else:
+                    did_you_mean_result = self.__didYouMean( badtaxon )
                 result += """<font color='red'>
                   <b>%s</b> 
                   <span class="didyoumean"> 
                   <i> Did you mean</i> : %s <br />
                   </span>
                   </font>
-                  """ % (badtaxon, self.__didYouMean( badtaxon ) )
+                  """ % (badtaxon, did_you_mean_result )
         return result
 
     """
@@ -294,8 +309,12 @@ class Taxomanie( Taxobject ):
         return self._presentation( "help.html", pagedef = "Home > Help" )
 
     @cherrypy.expose
-    def getImage( self, imagename ): #XXX not used
-        return open( imagename, "rb").read()
+    def getImageFond( self, imagename ): #XXX not used
+        if imagename not in ["Raster.gif", "NautilusBlack.jpg",\
+            "NautilusGrey.jpg", "NautilusGreen.jpg", "NautilusWhite.jpg",\
+            "NautilusDarkGreen.jpg"]:
+            raise "What do you the fucking do ?!?"
+        return open( "templates/"+imagename, "rb").read()
 
     @cherrypy.expose
     def getJquery( self ):

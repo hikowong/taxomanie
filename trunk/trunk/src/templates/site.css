@@ -181,7 +181,7 @@ body
 	font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
 	font-size: 11px;
 	background-color: #333;
-	background-image:  url(http://taxomanie.googlecode.com/svn/trunk/trunk/src/templates/Raster.gif);
+	background-image:  url(getImageFond?imagename=Raster.gif);
 	background-attachment: fixed;
 	background-position: top left;
 	margin: 0px;
@@ -194,7 +194,7 @@ body table.body
     {
 	font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
     font-size: 11px;
-    background-image:  url(http://taxomanie.googlecode.com/svn/trunk/trunk/src/templates/NautilusBlack.jpg);
+    background-image:  url(getImageFond?imagename=NautilusBlack.jpg);
 	background-attachment: fixed;
 	background-position: top left;
 	background-repeat: no-repeat;
@@ -222,7 +222,7 @@ td.header2
     {
 	background-color: #1AA21A;
 	/* background-color: #0063a8; Blue*/
-	background-image:  url(http://taxomanie.googlecode.com/svn/trunk/trunk/src/templates/NautilusGreen.jpg);
+	background-image:  url(getImageFond?imagename=NautilusGreen.jpg);
 	background-attachment: fixed;
 	background-position: top left;
 	background-repeat: no-repeat;
@@ -258,7 +258,7 @@ td.crumbs2
 	font-size: 11px;
 	background-color: #006600;
 	/* background-color: #194b6e; DarkBlue */
-	background-image:  url(http://taxomanie.googlecode.com/svn/trunk/trunk/src/templates/NautilusDarkGreen.jpg);
+	background-image:  url(getImageFond?imagename=NautilusDarkGreen.jpg);
 	background-attachment: fixed;
 	background-position: top left;
 	background-repeat: no-repeat;
@@ -301,7 +301,7 @@ td.content
 	border-top: 1px solid #000;
 	border-left: 1px solid #000;
 	background-color: #fff;
-	background-image:  url(http://taxomanie.googlecode.com/svn/trunk/trunk/src/templates/NautilusWhite.jpg);
+	background-image:  url(getImageFond?imagename=NautilusWhite.jpg);
 	background-attachment: fixed;
 	background-position: top left;
 	background-repeat: no-repeat;
@@ -331,7 +331,7 @@ td.links a
 	border-top: 1px solid #333;
 	border-bottom: 1px solid #000;
 	background-color: #858585;
-	background-image:  url(http://taxomanie.googlecode.com/svn/trunk/trunk/src/templates/NautilusGrey.jpg);
+	background-image:  url(getImageFond?imagename=NautilusGrey.jpg);
 	background-attachment: fixed;
 	background-position: top left;
 	background-repeat: no-repeat;
