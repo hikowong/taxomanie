@@ -5,7 +5,6 @@
    Released by SoO.D and NicoO.A (02/2008)
 */
 
-
 /*-------------------------GENERAL LINKS--------------------------------------*/
 a {
     font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
@@ -118,7 +117,7 @@ a:hover.genre span, a:hover.species span
     right:10px; 
     text-align:left; 
     color: #fff;
-    /*background: #000; éviter à cause des images png, ex: homo */
+    background: #FFF;
     /*width: 200px;*/
     /*height: 200px;*/
     }
@@ -342,6 +341,14 @@ td.links a:active
     }
 
 /*-------------------------OTHERS--------------------------------------*/
+.treeline
+{
+    font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
+    font-size: 20px;
+    line-height: 10px;
+
+}
+
 legend
     {
     font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;

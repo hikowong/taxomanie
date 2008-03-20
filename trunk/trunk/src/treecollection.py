@@ -52,10 +52,10 @@ class TreeCollection( Taxobject ):
         """
         count the number of species by tree
         """
-        self.taxa_list = set()
+        self.taxa_list = set() # stats
         self.species_count = {"XXX":0}
-        self._d_taxonlist = {}
-        self._d_reprtaxon = {}
+        self._d_taxonlist = {} # stats
+        self._d_reprtaxon = {} # stats
         self.bad_taxa_list = set()
         self.homonyms = {}
         for tree in self.getCollection():
@@ -97,6 +97,7 @@ class TreeCollection( Taxobject ):
         """
         self._d_taxonlist = {}
         self._d_reprtaxon = {}
+        self.taxa_list = set() # stats
         for tree in self.getCollection():
             if not self._d_taxonlist.has_key( tree["name"] ):
                 self._d_taxonlist[tree["name"]] = set()#stats
@@ -245,7 +246,7 @@ class TreeCollection( Taxobject ):
             result += "<a class='genre' href='"+self.NCBI+ \
               self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+ \
                 "</a> Exemple:(6/7) = (6 species in 7 trees)<br />\n"
-            result += "|<br />\n"
+            result += """<span class="treeline">|</span><br />\n"""
         # Create tree display
         for node in tree.successors( root ):
             dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
@@ -261,14 +262,14 @@ class TreeCollection( Taxobject ):
                 blockname += str( blocknum )
                 result += "<div id='%s' class='interparents'><tt>" % blockname
                 if len( inter_parents ):
-                    result += "| "*mydepth
-                    result +=  ("| "*mydepth).join(
+                    result += """<span class="treeline">|</span> """*mydepth
+                    result +=  ("""<span class="treeline">|</span> """*mydepth).join(
                       self.__linkGenre(i,i,blockname) for i in inter_parents ) 
                 result += "</tt></div>" 
             # Create arborescence display
             depth = 0
             while depth != mydepth :
-                result += "| "
+                result += """<span class="treeline">|</span> """
                 depth += 1
             subnodes = tree.successors( node )
             if subnodes: # it's a genre
@@ -357,7 +358,46 @@ class TreeCollection( Taxobject ):
             result += "<br />\n"
         result += "</fieldset>\n"
         return result
-            
+
+    def _nxgraph2list( self, tree, node, d="" ):
+        if not d:
+            d = {}
+            for i in tree.edges():
+                if not d.has_key( i[0] ):
+                    d[i[0]] = []
+                d[i[0]].append( i[1] )
+            for i in tree.edges():
+                if not d.has_key( i[1] ):
+                    d[i[1]] = i[1]        
+        m = []
+        for node in tree.successors( node ):
+            if isinstance( d[node], list ):
+                m.append( self._nxgraph2list( tree, node, d ) )
+            else:
+                m.append( d[node] )
+        return m
+
+    def _list2nwk( self, l ):
+        result = str( l )
+        result = result.replace("[", "(").replace("]",")")
+        result = result.replace(", ",",").replace( " ,", "," )
+        result = result.replace( "'", "" )
+        return result
+
+    def _nxgraph2nwk( self, tree, root ):
+        l = self._nxgraph2list( tree, root )
+        return self._list2nwk( l )
+        
+    def getNCBITreeAsNwk( self ):
+        """
+        return the NCBI arborescence in a newick string
+        """
+        self.__initStat()
+        if self.getCollection():
+            tree = self.reference.getNCBIArborescence( self.taxa_list )
+            tree = self.__removeSingleParent( tree )
+            return self._nxgraph2nwk( tree, "root" )
+        return ""
 
 if __name__ == "__main__":
     from taxonomyreference import TaxonomyReference
@@ -402,21 +442,16 @@ end;
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
-    print len(treecol.collection)
-#    for tree in treecol.collection:
-#        print tree["tree"]
-#    print len(col.split(";")[1:-1]), col.split(";")[1:-1]
     dr = time.time()
+    print ">>>>>", treecol.getNCBITreeAsNwk()
     col = treecol.query( "{murinae}>2" )
     fr = time.time()
-    print len(col)
-    print col
-    print treecol.getCollection()
-    print treecol.bad_taxa_list
-    print treecol.displayStats()
-    print treecol.getCollection()
-    print treecol.bad_taxa_list
-    print treecol.homonyms
-    print treecol.displayHomonymList()
+#    print treecol.getCollection()
+#    print treecol.bad_taxa_list
+#    print treecol.displayStats()
+#    print treecol.getCollection()
+#    print treecol.bad_taxa_list
+#    print treecol.homonyms
+#    print treecol.displayHomonymList()
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr
