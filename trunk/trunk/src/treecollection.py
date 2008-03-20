@@ -58,8 +58,6 @@ class TreeCollection( Taxobject ):
         self._d_reprtaxon = {}
         self.bad_taxa_list = set()
         self.homonyms = {}
-        print "collection>>>>", self.getCollection()
-        print "bad_taxa>>", self.bad_taxa_list
         for tree in self.getCollection():
             if not self.species_count.has_key( tree["name"] ):
                 self.species_count[tree["name"]] = {}
@@ -91,6 +89,31 @@ class TreeCollection( Taxobject ):
                 elif not self.reference.isHomonym( taxon ):
                     self.species_count["XXX"] += 1
                     self.bad_taxa_list.add( taxon )
+        #self.taxa_list = list( self.taxa_list )#stats
+
+    def __initStat( self ):
+        """
+        count the number of species by tree
+        """
+        self._d_taxonlist = {}
+        self._d_reprtaxon = {}
+        for tree in self.getCollection():
+            if not self._d_taxonlist.has_key( tree["name"] ):
+                self._d_taxonlist[tree["name"]] = set()#stats
+            for taxon in getTaxa( tree["tree"] ):
+                old_taxon_name = taxon
+                taxon = self.reference.stripTaxonName(taxon)
+                if self.reference.isValid( taxon ):
+                    self.taxa_list.add( taxon )#stats
+                    self._d_taxonlist[tree["name"]].add( taxon )#stats
+                    for tax in self.reference.getParents( taxon ):#stats
+                        self._d_taxonlist[tree["name"]].add( tax )#stats
+                        if not self._d_reprtaxon.has_key( tax ): #
+                            self._d_reprtaxon[tax] = set()#
+                        self._d_reprtaxon[tax].add( taxon )#
+                    if not self._d_reprtaxon.has_key( taxon ):#stats
+                        self._d_reprtaxon[taxon] = set()#stats
+                    self._d_reprtaxon[taxon].add( old_taxon_name )#stats
         #self.taxa_list = list( self.taxa_list )#stats
 
     def getNbTrees( self, taxon ):
@@ -143,8 +166,8 @@ class TreeCollection( Taxobject ):
         @new_list (list): the filtered collection
         """
         new_list = []
-        for i in xrange( len(self.getCollection()) ):
-            tree = self.getCollection()[i]
+        for i in xrange( len(self.collection) ):
+            tree = self.collection[i]
             try:
                 if self.__eval_query( query, tree ):
                     new_list.append( tree )
@@ -190,8 +213,8 @@ class TreeCollection( Taxobject ):
         """
         Display NCBI arborescence with stats
         """
-        self.__init()
-        if self.taxa_list:
+        self.__initStat()
+        if self.getCollection():
             tree = self.reference.getNCBIArborescence( self.taxa_list )
             if not allparents:
                 tree = self.__removeSingleParent( tree )
