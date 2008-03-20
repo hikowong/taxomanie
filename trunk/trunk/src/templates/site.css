@@ -33,6 +33,11 @@ div.interparents
 /*    color: lightgray;*/
 }
 
+a.nolink:hover
+{
+    text-decoration: None;
+}
+
 /*-------------------------TAXON LINKS--------------------------------------*/
 a.species:link 
     {
@@ -104,6 +109,34 @@ a:hover.genre span, a:hover.species span
     padding:2px 4px;
     }
 
+span.didyoumean
+{
+    font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
+    font-size: 10px;
+    color: #000;
+}
+
+span.didyoumean a:hover, span.didyoumean a:visited, span.didyoumean a:link,
+span.didyoumean strong
+{
+    font-size: 11px;
+    color: darkblue;
+    font-weight: normal;
+}    
+    
+span.homonymlist
+{
+    font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
+    font-size: 10px;
+    color: #000;
+}
+
+span.homonymlist a:hover, span.homonymlist a:visited, span.homonymlist a:link
+{
+    font-size: 11px;
+    color: darkblue;
+}    
+ 
 /*----------------------PREVIEW CONTENT : IMAGE TAXA---------------*/
 #preview 
     { 

@@ -1,3 +1,18 @@
+<script type="text/javascript"> 
+
+$(document).ready(function() { 
+    $('#sugestions').text('Processing...');
+    $('#sugestions').load( "getAllSugestions" ); 
+}); 
+
+$(document).ready(function(){
+    $("#exemplequery").hide();
+    $("#exemplelink").click(function () {
+        $("#exemplequery").slideToggle("slow");
+    });
+});
+                           
+</script>
 <!-- MENU : BEGINNING______________________________________________________________________ -->
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
 <center> <b> Home </b> </center>
@@ -20,6 +35,7 @@ Download NCBI tree </a>
 <!-- query panel -->
 <div class="query">
 <form action="statistics" class="nopadding">
+<a onclick="javascript:toggleExemple();" id="exemplelink"> View exemple </a>&nbsp;
 <input size=60  type=text 
 onfocus="if(this.value=='Your query...'){this.value='';}" 
 onblur="if(this.value==''){this.value='Your query...';}"
@@ -35,8 +51,9 @@ else:
 value="Your query..."
 <%|%>
 name="query" /> 
-<input type="submit" value="Search" class="button" id="wait2">
-<br><tt> e.g: <b> {murinae} > 2 and {carnivora} and not ({primates} or {laurasiatheria} < 4) </b><br>
+<input type="submit" value="Search" class="button" id="wait2"> <br>
+<tt id="exemplequery"> e.g: <b> {murinae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
+<br /> 
 <i>You can download your result after your query</i></tt>
 </form>
 <%
@@ -89,8 +106,8 @@ else:
     <a name="arbo"></a>
     <fieldset>
         <legend> General informations of the collection </legend>
-        <%$ _nbtaxa_ %> taxa <br />
         <%$ _nbtree_ %> trees <br />
+        <%$ _nbtaxa_ %> taxa <br />
         <font color="red"> <%$ len(_badtaxalist_)%> bad taxa </font><br />
         <font color="orange"><%$ len(_homonymlist_)%> homonyms </font><br />
     </fieldset>
@@ -98,23 +115,18 @@ else:
     if len(_badtaxalist_):
         #
 %>
-    <fieldset>
+    <fieldset class="sugestions">
         <legend> <%$ len( _badtaxalist_)%> bad taxa </legend>
-<%
-        for taxon in _badtaxalist_:
-            #
-%>
-    <font color='red'>
-    <%$ taxon %> <br />
-    </font>
-        <%|%>
+        <span id="sugestions"> </span>
     </fieldset>
     <%|%>
 <%
     if len(_homonymlist_):
         #
 %>
+    <span class="homonymlist">
     <%$ _disphomonym_ %>
+    </span>
     <%|%>
     <fieldset>
         <legend> NCBI taxonomy</legend>
