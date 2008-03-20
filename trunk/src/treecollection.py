@@ -23,7 +23,7 @@ class TreeCollection( Taxobject ):
         #super( TreeCollection, self ).__init__()
         self.reference = reference
         self.collection = []
-        self.query_collection = []
+        self.query_collection = None
         # Nexus collection
         if nwk_collection[:6].lower().strip() == "#nexus":
             nwk_collection = removeNexusComments( nwk_collection )
@@ -58,6 +58,8 @@ class TreeCollection( Taxobject ):
         self._d_reprtaxon = {}
         self.bad_taxa_list = set()
         self.homonyms = {}
+        print "collection>>>>", self.getCollection()
+        print "bad_taxa>>", self.bad_taxa_list
         for tree in self.getCollection():
             if not self.species_count.has_key( tree["name"] ):
                 self.species_count[tree["name"]] = {}
@@ -106,7 +108,7 @@ class TreeCollection( Taxobject ):
         return the query collection if there was a query
         return the complete collection otherwise
         """
-        if self.query_collection:
+        if self.query_collection is not None:
             return self.query_collection
         return self.collection
 
@@ -114,7 +116,7 @@ class TreeCollection( Taxobject ):
         """
         clear the query collection
         """
-        self.query_collection = []
+        self.query_collection = None
     
     def __eval_query( self, query, tree ):
         res = query 
@@ -189,10 +191,12 @@ class TreeCollection( Taxobject ):
         Display NCBI arborescence with stats
         """
         self.__init()
-        tree = self.reference.getNCBIArborescence( self.taxa_list )
-        if not allparents:
-            tree = self.__removeSingleParent( tree )
-        return self.__displayStat( tree, root="root" )
+        if self.taxa_list:
+            tree = self.reference.getNCBIArborescence( self.taxa_list )
+            if not allparents:
+                tree = self.__removeSingleParent( tree )
+            return self.__displayStat( tree, root="root" )
+        return ""
 
     def __removeSingleParent( self, tree ):
         for node in tree:
@@ -380,9 +384,15 @@ end;
 #        print tree["tree"]
 #    print len(col.split(";")[1:-1]), col.split(";")[1:-1]
     dr = time.time()
-    col = treecol.query( "{murinae}>1" )
+    col = treecol.query( "{murinae}>2" )
     fr = time.time()
     print len(col)
+    print col
+    print treecol.getCollection()
+    print treecol.bad_taxa_list
+    print treecol.displayStats()
+    print treecol.getCollection()
+    print treecol.bad_taxa_list
     print treecol.homonyms
     print treecol.displayHomonymList()
     print "collection generee en ", f-d

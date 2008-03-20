@@ -56,6 +56,12 @@ if _msg_:
     <div  class="error"><%$ _msg_ %></div>
 <%|%>
 </div>
+<%
+if len( _collection_ ) == 0:
+    #
+%>
+   <div class="error">Empty collection</div>
+<%|%>
 <!-- end query panel -->
     <br />
 <!--
