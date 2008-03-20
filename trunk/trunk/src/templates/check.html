@@ -66,6 +66,31 @@ if _msg_:
     <div  class="error"><%$ _msg_ %></div>
 <%|%>
 
+<!-- Select on tree names -->
+<center>
+<form name="treename" action="check">
+    <b>Display tree </b>&nbsp;
+    <select name="index" onchange="javascript:document.treename.submit();">
+<%
+index = 0
+for tree in _collection_:
+    index += 1
+    #
+%>
+     <option value="<%$ index %>"
+<%
+    if _index_ == index:
+        #
+%>
+        selected
+    <%|%>
+    ><%$ tree["name"] %> </option>
+<%|%>
+    </select>
+</form>
+</center>
+
+
 <%#
 Navigation buttons beetween trees
 #%>
