@@ -65,6 +65,7 @@ class Taxomanie( Taxobject ):
             cherrypy.session["collection"] = TreeCollection( input, self.reference )
         _msg_ = ""
         if query:
+            cherrypy.session.get("collection").clearQuery()
             cherrypy.session["query"] = query
             try:
                 cherrypy.session.get("collection").query( query )
@@ -270,46 +271,76 @@ class Taxomanie( Taxobject ):
                   """ % (badtaxon, did_you_mean_result )
         return result
 
-    def getStat1( self ):
+    def getStat1( self, sort ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNbNodes()
         result = ""
+        #short by nbtaxa
+        if sort == "nbtaxa":
+            new_resultlist = []
+            for i, j in resultlist:
+                new_resultlist.append( (j,i) )
+            resultlist = new_resultlist
+        resultlist.sort()
         resultlist.reverse()
         nbtaxa_max, nop = max( resultlist ) 
         for res in resultlist:
-            nbtree, nbtaxon = res
+            if sort == "nbtaxa":
+                nbtaxon, nbtree = res
+            else:
+                nbtree, nbtaxon = res
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = string.center( "-"+str(nbtreepourcent)+"%-", nbtree*70/nbtaxa_max )
-            bar = bar.replace( " ", "#" ).replace( "-", " ")
+            bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*70/nbtaxa_max )
+            bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+            bar = """<span class="statMetric">"""+bar+"</span>"
             base = "["+string.center( str(nbtaxon), 4)+"]"
             base = base.replace( " ", "&nbsp;" )
-            result += base+bar+"("+str(nbtree)+" trees)<br />\n"
+            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
         return result
 
-    def getStat2( self ):
+    def getStat2( self, sort ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNode()
         result = ""
-        resultlist.reverse()
+        # get the max len of taxon name 
         nbtaxa_max, nop = max( resultlist ) 
         taxon_name_max = 0 
         for nbtaxa, taxon_name in resultlist:
             if len(taxon_name) > taxon_name_max:
                 taxon_name_max = len(taxon_name)
+        #short by names
+        if sort == "names":
+            new_resultlist = []
+            for i, j in resultlist:
+                new_resultlist.append( (j,i) )
+            resultlist = new_resultlist
+        resultlist.sort()
         for res in resultlist:
-            nbtree, taxon = res
+            if sort=="names":
+                taxon, nbtree = res
+            else:
+                nbtree, taxon = res
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = string.center( "-"+str(nbtreepourcent)+"%-", nbtree*70/nbtaxa_max )
-            bar = bar.replace( " ", "#" ).replace( "-", " ")
+            bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*70/nbtaxa_max )
+            bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+            bar = """<span class="statMetric">"""+bar+"</span>"
             base = "["+string.center( str(taxon), taxon_name_max)+"]"
             base = base.replace( " ", "&nbsp;" )
-            result += base+bar+"("+str(nbtree)+" trees)<br />\n"
+            if cherrypy.session.get("query"):
+                last_query = "+and+"+cherrypy.session.get("query")
+            else:
+                last_query = ""
+            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+\
+              '<a href="/statistics?query=%7B'+taxon+'%7D'+last_query+'">'+ \
+              str(nbtree)+"</a> trees)<br />\n"
         return result
 
     @cherrypy.expose
-    def statistics( self, myFile=None, query=None, clear_query=False, delimiter="_" ):
+    def statistics( self, myFile=None, query=None, clear_query=False,
+      delimiter="_", sortby_stat1="", sortby_stat2="" ):
         try:
             _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
         except AttributeError: # if session expired
             return self.sessionexpired()
+        cherrypy.session.get("collection").initStat()
         self._pleet["_query_"] = cherrypy.session.get("query")
         self._pleet["_clearquery_"] = clear_query
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
@@ -318,9 +349,13 @@ class Taxomanie( Taxobject ):
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonyms.keys()
         self._pleet["_disphomonym_"] = cherrypy.session.get("collection").displayHomonymList()
+        cherrypy.session["sortby_stat1"] = sortby_stat1 or cherrypy.session.get("sortby_stat1") or "trees"
+        cherrypy.session["sortby_stat2"] = sortby_stat2 or cherrypy.session.get("sortby_stat2") or "trees"
+        self._pleet["_sortby_stat1_"] = cherrypy.session.get("sortby_stat1")
+        self._pleet["_sortby_stat2_"] = cherrypy.session.get("sortby_stat2")
         if cherrypy.session.get( "collection" ).getCollection():
-            self._pleet["_stat1_"] = self.getStat1()
-            self._pleet["_stat2_"] = self.getStat2()
+            self._pleet["_stat1_"] = self.getStat1( cherrypy.session.get("sortby_stat1") )
+            self._pleet["_stat2_"] = self.getStat2( cherrypy.session.get("sortby_stat2") )
         else:
             self._pleet["_stat1_"] = ""
             self._pleet["_stat2_"] = ""
