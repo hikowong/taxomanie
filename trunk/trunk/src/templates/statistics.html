@@ -86,23 +86,6 @@ else:
 %>
 <!-- end query panel -->
     <br />
-<!--
-    <a name="chart1"></a>
-    <fieldset>
-        <legend> Chart1 : Number of trees with number of taxa (<%$ len(_collection_) %> trees)</legend>
-        <img src="/getStatImg1" />
-    </fieldset><br />
-    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
-    <br /><br />
-
-    <a name="chart2"></a>
-    <fieldset>
-        <legend> Chart2 : Number of trees wich has this taxon (<%$ len(_collection_) %> trees)</legend>
-        <img src="/getStatImg2" />
-    </fieldset><br />
-    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
-    <br /><br />
--->
     <a name="arbo"></a>
     <fieldset>
         <legend> General informations of the collection </legend>
@@ -130,12 +113,48 @@ else:
     <%|%>
     <fieldset>
         <legend> Number of taxa by trees </legend>
-        <tt>
-        <%$ _stat1_ %>
-        </tt>
+        <form name="sortbystat1" action="statistics">
+            <b>Short by </b>&nbsp;
+            <select name="sortby_stat1" onchange="javascript:document.sortbystat1.submit();">
+<%
+    if _sortby_stat1_ == "nbtaxa":
+        #
+%>
+             <option selected value="nbtaxa"> number of taxa </option>
+             <option value="trees"> trees </option>
+<%
+    else:
+        #
+%>
+             <option value="nbtaxa"> number of taxa </option>
+             <option selected value="trees"> trees </option>
+    <%|%>
+            </select>
+        </form>
+         <%$ _stat1_ %>
     </fieldset>
+
     <fieldset>
         <legend> Number of trees by taxa </legend>
+        <form name="sortbystat2" action="statistics">
+            <b>Short by </b>&nbsp;
+            <select name="sortby_stat2" onchange="javascript:document.sortbystat2.submit();">
+<%
+    if _sortby_stat2_ == "names":
+        #
+%>
+             <option selected value="names"> taxa names </option>
+             <option value="trees"> trees </option>
+<%
+    else:
+        #
+%>
+             <option value="names"> taxa names </option>
+             <option selected value="trees"> trees </option>
+    <%|%>
+            </select>
+        </form>
+ 
         <tt>
         <%$ _stat2_ %>
         </tt>

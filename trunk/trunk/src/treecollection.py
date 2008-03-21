@@ -92,7 +92,7 @@ class TreeCollection( Taxobject ):
                     self.bad_taxa_list.add( taxon )
         #self.taxa_list = list( self.taxa_list )#stats
 
-    def __initStat( self ):
+    def initStat( self ):
         """
         count the number of species by tree
         """
@@ -142,6 +142,7 @@ class TreeCollection( Taxobject ):
         clear the query collection
         """
         self.query_collection = None
+        self.last_query = ""
     
     def __eval_query( self, query, tree ):
         res = query 
@@ -192,7 +193,7 @@ class TreeCollection( Taxobject ):
         """
         d_tree_taxon = {}
         l_taxa = []
-        for tree in self.collection:
+        for tree in self.getCollection():
             for taxon in getTaxa( tree["tree"] ):
                 if self.reference.isValid( taxon ):
                     if taxon not in l_taxa: l_taxa.append( taxon )
@@ -202,7 +203,7 @@ class TreeCollection( Taxobject ):
         result_list = []
         for i, j in d_tree_taxon.iteritems():
             result_list.append( (j,i) )
-        return result_list
+        return result_list[:]
 
     def statNbTreeWithNbNodes( self ):
         """
@@ -217,13 +218,13 @@ class TreeCollection( Taxobject ):
         result_list = []
         for i, j in d_tree_nodes.iteritems():
             result_list.append( (j,i) )
-        return result_list
+        return result_list[:]
 
     def displayStats( self, allparents = False ):
         """
         Display NCBI arborescence with stats
         """
-        self.__initStat()
+#        self.__initStat()
         if self.getCollection():
             tree = self.reference.getNCBIArborescence( self.taxa_list )
             if not allparents:
@@ -407,7 +408,7 @@ class TreeCollection( Taxobject ):
         """
         return the NCBI arborescence in a newick string
         """
-        self.__initStat()
+        self.initStat()
         if self.getCollection():
             tree = self.reference.getNCBIArborescence( self.taxa_list )
             tree = self.__removeSingleParent( tree )

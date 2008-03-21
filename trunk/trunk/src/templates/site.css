@@ -372,6 +372,32 @@ td.links a:active
     {
 	color: #ff0;
     }
+/*-------------------------Stats--------------------------------------*/
+.statMetric {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        color: #333;                            /* #099 mettre couleur du milieu par defaut */
+        font-size: 6px;                         /* taille des unites de la barre */             
+        border-top-color: #CCC;         /* #0CC couleur du haut de barre */
+        background-color: #999;         /* #099 couleur du milieu de barre */
+        border-bottom-color: #666;      /* #066 couleur du bas de barre */      
+        border-top-width: 3px;
+        border-top-style: solid;        
+        border-bottom-width: 3px;
+        border-bottom-style: solid;
+        
+        /* #099 couleur des graduation, BLOC A COMMENTER PR MASQUER GRADUATION *//*
+        border-right-color: #060; 
+        border-right-width: 1px;
+        border-right-style: solid;*/            
+}
+
+.statMetric b
+{
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 10px;
+        color: #000;
+}
+
 
 /*-------------------------OTHERS--------------------------------------*/
 .treeline
