@@ -1,0 +1,55 @@
+#summary One-sentence summary of this page.
+
+= Introduction =
+
+Add your content here.
+
+
+= Details =
+{{{
+/*-------------------------STATS--------------------------------------*/
+td.statTitle {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 11px;
+        color: #000;
+        text-align: right;
+        font-weight: italic;
+        padding:1px;
+        margin: 1px;
+}
+
+td.statBar {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        font-size: 10px;
+        color: #000;
+        padding: 1px;
+        margin: 1px;
+}
+
+span.statMetric {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        color: #999;                    /* #099 mettre couleur du milieu par defaut */
+        font-size: 5px;                 /* taille des unités de la barre */
+        border-top-color: #CCC;         /* #0CC couleur du haut de barre */
+        background-color: #999;         /* #099 couleur du milieu de barre */
+        border-bottom-color: #666;      /* #066 couleur du bas de barre */
+        border-top-width: 4px;
+        border-top-style: solid;
+        border-bottom-width: 3px;
+        border-bottom-style: solid;
+        text-align: left;
+
+        /* #099 couleur des graduation, BLOC A COMMENTER PR MASQUER GRADUATION */ /*
+        border-right-color: #999;
+        border-right-width: 1px;
+        border-right-style: solid;*/
+}
+
+span.statPercent {
+        font-family: Verdana, Arial, Helvetica, sans-serif;
+        color: #333;
+        font-size: 10px;  
+        text-align: center;
+        font-weight: bold;
+}
+}}}
