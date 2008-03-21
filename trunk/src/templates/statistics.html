@@ -21,8 +21,8 @@ $(document).ready(function(){
 <a href="about" class="path" title="About PhyloExplorer project...">About</a>
 <br />
 <center> <b>Current collection</b> </center>
-<a href="/check" id="wait" class="path" title="Go back to collection"> Browse collection </a>
-<a href="/downloadNCBITree" id="wait" class="path" title="Download the NCBI arborescen">
+<a href="/check" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
+<a href="/downloadNCBITree" blockui="wait" class="path" title="Download the NCBI arborescen">
 Download NCBI tree </a>
 <br />
 <!-- MENU : END -->
@@ -51,7 +51,7 @@ else:
 value="Your query..."
 <%|%>
 name="query" /> 
-<input type="submit" value="Search" class="button" id="wait2"> <br>
+<input type="submit" value="Search" class="button" blockui="wait"> <br>
 <tt id="exemplequery"> e.g: <b> {murinae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
 <br /> 
 <i>You can download your result after your query</i></tt>
@@ -60,7 +60,7 @@ name="query" />
 if _query_:
     #
 %>
-    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a href=statistics?clear_query=1>Back to full collection</a>
+    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=statistics?clear_query=1>Back to full collection</a>
 <%
 else:
     _query_ = ""

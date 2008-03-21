@@ -13,6 +13,7 @@ from treecollection import TreeCollection
 from taxobject import Taxobject 
 import ConfigParser
 import httplib
+import string
 
 class Taxomanie( Taxobject ):
     
@@ -225,8 +226,11 @@ class Taxomanie( Taxobject ):
         contenu = contenu.split( "<!--  end of content  -->" )[0]
         contenu = contenu.split( "<a " )[1:]
         my_meaning_list = []
+        ncbi_url = "http://www.ncbi.nlm.nih.gov"
         for i in contenu:
-            my_meaning_list.append( """<a class="species" """+i.split( "</a>" )[0]+"</a>" )
+            link_body = i.split( "</a>" )[0]
+            link_body = link_body.replace( "/Taxonomy/", ncbi_url+"/Taxonomy/")
+            my_meaning_list.append( """<a class="species" target="_blank" """+link_body+"</a>" )
         return ", ".join( my_meaning_list)
 
     def __didYouMean( self, name ):
@@ -239,8 +243,11 @@ class Taxomanie( Taxobject ):
         contenu = contenu.split( "<!--  end of content  -->" )[0]
         contenu = contenu.split( "<a " )[1:]
         my_meaning_list = []
+        ncbi_url = "http://www.ncbi.nlm.nih.gov"
         for i in contenu:
-            my_meaning_list.append( """<a class="species" """+i.split( "</a>" )[0]+"</a>" )
+            link_body = i.split( "</a>" )[0]
+            link_body = link_body.replace( "/Taxonomy/", ncbi_url+"/Taxonomy/")
+            my_meaning_list.append( """<a class="species" target="_blank" """+link_body+"</a>" )
         return ", ".join( my_meaning_list)
 
 
@@ -271,7 +278,11 @@ class Taxomanie( Taxobject ):
         for res in resultlist:
             nbtree, nbtaxon = res
             nbtreepourcent = nbtree*100/nbtaxa_max
-            result += "["+str(nbtaxon)+"]"+"#"*nbtreepourcent+"("+str(nbtree)+","+str(nbtreepourcent)+"%)<br />"
+            bar = string.center( "-"+str(nbtreepourcent)+"%-", nbtree*70/nbtaxa_max )
+            bar = bar.replace( " ", "#" ).replace( "-", " ")
+            base = "["+string.center( str(nbtaxon), 4)+"]"
+            base = base.replace( " ", "&nbsp;" )
+            result += base+bar+"("+str(nbtree)+" trees)<br />\n"
         return result
 
     def getStat2( self ):
@@ -279,10 +290,18 @@ class Taxomanie( Taxobject ):
         result = ""
         resultlist.reverse()
         nbtaxa_max, nop = max( resultlist ) 
+        taxon_name_max = 0 
+        for nbtaxa, taxon_name in resultlist:
+            if len(taxon_name) > taxon_name_max:
+                taxon_name_max = len(taxon_name)
         for res in resultlist:
             nbtree, taxon = res
             nbtreepourcent = nbtree*100/nbtaxa_max
-            result += "["+taxon+"]"+"#"*nbtreepourcent+"("+str(nbtree)+","+str(nbtreepourcent)+"%)<br />"
+            bar = string.center( "-"+str(nbtreepourcent)+"%-", nbtree*70/nbtaxa_max )
+            bar = bar.replace( " ", "#" ).replace( "-", " ")
+            base = "["+string.center( str(taxon), taxon_name_max)+"]"
+            base = base.replace( " ", "&nbsp;" )
+            result += base+bar+"("+str(nbtree)+" trees)<br />\n"
         return result
 
     @cherrypy.expose
@@ -299,8 +318,12 @@ class Taxomanie( Taxobject ):
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonyms.keys()
         self._pleet["_disphomonym_"] = cherrypy.session.get("collection").displayHomonymList()
-        self._pleet["_stat1_"] = self.getStat1()
-        self._pleet["_stat2_"] = self.getStat2()
+        if cherrypy.session.get( "collection" ).getCollection():
+            self._pleet["_stat1_"] = self.getStat1()
+            self._pleet["_stat2_"] = self.getStat2()
+        else:
+            self._pleet["_stat1_"] = ""
+            self._pleet["_stat2_"] = ""
         pagedef = "Home > Upload Collection > Statistics"
         return self._presentation( "statistics.html", msg = _msg_, pagedef = pagedef)
 

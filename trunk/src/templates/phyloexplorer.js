@@ -3,13 +3,12 @@
 * Please wait on submit
 **/
 $(document).ready(function() { 
-    $('#wait').click(function() { 
-        $.blockUI(); 
-    }); 
-    $('#wait2').click(function() { 
+    $("[blockui='wait']").click(function() { 
         $.blockUI(); 
     }); 
 }); 
+
+
 
 /**
 * Images
