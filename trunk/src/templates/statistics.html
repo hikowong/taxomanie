@@ -22,7 +22,7 @@ $(document).ready(function(){
 <br />
 <center> <b>Current collection</b> </center>
 <a href="/check" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
-<a href="/downloadNCBITree" blockui="wait" class="path" title="Download the NCBI arborescen">
+<a href="/downloadNCBITree" class="path" title="Download the NCBI arborescence">
 Download NCBI tree </a>
 <br />
 <!-- MENU : END -->
@@ -94,23 +94,61 @@ else:
         <font color="red"> <%$ len(_badtaxalist_)%> bad taxa </font><br />
         <font color="orange"><%$ len(_homonymlist_)%> homonyms </font><br />
     </fieldset>
+
+<!-- correct collection fieldset -->
 <%
-    if len(_badtaxalist_):
+    if len(_badtaxalist_) or len(_homonymlist_):
         #
 %>
-    <fieldset class="sugestions">
-        <legend> <%$ len( _badtaxalist_)%> bad taxa </legend>
-        <span id="sugestions"> </span>
-    </fieldset>
-    <%|%>
+        <fieldset>
+        <legend> Correct your collection </legend>
+        <form action="recreateCollection">
+        <!-- badtaxa fieldset -->
 <%
-    if len(_homonymlist_):
-        #
+        if len(_badtaxalist_):
+            #
 %>
-    <span class="homonymlist">
-    <%$ _disphomonym_ %>
-    </span>
+        <fieldset class="sugestions">
+            <legend> <%$ len( _badtaxalist_)%> bad taxa </legend>
+            <span id="sugestions"> </span>
+        </fieldset>
+        <!-- end badtaxa fieldset -->
+        <%|%>
+        <!-- homonym fieldset -->
+<%
+        if len(_homonymlist_):
+            #
+%>
+            <span class="homonymlist">
+            <fieldset>
+            <legend> <%$ len(_treecollection_.homonyms.keys()) %> homonym(s) </legend>
+<%
+            for homonym, taxa in _treecollection_.homonyms.iteritems():
+                #
+%>
+                <font color="orange"><%$ homonym %></font> :
+<%
+                for taxon in taxa:
+                    dispnode = taxon.split("|")[0].replace(_treecollection_.reference.delimiter, " ")
+                    dispnode = dispnode.replace( "<", "&lt;" )
+                    dispnode = dispnode.replace( ">", "&gt;" )
+                    #
+%>
+                    <%$ _treecollection_._TreeCollection__linkSpecies( dispnode, taxon) %>
+                    <input type="radio" name="<%$ homonym %>" value="<%$ dispnode %>" />
+                <%|%>
+                <br />
+            <%|%>
+            </fieldset>
+            </span>
+        <!-- end homonym fieldset -->
+        <%|%>
+        <input type="submit" value="correct collection"/>
+        </form>
+        </fieldset>
     <%|%>
+<!-- end collection fieldset -->
+
     <fieldset>
         <legend> Number of taxa by trees </legend>
         <form name="sortbystat1" action="statistics">

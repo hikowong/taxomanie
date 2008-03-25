@@ -21,6 +21,7 @@ class TreeCollection( Taxobject ):
         @nwk_collection (string): collection in phylip or nexus format
         """
         #super( TreeCollection, self ).__init__()
+        self.orignial_collection = nwk_collection.lower()
         self.reference = reference
         self.collection = []
         self.query_collection = None
@@ -402,7 +403,7 @@ class TreeCollection( Taxobject ):
 
     def _nxgraph2nwk( self, tree, root ):
         l = self._nxgraph2list( tree, root )
-        return self._list2nwk( l )+";"
+        return self._list2nwk( l )[1:-1]+";" # removing extras parenthesis
         
     def getNCBITreeAsNwk( self ):
         """
@@ -412,8 +413,27 @@ class TreeCollection( Taxobject ):
         if self.getCollection():
             tree = self.reference.getNCBIArborescence( self.taxa_list )
             tree = self.__removeSingleParent( tree )
-            return self._nxgraph2nwk( tree, "root" )
+            tree = self._nxgraph2nwk( tree, "root" )
+            tree = tree.replace( " ", self.reference.delimiter )
+            return tree
         return ""
+
+    def filter( self, taxa_list ):
+        """
+        return the original collection without certains taxa
+        """
+        ori = self.orignial_collection
+        for taxon in taxa_list:
+            ori = ori.replace( taxon, "")
+        while ",," in ori or "(," in ori or ",)" in ori or "()" in ori:
+            ori = ori.replace(",,",",")
+            ori = ori.replace("(,","(")
+            ori = ori.replace(",)",")")
+            ori = ori.replace("()","")
+        return ori
+
+        
+        
 
 if __name__ == "__main__":
     from taxonomyreference import TaxonomyReference
@@ -453,8 +473,8 @@ tree ENm001.mcs1005.merge20.443262.6.mfa =
 end;
 """
     import time
-    col = open( "../data/omm_cds_nex.tre" ).read()
-    col = open("../data/tree.nwk").read()
+#    col = open( "../data/omm_cds_nex.tre" ).read()
+#    col = open("../data/tree.nwk").read()
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
@@ -463,12 +483,16 @@ end;
     col = treecol.query( "{murinae}>1" )
     fr = time.time()
     print len(treecol.getCollection())
-    print treecol.statNbTreeWithNbNodes()
+#    print treecol.statNbTreeWithNbNodes()
 #    print treecol.bad_taxa_list
 #    print treecol.displayStats()
 #    print treecol.getCollection()
 #    print treecol.bad_taxa_list
 #    print treecol.homonyms
 #    print treecol.displayHomonymList()
+    print ">"*20
+    print treecol.orignial_collection
+    print "<"*20
+    print treecol.filter( "mus", "rattus", "pan", "bos", "canis" )
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr

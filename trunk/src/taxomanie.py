@@ -64,6 +64,8 @@ class Taxomanie( Taxobject ):
             input = input.strip()
             cherrypy.session["collection"] = TreeCollection( input, self.reference )
         _msg_ = ""
+        if query is not None and query == "":
+            clear_query = True
         if query:
             cherrypy.session.get("collection").clearQuery()
             cherrypy.session["query"] = query
@@ -188,12 +190,11 @@ class Taxomanie( Taxobject ):
         cherrypy.response.headers['Content-Type'] = 'application/x-download'
         if target == "nexus":
             body = "#nexus\nbegin trees;\n"
-            for i in xrange( len(cherrypy.session.get("col_query")) ):
-                tree = cherrypy.session.get("col_query")[i]
+            for tree in cherrypy.session.get("collection").getCollection():
                 body += "Tree %s = %s;\n" % (tree["name"], tree["tree"])
             body += "end;\n"
         else:
-            body = ";\n".join( tree["tree"] for tree in cherrypy.session.get("col_query") )
+            body = ";\n".join( tree["tree"] for tree in cherrypy.session.get("collection").getCollection() )
         cherrypy.response.headers['Content-Length'] = len(body)
         cherrypy.response.headers['Content-Disposition'] = \
           'attachment; filename=filtered_tree_collection-%s.nwk' % (
@@ -212,64 +213,45 @@ class Taxomanie( Taxobject ):
         cherrypy.response.body = body 
         return cherrypy.response.body
 
-    def __didYouMeanProxy( self, name ):
-        name = "+".join(name.strip().split() )
-        conn = httplib.HTTP( self.proxy )
-        conn.putrequest( 'GET',"http://www.ncbi.nlm.nih.gov//Taxonomy/Browser/wwwtax.cgi?name="+name )
-        conn.putheader('Accept', 'text/html')
-        conn.putheader('Accept', 'text/plain')
-        conn.endheaders()
-        errcode, errmsg, headers = conn.getreply()
-        f=conn.getfile()
-        contenu = f.read()
-        conn.close()    
-        contenu = contenu.split( "<!--  the contents   -->" )[1]
-        contenu = contenu.split( "<!--  end of content  -->" )[0]
-        contenu = contenu.split( "<a " )[1:]
-        my_meaning_list = []
-        ncbi_url = "http://www.ncbi.nlm.nih.gov"
-        for i in contenu:
-            link_body = i.split( "</a>" )[0]
-            link_body = link_body.replace( "/Taxonomy/", ncbi_url+"/Taxonomy/")
-            my_meaning_list.append( """<a class="species" target="_blank" """+link_body+"</a>" )
-        return ", ".join( my_meaning_list)
-
-    def __didYouMean( self, name ):
-        name = "+".join(name.strip().split() )
-        conn = httplib.HTTPConnection("www.ncbi.nlm.nih.gov")
-        conn.request("GET", "/Taxonomy/Browser/wwwtax.cgi?name="+name)
-        contenu = conn.getresponse().read()
-        conn.close()    
-        contenu = contenu.split( "<!--  the contents   -->" )[1]
-        contenu = contenu.split( "<!--  end of content  -->" )[0]
-        contenu = contenu.split( "<a " )[1:]
-        my_meaning_list = []
-        ncbi_url = "http://www.ncbi.nlm.nih.gov"
-        for i in contenu:
-            link_body = i.split( "</a>" )[0]
-            link_body = link_body.replace( "/Taxonomy/", ncbi_url+"/Taxonomy/")
-            my_meaning_list.append( """<a class="species" target="_blank" """+link_body+"</a>" )
-        return ", ".join( my_meaning_list)
-
-
+    def __getNCBIDidYouMean( self ):
+        my_meaning_list = {}
+        for badtaxon in cherrypy.session.get("collection").bad_taxa_list:
+            if self.proxy:
+                conn = httplib.HTTP( self.proxy )
+                conn.putrequest( 'GET',
+                  "http://www.ncbi.nlm.nih.gov//Taxonomy/Browser/wwwtax.cgi?name="+badtaxon )
+                conn.putheader('Accept', 'text/html')
+                conn.putheader('Accept', 'text/plain')
+                conn.endheaders()
+                errcode, errmsg, headers = conn.getreply()
+                f=conn.getfile()
+                contenu = f.read()
+                conn.close()    
+            else:
+                conn = httplib.HTTPConnection("www.ncbi.nlm.nih.gov")
+                conn.request("GET", "/Taxonomy/Browser/wwwtax.cgi?name="+badtaxon)
+                contenu = conn.getresponse().read()
+                conn.close()    
+            contenu = contenu.split( "<!--  the contents   -->" )[1]
+            contenu = contenu.split( "<!--  end of content  -->" )[0]
+            contenu = contenu.split( "<a " )[1:]
+            my_meaning_list[badtaxon] = []
+            ncbi_url = "http://www.ncbi.nlm.nih.gov"
+            for i in contenu:
+                link_body = i.split( "</a>" )[0]
+                if link_body.split(">")[1] == "<strong":
+                    my_meaning_list[badtaxon].append(
+                      link_body.split(">")[2].split("[")[0].strip().lower() )
+                else:
+                    my_meaning_list[badtaxon].append(
+                      link_body.split(">")[1].strip().lower() )
+        return my_meaning_list
+                    
     @cherrypy.expose
     def getAllSugestions( self ):
-        bad_taxa_list = cherrypy.session.get("collection").bad_taxa_list
-        result = ""
-        if bad_taxa_list:
-            for badtaxon in bad_taxa_list:
-                if self.proxy:
-                    did_you_mean_result = self.__didYouMeanProxy( badtaxon )
-                else:
-                    did_you_mean_result = self.__didYouMean( badtaxon )
-                result += """<font color='red'>
-                  <b>%s</b> 
-                  <span class="didyoumean"> 
-                  <i> Did you mean</i> : %s <br />
-                  </span>
-                  </font>
-                  """ % (badtaxon, did_you_mean_result )
-        return result
+        self._pleet.setTemplate( open("templates/getallsugestions.html").read() )
+        self._pleet["_suggestlist_"] = self.__getNCBIDidYouMean()
+        return self._pleet.render()
 
     def getStat1( self, sort ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNbNodes()
@@ -341,6 +323,7 @@ class Taxomanie( Taxobject ):
         except AttributeError: # if session expired
             return self.sessionexpired()
         cherrypy.session.get("collection").initStat()
+        self._pleet["_treecollection_"] = cherrypy.session.get("collection")
         self._pleet["_query_"] = cherrypy.session.get("query")
         self._pleet["_clearquery_"] = clear_query
         self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
@@ -398,6 +381,13 @@ class Taxomanie( Taxobject ):
         result += open( "templates/phyloexplorer.js").read()
         #return open( "templates/phyloexplorer.js").read()
         return result
+
+    @cherrypy.expose
+    def recreateCollection( self, **kwargs ):
+        new_nwk = cherrypy.session.get("collection").orignial_collection
+        for old_name, new_name in kwargs.iteritems():
+            new_nwk = new_nwk.replace( old_name, new_name ) 
+        return self.statistics( new_nwk )
 
 cherrypy.tree.mount(Taxomanie())
 
