@@ -459,6 +459,24 @@ a.showparents:hover  {
     color: #000;
 }
 
+a.selectall, a.selectall:visited, a.selectall:link
+    {
+    font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
+	font-size: 10px;
+    color: grey;
+	font-weight: bold;
+	text-decoration: none;
+    font-style: italic;
+    /*background-color: silver;*/
+    }
+
+a.selectall:hover  {
+    /*background-color: grey;
+    font-weight: bold;*/
+    color: #000;
+}
+
+
 
 a#iNode
     {
