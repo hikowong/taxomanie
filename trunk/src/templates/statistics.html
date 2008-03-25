@@ -11,7 +11,18 @@ $(document).ready(function(){
         $("#exemplequery").slideToggle("slow");
     });
 });
-                           
+
+function unselectAll(){
+    $(document).ready( function(){
+       $("input.restrict").removeAttr( "checked" );
+    });
+}
+function selectAll(){
+    $(document).ready( function(){
+       $("input.restrict").attr( "checked", "checked" );
+    });
+}
+                            
 </script>
 <!-- MENU : BEGINNING______________________________________________________________________ -->
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
@@ -93,7 +104,7 @@ else:
         <%$ _nbtaxa_ %> taxa <br />
         <font color="red"> <%$ len(_badtaxalist_)%> bad taxa </font><br />
         <font color="orange"><%$ len(_homonymlist_)%> homonyms </font><br />
-    </fieldset>
+    </fieldset><br />
 
 <!-- correct collection fieldset -->
 <%
@@ -143,12 +154,13 @@ else:
             </span>
         <!-- end homonym fieldset -->
         <%|%>
-        <input type="submit" value="correct collection"/>
+        <input type="submit" value="Correct collection"/>
         </form>
-        </fieldset>
+        </fieldset><br />
     <%|%>
 <!-- end collection fieldset -->
 
+<!-- stat1 -->
     <fieldset>
         <legend> Number of taxa by trees </legend>
         <form name="sortbystat1" action="statistics">
@@ -171,7 +183,9 @@ else:
         </form>
          <%$ _stat1_ %>
     </fieldset>
+<!-- end stat1 -->
 
+<!-- stat2 -->
     <fieldset>
         <legend> Number of trees by taxa </legend>
         <form name="sortbystat2" action="statistics">
@@ -196,13 +210,34 @@ else:
         <tt>
         <%$ _stat2_ %>
         </tt>
-    </fieldset>
+    </fieldset><br />
+<!-- end stat2 -->
+
+<!-- NCBI tree -->
     <fieldset>
         <legend> NCBI taxonomy</legend>
         <tt>
         <%$ _ncbitree_ %>
         </tt>
     </fieldset><br />
+<!-- end NCBI tree -->
+
+    <fieldset>
+        <legend> Restrict your collection </legend>
+        <form action="createFilteredCollection">
+        <a class="selectall" onclick="javascript:selectAll();"> Select all</a> &nbsp; &nbsp;
+        <a class="selectall" onclick="javascript:unselectAll();"> Unselect all </a>
+        <br />
+<%
+    for taxon in _taxalist_:
+        #
+%>
+        <input class="restrict" type="checkbox" name="<%$ taxon %>" value="<%$ taxon %>" />
+        <%$ _treecollection_._TreeCollection__linkSpecies(taxon.capitalize(), taxon) %> <br />
+    <%|%>
+    <input type="submit" value="Restrict collection" />
+    </form>
+    </fieldset>
 <%|%>
 </div>
             <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
