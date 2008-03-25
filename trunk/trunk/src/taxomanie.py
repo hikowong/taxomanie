@@ -82,11 +82,6 @@ class Taxomanie( Taxobject ):
         return _msg_
 
     @cherrypy.expose
-    def sessionexpired( self ):
-        pagedef = "Home > Expired session"
-        return self._presentation( "sessionexpired.html", pagedef = pagedef )
-
-    @cherrypy.expose
     def css( self ):
         return open( "templates/site.css" ).read()
 
@@ -104,7 +99,9 @@ class Taxomanie( Taxobject ):
         try:
             _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
         except AttributeError: # if session expired
-            return self.sessionexpired()
+            return self._presentation( "error.html",
+              msg="Your session has expired. Please upload your collection again",
+              pagedef="Home > Error" )
         index = int( index )
         cherrypy.session["nbbadtaxa"] = cherrypy.session.get("collection").species_count["XXX"]
         if index > len(cherrypy.session.get("collection").getCollection()):
@@ -321,13 +318,19 @@ class Taxomanie( Taxobject ):
         try:
             _msg_ = self.__initCollection( myFile, query, clear_query, delimiter )
         except AttributeError: # if session expired
-            return self.sessionexpired()
+            return self._presentation( "error.html",
+              msg="Your session has expired. Please upload your collection again",
+              pagedef="Home > Error" )
         cherrypy.session.get("collection").initStat()
         self._pleet["_treecollection_"] = cherrypy.session.get("collection")
         self._pleet["_query_"] = cherrypy.session.get("query")
         self._pleet["_clearquery_"] = clear_query
-        self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
+        try:
+            self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
+        except:
+            return self._presentation( "error.html", msg="Bad collection", pagedef="Home > Error" )
         self._pleet["_nbtaxa_"] = len(cherrypy.session.get("collection").taxa_list)
+        self._pleet["_taxalist_"] = cherrypy.session.get("collection").taxa_list
         self._pleet["_nbtree_"] = len( cherrypy.session.get("collection").getCollection() )
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonyms.keys()
@@ -384,10 +387,19 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def recreateCollection( self, **kwargs ):
+        if not kwargs:
+            return self._presentation( "statistics.html", msg="You must choose taxon to correct your collection" )
         new_nwk = cherrypy.session.get("collection").orignial_collection
         for old_name, new_name in kwargs.iteritems():
             new_nwk = new_nwk.replace( old_name, new_name ) 
         return self.statistics( new_nwk )
+
+    @cherrypy.expose
+    def createFilteredCollection( self, **kwargs ):
+        if not kwargs:
+            return self._presentation( "statistics.html", msg="You must choose one or more taxon to restrict your collection" )
+        filtered_list = [i for i in cherrypy.session.get("collection").taxa_list if i not in kwargs]
+        return self.statistics( cherrypy.session.get("collection").filter( filtered_list ) )
 
 cherrypy.tree.mount(Taxomanie())
 
