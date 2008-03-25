@@ -1,0 +1,23 @@
+<span class="didyoumean"> 
+<font color='red'>
+<%
+if len(_suggestlist_.keys()):
+    for badtaxon, suggest in _suggestlist_.iteritems():
+        #
+%>
+        <b><%$badtaxon%></b> 
+        <i> Did you mean</i> :
+<%
+        for taxon in suggest:
+            #
+%>
+            <a class="species" target="_blank"
+            href="http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?name=<%$ taxon %>">
+            <%$ taxon %> </a>
+            <input type="radio" name="<%$ badtaxon %>" value="<%$ taxon %>" />
+        <%|%>
+        <br />
+<%|%>
+</span>
+</font>
+

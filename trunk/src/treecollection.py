@@ -256,7 +256,7 @@ class TreeCollection( Taxobject ):
         if root == "root":
             result += "<a class='genre' href='"+self.NCBI+ \
               self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+ \
-                "</a> Exemple:(6/7) = (6 species in 7 trees)<br />\n"
+                "</a> Example:(6/7) = (6 species in 7 trees)<br />\n"
             result += """<span class="treeline">|</span><br />\n"""
         # Create tree display
         for node in tree.successors( root ):
@@ -312,14 +312,15 @@ class TreeCollection( Taxobject ):
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize() )
         if stat:
-            result += """ (<a title='%s' href="statistics?query=%%7B%s%%7D%s">%s</a>/<a
-              class="nolink" title='%s'>%s</a>)\n""" % (
+            result += """
+            (<a class="nolink" title='%s'>%s</a>/
+            <a title='%s' href="statistics?query=%%7B%s%%7D%s">%s</a>)\n""" % (
+              ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
+              str(len(self._d_reprtaxon[bdnode])),
               "Restrict your collection to these trees",
               bdnode,
               self.last_query,
-              self.getNbTrees( bdnode ),
-              ",".join( [i for i in self._d_reprtaxon[bdnode]]) ,
-              str(len(self._d_reprtaxon[bdnode])))
+              self.getNbTrees( bdnode ))
         if nb_inter_parents:
             result += """<a id="a-%s" class='showparents'
               onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
@@ -345,14 +346,15 @@ class TreeCollection( Taxobject ):
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize())
-        result += """ (<a title="%s" href="statistics?query=%%7B%s%%7D%s">%s</a>/<a
-          class="nolink" title='%s'>%s</a>)\n""" % (
+        result += """
+        (<a class="nolink" title='%s'>%s</a>/
+        <a title="%s" href="statistics?query=%%7B%s%%7D%s">%s</a>)\n""" % (
+          ",".join( [i for i in self._d_reprtaxon[bdnode]]),
+          str(len(self._d_reprtaxon[bdnode])),
           "Restrict your collection to these trees",
           bdnode,
           self.last_query,
-          self.getNbTrees( bdnode ),
-          ",".join( [i for i in self._d_reprtaxon[bdnode]]),
-          str(len(self._d_reprtaxon[bdnode])))
+          self.getNbTrees( bdnode ))
         if isinterparent and nb_inter_parents:
             result += """<a id="a-%s" class='showparents'
               onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
@@ -422,7 +424,7 @@ class TreeCollection( Taxobject ):
         """
         return the original collection without certains taxa
         """
-        ori = self.orignial_collection
+        ori = removeBootStraps( self.orignial_collection )
         for taxon in taxa_list:
             ori = ori.replace( taxon, "")
         while ",," in ori or "(," in ori or ",)" in ori or "()" in ori:
