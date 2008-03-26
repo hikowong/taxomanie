@@ -251,36 +251,43 @@ class Taxomanie( Taxobject ):
         return self._pleet.render()
 
     def getStat1( self, sort ):
-        resultlist = cherrypy.session.get("collection").statNbTreeWithNbNodes()
+        d_stat = cherrypy.session.get("collection").stat1()
+        ratio = sorted( d_stat.keys() )[1]-sorted( d_stat.keys() )[0]
         result = ""
-        #short by nbtaxa
-        if sort == "nbtaxa":
-            new_resultlist = []
-            for i, j in resultlist:
-                new_resultlist.append( (j,i) )
-            resultlist = new_resultlist
-        resultlist.sort()
-        resultlist.reverse()
-        nbtaxa_max, nop = max( resultlist ) 
-        for res in resultlist:
-            if sort == "nbtaxa":
-                nbtaxon, nbtree = res
-            else:
-                nbtree, nbtaxon = res
-            nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*70/nbtaxa_max )
-            bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
-            bar = """<span class="statMetric">"""+bar+"</span>"
-            base = "["+string.center( str(nbtaxon), 4)+"]"
-            base = base.replace( " ", "&nbsp;" )
-            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
+        nbtaxa_max = max( d_stat.values() ) 
+        for nbtaxon, nbtree in sorted(d_stat.items()):
+            if nbtree:
+                nbtreepourcent = nbtree*100/nbtaxa_max
+                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+                bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+                bar = """<span class="statMetric">"""+bar+"</span>"
+                base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
+                base = base.replace( " ", "&nbsp;" )
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
         return result
 
     def getStat2( self, sort ):
+        d_stat = cherrypy.session.get("collection").stat2()
+        ratio = sorted( d_stat.keys() )[1]-sorted( d_stat.keys() )[0]
+        result = ""
+        nbtaxa_max = max( d_stat.values() ) 
+        for nbtaxon, nbtree in sorted(d_stat.items()):
+            if nbtree:
+                nbtreepourcent = nbtree*100/nbtaxa_max
+                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+                bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+                bar = """<span class="statMetric">"""+bar+"</span>"
+                base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
+                base = base.replace( " ", "&nbsp;" )
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
+        return result
+
+
+    def getStat3( self, sort ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNode()
         result = ""
         if resultlist:
-        # get the max len of taxon name 
+            # get the max len of taxon name 
             nbtaxa_max, nop = max( resultlist ) 
             taxon_name_max = 0 
             for nbtaxa, taxon_name in resultlist:

@@ -178,7 +178,6 @@ else:
             </span>
         <!-- end homonym fieldset -->
         <%|%>
-        <br />
         <input type="submit" value="Correct collection"/>
         </form>
         </fieldset><br />
@@ -187,8 +186,9 @@ else:
 
 <!-- stat1 -->
     <fieldset>
-        <legend> Number of taxa by trees </legend>
+        <legend> Tree size distribution </legend>
         <form name="sortbystat1" action="statistics">
+<!--
             <b>Sort by </b>&nbsp;
             <select name="sortby_stat1" onchange="javascript:document.sortbystat1.submit();">
 <%
@@ -206,14 +206,16 @@ else:
     <%|%>
             </select>
         </form>
-         <%$ _stat1_ %>
+-->
+        <%$ _stat1_ %>
     </fieldset>
 <!-- end stat1 -->
 
 <!-- stat2 -->
     <fieldset>
-        <legend> Number of trees by taxa </legend>
+        <legend> Taxon frequency distribution </legend>
         <form name="sortbystat2" action="statistics">
+<!--
             <b>Sort by </b>&nbsp;
             <select name="sortby_stat2" onchange="javascript:document.sortbystat2.submit();">
 <%
@@ -231,7 +233,7 @@ else:
     <%|%>
             </select>
         </form>
- 
+-->
         <tt>
         <%$ _stat2_ %>
         </tt>
