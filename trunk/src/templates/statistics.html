@@ -35,6 +35,7 @@ function selectAll(){
 <a href="/check" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
 <a href="/downloadNCBITree" class="path" title="Download the NCBI arborescence">
 Download NCBI tree </a>
+<a href="/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
 <!-- MENU : END -->
      </td>
@@ -164,7 +165,7 @@ else:
     <fieldset>
         <legend> Number of taxa by trees </legend>
         <form name="sortbystat1" action="statistics">
-            <b>Short by </b>&nbsp;
+            <b>Sort by </b>&nbsp;
             <select name="sortby_stat1" onchange="javascript:document.sortbystat1.submit();">
 <%
     if _sortby_stat1_ == "nbtaxa":
@@ -189,7 +190,7 @@ else:
     <fieldset>
         <legend> Number of trees by taxa </legend>
         <form name="sortbystat2" action="statistics">
-            <b>Short by </b>&nbsp;
+            <b>Sort by </b>&nbsp;
             <select name="sortby_stat2" onchange="javascript:document.sortbystat2.submit();">
 <%
     if _sortby_stat2_ == "names":
@@ -216,17 +217,21 @@ else:
 <!-- NCBI tree -->
     <fieldset>
         <legend> NCBI taxonomy</legend>
-        <tt>
-        <%$ _ncbitree_ %>
-        </tt>
+        <form action="createFilteredCollection">
+            <a class="selectall" onclick="javascript:selectAll();"> Select all</a> &nbsp; &nbsp;
+            <a class="selectall" onclick="javascript:unselectAll();"> Unselect all </a>
+            <br />
+            <tt>
+            <%$ _ncbitree_ %>
+            </tt>
+        <input type="submit" value="Restrict collection" />
+        </form>
     </fieldset><br />
 <!-- end NCBI tree -->
 
+<!-- restric
     <fieldset>
         <legend> Restrict your collection </legend>
-        <form action="createFilteredCollection">
-        <a class="selectall" onclick="javascript:selectAll();"> Select all</a> &nbsp; &nbsp;
-        <a class="selectall" onclick="javascript:unselectAll();"> Unselect all </a>
         <br />
 <%
     for taxon in _taxalist_:
@@ -235,9 +240,8 @@ else:
         <input class="restrict" type="checkbox" name="<%$ taxon %>" value="<%$ taxon %>" />
         <%$ _treecollection_._TreeCollection__linkSpecies(taxon.capitalize(), taxon) %> <br />
     <%|%>
-    <input type="submit" value="Restrict collection" />
-    </form>
     </fieldset>
+-->
 <%|%>
 </div>
             <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
