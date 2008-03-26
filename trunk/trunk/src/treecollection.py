@@ -310,7 +310,7 @@ class TreeCollection( Taxobject ):
                     depth += 1
                 subnodes = tree.successors( node )
                 if subnodes: # it's a genre
-                    result += """<span name="%s">\n""" % bdnode
+                    result += """<span genre="%s">\n""" % bdnode
                     result += self.__linkGenre( dispnode, bdnode, blockname, True, nb_inter_parents, stat=True )
                     result += self.__displayStat( tree,  node, depth + 1, 
                       lastnode = bdnode, blockname = blockname+"a")
@@ -370,9 +370,9 @@ class TreeCollection( Taxobject ):
             style = 'class="genre"'
         result += "+-"
         if stat:
-            pass
-            #result += """<input class="restrict" type="checkbox" name="%s" value="%s" />""" % (
-            #  bdnode, bdnode )
+            #pass
+            result += """<input class="restrict" type="checkbox" genre="%s"
+            onclick="javascript:selectGenre('%s');" />""" % ( bdnode, bdnode )
         result += """<a id="%s" %s name="genre" onmouseover="go('%s')" 
           href="%s%s" target='_blank'> %s </a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
@@ -462,7 +462,8 @@ class TreeCollection( Taxobject ):
         print ">>>collection", self.orignial_collection
         ori = removeBootStraps( self.orignial_collection )
         for taxon in taxa_list:
-            ori = re.sub( "\s*"+taxon+"\s*([),])", r"\1", ori, re.DOTALL )
+            print "deleting>>>", taxon
+            ori = re.sub( "\s*"+taxon+"\s*([),])", r"\1", ori, count=0 )
         while ",," in ori or "(," in ori or ",)" in ori or "()" in ori:
             ori = ori.replace(",,",",")
             ori = ori.replace("(,","(")
@@ -472,6 +473,8 @@ class TreeCollection( Taxobject ):
             ori = re.sub( r"(\(\s+,)","(", ori )
             ori = re.sub( r"(\(\s+\))","", ori )
             ori = re.sub( r"(,\s+,)",",", ori )
+        while re.findall( r"\((\([^()]+\))\)", ori, re.DOTALL ):
+            ori = re.sub( r"\((\([^()]+\))\)", r"\1", ori, count=0  )
 #        ori = re.sub( r"\(([^,()]+\))[^;]", r"\1", ori, re.DOTALL )
 #        ori = re.sub( r"\((\([^()]+\))\)", r"\1", ori, re.DOTALL )
 #        ori = re.sub( r"\(([^,()]+)\)", r"\1", ori, re.DOTALL )
