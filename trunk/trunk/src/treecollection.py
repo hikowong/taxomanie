@@ -50,7 +50,7 @@ class TreeCollection( Taxobject ):
                     } )
         self.__init()
 
-    def __init( self ):
+    def  __init( self ):
         """
         count the number of species by tree
         """
@@ -65,32 +65,33 @@ class TreeCollection( Taxobject ):
                 self.species_count[tree["name"]] = {}
                 self._d_taxonlist[tree["name"]] = set()#stats
             for taxon in getTaxa( tree["tree"] ):
-                old_taxon_name = taxon
-                taxon = self.reference.stripTaxonName(taxon)
-                if self.reference.isHomonym( taxon ):
-                    if not self.homonyms.has_key( taxon ):
-                        self.homonyms[taxon] =  self.reference.getHomonyms( taxon )
-                if self.reference.isValid( taxon ):
-                    self.taxa_list.add( taxon )#stats
-                    self._d_taxonlist[tree["name"]].add( taxon )#stats
-                    for tax in self.reference.getParents( taxon ):#stats
-                        self._d_taxonlist[tree["name"]].add( tax )#stats
-                        if not self._d_reprtaxon.has_key( tax ): #
-                            self._d_reprtaxon[tax] = set()#
-                        self._d_reprtaxon[tax].add( taxon )#
-                    if not self.species_count[tree["name"]].has_key( taxon ):
-                        self.species_count[tree["name"]][taxon] = 0
-                    if not self._d_reprtaxon.has_key( taxon ):#stats
-                        self._d_reprtaxon[taxon] = set()#stats
-                    self._d_reprtaxon[taxon].add( old_taxon_name )#stats
-                    self.species_count[tree["name"]][taxon] += 1
-                    for parent in self.reference.getParents( taxon ):
-                        if not self.species_count[tree["name"]].has_key( parent ):
-                            self.species_count[tree["name"]][parent] = 0
-                        self.species_count[tree["name"]][parent] += 1
-                elif not self.reference.isHomonym( taxon ):
-                    self.species_count["XXX"] += 1
-                    self.bad_taxa_list.add( taxon )
+                if taxon.strip():
+                    old_taxon_name = taxon
+                    taxon = self.reference.stripTaxonName(taxon)
+                    if self.reference.isHomonym( taxon ):
+                        if not self.homonyms.has_key( taxon ):
+                            self.homonyms[taxon] =  self.reference.getHomonyms( taxon )
+                    if self.reference.isValid( taxon ):
+                        self.taxa_list.add( taxon )#stats
+                        self._d_taxonlist[tree["name"]].add( taxon )#stats
+                        for tax in self.reference.getParents( taxon ):#stats
+                            self._d_taxonlist[tree["name"]].add( tax )#stats
+                            if not self._d_reprtaxon.has_key( tax ): #
+                                self._d_reprtaxon[tax] = set()#
+                            self._d_reprtaxon[tax].add( taxon )#
+                        if not self.species_count[tree["name"]].has_key( taxon ):
+                            self.species_count[tree["name"]][taxon] = 0
+                        if not self._d_reprtaxon.has_key( taxon ):#stats
+                            self._d_reprtaxon[taxon] = set()#stats
+                        self._d_reprtaxon[taxon].add( old_taxon_name )#stats
+                        self.species_count[tree["name"]][taxon] += 1
+                        for parent in self.reference.getParents( taxon ):
+                            if not self.species_count[tree["name"]].has_key( parent ):
+                                self.species_count[tree["name"]][parent] = 0
+                            self.species_count[tree["name"]][parent] += 1
+                    elif not self.reference.isHomonym( taxon ):
+                        self.species_count["XXX"] += 1
+                        self.bad_taxa_list.add( taxon )
         #self.taxa_list = list( self.taxa_list )#stats
 
     def initStat( self ):
@@ -104,19 +105,20 @@ class TreeCollection( Taxobject ):
             if not self._d_taxonlist.has_key( tree["name"] ):
                 self._d_taxonlist[tree["name"]] = set()#stats
             for taxon in getTaxa( tree["tree"] ):
-                old_taxon_name = taxon
-                taxon = self.reference.stripTaxonName(taxon)
-                if self.reference.isValid( taxon ):
-                    self.taxa_list.add( taxon )#stats
-                    self._d_taxonlist[tree["name"]].add( taxon )#stats
-                    for tax in self.reference.getParents( taxon ):#stats
-                        self._d_taxonlist[tree["name"]].add( tax )#stats
-                        if not self._d_reprtaxon.has_key( tax ): #
-                            self._d_reprtaxon[tax] = set()#
-                        self._d_reprtaxon[tax].add( taxon )#
-                    if not self._d_reprtaxon.has_key( taxon ):#stats
-                        self._d_reprtaxon[taxon] = set()#stats
-                    self._d_reprtaxon[taxon].add( old_taxon_name )#stats
+                if taxon.strip():
+                    old_taxon_name = taxon
+                    taxon = self.reference.stripTaxonName(taxon)
+                    if self.reference.isValid( taxon ):
+                        self.taxa_list.add( taxon )#stats
+                        self._d_taxonlist[tree["name"]].add( taxon )#stats
+                        for tax in self.reference.getParents( taxon ):#stats
+                            self._d_taxonlist[tree["name"]].add( tax )#stats
+                            if not self._d_reprtaxon.has_key( tax ): #
+                                self._d_reprtaxon[tax] = set()#
+                            self._d_reprtaxon[tax].add( taxon )#
+                        if not self._d_reprtaxon.has_key( taxon ):#stats
+                            self._d_reprtaxon[taxon] = set()#stats
+                        self._d_reprtaxon[taxon].add( old_taxon_name )#stats
         #self.taxa_list = list( self.taxa_list )#stats
 
     def getNbTrees( self, taxon ):
@@ -218,8 +220,27 @@ class TreeCollection( Taxobject ):
             d_tree_nodes[taxa_len] += 1
         result_list = []
         for i, j in d_tree_nodes.iteritems():
-            result_list.append( (j,i) )
+            result_list.append( (i,j) )
         return result_list[:]
+
+    def stat1( self ):
+        stat = {}
+        ratio = int(max( self.statNbTreeWithNbNodes() )[0]*10.0/100) or 1
+        old_ratio = 0
+        print "ratio>", ratio
+        index = 1
+        stat_list = self.statNbTreeWithNbNodes()
+        stat_list.sort()
+        print stat_list
+        for i,j in stat_list:
+            if old_ratio <= i < ratio*index:
+                if not stat.has_key( ratio*index ):
+                    stat[ratio*index] = []
+                stat[ratio*index].append( j )
+            elif i >= ratio*index:
+                old_ratio = ratio*index
+                index += 1
+        return stat
 
     def displayStats( self, allparents = False ):
         """
@@ -230,6 +251,8 @@ class TreeCollection( Taxobject ):
             tree = self.reference.getNCBIArborescence( self.taxa_list )
             if not allparents:
                 tree = self.__removeSingleParent( tree )
+            print "tree>>", tree.nodes()
+            print "tree>>", tree.edges()
             return self.__displayStat( tree, root="root" )
         return ""
 
@@ -256,42 +279,47 @@ class TreeCollection( Taxobject ):
         if root == "root":
             result += "<a class='genre' href='"+self.NCBI+ \
               self.reference.TAXONOMY[root]["id"]+"'>"+root.capitalize()+ \
-                "</a> Example:(6/7) = (6 species in 7 trees)<br />\n"
+                "</a> (%s/%s) = (%s species in %s trees)<br />\n" % (
+                  len(self.taxa_list), len(self.getCollection()),
+                  len(self.taxa_list), len(self.getCollection()))
             result += """<span class="treeline">|</span><br />\n"""
         # Create tree display
-        for node in tree.successors( root ):
-            dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
-            dispnode = dispnode.replace( "<", "&lt;" )
-            dispnode = dispnode.replace( ">", "&gt;" )
-            bdnode = self.reference.stripTaxonName( node.split("|")[0] )
-            nb_inter_parents = 0
-            # Create div for interparents (parents beetween nodes)
-            if lastnode in self.reference.getParents( bdnode ):
-                inter_parents = self.reference.getIntervalParents( lastnode, bdnode )
-                nb_inter_parents = len( inter_parents )
-                blocknum += 1
-                blockname += str( blocknum )
-                result += "<div id='%s' class='interparents'><tt>" % blockname
-                if len( inter_parents ):
-                    result += """<span class="treeline">|</span> """*mydepth
-                    result +=  ("""<span class="treeline">|</span> """*mydepth).join(
-                      self.__linkGenre(i,i,blockname) for i in inter_parents ) 
-                result += "</tt></div>" 
-            # Create arborescence display
-            depth = 0
-            while depth != mydepth :
-                result += """<span class="treeline">|</span> """
-                depth += 1
-            subnodes = tree.successors( node )
-            if subnodes: # it's a genre
-                result += self.__linkGenre( dispnode, bdnode, blockname, True, nb_inter_parents )
-                result += self.__displayStat( tree,  node, depth + 1, 
-                  lastnode = bdnode, blockname = blockname+"a")
-            else: # it's a species (ie taxon)
-#                if "XXX" in node:
-#                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
-#                else:
-                result += self.__linkSpecies( dispnode, bdnode, True, blockname, nb_inter_parents)
+        if root in tree.nodes():
+            for node in tree.successors( root ):
+                dispnode = node.split("|")[0].replace(self.reference.delimiter, " ")
+                dispnode = dispnode.replace( "<", "&lt;" )
+                dispnode = dispnode.replace( ">", "&gt;" )
+                bdnode = self.reference.stripTaxonName( node.split("|")[0] )
+                nb_inter_parents = 0
+                # Create div for interparents (parents beetween nodes)
+                if lastnode in self.reference.getParents( bdnode ):
+                    inter_parents = self.reference.getIntervalParents( lastnode, bdnode )
+                    nb_inter_parents = len( inter_parents )
+                    blocknum += 1
+                    blockname += str( blocknum )
+                    result += "<div id='%s' class='interparents'><tt>" % blockname
+                    if len( inter_parents ):
+                        result += """<span class="treeline">|</span> """*mydepth
+                        result +=  ("""<span class="treeline">|</span> """*mydepth).join(
+                          self.__linkGenre(i,i,blockname) for i in inter_parents ) 
+                    result += "</tt></div>" 
+                # Create arborescence display
+                depth = 0
+                while depth != mydepth :
+                    result += """<span class="treeline">|</span> """
+                    depth += 1
+                subnodes = tree.successors( node )
+                if subnodes: # it's a genre
+                    result += """<span name="%s">\n""" % bdnode
+                    result += self.__linkGenre( dispnode, bdnode, blockname, True, nb_inter_parents, stat=True )
+                    result += self.__displayStat( tree,  node, depth + 1, 
+                      lastnode = bdnode, blockname = blockname+"a")
+                    result += """</span>\n"""
+                else: # it's a species (ie taxon)
+    #                if "XXX" in node:
+    #                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
+    #                else:
+                    result += self.__linkSpecies( dispnode, bdnode, True, blockname, nb_inter_parents)
         return result
 
     def __linkSpecies( self, dispnode, bdnode, stat=False, blockname="", nb_inter_parents=0 ):
@@ -304,6 +332,8 @@ class TreeCollection( Taxobject ):
             style = 'class="species"'
         if stat:
             result += "+-"
+            result += """<input class="restrict" type="checkbox" name="%s" value="%s" />""" % (
+              bdnode, bdnode )
         result += """<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s</a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,                        
@@ -330,7 +360,7 @@ class TreeCollection( Taxobject ):
             result += "<br />\n"
         return result
 
-    def __linkGenre( self, dispnode, bdnode, blockname, isinterparent=False, nb_inter_parents=0 ):
+    def __linkGenre( self, dispnode, bdnode, blockname, isinterparent=False, nb_inter_parents=0, stat = 0 ):
         result = ""
         dispnode = dispnode.replace( "<", "&lt;" )
         dispnode = dispnode.replace( ">", "&gt;" )
@@ -338,7 +368,12 @@ class TreeCollection( Taxobject ):
             style = 'class="genre_homonym"'
         else:
             style = 'class="genre"'
-        result += """+-<a id="%s" %s name="genre" onmouseover="go('%s')" 
+        result += "+-"
+        if stat:
+            pass
+            #result += """<input class="restrict" type="checkbox" name="%s" value="%s" />""" % (
+            #  bdnode, bdnode )
+        result += """<a id="%s" %s name="genre" onmouseover="go('%s')" 
           href="%s%s" target='_blank'> %s </a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,
@@ -424,14 +459,36 @@ class TreeCollection( Taxobject ):
         """
         return the original collection without certains taxa
         """
+        print ">>>collection", self.orignial_collection
         ori = removeBootStraps( self.orignial_collection )
         for taxon in taxa_list:
-            ori = ori.replace( taxon, "")
+            ori = re.sub( "\s*"+taxon+"\s*([),])", r"\1", ori, re.DOTALL )
         while ",," in ori or "(," in ori or ",)" in ori or "()" in ori:
             ori = ori.replace(",,",",")
             ori = ori.replace("(,","(")
             ori = ori.replace(",)",")")
             ori = ori.replace("()","")
+            ori = re.sub( r"(,\s+\))",")", ori )
+            ori = re.sub( r"(\(\s+,)","(", ori )
+            ori = re.sub( r"(\(\s+\))","", ori )
+            ori = re.sub( r"(,\s+,)",",", ori )
+#        ori = re.sub( r"\(([^,()]+\))[^;]", r"\1", ori, re.DOTALL )
+#        ori = re.sub( r"\((\([^()]+\))\)", r"\1", ori, re.DOTALL )
+#        ori = re.sub( r"\(([^,()]+)\)", r"\1", ori, re.DOTALL )
+#        print "ori_avant_whiles>>>", ori
+#        replace_list = re.findall(r"\((\([^()]+\))\)", ori, re.DOTALL )
+#        while replace_list:
+#            for i in replace_list:
+#                ori = ori.replace( "("+i+")", i )
+#            replace_list = re.findall( r"\((\([^()]+\))\)", ori, re.DOTALL)
+#        print "ori_avant_while2>>>", ori
+#        replace_list =  re.findall( r"\(([^,( )]+)\)[^;]", ori, re.DOTALL )
+#        while replace_list:
+#            for i in replace_list:
+#                print ">>replace", i
+#                ori = ori.replace( "("+i+")", i )
+#            replace_list =  re.findall( r"\(([^,( )]+)\)[^;]", ori, re.DOTALL )
+        print ">>>ori", ori
         return ori
 
         
@@ -476,13 +533,13 @@ end;
 """
     import time
 #    col = open( "../data/omm_cds_nex.tre" ).read()
-#    col = open("../data/tree.nwk").read()
+    col = open("../data/tree.nwk").read()
+    col = "(rattus, mus);(mus musculus);"
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
     dr = time.time()
     print len(treecol.getCollection())
-    col = treecol.query( "{murinae}>1" )
     fr = time.time()
     print len(treecol.getCollection())
 #    print treecol.statNbTreeWithNbNodes()
@@ -492,9 +549,10 @@ end;
 #    print treecol.bad_taxa_list
 #    print treecol.homonyms
 #    print treecol.displayHomonymList()
+#    print treecol.statNbTreeWithNbNodes()
     print ">"*20
-    print treecol.orignial_collection
+#    print treecol.stat1()
+    print treecol.filter( ["mus", "rattus", "pan", "bos", "canis"] )
     print "<"*20
-    print treecol.filter( "mus", "rattus", "pan", "bos", "canis" )
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr

@@ -279,37 +279,38 @@ class Taxomanie( Taxobject ):
     def getStat2( self, sort ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNode()
         result = ""
+        if resultlist:
         # get the max len of taxon name 
-        nbtaxa_max, nop = max( resultlist ) 
-        taxon_name_max = 0 
-        for nbtaxa, taxon_name in resultlist:
-            if len(taxon_name) > taxon_name_max:
-                taxon_name_max = len(taxon_name)
-        #short by names
-        if sort == "names":
-            new_resultlist = []
-            for i, j in resultlist:
-                new_resultlist.append( (j,i) )
-            resultlist = new_resultlist
-        resultlist.sort()
-        for res in resultlist:
-            if sort=="names":
-                taxon, nbtree = res
-            else:
-                nbtree, taxon = res
-            nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*70/nbtaxa_max )
-            bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
-            bar = """<span class="statMetric">"""+bar+"</span>"
-            base = "["+string.center( str(taxon), taxon_name_max)+"]"
-            base = base.replace( " ", "&nbsp;" )
-            if cherrypy.session.get("query"):
-                last_query = "+and+"+cherrypy.session.get("query")
-            else:
-                last_query = ""
-            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+\
-              '<a href="/statistics?query=%7B'+taxon+'%7D'+last_query+'">'+ \
-              str(nbtree)+"</a> trees)<br />\n"
+            nbtaxa_max, nop = max( resultlist ) 
+            taxon_name_max = 0 
+            for nbtaxa, taxon_name in resultlist:
+                if len(taxon_name) > taxon_name_max:
+                    taxon_name_max = len(taxon_name)
+            #short by names
+            if sort == "names":
+                new_resultlist = []
+                for i, j in resultlist:
+                    new_resultlist.append( (j,i) )
+                resultlist = new_resultlist
+            resultlist.sort()
+            for res in resultlist:
+                if sort=="names":
+                    taxon, nbtree = res
+                else:
+                    nbtree, taxon = res
+                nbtreepourcent = nbtree*100/nbtaxa_max
+                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*70/nbtaxa_max )
+                bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+                bar = """<span class="statMetric">"""+bar+"</span>"
+                base = "["+string.center( str(taxon), taxon_name_max)+"]"
+                base = base.replace( " ", "&nbsp;" )
+                if cherrypy.session.get("query"):
+                    last_query = "+and+"+cherrypy.session.get("query")
+                else:
+                    last_query = ""
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+\
+                  '<a href="/statistics?query=%7B'+taxon+'%7D'+last_query+'">'+ \
+                  str(nbtree)+"</a> trees)<br />\n"
         return result
 
     @cherrypy.expose
@@ -325,9 +326,9 @@ class Taxomanie( Taxobject ):
         self._pleet["_treecollection_"] = cherrypy.session.get("collection")
         self._pleet["_query_"] = cherrypy.session.get("query")
         self._pleet["_clearquery_"] = clear_query
-        try:
+        if 1:#try:
             self._pleet["_ncbitree_"] = cherrypy.session.get("collection").displayStats()
-        except:
+        else:#except:
             return self._presentation( "error.html", msg="Bad collection", pagedef="Home > Error" )
         self._pleet["_nbtaxa_"] = len(cherrypy.session.get("collection").taxa_list)
         self._pleet["_taxalist_"] = cherrypy.session.get("collection").taxa_list
@@ -389,6 +390,8 @@ class Taxomanie( Taxobject ):
     def recreateCollection( self, **kwargs ):
         if not kwargs:
             return self._presentation( "statistics.html", msg="You must choose taxon to correct your collection" )
+        if not cherrypy.session.get("collection"):
+            return self._presentation( "error.html", msg="Your session has expired" )
         new_nwk = cherrypy.session.get("collection").orignial_collection
         for old_name, new_name in kwargs.iteritems():
             new_nwk = new_nwk.replace( old_name, new_name ) 
@@ -398,6 +401,8 @@ class Taxomanie( Taxobject ):
     def createFilteredCollection( self, **kwargs ):
         if not kwargs:
             return self._presentation( "statistics.html", msg="You must choose one or more taxon to restrict your collection" )
+        if not cherrypy.session.get("collection"):
+            return self._presentation( "error.html", msg="Your session has expired" )
         filtered_list = [i for i in cherrypy.session.get("collection").taxa_list if i not in kwargs]
         return self.statistics( cherrypy.session.get("collection").filter( filtered_list ) )
 
