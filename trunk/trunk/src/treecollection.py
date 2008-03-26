@@ -225,22 +225,36 @@ class TreeCollection( Taxobject ):
 
     def stat1( self ):
         stat = {}
-        ratio = int(max( self.statNbTreeWithNbNodes() )[0]*10.0/100) or 1
-        old_ratio = 0
-        print "ratio>", ratio
-        index = 1
-        stat_list = self.statNbTreeWithNbNodes()
-        stat_list.sort()
-        print stat_list
+        nbmax = max( self.statNbTreeWithNbNodes() )[0]
+        ratio = int(nbmax*10.0/100) or 1
+        stat_list = sorted( self.statNbTreeWithNbNodes() )
+        for i in xrange( 0, nbmax+ratio, ratio):
+            stat[i] = 0
         for i,j in stat_list:
-            if old_ratio <= i < ratio*index:
-                if not stat.has_key( ratio*index ):
-                    stat[ratio*index] = []
-                stat[ratio*index].append( j )
-            elif i >= ratio*index:
-                old_ratio = ratio*index
-                index += 1
+            for key in stat.keys():
+                if key <= i < key+ratio:
+                    stat[key] += j
         return stat
+
+    def stat2( self ):
+        stat = {}
+        for tree in self.getCollection():
+            nbtaxa = len(getTaxa( tree["tree"] ) )
+            if not stat.has_key( nbtaxa ):
+                stat[nbtaxa] = 1
+            stat[nbtaxa] += 1
+        nbmax = max( stat.keys() )
+        ratio = int( nbmax*10.0/100) or 1
+        result_stat = {}
+        for i in xrange( 0, nbmax+ratio, ratio):
+            result_stat[i] = 0
+        for i,j in stat.iteritems():
+            for key in result_stat.keys():
+                if key <= i < key+ratio:
+                    result_stat[key] += j
+        return result_stat
+
+
 
     def displayStats( self, allparents = False ):
         """
@@ -251,8 +265,6 @@ class TreeCollection( Taxobject ):
             tree = self.reference.getNCBIArborescence( self.taxa_list )
             if not allparents:
                 tree = self.__removeSingleParent( tree )
-            print "tree>>", tree.nodes()
-            print "tree>>", tree.edges()
             return self.__displayStat( tree, root="root" )
         return ""
 
@@ -459,10 +471,8 @@ class TreeCollection( Taxobject ):
         """
         return the original collection without certains taxa
         """
-        print ">>>collection", self.orignial_collection
         ori = removeBootStraps( self.orignial_collection )
         for taxon in taxa_list:
-            print "deleting>>>", taxon
             ori = re.sub( "\s*"+taxon+"\s*([),])", r"\1", ori, count=0 )
         while ",," in ori or "(," in ori or ",)" in ori or "()" in ori:
             ori = ori.replace(",,",",")
@@ -491,7 +501,6 @@ class TreeCollection( Taxobject ):
 #                print ">>replace", i
 #                ori = ori.replace( "("+i+")", i )
 #            replace_list =  re.findall( r"\(([^,( )]+)\)[^;]", ori, re.DOTALL )
-        print ">>>ori", ori
         return ori
 
         
@@ -537,7 +546,7 @@ end;
     import time
 #    col = open( "../data/omm_cds_nex.tre" ).read()
     col = open("../data/tree.nwk").read()
-    col = "(rattus, mus);(mus musculus);"
+#    col = "(rattus, mus);(mus musculus);"
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
@@ -554,8 +563,8 @@ end;
 #    print treecol.displayHomonymList()
 #    print treecol.statNbTreeWithNbNodes()
     print ">"*20
-#    print treecol.stat1()
-    print treecol.filter( ["mus", "rattus", "pan", "bos", "canis"] )
+    print treecol.stat1()
+#    print treecol.filter( ["mus", "rattus", "pan", "bos", "canis"] )
     print "<"*20
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr
