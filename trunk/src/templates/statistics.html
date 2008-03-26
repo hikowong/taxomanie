@@ -6,7 +6,7 @@ $(document).ready(function() {
 }); 
 
 $(document).ready(function(){
-    $("#exemplequery").hide();
+//    $("#exemplequery").hide();
     $("#exemplelink").click(function () {
         $("#exemplequery").slideToggle("slow");
     });
@@ -22,7 +22,20 @@ function selectAll(){
        $("input.restrict").attr( "checked", "checked" );
     });
 }
-                            
+
+function selectGenre( genre ){
+    $(document).ready( function(){
+        if( $("span[genre="+genre+"] input").attr("check")){
+           $("span[genre="+genre+"] input").removeAttr( "check" );
+           $("span[genre="+genre+"] input").removeAttr( "checked" );
+        }
+        else{
+            $("span[genre="+genre+"]  input").attr("check", "check");
+            $("span[genre="+genre+"]  input").attr("checked", "checked");
+        }
+    });
+}
+
 </script>
 <!-- MENU : BEGINNING______________________________________________________________________ -->
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
@@ -47,7 +60,8 @@ Download NCBI tree </a>
 <!-- query panel -->
 <div class="query">
 <form action="statistics" class="nopadding">
-<a onclick="javascript:toggleExemple();" id="exemplelink"> View exemple </a>&nbsp;
+<!-- <a onclick="javascript:toggleExemple();" id="exemplelink"> View exemple
+</a>&nbsp; -->
 <input size=60  type=text 
 onfocus="if(this.value=='Your query...'){this.value='';}" 
 onblur="if(this.value==''){this.value='Your query...';}"
@@ -102,9 +116,18 @@ else:
     <fieldset>
         <legend> General informations of the collection </legend>
         <%$ _nbtree_ %> trees <br />
-        <%$ _nbtaxa_ %> taxa <br />
-        <font color="red"> <%$ len(_badtaxalist_)%> bad taxa </font><br />
-        <font color="orange"><%$ len(_homonymlist_)%> homonyms </font><br />
+        <%$ _nbtaxa_ %> taxa &nbsp;
+<%
+    if len(_badtaxalist_):
+        #
+%>
+        <font color="red"> <%$ len(_badtaxalist_)%> bad taxa </font>&nbsp;
+<%
+    if len(_homonymlist_):
+        #
+%>
+        <font color="orange"><%$ len(_homonymlist_)%> homonyms </font>
+    <%|%>
     </fieldset><br />
 
 <!-- correct collection fieldset -->
@@ -155,6 +178,7 @@ else:
             </span>
         <!-- end homonym fieldset -->
         <%|%>
+        <br />
         <input type="submit" value="Correct collection"/>
         </form>
         </fieldset><br />
