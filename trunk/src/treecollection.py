@@ -57,6 +57,7 @@ class TreeCollection( Taxobject ):
         self.taxa_list = set() # stats
         self.species_count = {"XXX":0}
         self._d_taxonlist = {} # stats
+        self._d_taxon_user = {}
         self._d_reprtaxon = {} # stats
         self.bad_taxa_list = set()
         self.homonyms = {}
@@ -68,6 +69,9 @@ class TreeCollection( Taxobject ):
                 if taxon.strip():
                     old_taxon_name = taxon
                     taxon = self.reference.stripTaxonName(taxon)
+                    if not self._d_taxon_user.has_key( taxon ):
+                        self._d_taxon_user[taxon] = set()
+                    self._d_taxon_user[taxon].add( old_taxon_name )
                     if self.reference.isHomonym( taxon ):
                         if not self.homonyms.has_key( taxon ):
                             self.homonyms[taxon] =  self.reference.getHomonyms( taxon )
@@ -467,6 +471,8 @@ class TreeCollection( Taxobject ):
         ori = removeBootStraps( self.orignial_collection )
         for taxon in taxa_list:
             ori = re.sub( "\s*"+taxon+"\s*([),])", r"\1", ori, count=0 )
+            for taxon_user in self._d_taxon_user[taxon]:
+                ori = re.sub( "\s*"+taxon_user+"\s*([),])", r"\1", ori, count=0 )
         while ",," in ori or "(," in ori or ",)" in ori or "()" in ori:
             ori = ori.replace(",,",",")
             ori = ori.replace("(,","(")
