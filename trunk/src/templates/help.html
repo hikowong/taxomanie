@@ -29,12 +29,29 @@ tree dd = ((mus, rattus),pan);
 end;
 </pre></ul>
 
-<h3> What can I do with Taxomanie ? </h3>
-<ul><b>You can check phylogenetic trees (on the Homepage):</b>
+<h3> What can I do with PhyloExplorer ? </h3>
+<ul><b>You can check PHYLOGENETIC TREES (on the Homepage):</b>
 <pre>
 - by uploading a Newick or simple Nexus format file
 - by entering a Newick or simple Nexus format tree in the textfield
 
+</pre>
+</ul>
+
+<ul><b>You can get STATISTICS about your collection of trees as soon as your collection is sent:</b>
+<pre>
+- <u>General informations</u>: shows the number of trees, the number of taxa (including bad taxa and homonyms).
+- <u>Correct your collection</u>: enables you to set the right name of bad taxa and homonyms. Then click "<u>Correct collection</u>".
+- <u>Chart area</u>: 2 charts are displayed
+              --> <i>The 1st one</i> displays how full trees are.
+              --> <i>The 2nd one</i> displays the distribution frequency of a taxon.
+- <u>NCBI taxonomy</u>: every node of the whole collection are displayed with the NCBI arborescence.
+              --> Every node has 2 numbers --> (number of its representatives, number of trees in which it is).
+              --> <i>Dark blue</i> names are the species that are in YOUR collection.
+              --> <i>Light blue</i> names are the commom parents of species.
+              --> You can filter your collection thanks to the checkbox next to each name.
+                  (If you check a box, it means you don't want this node in your collection)
+                  Then click "<u>Restrict collection</u>" to filter.
 </pre>
 </ul>
 
@@ -44,32 +61,48 @@ end;
 </pre>
 </ul>
 
-<ul><b>You can query the collection</b>
+<ul><b>You can QUERY the collection</b>
 <pre>
 - To search a taxon or node in the collection
-- Example of query: {catarrhini}>3 and {murinae} and {bos} and not {glires}
-  Get every tree where "murinae" and "bos" are, but not "glires" and where the number of "catarrhini" is up to 3
+- Example of query: <i>{catarrhini}>3 and {murinae} and {bos} and not {glires}</i>
+  i.e: get every tree where "murinae" and "bos" are, but not "glires" and where the number of "catarrhini" is up to 3
+- <u>Syntax of query</u> (upper or lower case is accepted):
+                    --> <b>{...}</b>        {name you want to search}</b> must be between braces. e.g: <b>{mus musculus}</b>
+                    --> <b>OR</b>           {name 1} <b>or</b> {name 2} <b>or</b> {name 3} ...
+                    --> <b>AND</b>          {name 1} <b>and</b> {name 2} <b>and</b> {name 3} ...
+                    --> <b>NOT</b>          {name 1} and <b>not</b> {name 2} and <b>not</b> {name 3} ...
+                    --> <b>(...)</b>        not {name 1} and not <b>(</b>{name 2} or {name 3}<b>)</b> ... use brackets for priority operations
+                    --> <b><, >, <=, >=</b> {name 1} <b>></b> 2 and {name 2} <b><</b> 4 ... e.g: {eutheria} <b>></b> 4 and {murinae} <b><</b> 3
+                    --> <b>==</b>           {name 1} <b>==</b> 3 ... e.g: {laurasiatheria} <b>==</b> 2
+  Spaces between operands are accepted: <b>{glires}>3</b> is equivalent to <b>{glires} > 3</b>. It's the same for <b>==</b>, <b><=</b>, <b>>=</b> ...
 </pre>
 </ul>
 
-<ul><b>You can get statistics about your collection of trees:</b>
+<ul><b>You can obviously BROWSE YOUR COLLECTION</b>
 <pre>
-- Just clic the "Statistics" button.
-- Every node of the whole collection are displayed with the NCBI arborescence
-- Every node has 2 numbers --> ( number of its representatives, number of trees in which it is  )
+- Just click the "<u>Browse collection</u>" button
+- <u>Display tree</u>: choose the tree you want to display thanks to the select menu
+- <u>Show parents</u>: show intermediate parents of an intern node (<i>usually hidden for visual comfort</i>)
+- <u>Show/hide all parents</u>: expand/hide all intermediate parents
 </pre>
 </ul>
 
-<ul><b>You can hide/show interns nodes in trees</b>
+<ul><b>You can hide/show intern nodes in trees</b>
 <pre>
-- Just clic the "Hide intern nodes"/"Show intern nodes" button above the Tree Name
-- The tree will be displayed with/without the intern nodes
+- Just click the "<u>Show/hide intern nodes</u>" button above the Tree Name
+- The tree will be displayed with/without the intern nodes (just show the structure of the user's original tree)
 </pre>
 </ul>
 
-<ul><b>You can download your filtered collection</b>
+<ul><b>You can DOWNLOAD your filtered collection</b>
 <pre>
-- Just clic the "Download collection" button
+- Just click the "<u>Download collection</u>" button
+</pre>
+</ul>
+
+<ul><b>You can DOWNLOAD the NCBI taxonomy</b>
+<pre>
+- Just click the "<u>Download NCBI tree</u>" button
 </pre>
 </ul>
 <!-- CONTENT : END -->
