@@ -87,9 +87,7 @@ class Taxomanie( Taxobject ):
 
     @cherrypy.expose
     def index( self, msg = "" ):
-        print cherrypy.session.keys()
         cherrypy.session.clear()
-        print cherrypy.session.keys()
         return self._presentation( "index.html", msg, pagedef = "Home > Upload Collection")
     
 
@@ -256,14 +254,16 @@ class Taxomanie( Taxobject ):
         result = ""
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
-            if nbtree:
-                nbtreepourcent = nbtree*100/nbtaxa_max
-                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
-                bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
-                bar = """<span class="statMetric">"""+bar+"</span>"
+            nbtreepourcent = nbtree*100/nbtaxa_max
+            bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+            bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+            bar = """<span class="statMetric">"""+bar+"</span>"
+            if nbtaxon == nbtaxon + ratio-1:
+                base = "["+string.center( str(nbtaxon), 7)+"]"
+            else:
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
-                base = base.replace( " ", "&nbsp;" )
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
+            base = base.replace( " ", "&nbsp;" )
+            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
         return result
 
     def getStat2( self, sort ):
@@ -272,16 +272,17 @@ class Taxomanie( Taxobject ):
         result = ""
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
-            if nbtree:
-                nbtreepourcent = nbtree*100/nbtaxa_max
-                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
-                bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
-                bar = """<span class="statMetric">"""+bar+"</span>"
+            nbtreepourcent = nbtree*100/nbtaxa_max
+            bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+            bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+            bar = """<span class="statMetric">"""+bar+"</span>"
+            if nbtaxon == nbtaxon + ratio-1:
+                base = "["+string.center( str(nbtaxon), 7)+"]"
+            else:
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
-                base = base.replace( " ", "&nbsp;" )
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
+            base = base.replace( " ", "&nbsp;" )
+            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
         return result
-
 
     def getStat3( self, sort ):
         resultlist = cherrypy.session.get("collection").statNbTreeWithNode()
