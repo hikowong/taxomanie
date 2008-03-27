@@ -270,7 +270,7 @@ class Taxomanie( Taxobject ):
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
             if base:
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" trees)</tt><br />\n"
         return result
 
     def getStat2( self, sort ):
@@ -295,7 +295,7 @@ class Taxomanie( Taxobject ):
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
             if base:
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" trees)</tt><br />\n"
         return result
 
 
