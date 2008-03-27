@@ -206,24 +206,6 @@ class TreeCollection( Taxobject ):
         self.last_query = self.last_query.replace("=", "%3D" )
         return new_list
 
-    def statNbTreeWithNode( self ):
-        """
-        return the number of tree for each taxon
-        """
-        d_tree_taxon = {}
-        l_taxa = []
-        for tree in self.getCollection():
-            for taxon in getTaxa( tree["tree"] ):
-                if self.reference.isValid( taxon ):
-                    if taxon not in l_taxa: l_taxa.append( taxon )
-                    if not d_tree_taxon.has_key( taxon ):
-                        d_tree_taxon[taxon] = 0
-                    d_tree_taxon[taxon] += 1
-        result_list = []
-        for i, j in d_tree_taxon.iteritems():
-            result_list.append( (j,i) )
-        return result_list[:]
-
     def stat1( self ):
         stat = {}
         for tree in self.getCollection():
