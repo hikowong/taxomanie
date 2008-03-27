@@ -29,6 +29,18 @@ class TreeCollection( Taxobject ):
         # Nexus collection
         if nwk_collection[:6].lower().strip() == "#nexus":
             nwk_collection = removeNexusComments( nwk_collection )
+            nwk_collection = nwk_collection.lower()
+            # Support of the nexus translate
+            if "translate" in nwk_collection:
+                d_translation = {}
+                translation = nwk_collection.split("translate")[1].split(";")[0].split()
+                for i in range(0,len(translation),2):
+                    d_translation[translation[i]] = translation[i+1].replace(",","")
+                for indice, translation in d_translation.iteritems():
+                    nwk_collection = nwk_collection.replace( indice+":", translation+":" )
+                nwk_collection = "#nexus\nbegin trees;\n"+ \
+                  ";".join(nwk_collection.split("translate")[1].split(";")[1:])
+                nwk_collection = removeBootStraps( nwk_collection )
             for tree in nwk_collection.split(";")[1:-2]:
                 tree = tree.strip()
                 nwktree = removeBootStraps( tidyNwk( tree.split("=")[1].strip().lower() ) )

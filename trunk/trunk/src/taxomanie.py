@@ -259,11 +259,15 @@ class Taxomanie( Taxobject ):
             bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
-                base = "["+string.center( str(nbtaxon), 7)+"]"
+                if nbtaxon:
+                    base = "["+string.center( str(nbtaxon), 7)+"]"
+                else:
+                    base = ""
             else:
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
-            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
+            if base:
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
         return result
 
     def getStat2( self, sort ):
@@ -277,11 +281,15 @@ class Taxomanie( Taxobject ):
             bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
-                base = "["+string.center( str(nbtaxon), 7)+"]"
+                if nbtaxon:
+                    base = "["+string.center( str(nbtaxon), 7)+"]"
+                else:
+                    base = ""
             else:
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
-            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
+            if base:
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
         return result
 
     def getStat3( self, sort ):
@@ -349,8 +357,13 @@ class Taxomanie( Taxobject ):
         self._pleet["_sortby_stat1_"] = cherrypy.session.get("sortby_stat1")
         self._pleet["_sortby_stat2_"] = cherrypy.session.get("sortby_stat2")
         if cherrypy.session.get( "collection" ).getCollection():
-            self._pleet["_stat1_"] = self.getStat1( cherrypy.session.get("sortby_stat1") )
-            self._pleet["_stat2_"] = self.getStat2( cherrypy.session.get("sortby_stat2") )
+            try:
+                self._pleet["_stat1_"] = self.getStat1( cherrypy.session.get("sortby_stat1") )
+                self._pleet["_stat2_"] = self.getStat2( cherrypy.session.get("sortby_stat2") )
+            except IndexError:
+                return self._presentation( "error.html",
+                  msg="Your collection might be contains some empty or misformed trees...  Please, check your collection.",
+                  pagedef="Home > Error" )
         else:
             self._pleet["_stat1_"] = ""
             self._pleet["_stat2_"] = ""
