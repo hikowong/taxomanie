@@ -277,7 +277,10 @@ class Taxomanie( Taxobject ):
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+            if nbtreepourcent:
+                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+            else:
+                bar = string.center( "--|", nbtree*100/nbtaxa_max )
             bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
@@ -292,42 +295,6 @@ class Taxomanie( Taxobject ):
                 result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+str(nbtree)+" trees)<br />\n"
         return result
 
-    def getStat3( self, sort ):
-        resultlist = cherrypy.session.get("collection").statNbTreeWithNode()
-        result = ""
-        if resultlist:
-            # get the max len of taxon name 
-            nbtaxa_max, nop = max( resultlist ) 
-            taxon_name_max = 0 
-            for nbtaxa, taxon_name in resultlist:
-                if len(taxon_name) > taxon_name_max:
-                    taxon_name_max = len(taxon_name)
-            #short by names
-            if sort == "names":
-                new_resultlist = []
-                for i, j in resultlist:
-                    new_resultlist.append( (j,i) )
-                resultlist = new_resultlist
-            resultlist.sort()
-            for res in resultlist:
-                if sort=="names":
-                    taxon, nbtree = res
-                else:
-                    nbtree, taxon = res
-                nbtreepourcent = nbtree*100/nbtaxa_max
-                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*70/nbtaxa_max )
-                bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
-                bar = """<span class="statMetric">"""+bar+"</span>"
-                base = "["+string.center( str(taxon), taxon_name_max)+"]"
-                base = base.replace( " ", "&nbsp;" )
-                if cherrypy.session.get("query"):
-                    last_query = "+and+"+cherrypy.session.get("query")
-                else:
-                    last_query = ""
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;("+\
-                  '<a href="/statistics?query=%7B'+taxon+'%7D'+last_query+'">'+ \
-                  str(nbtree)+"</a> trees)<br />\n"
-        return result
 
     @cherrypy.expose
     def statistics( self, myFile=None, query=None, clear_query=False,
@@ -352,6 +319,7 @@ class Taxomanie( Taxobject ):
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonyms.keys()
         self._pleet["_disphomonym_"] = cherrypy.session.get("collection").displayHomonymList()
+        self._pleet["_NCBItree_"] = cherrypy.session.get("collection").getNCBITreeAsNwk()
         cherrypy.session["sortby_stat1"] = sortby_stat1 or cherrypy.session.get("sortby_stat1") or "trees"
         cherrypy.session["sortby_stat2"] = sortby_stat2 or cherrypy.session.get("sortby_stat2") or "trees"
         self._pleet["_sortby_stat1_"] = cherrypy.session.get("sortby_stat1")

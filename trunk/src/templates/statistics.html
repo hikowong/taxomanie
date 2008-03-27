@@ -146,6 +146,7 @@ else:
         <fieldset class="sugestions">
             <legend> <%$ len( _badtaxalist_)%> bad taxa </legend>
             <span id="sugestions"> </span>
+            <span id="graph"> </span>
         </fieldset>
         <!-- end badtaxa fieldset -->
         <%|%>
@@ -187,26 +188,6 @@ else:
 <!-- stat1 -->
     <fieldset>
         <legend> Tree size distribution </legend>
-<!--
-        <form name="sortbystat1" action="statistics">
-            <b>Sort by </b>&nbsp;
-            <select name="sortby_stat1" onchange="javascript:document.sortbystat1.submit();">
-<%
-    if _sortby_stat1_ == "nbtaxa":
-        #
-%>
-             <option selected value="nbtaxa"> number of taxa </option>
-             <option value="trees"> trees </option>
-<%
-    else:
-        #
-%>
-             <option value="nbtaxa"> number of taxa </option>
-             <option selected value="trees"> trees </option>
-    <%|%>
-            </select>
-        </form>
--->
         <%$ _stat1_ %>
     </fieldset>
 <!-- end stat1 -->
@@ -214,26 +195,6 @@ else:
 <!-- stat2 -->
     <fieldset>
         <legend> Taxon frequency distribution </legend>
-<!--
-        <form name="sortbystat2" action="statistics">
-            <b>Sort by </b>&nbsp;
-            <select name="sortby_stat2" onchange="javascript:document.sortbystat2.submit();">
-<%
-    if _sortby_stat2_ == "names":
-        #
-%>
-             <option selected value="names"> taxa names </option>
-             <option value="trees"> trees </option>
-<%
-    else:
-        #
-%>
-             <option value="names"> taxa names </option>
-             <option selected value="trees"> trees </option>
-    <%|%>
-            </select>
-        </form>
--->
         <tt>
         <%$ _stat2_ %>
         </tt>
@@ -243,6 +204,11 @@ else:
 <!-- NCBI tree -->
     <fieldset>
         <legend> NCBI taxonomy</legend>
+        <a target="_blank" style="color:green"
+        href="http://www.phylowidget.org/full/index.html?tree='<%$ _NCBItree_ %>'"
+        title="Display the ncbi tree as graph"> Click to visualize this tree as graph </a>
+        <br />
+        <br />
         <form action="createFilteredCollection">
             <a class="selectall" onclick="javascript:selectAll();"> Select all</a> &nbsp; &nbsp;
             <a class="selectall" onclick="javascript:unselectAll();"> Unselect all </a>
@@ -254,20 +220,6 @@ else:
         </form>
     </fieldset><br />
 <!-- end NCBI tree -->
-
-<!-- restric
-    <fieldset>
-        <legend> Restrict your collection </legend>
-        <br />
-<%
-    for taxon in _taxalist_:
-        #
-%>
-        <input class="restrict" type="checkbox" name="<%$ taxon %>" value="<%$ taxon %>" />
-        <%$ _treecollection_._TreeCollection__linkSpecies(taxon.capitalize(), taxon) %> <br />
-    <%|%>
-    </fieldset>
--->
 <%|%>
 </div>
             <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
