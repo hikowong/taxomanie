@@ -208,40 +208,12 @@ class TreeCollection( Taxobject ):
             result_list.append( (j,i) )
         return result_list[:]
 
-    def statNbTreeWithNbNodes( self ):
-        """
-        return the number of tree for each number of taxa
-        """
-        d_tree_nodes = {}
-        for tree in self.getCollection():
-            taxa_len = len( getTaxa( tree["tree"] ) )
-            if not d_tree_nodes.has_key( taxa_len ):
-                d_tree_nodes[taxa_len] = 0
-            d_tree_nodes[taxa_len] += 1
-        result_list = []
-        for i, j in d_tree_nodes.iteritems():
-            result_list.append( (i,j) )
-        return result_list[:]
-
     def stat1( self ):
-        stat = {}
-        nbmax = max( self.statNbTreeWithNbNodes() )[0]
-        ratio = int(nbmax*10.0/100) or 1
-        stat_list = sorted( self.statNbTreeWithNbNodes() )
-        for i in xrange( 0, nbmax+ratio, ratio):
-            stat[i] = 0
-        for i,j in stat_list:
-            for key in stat.keys():
-                if key <= i < key+ratio:
-                    stat[key] += j
-        return stat
-
-    def stat2( self ):
         stat = {}
         for tree in self.getCollection():
             nbtaxa = len(getTaxa( tree["tree"] ) )
             if not stat.has_key( nbtaxa ):
-                stat[nbtaxa] = 1
+                stat[nbtaxa] = 0
             stat[nbtaxa] += 1
         nbmax = max( stat.keys() )
         ratio = int( nbmax*10.0/100) or 1
@@ -254,6 +226,27 @@ class TreeCollection( Taxobject ):
                     result_stat[key] += j
         return result_stat
 
+    def stat2( self ):
+        stat = {}
+        for tree in self.getCollection():
+            already_done = set()
+            for taxon in getTaxa( tree["tree"] ):
+                taxon = self.reference.stripTaxonName( taxon )
+                if taxon not in already_done:
+                    if not stat.has_key( taxon ):
+                        stat[taxon] = 0
+                    stat[taxon] += 1    
+                    already_done.add( taxon )
+        nbmax = max( stat.values() )
+        ratio = int( nbmax*10.0/100) or 1
+        result_stat = {}
+        for i in xrange( 0, nbmax+ratio, ratio):
+            result_stat[i] = 0
+        for i in stat.values():
+            for key in result_stat.keys():
+                if key <= i < key+ratio:
+                    result_stat[key] += 1
+        return result_stat
 
 
     def displayStats( self, allparents = False ):
@@ -563,6 +556,7 @@ end;
 #    print treecol.displayHomonymList()
 #    print treecol.statNbTreeWithNbNodes()
     print ">"*20
+    print treecol._d_reprtaxon
     print treecol.stat1()
 #    print treecol.filter( ["mus", "rattus", "pan", "bos", "canis"] )
     print "<"*20
