@@ -255,7 +255,10 @@ class Taxomanie( Taxobject ):
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+            if nbtreepourcent:
+                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+            else:
+                bar = string.center( "|", nbtree*100/nbtaxa_max )
             bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
@@ -280,7 +283,7 @@ class Taxomanie( Taxobject ):
             if nbtreepourcent:
                 bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
             else:
-                bar = string.center( "--|", nbtree*100/nbtaxa_max )
+                bar = string.center( "|", nbtree*100/nbtaxa_max )
             bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
