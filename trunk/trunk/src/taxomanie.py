@@ -255,10 +255,12 @@ class Taxomanie( Taxobject ):
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
-            if nbtreepourcent:
-                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
-            else:
-                bar = string.center( "|", nbtree*100/nbtaxa_max )
+            bar = string.center( "", nbtree*100/nbtaxa_max )
+#            if nbtreepourcent:
+#                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+#                bar = string.center( "", nbtree*100/nbtaxa_max )
+#            else:
+#                bar = string.center( "", nbtree*100/nbtaxa_max )
             bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
@@ -280,10 +282,12 @@ class Taxomanie( Taxobject ):
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
-            if nbtreepourcent:
-                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
-            else:
-                bar = string.center( "|", nbtree*100/nbtaxa_max )
+            bar = string.center( "", nbtree*100/nbtaxa_max )
+#            if nbtreepourcent:
+                #bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
+#                bar = string.center( "|", nbtree*100/nbtaxa_max )
+#            else:
+#                bar = string.center( "", nbtree*100/nbtaxa_max )
             bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
@@ -295,7 +299,7 @@ class Taxomanie( Taxobject ):
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
             if base:
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" trees)</tt><br />\n"
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" taxa)</tt><br />\n"
         return result
 
 
@@ -396,6 +400,7 @@ class Taxomanie( Taxobject ):
         if not cherrypy.session.get("collection"):
             return self._presentation( "error.html", msg="Your session has expired" )
         filtered_list = [i for i in cherrypy.session.get("collection").taxa_list if i not in kwargs]
+        print filtered_list
         return self.statistics( cherrypy.session.get("collection").filter( filtered_list ) )
 
 cherrypy.tree.mount(Taxomanie())
