@@ -2,7 +2,7 @@
 from phylogenictree import PhylogenicTree
 from taxobject import Taxobject
 from lib.phylogelib import getTaxa, tidyNwk, removeBootStraps, \
-  removeNexusComments
+  removeNexusComments, getBrothers
 import re
 
 class TreeCollection( Taxobject ):
@@ -459,6 +459,31 @@ class TreeCollection( Taxobject ):
         return ""
 
     def filter( self, taxa_list ):
+        new_col = "#nexus\nbegin trees;\n"
+        for tree in self.getCollection():
+            new_tree = tidyNwk( tree["tree"] )
+            new_tree = new_tree.replace( " ", "_" )
+            try:
+                for taxon in taxa_list:
+                    taxon = "_".join( taxon.split() )
+                    while taxon in getTaxa( new_tree ):
+                        list_taxa = getBrothers(new_tree, taxon )
+                        list_brother = getBrothers(new_tree, taxon )
+                        list_brother.remove( taxon )
+                        if len( list_brother ) > 1:
+                            new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
+                        else:
+                            new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
+                if len( getTaxa( new_tree ) ) == 1:
+                    new_col += str(tree["name"])+" = ("+new_tree+");\n"
+                else:
+                    new_col += str(tree["name"])+" = "+new_tree+";\n"
+            except:
+                continue
+        new_col += "end;\n"
+        return new_col
+
+    def filter2( self, taxa_list ):
         """
         return the original collection without certains taxa
         """
@@ -539,7 +564,8 @@ end;
     import time
 #    col = open( "../data/omm_cds_nex.tre" ).read()
     col = open("../data/tree.nwk").read()
-#    col = "(rattus, mus);(mus musculus);"
+#    col = "((rattus, mus),bos,(pan, homo));"
+#    col = '((((bos,canis),(((homo,pan),macaca),((mus,rattus),oryctolagus))),dasypus),(echinops,loxodonta),monodelphis);'
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
     f = time.time()
@@ -556,9 +582,7 @@ end;
 #    print treecol.displayHomonymList()
 #    print treecol.statNbTreeWithNbNodes()
     print ">"*20
-    print treecol._d_reprtaxon
-    print treecol.stat1()
-#    print treecol.filter( ["mus", "rattus", "pan", "bos", "canis"] )
+    print treecol.filter(['felis catus', 'tarsius syrichta', 'tursiops truncatus', 'choloepus hoffmanni', 'homo', 'oryctolagus cuniculus', 'rattus', 'macaca', 'callithrix jacchus', 'cavia porcellus', 'mus musculus', 'sorex araneus', 'erinaceus europaeus', 'mus', 'rattus norvegicus', 'dipodomys ordii', 'monodelphis', 'loxodonta', 'otolemur garnettii', 'pan', 'monodelphis domestica', 'myotis lucifugus', 'sus scrofa', 'spermophilus tridecemlineatus', 'microcebus murinus', 'ochotona princeps', 'dasypus novemcinctus', 'procavia capensis', 'macaca mulatta', 'pongo pygmaeus', 'loxodonta africana', 'equus caballus', 'oryctolagus', 'bos taurus', 'bos', 'dasypus', 'tupaia belangeri', 'pteropus vampyrus', 'macropus eugenii', 'echinops telfairi'] )
     print "<"*20
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr
