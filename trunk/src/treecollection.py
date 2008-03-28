@@ -458,7 +458,6 @@ class TreeCollection( Taxobject ):
         return ""
 
     def filter( self, taxa_list ):
-        print "taxa_list>", taxa_list
         new_col = "#nexus\nbegin trees;\n"
         for tree in self.getCollection():
             new_tree = tidyNwk( tree["tree"] )
@@ -489,7 +488,6 @@ class TreeCollection( Taxobject ):
             except:
                 continue
         new_col += "end;\n"
-        print "new_col>", new_col
         return new_col
 
     def filter2( self, taxa_list ):
