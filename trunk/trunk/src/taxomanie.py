@@ -375,6 +375,11 @@ class Taxomanie( Taxobject ):
         return open( "templates/jquery-1.2.3.js").read()
 
     @cherrypy.expose
+    def getIco( self ):
+        return open( "templates/favicon.ico", "rb").read()
+
+
+    @cherrypy.expose
     def getJavascript( self ):
         result =  open( "templates/jquery-1.2.3.js").read()
         result +=  open( "templates/jquery.blockUI.js").read()
@@ -400,8 +405,7 @@ class Taxomanie( Taxobject ):
         if not cherrypy.session.get("collection"):
             return self._presentation( "error.html", msg="Your session has expired" )
         filtered_list = [i for i in cherrypy.session.get("collection").taxa_list if i not in kwargs]
-        print filtered_list
-        return self.statistics( cherrypy.session.get("collection").filter( filtered_list ) )
+        return self.statistics( cherrypy.session.get("collection").filter( kwargs.keys() ) )
 
 cherrypy.tree.mount(Taxomanie())
 

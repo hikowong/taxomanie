@@ -246,7 +246,6 @@ class TreeCollection( Taxobject ):
                     result_stat[key] += 1
         return result_stat
 
-
     def displayStats( self, allparents = False ):
         """
         Display NCBI arborescence with stats
@@ -459,28 +458,38 @@ class TreeCollection( Taxobject ):
         return ""
 
     def filter( self, taxa_list ):
+        print "taxa_list>", taxa_list
         new_col = "#nexus\nbegin trees;\n"
         for tree in self.getCollection():
             new_tree = tidyNwk( tree["tree"] )
-            new_tree = new_tree.replace( " ", "_" )
+            if " " in new_tree:
+                new_tree = new_tree.replace( " ", "_" )
+                delimiter = "_"
+            else:
+                delimiter = self.reference.delimiter
             try:
                 for taxon in taxa_list:
-                    taxon = "_".join( taxon.split() )
-                    while taxon in getTaxa( new_tree ):
-                        list_taxa = getBrothers(new_tree, taxon )
-                        list_brother = getBrothers(new_tree, taxon )
-                        list_brother.remove( taxon )
-                        if len( list_brother ) > 1:
-                            new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
-                        else:
-                            new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
+                    for_list = list( self._d_taxon_user[taxon] )
+                    if self._d_taxon_user.has_key( taxon.split()[0] ):
+                        for_list += list(self._d_taxon_user[taxon.split()[0]])
+                    for taxon in for_list:
+                        taxon = delimiter.join( taxon.split() )
+                        while taxon in getTaxa( new_tree ):
+                            list_taxa = getBrothers(new_tree, taxon )
+                            list_brother = getBrothers(new_tree, taxon )
+                            list_brother.remove( taxon )
+                            if len( list_brother ) > 1:
+                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
+                            else:
+                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
                 if len( getTaxa( new_tree ) ) == 1:
-                    new_col += str(tree["name"])+" = ("+new_tree+");\n"
+                    new_col += "Tree "+str(tree["name"])+" = ("+new_tree+");\n"
                 else:
-                    new_col += str(tree["name"])+" = "+new_tree+";\n"
+                    new_col += "Tree "+str(tree["name"])+" = "+new_tree+";\n"
             except:
                 continue
         new_col += "end;\n"
+        print "new_col>", new_col
         return new_col
 
     def filter2( self, taxa_list ):
@@ -564,7 +573,7 @@ end;
     import time
 #    col = open( "../data/omm_cds_nex.tre" ).read()
     col = open("../data/tree.nwk").read()
-#    col = "((rattus, mus),bos,(pan, homo));"
+#    col = "((rattus,mus),bos,(pan,homo));(mus musculus,(pan,bos));"
 #    col = '((((bos,canis),(((homo,pan),macaca),((mus,rattus),oryctolagus))),dasypus),(echinops,loxodonta),monodelphis);'
     d = time.time()
     treecol = TreeCollection( col, TaxonomyReference() )
@@ -582,7 +591,7 @@ end;
 #    print treecol.displayHomonymList()
 #    print treecol.statNbTreeWithNbNodes()
     print ">"*20
-    print treecol.filter(['felis catus', 'tarsius syrichta', 'tursiops truncatus', 'choloepus hoffmanni', 'homo', 'oryctolagus cuniculus', 'rattus', 'macaca', 'callithrix jacchus', 'cavia porcellus', 'mus musculus', 'sorex araneus', 'erinaceus europaeus', 'mus', 'rattus norvegicus', 'dipodomys ordii', 'monodelphis', 'loxodonta', 'otolemur garnettii', 'pan', 'monodelphis domestica', 'myotis lucifugus', 'sus scrofa', 'spermophilus tridecemlineatus', 'microcebus murinus', 'ochotona princeps', 'dasypus novemcinctus', 'procavia capensis', 'macaca mulatta', 'pongo pygmaeus', 'loxodonta africana', 'equus caballus', 'oryctolagus', 'bos taurus', 'bos', 'dasypus', 'tupaia belangeri', 'pteropus vampyrus', 'macropus eugenii', 'echinops telfairi'] )
+    print treecol.filter( ["mus musculus"] )
     print "<"*20
     print "collection generee en ", f-d
     print "requete generee en ", fr-dr
