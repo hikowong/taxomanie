@@ -12,6 +12,7 @@ _*Structure of the technical report*_
     # Formats des fichiers _(nexus, phylip, nexus translate, commentaire, csv, exemples)_
     # Analyse et méthode _(diagrammes, RAM, session, graphe, liste python, serveur...)_
     # Liste des fonctionnalités _(quoi, comment, avec quelles fct°, enchainement)_
+    # Structure _(preproc, classes...)_
     # Algorithmes et programmation
     # IHM _(template, css, js, stat, variable serveur, images...)_
     # Module phyloWidget _(résumé, spécifications, possibilités, exemples of use, site ref...)_
