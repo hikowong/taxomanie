@@ -255,13 +255,8 @@ class Taxomanie( Taxobject ):
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = string.center( "", nbtree*100/nbtaxa_max )
-#            if nbtreepourcent:
-#                bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
-#                bar = string.center( "", nbtree*100/nbtaxa_max )
-#            else:
-#                bar = string.center( "", nbtree*100/nbtaxa_max )
-            bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+            bar = " "*( nbtree*70/nbtaxa_max )
+            bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
                 if nbtaxon:
@@ -280,15 +275,11 @@ class Taxomanie( Taxobject ):
         ratio = sorted( d_stat.keys() )[1]-sorted( d_stat.keys() )[0]
         result = ""
         nbtaxa_max = max( d_stat.values() ) 
+        print d_stat
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = string.center( "", nbtree*100/nbtaxa_max )
-#            if nbtreepourcent:
-                #bar = string.center( "-<b>"+str(nbtreepourcent)+"%</b>-|", nbtree*100/nbtaxa_max )
-#                bar = string.center( "|", nbtree*100/nbtaxa_max )
-#            else:
-#                bar = string.center( "", nbtree*100/nbtaxa_max )
-            bar = bar.replace( " ", "&nbsp;&nbsp;|" ).replace( "-", "&nbsp;")
+            bar = " "*( nbtree*70/nbtaxa_max )
+            bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
                 if nbtaxon:
@@ -299,7 +290,8 @@ class Taxomanie( Taxobject ):
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
             if base:
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" taxa)</tt><br />\n"
+                result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("+str(nbtree)+" taxa)</tt><br />\n"
+                #result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" taxa)</tt><br />\n"
         return result
 
 
@@ -326,7 +318,10 @@ class Taxomanie( Taxobject ):
         self._pleet["_badtaxalist_"] = cherrypy.session.get("collection").bad_taxa_list
         self._pleet["_homonymlist_"] = cherrypy.session.get("collection").homonyms.keys()
         self._pleet["_disphomonym_"] = cherrypy.session.get("collection").displayHomonymList()
-        self._pleet["_NCBItree_"] = cherrypy.session.get("collection").getNCBITreeAsNwk()
+        try:
+            self._pleet["_NCBItree_"] = cherrypy.session.get("collection").getNCBITreeAsNwk()
+        except:
+            return self._presentation( "error.html", msg="Bad collection", pagedef="Home > Error" )
         cherrypy.session["sortby_stat1"] = sortby_stat1 or cherrypy.session.get("sortby_stat1") or "trees"
         cherrypy.session["sortby_stat2"] = sortby_stat2 or cherrypy.session.get("sortby_stat2") or "trees"
         self._pleet["_sortby_stat1_"] = cherrypy.session.get("sortby_stat1")
