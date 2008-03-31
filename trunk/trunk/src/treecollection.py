@@ -108,7 +108,6 @@ class TreeCollection( Taxobject ):
                     elif not self.reference.isHomonym( taxon ):
                         self.species_count["XXX"] += 1
                         self.bad_taxa_list.add( taxon )
-        #self.taxa_list = list( self.taxa_list )#stats
 
     def initStat( self ):
         """
@@ -135,7 +134,6 @@ class TreeCollection( Taxobject ):
                         if not self._d_reprtaxon.has_key( taxon ):#stats
                             self._d_reprtaxon[taxon] = set()#stats
                         self._d_reprtaxon[taxon].add( old_taxon_name )#stats
-        #self.taxa_list = list( self.taxa_list )#stats
 
     def getNbTrees( self, taxon ):
         """
@@ -216,7 +214,7 @@ class TreeCollection( Taxobject ):
         nbmax = max( stat.keys() )
         ratio = int( nbmax*10.0/100) or 1
         result_stat = {}
-        for i in xrange( 0, nbmax+ratio, ratio):
+        for i in xrange( 0, nbmax, ratio):
             result_stat[i] = 0
         for i,j in stat.iteritems():
             for key in result_stat.keys():
@@ -238,7 +236,7 @@ class TreeCollection( Taxobject ):
         nbmax = max( stat.values() )
         ratio = int( nbmax*10.0/100) or 1
         result_stat = {}
-        for i in xrange( 0, nbmax+ratio, ratio):
+        for i in xrange( 0, nbmax, ratio):
             result_stat[i] = 0
         for i in stat.values():
             for key in result_stat.keys():
@@ -250,7 +248,7 @@ class TreeCollection( Taxobject ):
         """
         Display NCBI arborescence with stats
         """
-#        self.__initStat()
+        #self.initStat()
         if self.getCollection():
             tree = self.reference.getNCBIArborescence( self.taxa_list )
             if not allparents:
@@ -260,11 +258,12 @@ class TreeCollection( Taxobject ):
 
     def __removeSingleParent( self, tree ):
         for node in tree:
-            n = tree.predecessors( node ) + tree.successors(node)
-            if len(n) == 2:
-                tree.delete_edge( n[0], node )
-                tree.delete_edge( node, n[1] )
-                tree.add_edge( n[0], n[1] )
+            if node not in self.taxa_list:
+                n = tree.predecessors( node ) + tree.successors(node)
+                if len(n) == 2:
+                    tree.delete_edge( n[0], node )
+                    tree.delete_edge( node, n[1] )
+                    tree.add_edge( n[0], n[1] )
         return tree
 
     def __displayStat( self, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
@@ -313,14 +312,14 @@ class TreeCollection( Taxobject ):
                 subnodes = tree.successors( node )
                 if subnodes: # it's a genre
                     result += """<span genre="%s">\n""" % bdnode
-                    result += self.__linkGenre( dispnode, bdnode, blockname, True, nb_inter_parents, stat=True )
+                    if bdnode in self.taxa_list:
+                        result += self.__linkSpecies( dispnode, bdnode, True, blockname, nb_inter_parents)
+                    else:
+                        result += self.__linkGenre( dispnode, bdnode, blockname, True, nb_inter_parents, stat=True )
                     result += self.__displayStat( tree,  node, depth + 1, 
                       lastnode = bdnode, blockname = blockname+"a")
                     result += """</span>\n"""
                 else: # it's a species (ie taxon)
-    #                if "XXX" in node:
-    #                    result += "+-<font color='red'><b>"+dispnode.capitalize()+"</b></font><br />\n"
-    #                else:
                     result += self.__linkSpecies( dispnode, bdnode, True, blockname, nb_inter_parents)
         return result
 
@@ -372,14 +371,13 @@ class TreeCollection( Taxobject ):
             style = 'class="genre"'
         result += "+-"
         if stat:
-            #pass
             result += """<input class="restrict" type="checkbox" genre="%s"
             onclick="javascript:selectGenre('%s');" />""" % ( bdnode, bdnode )
         result += """<a id="%s" %s name="genre" onmouseover="go('%s')" 
           href="%s%s" target='_blank'> %s </a>""" % (
           self.reference.TAXONOMY[bdnode]["id"],
           style,
-          bdnode,#.capitalize().replace(" ", "_"),
+          bdnode,
           self.NCBI,
           self.reference.TAXONOMY[bdnode]["id"],
           dispnode.capitalize())
