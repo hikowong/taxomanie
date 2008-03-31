@@ -23,5 +23,5 @@ _*Structure of the technical report*_
   * *Guide utilisateur* _(possibilités en screenshot)_
   * *Glossaire phylogénétique*
   * *Glossaire technique*
-  * *Glossaire des commandes en mode console*
+  * *Glossaire des commandes* _(mode console)_
   * *Crédits*
