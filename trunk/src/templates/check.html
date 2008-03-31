@@ -103,7 +103,7 @@ if len(_collection_) > 1:
     if _index_ > 1:
         #
 %>
-        &nbsp;<a blockui="wait" href='check?index=<%$ _index_-1 %>'>Previous</a>&nbsp;
+        &nbsp;<a href='check?index=<%$ _index_-1 %>'>Previous</a>&nbsp;
     <%|%>
 
     <input type="text" size="5" value="<%$ _index_ %>" name="index" />
@@ -113,7 +113,7 @@ if len(_collection_) > 1:
     if _index_ < len(_collection_):
         #
 %>
-        &nbsp;<a blockui="wait" href='check?index=<%$ _index_+1 %>'>Next</a>&nbsp;
+        &nbsp;<a href='check?index=<%$ _index_+1 %>'>Next</a>&nbsp;
 <%|%>
 </form>
 <!-- tree or not -->
@@ -187,7 +187,7 @@ if len(_collection_) > 1:
     if _index_ > 1:
         #
 %>
-        &nbsp;<a blockui="wait" href='check?index=<%$ _index_-1 %>'>Previous</a>&nbsp;
+        &nbsp;<a href='check?index=<%$ _index_-1 %>'>Previous</a>&nbsp;
     <%|%>
 
     <input type="text" size="5" value="<%$ _index_ %>" name="index" />
@@ -197,7 +197,7 @@ if len(_collection_) > 1:
     if _index_ < len(_collection_):
         #
 %>
-        &nbsp;<a blockui="wait" href='check?index=<%$ _index_+1 %>'>Next</a>&nbsp;
+        &nbsp;<a href='check?index=<%$ _index_+1 %>'>Next</a>&nbsp;
 <%|%>
 </form>
 <!-- CONTENT : END -->
