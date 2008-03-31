@@ -1,0 +1,28 @@
+_*Structure of the technical report*_ 
+
+= Plan =
+
+  * *Sommaire*
+  * *Présentation du projet*
+    # Phylogénie et Taxonomie
+    # Arbres phylogénétiques
+    # Les sources du NCBI
+    # Besoins et exigences
+  * *Documentation technique*
+    # Formats des fichiers _(nexus, phylip, nexus translate, commentaire, csv, exemples)_
+    # Analyse et méthode _(diagrammes, RAM, session, graphe, liste python, serveur...)_
+    # Liste des fonctionnalités _(quoi, comment, avec quelles fct°, enchainement)_
+    # Algorithmes et programmation
+    # Interface de l'application _(template, css, js, stat, variable serveur, images...)_
+    # Module phyloWidget _(résumé, spécifications, possibilités, exemples of use, site ref...)_
+    # Bilan _(a terme, a revoir, a prévoir, charge serveur, sécurité...)_
+  * *Installation*
+    # Spécifications _(versions des composants, système requis, site...)_
+    # Mise en place _(différentes solutions d'installation, ou mise à jour)_
+    # Répertoires et fichiers
+  * *Guide utilisateur* _(possibilités en screenshot)_
+  * *Glossaire phylogénétique*
+  * *Glossaire technique*
+  * *Glossaire des commandes en mode console*
+  * *Crédits*
+
