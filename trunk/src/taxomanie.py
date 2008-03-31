@@ -330,7 +330,7 @@ class Taxomanie( Taxobject ):
             try:
                 self._pleet["_stat1_"] = self.getStat1( cherrypy.session.get("sortby_stat1") )
                 self._pleet["_stat2_"] = self.getStat2( cherrypy.session.get("sortby_stat2") )
-            except IndexError:
+            except:
                 return self._presentation( "error.html",
                   msg="Your collection might be contains some empty or misformed trees...  Please, check your collection.",
                   pagedef="Home > Error" )
