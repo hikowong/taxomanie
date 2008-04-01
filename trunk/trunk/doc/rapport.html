@@ -1,0 +1,903 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.2.5" />
+<style type="text/css">
+/* Debug borders */
+p, li, dt, dd, div, pre, h1, h2, h3, h4, h5, h6 {
+/*
+  border: 1px solid red;
+*/
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+}
+
+strong {
+  font-weight: bold;
+}
+
+tt {
+  color: navy;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  font-family: sans-serif;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+
+div.sectionbody {
+  font-family: serif;
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+pre {
+  padding: 0;
+  margin: 0;
+}
+
+span#author {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+span#email {
+}
+span#revision {
+  font-family: sans-serif;
+}
+
+div#footer {
+  font-family: sans-serif;
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+div#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+div#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+div#preamble,
+div.tableblock, div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-right: 10%;
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.5em;
+  margin-bottom: 2.5em;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+
+div.listingblock {
+  margin-right: 0%;
+}
+div.listingblock > div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock > div.content {
+  padding-left: 2.0em;
+}
+
+div.attribution {
+  text-align: right;
+}
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 2px solid silver;
+}
+
+div.exampleblock > div.content {
+  border-left: 2px solid silver;
+  padding: 0.5em;
+}
+
+div.verseblock div.content {
+  white-space: pre;
+}
+
+div.imageblock div.content { padding-left: 0; }
+div.imageblock img { border: 1px solid silver; }
+span.image img { border-style: none; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: italic;
+}
+dd > *:first-child {
+  margin-top: 0;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+div.olist2 ol {
+  list-style-type: lower-alpha;
+}
+
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead {
+  font-family: sans-serif;
+  font-weight: bold;
+}
+tfoot {
+  font-weight: bold;
+}
+
+div.hlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hlist td {
+  padding-bottom: 5px;
+}
+td.hlist1 {
+  vertical-align: top;
+  font-style: italic;
+  padding-right: 0.8em;
+}
+td.hlist2 {
+  vertical-align: top;
+}
+
+@media print {
+  div#footer-badges { display: none; }
+}
+
+div#toctitle {
+  color: #527bbd;
+  font-family: sans-serif;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+/* Workarounds for IE6's broken and incomplete CSS2. */
+
+div.sidebar-content {
+  background: #ffffee;
+  border: 1px solid silver;
+  padding: 0.5em;
+}
+div.sidebar-title, div.image-title {
+  font-family: sans-serif;
+  font-weight: bold;
+  margin-top: 0.0em;
+  margin-bottom: 0.5em;
+}
+
+div.listingblock div.content {
+  border: 1px solid silver;
+  background: #f4f4f4;
+  padding: 0.5em;
+}
+
+div.quoteblock-content {
+  padding-left: 2.0em;
+}
+
+div.exampleblock-content {
+  border-left: 2px solid silver;
+  padding-left: 0.5em;
+}
+
+/* IE6 sets dynamically generated links as visited. */
+div#toc a:visited { color: blue; }
+</style>
+<title>PhyloExplorer</title>
+</head>
+<body>
+<div id="header">
+<h1>PhyloExplorer</h1>
+</div>
+<div id="preamble">
+<div class="sectionbody">
+<div class="literalblock">
+<div class="content">
+<pre><tt>Nicolas Auberval
+Nicolas Clairon
+Sorel Disert</tt></pre>
+</div></div>
+</div>
+</div>
+<h1 id="_documentation_technique">Documentation technique</h1>
+<h2 id="_choix_technique">Choix technique</h2>
+<div class="sectionbody">
+<div class="vlist"><dl>
+<dt>
+Langage de programmation
+</dt>
+<dd>
+<p>
+Tout le projet PhyloExplorer repose sur le langage <strong>Python</strong>. Ce langage a été
+choisi pour sa licence (libre), sa portabilité (multiplateforme), sa robustesse,
+et sa syntaxe simple et claire. La facilité avec laquel il manipule les
+chaines de caractères à fait pencher la balance en sa faveur. Enfin, une
+bibliothèque python sur le traitement d'arbres phylogénétiques avait déjà été
+créé par l'un des auteurs : la base était déjà faite.
+</p>
+</dd>
+<dt>
+Serveur Web
+</dt>
+<dd>
+<p>
+Apache a été envisagé mais nous voulions un serveur web simple et autonome or
+le mod_python d'apache n'est pas trivial à installer et configurer. Nous nous
+sommes donc tournés vers <strong>CherryPy</strong> qui est un "<em>framework HTTP orienté
+objet</em>". Ainsi, l'installation était grandement facilité et une utilisation
+standalone pouvait être envisagée (lancer le script, ouvrez votre navigateur,
+pointez à l'adresse "localhost:8080", c'est prêt !).
+</p>
+</dd>
+<dt>
+La gestion de graphes
+</dt>
+<dd>
+<p>
+Notre but étant de créer l'aborescence du NCBI à partir d'une liste de taxon,
+il nous fallait une bibliothèque de gestion de graphes. Nous utilisons pour
+cela <strong>NetworkX</strong>. Entièrement écrite en python, cette bibliothèque
+multiplateforme s'installe très facilement et est relativement puissante.
+</p>
+</dd>
+<dt>
+Moteur de templates
+</dt>
+<dd>
+<p>
+Le moteur de templates à été attribué à <strong>Pleet</strong>. Une bibliothèque python
+écrite par l'un des auteurs permettant d'embarquer du code python dans du
+HTML. Cette bibliothèque est très simple, rapide et fait bien son travail.
+</p>
+</dd>
+<dt>
+Gestionnaire de projet
+</dt>
+<dd>
+<p>
+Nous avons utilisé <strong>Google Code</strong>. Ce gestionnaire de projet permet de gérer très
+simplement des petits projets en mettant à disposition un système de wiki, un
+gestionnaire de bugs et un gestionnaire de version (subversion).
+</p>
+</dd>
+</dl></div>
+</div>
+<h2 id="_structure_du_projet">Structure du projet</h2>
+<div class="sectionbody">
+<div class="para"><p>Nous n'avons pas voulu enfermer PhyloExplorer dans une utilisation
+particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré en plusieurs parties :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+<strong>PhyloCore</strong> : une batterie de classes et de méthodes qui manipule les
+  collections d'arbres phylogénétiques et dialogue avec la base de données du
+  NCBI.
+</p>
+</li>
+<li>
+<p>
+<strong>PhyloWeb</strong> : comprenant un serveur web légé et autonome ainsi qu'un
+  ensemble de templates.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Cette distinction dans la structure permet aux développeurs de créer d'autres
+applications en se servant de la même base. Des scripts, pipelines ou encore
+des applications QT peuvent être crées à moindre coup.</p></div>
+<h3 id="_phylocore">PhyloCore</h3><div style="clear:left"></div>
+<div class="para"><p>PhyloCore regroupe trois classes (TaxanomyReference, TreeCollection et
+PhylogeneticTree) et une bibliothèque de gestion d'arbres phylogénétiques :
+<tt>phylogelib</tt>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">TODO mettre le diagramme de classe</td>
+</tr></table>
+</div>
+<h4 id="_phylogelib">Phylogelib</h4>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">TODO</td>
+</tr></table>
+</div>
+<h4 id="_l_outil_preproc_py">L'outil preproc.py</h4>
+<div class="para"><p>PhyloExplorer utilise la base de données du NCBI comme base d'information.
+Cette base de données est accessible à l'adresse :
+<tt>ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz</tt>. Cette archive
+comprend plusieurs images de la base du NCBI. Celles qui nous intéressent sont
+<tt>names.dump</tt> et <tt>nodes.dump</tt>. Ces images nous permettent de récupérer :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+l'id
+</p>
+</li>
+<li>
+<p>
+le nom (scientifique)
+</p>
+</li>
+<li>
+<p>
+le nom du parent
+</p>
+</li>
+<li>
+<p>
+l'homonym auquel il se rapporte
+</p>
+</li>
+<li>
+<p>
+la liste de ses parents
+</p>
+</li>
+<li>
+<p>
+la liste de ses synonymes
+</p>
+</li>
+<li>
+<p>
+la liste de ses noms communs.
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Le problème réside dans le fait que toutes ces informations sont éparpillés
+entre <tt>names.dump</tt> et <tt>nodes.dump</tt> (qui contiennent également beaucoup
+d'informations qui ne nous sont pas utiles). Nous avons alors effectué une
+compilation de ces informations et les avons placés dans le fichier
+<tt>taxonomy.csv</tt>. Voici sa structure :</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>id|nom|nom_du_parent|homonyme|liste!des!parents|liste!des!synonymes|liste!des!noms!communs|</tt></pre>
+</div></div>
+<div class="para"><p>Les éléments d'une liste sont séparés par un point d'exclamation. l'id est
+très important car il correspond à l'id du NCBI et donc de pouvoir générer les
+liens pointant vers le site du NCBI.</p></div>
+<div class="para"><p>Ainsi, à chaque fois qu'il que l'on veut mettre à jour le fichier
+<tt>taxonomy.csv</tt>, il faudra effectuer cette procédure. Nous avons créer un
+outil qui l'effectue automatiquement. Il s'appelle <tt>preproc.py</tt>.</p></div>
+<div class="para"><p>Cet outil téléchargera automatiquement l'image de la base du NCBI, extraira
+les informations nécessaire et générera le fichier <tt>taxonomy.csv</tt>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="title">A propos de base de données</div>Dans ce projet, il nous a été demandé de s'affranchir totalement de base de
+données classique (MySQL, SQLLite&#8230;) pour charger toute la taxonomy du NCBI
+en RAM. Cependant, pour plus de clareté (et par habitude ?) nous continuerons
+de parler de base de données du NCBI</td>
+</tr></table>
+</div>
+<h4 id="_taxonomyreference">TaxonomyReference</h4>
+<div class="para"><p>Cette classe permet d'intéragir avec la base du NCBI et plus particulièrement
+avec le fichier <tt>taxonomy.csv</tt> qu'il prend en paramètre :</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>reference = TaxonomyReference( "taxonomy.csv" )</tt></pre>
+</div></div>
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="sidebar-title">Méthodes principales</div>
+<div class="vlist"><dl>
+<dt>
+getCommonParent(self, taxa_list)
+</dt>
+<dd>
+<p>
+    retourne le premier parent commun de tous les taxons présents dans la liste
+</p>
+</dd>
+<dt>
+getHomonyms(self, name)
+</dt>
+<dd>
+<p>
+    retourne la liste des homonymes du nom passé en paramètre.+
+    Exemple:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&gt;&gt;&gt; self.getHonomyms( "echinops" )
+['echinops &lt;plant&gt;', 'echinops &lt;mammal&gt;']</tt></pre>
+</div></div>
+</dd>
+<dt>
+getIntervalParents(self, name1, name2)
+</dt>
+<dd>
+<p>
+    retourne la liste des parents intermédiaire entre deux taxons.<br />
+    Exemple:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&gt;&gt;&gt; self.getIntervalParents( "eukaryota", "eutheria" )
+['euarchontoglires', 'glires', 'rodentia', 'sciurognathi', 'muroidea']
+&gt;&gt;&gt; self.getIntervalParents( "murinae", "eutheria" )</tt></pre>
+</div></div>
+</dd>
+<dt>
+getNCBIArborescence(self, taxa_list)
+</dt>
+<dd>
+<p>
+    Cette méthode prend une liste de taxon et créer l'aborescence du NCBI en
+    recherchant les parents dans la base de données.
+</p>
+</dd>
+<dt>
+getParents(self, name)
+</dt>
+<dd>
+<p>
+    retourn la liste de tous les parents d'un taxon
+</p>
+</dd>
+<dt>
+isHomonym(self, name)
+</dt>
+<dd>
+<p>
+    retourne vrai si le taxon est un homonyme.<br />
+    Exemple:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&gt;&gt;&gt; self.isHomonym( "echinops" )
+True</tt></pre>
+</div></div>
+</dd>
+<dt>
+isValid(self, name)
+</dt>
+<dd>
+<p>
+    retourne vrai si le nom du taxon est un nom scientific présent dans la
+    base du NCBI
+</p>
+</dd>
+<dt>
+stripTaxonName(self, taxon_name)
+</dt>
+<dd>
+<p>
+    Troncate le nom passé dans le but d'en extraire le nom scientifique.
+    Exemple:
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>&gt;&gt;&gt; self.stripTaxonName( "rattus" ) -&gt; "rattus"
+&gt;&gt;&gt; self.stripTaxonName( "rattus_france" ) -&gt; "rattus"
+&gt;&gt;&gt; self.stripTaxonName( "rattus_rattus_france" ) -&gt; "rattus_rattus"</tt></pre>
+</div></div>
+</dd>
+</dl></div>
+</div></div>
+<div class="para"><p>Cette classe est incluse dans toutes les classes de PhyloCore.</p></div>
+<h4 id="_treecollection">TreeCollection</h4>
+<div class="para"><p>Cette classe représente une collection d'arbres phylogénétiques.
+Elle prend en paramètre une collection au format <em>Phyllip</em>, <em>Nexus</em> ou
+<em>Nexus translate</em>. Elle propose des méthodes permettant de manipuler
+une collection comme effectuer des filtrages et des requêtes.
+Elle permet également de récupérer les statistiques de la collections.</p></div>
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="sidebar-title">Méthodes principales</div>
+<div class="vlist"><dl>
+<dt>
+getCollection(self)
+</dt>
+<dd>
+<p>
+    Retourne la collection en cours ; c'est-à-dire que si une requête à
+    été lancé, elle renverra la collection filtrée. Sinon, elle renverra la
+    collection initiale.
+</p>
+</dd>
+<dt>
+clearQuery(self)
+</dt>
+<dd>
+<p>
+    Cette méthode permet de mettre à blanc la requête.
+    La méthode <em>getCollection()</em> renverra alors la collection
+    initiale.
+</p>
+</dd>
+<dt>
+query(self, query)
+</dt>
+<dd>
+<p>
+    Applique une requête à la collection. <tt>query</tt> doit être une expression du
+    type :
+</p>
+<div class="literalblock">
+<div class="content">
+<pre><tt>{genre1} &gt; 3 and ( {genre2} == 2 or {genre3} &lt; 4 )</tt></pre>
+</div></div>
+<div class="para"><p><tt>genre</tt> peut être soit le nom d'un taxon (<em>rattus_rattus</em>) soit le nom
+d'une espèce (<em>murinae</em>). <tt>genre</tt> doit être entre accolade. Le reste de la
+requête est une expression python classique (d'où l'utilisation du <tt>==</tt>).
+En fait, les noms entre accolades seront remplacés par leur occurence dans
+la collection. Nous obtienons donc une expression python classique qui
+sera évaluée :</p></div>
+<div class="literalblock">
+<div class="content">
+<pre><tt>4 &gt; 3 and ( 1 == 2 or 3 &lt; 4 )</tt></pre>
+</div></div>
+</dd>
+<dt>
+displayHomonymList(self)
+</dt>
+<dd>
+<p>
+    Cette méthode retourne la liste des homonymes au format HTML.
+</p>
+<div class="para"><p><strong>Remarque</strong> : <em>Cette methode doit être réécrite de manière à tenir compte du MVC</em></p></div>
+</dd>
+<dt>
+displayStats(self, allparents=False)
+</dt>
+<dd>
+<p>
+    Cette méthode renvoie l'abre du NCBI au format HTML. Cette arbre contient
+    des données statistiques qui permet de connaitre le nombre d'occurence
+    d'une espèce dans la collection.
+</p>
+<div class="para"><p><strong>Remarque</strong> : <em>Cette methode doit être réécrite de manière à tenir compte du MVC.
+ Elle doit se trouver dans une template</em></p></div>
+</dd>
+<dt>
+filter(self, taxa_list)
+</dt>
+<dd>
+<p>
+    Cette méthode va supprimer certains taxons de la collection d'arbre. Elle
+    est très utile pour ne travailler que sur une partie de la taxonomy sans
+    être pollué par d'autres taxons.
+</p>
+<div class="para"><p>Cette méthode prends en paramètre  la liste des taxons à supprimer.</p></div>
+</dd>
+<dt>
+getNCBITreeAsNwk(self)
+</dt>
+<dd>
+<p>
+    Cette méthode renvoie l'arborescence du NCBI de la collection au format
+    Newick. Elle est utilisé si l'on souhaite télécharger l'arbre modèle du
+    NCBI.
+</p>
+</dd>
+<dt>
+getNbTrees(self, taxon)
+</dt>
+<dd>
+<p>
+    Retourne le nombre d'arbre dans lesquels se trouve un taxon
+</p>
+</dd>
+<dt>
+initStat(self)
+</dt>
+<dd>
+<p>
+    Lorsque l'on fait des requêtes, on ne travaille que sur une partie de la
+    collection. Cette méthode permet de mettre à jour les statistiques.
+</p>
+</dd>
+<dt>
+stat1(self)
+</dt>
+<dd>
+<p>
+    Cette méthode aussi sobrement appellé stat1 permet de connaitre le nombre
+    d'arbre à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
+    début de l'intervalle. Voir la section statistiques pour plus de détails.
+</p>
+</dd>
+<dt>
+stat2(self)
+</dt>
+<dd>
+<p>
+    Cette méthode permet de connaître le nombre de taxon à n arbres. Comme
+    stat1, elle renvoie un dictionnaire. Voir la section statistiques pour
+    plus de détails.
+</p>
+</dd>
+</dl></div>
+</div></div>
+<div class="listingblock">
+<div class="title">Example: Utilisation</div>
+<div class="content">
+<pre><tt><strong>from</strong> treecollection <strong>import</strong> TreeCollection
+
+<i># Instanciation. On passe une collection au format Nexus en paramètre</i>
+mycollection = TreeCollection( open("mycol.tre").read() )
+
+<i># Récupère la collection</i>
+<strong>print</strong> mycollection.getCollection()
+
+<i># Combien d'arbres sont dans la collection</i>
+<strong>print</strong> len( mycollection.getCollection() )
+
+<i># Effectue une requête afin de ne garder tous les arbres dont les murinaes</i>
+<i># sont supérieurs à 1</i>
+mycollection.query( "{murinae} &gt; 1" )
+
+<i># Récupère la nouvelle collection</i>
+my_new_collection = mycollection.getCollection()
+
+<i># Efface la requête</i>
+mycollection.clearQuery()
+
+<i># Récupère la collection originelle</i>
+mycollection.getCollection()
+
+<i># Filtrage. On supprime tous les taxon "mus", "pan" et "homo" de la</i>
+<i># collection. Le resultat sera une chaine de caractère au format Nexus.</i>
+nexus_string = mycollection.filter( ["mus", "pan", "homo"] )</tt></pre>
+</div></div>
+<div class="para"><p>On voit bien dans cette exemple que la méthode <tt>query</tt> influera sur la méthode
+<tt>getCollection</tt> qui renverra alors qu'une partie de la collection. La méthode
+<tt>clearQuery</tt> permet d'effacer les effets de la requête.</p></div>
+<h5 id="_statistiques">Statistiques</h5>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">TODO</td>
+</tr></table>
+</div>
+<h3 id="_phylogenetictree">PhylogeneticTree</h3><div style="clear:left"></div>
+<div class="para"><p>Cette classe ne permet d'afficher une abre phylogenetic au format HTML. La
+représentation se fait sous forme d'arborescence simple. Par soucis de
+performances, cette classe est chargée uniquement lors de l'affichage d'un
+arbre phylogénétique. Ainsi, toutes les opérations relatives aux arbres se
+trouvent soit dans la bibliothèque Phylogelib, soit dans la classe
+TreeCollection.</p></div>
+<h3 id="_phyloweb">PhyloWeb</h3><div style="clear:left"></div>
+<div class="para"><p>Dans cette partie, nous allons parler du projet PhyloExplorer à proprement
+parler ; c'est-à-dire la partie applicatif. PhyloWeb est composé de deux
+grands ensemble : le serveur web PhyloExplorer.py et les templates qui lui
+sont associées.</p></div>
+<h4 id="_phyloexplorer_py">PhyloExplorer.py</h4>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">TODO</td>
+</tr></table>
+</div>
+<h4 id="_les_templates">Les templates</h4>
+<div class="para"><p>L'utilisation des templates métite que l'on s'y attarde un petit peu. Toutes
+les templates sont regroupées dans le répertoire "templates". Ce répertoire
+regroupe aussi les scripts CSS et javascripts.</p></div>
+<div class="para"><p>Une template, bien qu'ayant l'extension <tt>.html</tt>, est un ensemble de code
+python et d'html. Le code python est placé entre les balises <tt>&lt;%</tt> et <tt>%&gt;</tt>.</p></div>
+<div class="listingblock">
+<div class="title">Example: Une template basique</div>
+<div class="content">
+<pre><tt>&lt;%
+<strong>if</strong> True:
+%&gt;
+    &lt;%|%&gt;                           <b>(1)</b>
+    &lt;b&gt; Hello World ! &lt;/b&gt;
+&lt;%
+<strong>else</strong>:
+    <i>#                               <b>(2)</b></i>
+%&gt;
+    &lt;i&gt; Hello Me ! &lt;/i&gt;
+&lt;%|%&gt;</tt></pre>
+</div></div>
+<div class="para"><p>Le moteur de template Pleet va evaluer le code python et renverra le resultat.
+Dans cet exemple, <tt>True</tt> est toujours vrai donc <tt>Hello Word</tt> sera toujours
+affiché.</p></div>
+<div class="para"><p>Le symbole <tt>&lt;%|%&gt;</tt> <strong>(1)</strong> permet de spécifier l'indentation. On indique ainsi au
+moteur de template si on se trouve toujours dans le <tt>if</tt> ou non.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">Le fait de placer une ligne de commentaire <strong>(2)</strong> spécifie également l'indentation.</td>
+</tr></table>
+</div>
+<div class="para"><p>Pleet permet "d'exposer" des objets afin qu'ils puissent être utilisé dans les
+templates.</p></div>
+<div class="listingblock">
+<div class="title">Example: Exposition d'un objet</div>
+<div class="content">
+<pre><tt>pleet["_civilite_"] = civilite</tt></pre>
+</div></div>
+<div class="para"><p>Dans cet exemple, on rend accessible la variable <tt>civilite</tt> accessible dans la
+template sous le nom <tt><em>civilite</em></tt>.</p></div>
+<div class="listingblock">
+<div class="title">Example: Utilisation d'un objet exposé</div>
+<div class="content">
+<pre><tt>Bonjour
+&lt;%
+<strong>if</strong> _civilite_ == "Mme":
+    <i>#</i>
+%&gt;
+    Madame,
+&lt;%
+<strong>elif</strong> _civilite_ == "Mlle":
+    <i>#</i>
+%&gt;
+    Mademoiselle,
+&lt;%
+<strong>else</strong>:
+    <i>#</i>
+%&gt;
+    Monsieur,
+&lt;%|%&gt;</tt></pre>
+</div></div>
+<div class="para"><p>Dans cet exemple, une série de tests sur la variable <tt><em>civilite</em></tt> permettra de
+produire la bonne template.</p></div>
+</div>
+<h2 id="_installation">Installation</h2>
+<div class="sectionbody">
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">TODO</td>
+</tr></table>
+</div>
+</div>
+<h2 id="_difficult_s">Difficultés</h2>
+<div class="sectionbody">
+<div class="ilist"><ul>
+<li>
+<p>
+Problème d'accès concurrent.
+</p>
+</li>
+<li>
+<p>
+Problème d'homonymie
+</p>
+</li>
+</ul></div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2008-04-01 17:20:08 CEST
+</div>
+</div>
+</body>
+</html>

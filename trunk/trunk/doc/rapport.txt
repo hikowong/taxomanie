@@ -14,6 +14,47 @@ PhyloExplorer
 Documentation technique
 =======================
 
+Choix technique
+---------------
+
+Langage de programmation::
+
+Tout le projet PhyloExplorer repose sur le langage *Python*. Ce langage a été
+choisi pour sa licence (libre), sa portabilité (multiplateforme), sa robustesse,
+et sa syntaxe simple et claire. La facilité avec laquel il manipule les
+chaines de caractères à fait pencher la balance en sa faveur. Enfin, une
+bibliothèque python sur le traitement d'arbres phylogénétiques avait déjà été
+créé par l'un des auteurs : la base était déjà faite.
+
+Serveur Web::
+
+Apache a été envisagé mais nous voulions un serveur web simple et autonome or
+le mod_python d'apache n'est pas trivial à installer et configurer. Nous nous
+sommes donc tournés vers *CherryPy* qui est un "__framework HTTP orienté
+objet__". Ainsi, l'installation était grandement facilité et une utilisation
+standalone pouvait être envisagée (lancer le script, ouvrez votre navigateur,
+pointez à l'adresse "localhost:8080", c'est prêt !).
+
+La gestion de graphes::
+
+Notre but étant de créer l'aborescence du NCBI à partir d'une liste de taxon,
+il nous fallait une bibliothèque de gestion de graphes. Nous utilisons pour
+cela *NetworkX*. Entièrement écrite en python, cette bibliothèque
+multiplateforme s'installe très facilement et est relativement puissante.
+
+Moteur de templates::
+
+Le moteur de templates à été attribué à *Pleet*. Une bibliothèque python
+écrite par l'un des auteurs permettant d'embarquer du code python dans du
+HTML. Cette bibliothèque est très simple, rapide et fait bien son travail.
+
+Gestionnaire de projet::
+
+Nous avons utilisé **Google Code**. Ce gestionnaire de projet permet de gérer très
+simplement des petits projets en mettant à disposition un système de wiki, un
+gestionnaire de bugs et un gestionnaire de version (subversion).
+
+
 Structure du projet
 -------------------
 
@@ -32,9 +73,16 @@ des applications QT peuvent être crées à moindre coup.
 
 PhyloCore
 ~~~~~~~~~
-PhyloCore regroupe trois classes : TaxanomyReference, TreeCollection et
-PhylogeneticTree.
+PhyloCore regroupe trois classes (TaxanomyReference, TreeCollection et
+PhylogeneticTree) et une bibliothèque de gestion d'arbres phylogénétiques :
+`phylogelib`.
 
+NOTE: TODO mettre le diagramme de classe
+
+Phylogelib
+^^^^^^^^^^
+
+NOTE: TODO
 
 L'outil preproc.py
 ^^^^^^^^^^^^^^^^^^
@@ -131,7 +179,7 @@ isValid(self, name)::
     base du NCBI
 
 stripTaxonName(self, taxon_name)::
-    Troncate le nom passé dans le but d'en extraire le nom scientifique. \+
+    Troncate le nom passé dans le but d'en extraire le nom scientifique.
     Exemple:
 
     >>> self.stripTaxonName( "rattus" ) -> "rattus"
@@ -179,7 +227,7 @@ sera évaluée :
         4 > 3 and ( 1 == 2 or 3 < 4 )
 
 displayHomonymList(self)::
-    Cette méthode retourne la liste des homonymes au format HTML. \+
+    Cette méthode retourne la liste des homonymes au format HTML.
 +
 *Remarque* : __Cette methode doit être réécrite de manière à tenir compte du MVC__
 
@@ -187,7 +235,7 @@ displayHomonymList(self)::
 displayStats(self, allparents=False)::
     Cette méthode renvoie l'abre du NCBI au format HTML. Cette arbre contient
     des données statistiques qui permet de connaitre le nombre d'occurence
-    d'une espèce dans la collection. \+
+    d'une espèce dans la collection.
 +
 *Remarque* : __Cette methode doit être réécrite de manière à tenir compte du MVC.
  Elle doit se trouver dans une template__
@@ -196,7 +244,7 @@ displayStats(self, allparents=False)::
 filter(self, taxa_list)::
     Cette méthode va supprimer certains taxons de la collection d'arbre. Elle
     est très utile pour ne travailler que sur une partie de la taxonomy sans
-    être pollué par d'autres taxons.\+
+    être pollué par d'autres taxons.
 +
 Cette méthode prends en paramètre  la liste des taxons à supprimer.
 
@@ -263,4 +311,110 @@ On voit bien dans cette exemple que la méthode `query` influera sur la méthode
 Statistiques
 ++++++++++++
 
-blablabla
+NOTE: TODO
+
+PhylogeneticTree
+~~~~~~~~~~~~~~~~
+
+Cette classe ne permet d'afficher une abre phylogenetic au format HTML. La
+représentation se fait sous forme d'arborescence simple. Par soucis de
+performances, cette classe est chargée uniquement lors de l'affichage d'un
+arbre phylogénétique. Ainsi, toutes les opérations relatives aux arbres se
+trouvent soit dans la bibliothèque Phylogelib, soit dans la classe
+TreeCollection.
+
+PhyloWeb
+~~~~~~~~~
+
+Dans cette partie, nous allons parler du projet PhyloExplorer à proprement
+parler ; c'est-à-dire la partie applicatif. PhyloWeb est composé de deux
+grands ensemble : le serveur web PhyloExplorer.py et les templates qui lui
+sont associées.
+
+PhyloExplorer.py
+^^^^^^^^^^^^^^^^
+NOTE: TODO
+
+Les templates
+^^^^^^^^^^^^^
+
+L'utilisation des templates métite que l'on s'y attarde un petit peu. Toutes
+les templates sont regroupées dans le répertoire "templates". Ce répertoire
+regroupe aussi les scripts CSS et javascripts.
+
+Une template, bien qu'ayant l'extension `.html`, est un ensemble de code
+python et d'html. Le code python est placé entre les balises `<%` et `%>`.
+
+[python]
+.Une template basique
+code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+<%
+if True:
+%>
+    <%|%>                           <1>
+    <b> Hello World ! </b>
+<%
+else:
+    #                               <2>
+%>
+    <i> Hello Me ! </i>
+<%|%>
+code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Le moteur de template Pleet va evaluer le code python et renverra le resultat.
+Dans cet exemple, `True` est toujours vrai donc `Hello Word` sera toujours
+affiché.  
+
+Le symbole `<%|%>` *(1)* permet de spécifier l'indentation. On indique ainsi au
+moteur de template si on se trouve toujours dans le `if` ou non.
+
+NOTE: Le fait de placer une ligne de commentaire *(2)* spécifie également l'indentation.
+
+Pleet permet "d'exposer" des objets afin qu'ils puissent être utilisé dans les
+templates.
+
+[python]
+.Exposition d'un objet
+code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+pleet["_civilite_"] = civilite
+code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Dans cet exemple, on rend accessible la variable `civilite` accessible dans la
+template sous le nom `_civilite_`.
+
+[python]
+.Utilisation d'un objet exposé
+code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Bonjour 
+<%
+if _civilite_ == "Mme":
+    #
+%>
+    Madame,
+<%
+elif _civilite_ == "Mlle":
+    #
+%>
+    Mademoiselle,
+<%
+else:
+    #
+%>
+    Monsieur,
+<%|%>
+code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Dans cet exemple, une série de tests sur la variable `_civilite_` permettra de
+produire la bonne template.
+
+
+Installation
+------------
+NOTE: TODO
+
+Difficultés
+-----------
+
+- Problème d'accès concurrent.
+- Problème d'homonymie
+
