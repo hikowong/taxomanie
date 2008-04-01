@@ -1,5 +1,7 @@
 _*Structure of the technical report*_ 
 
+[http://taxomanie.googlecode.com/svn/trunk/trunk/doc/rapport.html Rendu du rapport]
+
 = Plan =
 
   * *Sommaire*
