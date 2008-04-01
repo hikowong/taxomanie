@@ -86,10 +86,14 @@ TaxonomyReference
 ^^^^^^^^^^^^^^^^^
 
 Cette classe permet d'intéragir avec la base du NCBI et plus particulièrement
-avec le fichier `taxonomy.csv` qu'il prend en paramètre.
+avec le fichier `taxonomy.csv` qu'il prend en paramètre :
+
+----------------------------------------------
+reference = TaxonomyReference( "taxonomy.csv" )
+----------------------------------------------
 
 .Méthodes principales
-**********************************************
+***************************************************
 getCommonParent(self, taxa_list)::
     retourne le premier parent commun de tous les taxons présents dans la liste
 
@@ -134,11 +138,129 @@ stripTaxonName(self, taxon_name)::
     >>> self.stripTaxonName( "rattus_france" ) -> "rattus"
     >>> self.stripTaxonName( "rattus_rattus_france" ) -> "rattus_rattus"
 
-**********************************************
+**********************************************************
+
+Cette classe est incluse dans toutes les classes de PhyloCore.
+
+TreeCollection
+^^^^^^^^^^^^^^
+
+Cette classe représente une collection d'arbres phylogénétiques.
+Elle prend en paramètre une collection au format _Phyllip_, _Nexus_ ou
+_Nexus translate_. Elle propose des méthodes permettant de manipuler
+une collection comme effectuer des filtrages et des requêtes.
+Elle permet également de récupérer les statistiques de la collections.
+
+.Méthodes principales
+************************************************************
+getCollection(self)::
+    Retourne la collection en cours ; c'est-à-dire que si une requête à
+    été lancé, elle renverra la collection filtrée. Sinon, elle renverra la
+    collection initiale.
+
+clearQuery(self)::
+    Cette méthode permet de mettre à blanc la requête.
+    La méthode _getCollection()_ renverra alors la collection
+    initiale.
+
+query(self, query)::
+    Applique une requête à la collection. `query` doit être une expression du
+    type : 
++
+    {genre1} > 3 and ( {genre2} == 2 or {genre3} < 4 )
++
+`genre` peut être soit le nom d'un taxon (_rattus_rattus_) soit le nom
+d'une espèce (_murinae_). `genre` doit être entre accolade. Le reste de la
+requête est une expression python classique (d'où l'utilisation du `==`).
+En fait, les noms entre accolades seront remplacés par leur occurence dans
+la collection. Nous obtienons donc une expression python classique qui
+sera évaluée :
+
+        4 > 3 and ( 1 == 2 or 3 < 4 )
+
+displayHomonymList(self)::
+    Cette méthode retourne la liste des homonymes au format HTML. \+
++
+*Remarque* : __Cette methode doit être réécrite de manière à tenir compte du MVC__
+
+  
+displayStats(self, allparents=False)::
+    Cette méthode renvoie l'abre du NCBI au format HTML. Cette arbre contient
+    des données statistiques qui permet de connaitre le nombre d'occurence
+    d'une espèce dans la collection. \+
++
+*Remarque* : __Cette methode doit être réécrite de manière à tenir compte du MVC.
+ Elle doit se trouver dans une template__
 
 
+filter(self, taxa_list)::
+    Cette méthode va supprimer certains taxons de la collection d'arbre. Elle
+    est très utile pour ne travailler que sur une partie de la taxonomy sans
+    être pollué par d'autres taxons.\+
++
+Cette méthode prends en paramètre  la liste des taxons à supprimer.
 
+getNCBITreeAsNwk(self)::
+    Cette méthode renvoie l'arborescence du NCBI de la collection au format
+    Newick. Elle est utilisé si l'on souhaite télécharger l'arbre modèle du
+    NCBI.
 
+getNbTrees(self, taxon)::
+    Retourne le nombre d'arbre dans lesquels se trouve un taxon
 
+initStat(self)::
+    Lorsque l'on fait des requêtes, on ne travaille que sur une partie de la
+    collection. Cette méthode permet de mettre à jour les statistiques.
+    
+stat1(self)::
+    Cette méthode aussi sobrement appellé stat1 permet de connaitre le nombre
+    d'arbre à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
+    début de l'intervalle. Voir la section statistiques pour plus de détails.
 
+stat2(self)::
+    Cette méthode permet de connaître le nombre de taxon à n arbres. Comme
+    stat1, elle renvoie un dictionnaire. Voir la section statistiques pour
+    plus de détails.
 
+**********************************************************
+
+[python]
+.Utilisation
+code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+from treecollection import TreeCollection
+
+# Instanciation. On passe une collection au format Nexus en paramètre
+mycollection = TreeCollection( open("mycol.tre").read() )
+
+# Récupère la collection
+print mycollection.getCollection()
+
+# Combien d'arbres sont dans la collection
+print len( mycollection.getCollection() )
+
+# Effectue une requête afin de ne garder tous les arbres dont les murinaes
+# sont supérieurs à 1
+mycollection.query( "{murinae} > 1" )
+
+# Récupère la nouvelle collection
+my_new_collection = mycollection.getCollection()
+
+# Efface la requête
+mycollection.clearQuery()
+
+# Récupère la collection originelle
+mycollection.getCollection()
+
+# Filtrage. On supprime tous les taxon "mus", "pan" et "homo" de la
+# collection. Le resultat sera une chaine de caractère au format Nexus.
+nexus_string = mycollection.filter( ["mus", "pan", "homo"] )
+code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+On voit bien dans cette exemple que la méthode `query` influera sur la méthode
+`getCollection` qui renverra alors qu'une partie de la collection. La méthode
+`clearQuery` permet d'effacer les effets de la requête.
+
+Statistiques
+++++++++++++
+
+blablabla
