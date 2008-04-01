@@ -1,0 +1,144 @@
+PhyloExplorer
+=============
+
+:Authors:
+
+   Nicolas Auberval
+   Nicolas Clairon
+   Sorel Disert
+
+//.. contents:: Sommaire
+//.. sectnum::
+//   :depth: 4
+
+Documentation technique
+=======================
+
+Structure du projet
+-------------------
+
+Nous n'avons pas voulu enfermer PhyloExplorer dans une utilisation
+particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré en plusieurs parties : 
+
+- *PhyloCore* : une batterie de classes et de méthodes qui manipule les
+  collections d'arbres phylogénétiques et dialogue avec la base de données du
+  NCBI.
+- *PhyloWeb* : comprenant un serveur web légé et autonome ainsi qu'un
+  ensemble de templates.
+
+Cette distinction dans la structure permet aux développeurs de créer d'autres
+applications en se servant de la même base. Des scripts, pipelines ou encore
+des applications QT peuvent être crées à moindre coup.
+
+PhyloCore
+~~~~~~~~~
+PhyloCore regroupe trois classes : TaxanomyReference, TreeCollection et
+PhylogeneticTree.
+
+
+L'outil preproc.py
+^^^^^^^^^^^^^^^^^^
+
+PhyloExplorer utilise la base de données du NCBI comme base d'information.
+Cette base de données est accessible à l'adresse :
+`ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz`. Cette archive
+comprend plusieurs images de la base du NCBI. Celles qui nous intéressent sont
+`names.dump` et `nodes.dump`. Ces images nous permettent de récupérer :
+
+- l'id
+- le nom (scientifique)
+- le nom du parent
+- l'homonym auquel il se rapporte
+- la liste de ses parents
+- la liste de ses synonymes
+- la liste de ses noms communs.
+
+Le problème réside dans le fait que toutes ces informations sont éparpillés
+entre `names.dump` et `nodes.dump` (qui contiennent également beaucoup
+d'informations qui ne nous sont pas utiles). Nous avons alors effectué une
+compilation de ces informations et les avons placés dans le fichier
+`taxonomy.csv`. Voici sa structure :
+
+-------------------------------------------------------------------------------------------
+id|nom|nom_du_parent|homonyme|liste!des!parents|liste!des!synonymes|liste!des!noms!communs|
+-------------------------------------------------------------------------------------------
+
+Les éléments d'une liste sont séparés par un point d'exclamation. l'id est
+très important car il correspond à l'id du NCBI et donc de pouvoir générer les
+liens pointant vers le site du NCBI.
+
+Ainsi, à chaque fois qu'il que l'on veut mettre à jour le fichier
+`taxonomy.csv`, il faudra effectuer cette procédure. Nous avons créer un
+outil qui l'effectue automatiquement. Il s'appelle `preproc.py`.
+
+Cet outil téléchargera automatiquement l'image de la base du NCBI, extraira
+les informations nécessaire et générera le fichier `taxonomy.csv`.
+
+[NOTE]
+.A propos de base de données
+Dans ce projet, il nous a été demandé de s'affranchir totalement de base de
+données classique (MySQL, SQLLite...) pour charger toute la taxonomy du NCBI
+en RAM. Cependant, pour plus de clareté (et par habitude ?) nous continuerons
+de parler de base de données du NCBI
+
+
+TaxonomyReference
+^^^^^^^^^^^^^^^^^
+
+Cette classe permet d'intéragir avec la base du NCBI et plus particulièrement
+avec le fichier `taxonomy.csv` qu'il prend en paramètre.
+
+.Méthodes principales
+**********************************************
+getCommonParent(self, taxa_list)::
+    retourne le premier parent commun de tous les taxons présents dans la liste
+
+getHomonyms(self, name)::
+    retourne la liste des homonymes du nom passé en paramètre.\+
+    Exemple:
+
+    >>> self.getHonomyms( "echinops" )
+    ['echinops <plant>', 'echinops <mammal>']
+
+getIntervalParents(self, name1, name2)::
+    retourne la liste des parents intermédiaire entre deux taxons. \+
+    Exemple:
+
+    >>> self.getIntervalParents( "eukaryota", "eutheria" )
+    ['euarchontoglires', 'glires', 'rodentia', 'sciurognathi', 'muroidea']
+    >>> self.getIntervalParents( "murinae", "eutheria" )
+
+getNCBIArborescence(self, taxa_list)::
+    Cette méthode prend une liste de taxon et créer l'aborescence du NCBI en
+    recherchant les parents dans la base de données.
+
+getParents(self, name)::
+    retourn la liste de tous les parents d'un taxon
+
+isHomonym(self, name)::
+    retourne vrai si le taxon est un homonyme. \+
+    Exemple:
+
+    >>> self.isHomonym( "echinops" )
+    True
+
+isValid(self, name)::
+    retourne vrai si le nom du taxon est un nom scientific présent dans la
+    base du NCBI
+
+stripTaxonName(self, taxon_name)::
+    Troncate le nom passé dans le but d'en extraire le nom scientifique. \+
+    Exemple:
+
+    >>> self.stripTaxonName( "rattus" ) -> "rattus"
+    >>> self.stripTaxonName( "rattus_france" ) -> "rattus"
+    >>> self.stripTaxonName( "rattus_rattus_france" ) -> "rattus_rattus"
+
+**********************************************
+
+
+
+
+
+
+
