@@ -321,7 +321,8 @@ class Taxomanie( Taxobject ):
         try:
             self._pleet["_NCBItree_"] = cherrypy.session.get("collection").getNCBITreeAsNwk()
         except:
-            return self._presentation( "error.html", msg="Bad collection", pagedef="Home > Error" )
+            return self._presentation( "error.html",
+              msg="Bad collection. Please, check your trees.", pagedef="Home > Error" )
         cherrypy.session["sortby_stat1"] = sortby_stat1 or cherrypy.session.get("sortby_stat1") or "trees"
         cherrypy.session["sortby_stat2"] = sortby_stat2 or cherrypy.session.get("sortby_stat2") or "trees"
         self._pleet["_sortby_stat1_"] = cherrypy.session.get("sortby_stat1")
@@ -332,7 +333,7 @@ class Taxomanie( Taxobject ):
                 self._pleet["_stat2_"] = self.getStat2( cherrypy.session.get("sortby_stat2") )
             except:
                 return self._presentation( "error.html",
-                  msg="Your collection might be contains some empty or misformed trees...  Please, check your collection.",
+                  msg="Your collection might be contains some empty or incorrect trees...  Please, check your collection.",
                   pagedef="Home > Error" )
         else:
             self._pleet["_stat1_"] = ""
