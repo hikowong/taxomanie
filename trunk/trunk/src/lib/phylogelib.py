@@ -25,10 +25,14 @@ def tidyNwk( nwk ):
     return nwk.strip()
 
 def checkNwk( nwk ):
+    """
+    Check if nwk is in the correct newick format
+    """
     try:
         nwk2list( nwk )
+        return True
     except:
-        raise ValueError, nwk+" is not correct"
+        return False
         
 def removeNexusComments( nex ):
     """ remove all nexus comments """

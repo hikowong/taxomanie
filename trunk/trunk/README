@@ -1,10 +1,10 @@
-TAXOMANIE
-=========
+PHYLOEXPLORER
+=============
 
 What is it ?
 -------------
 
-TaxoManie is a free, simple to use web service dedicated to check taxa's
+PhyloExplorer is a free, simple to use web service dedicated to check taxa's
 names and to give statistic of phylogeny trees.
 
 You can use filter and query in order to extract usefull informations of your
@@ -28,9 +28,8 @@ first:
 Working Usage
 -------------
 
-To lanch the serveur, juste type: `python taxomanie.py`
+To lanch the serveur, juste type: `python phyloexplorer.py`
 
 Open browser and type `http://localhost:8080` and you should see the
-application at work.
-
+application at work. If not, please edit the file `phyloexplorer.conf` 
 

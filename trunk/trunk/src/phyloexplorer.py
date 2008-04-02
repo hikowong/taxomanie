@@ -7,22 +7,20 @@ sys.path.insert( 0, "lib" )
 import cherrypy
 from cherrypy.lib import static
 
-from lib import phylogelib
-from phylogenictree import PhylogenicTree
 from treecollection import TreeCollection
 from taxobject import Taxobject 
 import ConfigParser
 import httplib
 import string
 
-class Taxomanie( Taxobject ):
+class PhyloExplorer( Taxobject ):
     
     reference = None
 
     def __init__( self ):
         if self.reference is None:
             from taxonomyreference import TaxonomyReference
-            Taxomanie.reference = TaxonomyReference()
+            PhyloExplorer.reference = TaxonomyReference()
         self._taximage_url = {}
         self.__loadProxy()
 
@@ -34,7 +32,7 @@ class Taxomanie( Taxobject ):
 
     def __loadProxy( self ):
         config = ConfigParser.ConfigParser()
-        config.read("taxomanie.conf")
+        config.read("phyloexplorer.conf")
         try:
             self.proxy = config.get("global","proxy").strip("\"")
         except:
@@ -403,7 +401,7 @@ class Taxomanie( Taxobject ):
         filtered_list = [i for i in cherrypy.session.get("collection").taxa_list if i not in kwargs]
         return self.statistics( cherrypy.session.get("collection").filter( kwargs.keys() ) )
 
-cherrypy.tree.mount(Taxomanie())
+cherrypy.tree.mount(PhyloExplorer())
 
 
 if __name__ == '__main__':
@@ -411,7 +409,7 @@ if __name__ == '__main__':
     import ConfigParser
     ## Open and parse config file
     config = ConfigParser.ConfigParser()
-    config.read("taxomanie.conf")
+    config.read("phyloexplorer.conf")
     ## Fill variables
     try:
         log_screen = bool(int(config.get("global","log.screen")))
@@ -420,10 +418,11 @@ if __name__ == '__main__':
     ip = config.get("global","server.socket_host").strip("\"")
     port = int(config.get("global","server.socket_port"))
     thread_pool = int(config.get("global","server.thread_pool"))
+    session_timeout = int(config.get("global","session.timeout"))
     # Fill cherrypy configuration
     cherrypy.config.update({
           "log.screen": log_screen,
-          "tools.sessions.timeout" : 1800 , #30 minutes
+          "tools.sessions.timeout" : session_timeout,
           "tools.sessions.on" : True,
           "server.socket_host": ip,
           "server.socket_port": port,

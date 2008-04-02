@@ -3,9 +3,9 @@ from taxonomyreference import TaxonomyReference
 from lib.phylogelib import getTaxa, getBrothers, \
     getChildren, tidyNwk, removeBootStraps, checkNwk
 
-class PhylogenicTree( object ):
+class PhylogeneticTree( object ):
     """
-    This class represente an Phylogenic Tree. It take a newick file in
+    This class represente an Phylogenetic Tree. It take a newick file in
     constructor. This class provides all some basis methods to get information
     of the phylogenic tree.
     """
@@ -20,12 +20,11 @@ class PhylogenicTree( object ):
         """
         if self.reference is None:
             if reference is None:
-                PhylogenicTree.reference = TaxonomyReference()
+                PhylogeneticTree.reference = TaxonomyReference()
             else:
-                PhylogenicTree.reference = reference
+                PhylogeneticTree.reference = reference
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
         checkNwk( self.nwk )
-#        self.nwk = ",".join([ " ".join(i.split()[:2]) for i in self.nwk.replace( "_", " ").split(",") ])
         self.root = "root"
         self.nb_taxa = 0
         self._getArborescence()
@@ -135,7 +134,6 @@ class PhylogenicTree( object ):
                     result += self.__linkSpecies( dispnode, bdnode, blockname, nb_inter_parents)
         return result
 
-
     def __linkSpecies( self, dispnode, bdnode, blockname, nb_inter_parents ):
         result = ""
         if self.reference.isHomonym( bdnode ):
@@ -183,7 +181,7 @@ if __name__ == "__main__":
 #    tree = """((((Bos:0.037413,Canis:0.017881):0.002871,(((Homo:0,Pan:0.001478):0.003588,Macaca:0.006948):0.012795,((Mus:0.031070,Ratus:0.016167):0.055242,Oryctolagu:0.050478):0.002924):0.002039):0.005355,Dasypus:0.033681):0.002698,(Echinops:0.076122,Loxodonta:0.025376):0.007440,Monodelph:0.093131);"""
     trees = ["((loxondonta africana,pan),homo)"]#, "((homo,mus),(ratus,pan))", "((mu,ratus),homo)"]
 
-    tree = PhylogenicTree( "((mus, rattus), pan, (bos, canis))" )
+    tree = PhylogeneticTree( "((mus, rattus), pan, (bos, canis))" )
     print tree.display()
 
     print "<hr />"
@@ -192,7 +190,7 @@ if __name__ == "__main__":
     print tree.display( xtree )
 
 #    for tree in trees:
-#        ptree = PhylogenicTree( tree )
+#        ptree = PhylogeneticTree( tree )
 #        print tree
 #        print ptree.tree.edges()
 #        print ptree.miss_spelled

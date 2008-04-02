@@ -385,7 +385,8 @@ gestionnaire de bugs et un gestionnaire de version (subversion).
 <h2 id="_structure_du_projet">Structure du projet</h2>
 <div class="sectionbody">
 <div class="para"><p>Nous n'avons pas voulu enfermer PhyloExplorer dans une utilisation
-particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré en plusieurs parties :</p></div>
+particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré
+en plusieurs parties :</p></div>
 <div class="ilist"><ul>
 <li>
 <p>
@@ -403,28 +404,83 @@ particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré 
 </ul></div>
 <div class="para"><p>Cette distinction dans la structure permet aux développeurs de créer d'autres
 applications en se servant de la même base. Des scripts, pipelines ou encore
-des applications QT peuvent être crées à moindre coup.</p></div>
+des applications QT peuvent être crées à moindre coût.</p></div>
 <h3 id="_phylocore">PhyloCore</h3><div style="clear:left"></div>
 <div class="para"><p>PhyloCore regroupe trois classes (TaxanomyReference, TreeCollection et
 PhylogeneticTree) et une bibliothèque de gestion d'arbres phylogénétiques :
 <tt>phylogelib</tt>.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">TODO mettre le diagramme de classe</td>
-</tr></table>
+<div class="imageblock">
+<div class="content">
+<img src="phylo1.png" alt="phylo1.png"/>
+</div>
+<div class="image-title">Figure: Diagramme de classes</div>
 </div>
 <h4 id="_phylogelib">Phylogelib</h4>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">TODO</td>
-</tr></table>
-</div>
+<div class="para"><p>Phylogelib est une bibliothèque python qui permet de manipuler des arbres
+phylogénétiques. Très rapide, elle se contente de manipuler des chaines de
+caractères au format newick (on évite ainsi la lourde gestion de graphes).</p></div>
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="sidebar-title">Fonctions principales utilisées dans PhyloExplorer</div>
+<div class="vlist"><dl>
+<dt>
+checkNwk(nwk)
+</dt>
+<dd>
+<p>
+Renvoie vrai si la chaine passée en paramètre est au format newick.
+</p>
+</dd>
+<dt>
+getBrothers(tree, node)
+</dt>
+<dd>
+<p>
+Retourne la liste des frères du noeud.
+</p>
+</dd>
+<dt>
+getChildren(tree)
+</dt>
+<dd>
+<p>
+Retroune la liste des premiers fils de l'arbre.
+</p>
+</dd>
+<dt>
+getTaxa(tree)
+</dt>
+<dd>
+<p>
+Renvoie la liste de tous les taxons de l'arbre.
+</p>
+</dd>
+<dt>
+removeBootStraps(tree)
+</dt>
+<dd>
+<p>
+Supprime les "bootstraps" de l'abres
+</p>
+</dd>
+<dt>
+removeNexusComments(nex)
+</dt>
+<dd>
+<p>
+Supprime les commentaires d'une collection au format nexus
+</p>
+</dd>
+<dt>
+tidyNwk(nwk)
+</dt>
+<dd>
+<p>
+Nettoie la chaine au format newick en supprimant tous les espaces superflux.
+</p>
+</dd>
+</dl></div>
+</div></div>
 <h4 id="_l_outil_preproc_py">L'outil preproc.py</h4>
 <div class="para"><p>PhyloExplorer utilise la base de données du NCBI comme base d'information.
 Cette base de données est accessible à l'adresse :
@@ -780,27 +836,42 @@ nexus_string = mycollection.filter( ["mus", "pan", "homo"] )</tt></pre>
 <td class="content">TODO</td>
 </tr></table>
 </div>
-<h3 id="_phylogenetictree">PhylogeneticTree</h3><div style="clear:left"></div>
+<h4 id="_phylogenetictree">PhylogeneticTree</h4>
 <div class="para"><p>Cette classe ne permet d'afficher une abre phylogenetic au format HTML. La
 représentation se fait sous forme d'arborescence simple. Par soucis de
 performances, cette classe est chargée uniquement lors de l'affichage d'un
 arbre phylogénétique. Ainsi, toutes les opérations relatives aux arbres se
 trouvent soit dans la bibliothèque Phylogelib, soit dans la classe
 TreeCollection.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="phylo2.png" alt="phylo2.png"/>
+</div>
+</div>
 <h3 id="_phyloweb">PhyloWeb</h3><div style="clear:left"></div>
 <div class="para"><p>Dans cette partie, nous allons parler du projet PhyloExplorer à proprement
 parler ; c'est-à-dire la partie applicatif. PhyloWeb est composé de deux
 grands ensemble : le serveur web PhyloExplorer.py et les templates qui lui
 sont associées.</p></div>
 <h4 id="_phyloexplorer_py">PhyloExplorer.py</h4>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">TODO</td>
-</tr></table>
-</div>
+<div class="para"><p>Ce fichier represente en quelque sorte le <em>main</em> du projet. C'est ce script
+qu'il faudra lancer pour exécuter le serveur web. L'application sera alors
+accessible via l'adresse <tt>http://adresse_ip:port</tt> où <tt>adresse_ip</tt> et <tt>port</tt>
+sont définis dans le fichier de configuration <tt>phyloexplorer.conf</tt>.</p></div>
+<div class="para"><p>le fichier <tt>phyloexplorer.py</tt> est composé de la classe PhyloExplorer qui sera
+utilisée par l'outil CherryPy. Cette classe possède plusieurs particularités
+qui sont propres à CherryPy comme l'exposition d'une méthode.</p></div>
+<div class="para"><p>Une méthode exposée est une méthode qui sera accessible via l'URL de
+l'application. Elle est reconnaissable par son décorateur :
+<tt>@cherrypy.expose</tt>. Chaque méthode exposée doit renvoyer une chaine de
+caractère qui sera affiché tel quel à l'utilisateur. Cette chaine doit donc
+être au format HTML.</p></div>
+<div class="para"><p>Pour plus d'information concernant le serveur web, merci de consulter la
+documentation de CherryPy.</p></div>
+<div class="para"><p>Pour renvoyer du HTML, nous utilisons la méthode <tt>self._presentation</tt> qui
+prend en paramètre, le nom de la template à utiliser, un message d'information
+(facultatif) et une petite chaine de caractère qui sera placé en haut de la
+page et qui indiquera où se trouve l'utilisateur (ex : <tt>Home &gt; Statistics</tt>).</p></div>
 <h4 id="_les_templates">Les templates</h4>
 <div class="para"><p>L'utilisation des templates métite que l'on s'y attarde un petit peu. Toutes
 les templates sont regroupées dans le répertoire "templates". Ce répertoire
@@ -870,6 +941,40 @@ produire la bonne template.</p></div>
 </div>
 <h2 id="_installation">Installation</h2>
 <div class="sectionbody">
+<div class="para"><p>Cette section détaille la procédure d'installation et de configuration de
+l'application web PhyloExplorer.</p></div>
+<h3 id="_pr_requis">Prérequis</h3><div style="clear:left"></div>
+<div class="para"><p>Pour une utilisation optimale, PhyloExplorer nécessite au minimum 2 Go de
+mémoire RAM. Prévoir également un processeur cadencé à 2 Ghz et 200 Mo d'espace
+disque pour l'installation.</p></div>
+<h3 id="_installation_2">Installation</h3><div style="clear:left"></div>
+<h4 id="_installation_des_d_pendances">Installation des dépendances</h4>
+<div class="para"><p>PhyloExplorer nécessite les bibliothèques suivantes :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Python &gt;= 2.4 : (<tt>http://www.python.org</tt>)
+</p>
+</li>
+<li>
+<p>
+CherryPy &gt;= 3.0 (<tt>http://www.cherrypy.org/</tt>)
+</p>
+</li>
+<li>
+<p>
+NetworkX &gt;= 0.35 (<tt>https://networkx.lanl.gov/wiki</tt>)
+</p>
+</li>
+<li>
+<p>
+Pleet (le paquet est disponible dans tools)
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Chacune de ces bibliothèques s'installe très facilement : extraire l'archive
+et taper simplement sous root <tt>$ python setup install.py</tt>.</p></div>
+<h4 id="_installation_de_phyloexplorer">Installation de PhyloExplorer</h4>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
@@ -878,25 +983,93 @@ produire la bonne template.</p></div>
 <td class="content">TODO</td>
 </tr></table>
 </div>
+<h3 id="_configuration">Configuration</h3><div style="clear:left"></div>
+<div class="para"><p>Le serveur web utilise le fichier <tt>phyloexplorer.conf</tt> pour sa configuration.
+Voici sa structure :</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>[global]
+log.screen = 0
+server.socket_host = "127.0.0.1"
+server.socket_port = 8080
+server.thread_pool = 10
+session.timeout = 1800
+proxy = "www.info-ufr.univ-montp2.fr:3128"</tt></pre>
+</div></div>
+<div class="vlist"><dl>
+<dt>
+log.screen
+</dt>
+<dd>
+<p>
+Cette variable est un booleen. Si elle est vrai (positionnée à 1), des
+informations de débogage seront envoyés sur la sortie standard de la console.
+Cette variable doit être mise à 0 pour un serveur de production.
+Voir la documentation de CherryPy pour plus de détails.
+</p>
+</dd>
+<dt>
+server.socket_host
+</dt>
+<dd>
+<p>
+Definit l'adresse ip de la machine où est lancé le serveur.
+Voir la documentation de CherryPy pour plus de détails.
+</p>
+</dd>
+<dt>
+server.socket_port
+</dt>
+<dd>
+<p>
+Definit le port où devra être accessible l'application.
+Voir la documentation de CherryPy pour plus de détails.
+</p>
+</dd>
+<dt>
+server.thread_pool
+</dt>
+<dd>
+<p>
+Définit le nombre d'instance à déployer. Plus le nombre de connexion est
+élevé, plus ce chiffre doit augmenter.
+Voir la documentation de CherryPy pour plus de détails.
+</p>
+</dd>
+<dt>
+session.timeout
+</dt>
+<dd>
+<p>
+Précise la durée de la session d'un utilisateur. Elle se définit en secondes
+et indique la période d'inactivité autorisée de l'utilisateur avant
+l'expiration de sa session.
+</p>
+</dd>
+<dt>
+proxy (facultatif)
+</dt>
+<dd>
+<p>
+Cette variable est propre à PhyloExplorer (ie ne provient pas de CherryPy).
+Elle permet de spécifier l'adresse du proxy afin d'autoriser l'affichage des
+images et la correction du nom des taxons. Si vous avez un problème avec ces
+fonctionnalités, vous devriez vérifier que cette variable est correctement
+renseignée.
+</p>
+</dd>
+</dl></div>
 </div>
-<h2 id="_difficult_s">Difficultés</h2>
+<h1 id="_annexe">Annexe</h1>
+<h2 id="_liens_externes">Liens externes</h2>
 <div class="sectionbody">
-<div class="ilist"><ul>
-<li>
-<p>
-Problème d'accès concurrent.
-</p>
-</li>
-<li>
-<p>
-Problème d'homonymie
-</p>
-</li>
-</ul></div>
+<div class="para"><p><strong>Python</strong> : <tt>http://www.python.org</tt></p></div>
+<div class="para"><p><strong>NetworkX</strong> : <tt>https://networkx.lanl.gov/wiki</tt></p></div>
+<div class="para"><p><strong>CherryPy</strong> : <tt>http://www.cherrypy.org/</tt></p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-04-01 17:20:08 CEST
+Last updated 2008-04-02 19:16:33 CEST
 </div>
 </div>
 </body>

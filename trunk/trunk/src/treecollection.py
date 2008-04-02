@@ -1,5 +1,4 @@
 
-from phylogenictree import PhylogenicTree
 from taxobject import Taxobject
 from lib.phylogelib import getTaxa, tidyNwk, removeBootStraps, \
   removeNexusComments, getBrothers
@@ -211,7 +210,6 @@ class TreeCollection( Taxobject ):
             if not stat.has_key( nbtaxa ):
                 stat[nbtaxa] = 0
             stat[nbtaxa] += 1
-        print "stat>>>", stat
         nbmax = max( stat.keys() )
         ratio = int( nbmax*10.0/100) or 1
         result_stat = {}
