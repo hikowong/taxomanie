@@ -5,14 +5,120 @@ PhyloExplorer
 
    Nicolas Auberval
    Nicolas Clairon
-   Sorel Disert
+   Sorel Diser
 
 //.. contents:: Sommaire
 //.. sectnum::
 //   :depth: 4
 
+Sommaire
+========
+
+NOTE: TODO (sorel) 
+
+Présentation du projet
+=======================
+
+Phylogénie et Taxonomie
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Comprendre le sujet
+^^^^^^^^^^^^^^^^^^^
+
+La phylogénie est l'étude de la formation et de l'évolution des organismes du vivant en vue d'établir leur parenté. Elle formalise la classification sous forme d'arbres phylogénétiques (équivalent à un arbre généalogique) dont les noeuds sont des taxons.
+La taxomanie associée définit l'étude et le regroupement de ces organismes en entité selon leurs critères, caractères et autres similitudes.
+
+Exemple d'arbres phylogénétiques
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+-----------------------------------------------
+Root
+| +- Hominoidea
+| +- Hominidae
+| +- Homo/pan/gorilla group
+| | +- Homo
+| | +- Pan 
+-----------------------------------------------
+
+Analyse de l'existant
+~~~~~~~~~~~~~~~~~~~~~
+
+Le NCBI _National Center for Biotechnology Information_
+Le site du NCBI est un ensemble d'outils et de bases de données sur les biotechnologie, voir `http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy`.
+En ce qui nous concerne, on retiendra les points qui suivent comme références de départ pour le projet PhyloExplorer :
+
+- Les données : base de données taxonomique téléchargeable à disposition du public
+- Les actions de bases : la gestion d'arbres phylogénétiques en ligne
+
+Comme tout site de recherche, le NCBI propose beaucoup d'informations via une interface chargée et peu adaptée au travail personnalisé.
+La navigation sur un arbre apparaît assez fastidueuse et les informations taxonomique complémentaires, certes complètes, deviennent vite illisibles.
+
+Besoins et objectifs
+~~~~~~~~~~~~~~~~~~~~
+
+Besoins
+^^^^^^^
+
+En perpétuel remaniement grâce/à cause de l'avancée des nouvelles techniques moléculaires et génétiques, les chercheurs ont besoin d'outils concis pour :
+- la visualisation,
+- l'analyse,
+- la modification,
+- la confrontation, 
+- le partage d'informations.
+
+Objectifs
+^^^^^^^^^
+
+L'objectif principal de ce projet est de pouvoir travailler sur sa propre collection d'arbres et d'appliquer les fonctionnalités suivantes :
+
+- parcourir et visualiser une collection d'arbres,
+- vérifier la conformité des arbres et taxons,
+- effectuer des requêtes sur une collection (tri),
+- filtrer une collection (garder des sous-arbres),
+- produire des statistiques sur la collection.
+
+Exigences
+^^^^^^^^^
+
+Les seules exigences interviennent au niveau des formats d'entrée/sortie du projet. Ces derniers prennent en compte une collection d'arbres. On cite _phylip_, _newick_, _nexus_ -> .nwk, et la banque de données _.csv_.
+
 Documentation technique
 =======================
+
+Formats des fichiers
+--------------------
+
+- Le format de données et de structure d'arbres phylogénétiques _Phylip/Newick_ 
+
+-----------------------------------
+((homo, rattus), bos ,(pan,mus));
+-----------------------------------
+
+- Le format de fichier _Nexus_ pour les collections d'arbres
+
+--------------------------------------------------------------
+#nexus
+begin trees;
+Tree 1 = ((homo, rattus), bos ,(pan,mus));
+Tree 2 = (pan,mus);
+Tree 3 = ((homo,rats),pan);
+Tree 4 = (((((homo,pan),macaca),ratus),dasypus),monodelphi);
+end;
+--------------------------------------------------------------
+
+- Exemple de données de la base _taxonomy.csv_ du NCBI
+
+-----------------------------------------------------------
+_id_	|	_nom taxon_	| 		|	_type_				|
+
+9611	|	Canis		|		|	scientific name		|
+9612	|	Canis lupus	|		|	scientific name		|
+9612	|	gray wolf	|		|	genbank common name	|
+9614	|	coyote		|		|	genbank common name	|
+9615	|	Canis canis	|		|	synonym				|
+-----------------------------------------------------------
+
+NOTE: TODO (sorel) Nexus translate, commentaire
 
 Choix technique
 ---------------
@@ -467,6 +573,41 @@ code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Dans cet exemple, une série de tests sur la variable `_civilite_` permettra de
 produire la bonne template.
 
+Interface et visualisation
+--------------------------
+
+NOTE: TODO (sorel) css, js, stat, variables serveur pr images et liens
+
+Module phyloWidget
+------------------
+
+NOTE: TODO (sorel) résumé, spécifications, possibilités, exemples of use, site ref
+
+Bilan
+-----
+
+Difficultés
+~~~~~~~~~~~
+
+- Problème d'accès concurrent.
+- Problème d'homonymie
+
+Sécurité
+~~~~~~~~
+
+NOTE: TODO faille soft, critique, charge serveur, amelioration?
+
+Résultats
+~~~~~~~~~
+
+NOTE: TODO liste fonctionnalités faites! + fonctionnalités bonus
+
+NOTE: TODO comparaison navigation sur NCBI et phyloexplorer (screenshot)
+
+Evolutions
+~~~~~~~~~~
+
+NOTE: TODO biopython
 
 Installation
 ------------
@@ -552,6 +693,40 @@ renseignée.
 
 Annexe
 ======
+
+Glossaire phylogénétique
+------------------------
+
+*Abre phylogénétique* : équivalent d'un arbre généalogique des taxons.
+
+*Phylogénie* : c'est l'étude de la formation et de l'évolution des organismes vivants en vue d'établir leur parenté. 
+
+*Taxon* : Les organismes du vivant sont classés selon des catégories en fonction de leurs similitudes et de leurs relations évolutives. Ces catégories sont des taxons et représentent les noeuds d'un arbre phylogénétique.
+
+Glossaire technique
+-------------------
+
+*Css* : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices _id_, _name_, _class_.
+
+*Csv* : _Comma Separated Values_, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.
+
+*Filtrage* : Ici permet de restreindre un arbre en sous arbres.
+
+*Jquery* : c'est une bibliothèque Javascript qui porte sur l'interaction entre JavaScript et HTML. La librairie se présente comme un unique fichier décrivant les utilisations _d'évènements multi navigateur_, _DOM_,_Effets et animations_, et surtout _Ajax_.
+
+*NCBI* : National Center for Biotechnology Information.
+
+*Nexus* : format de fichier contenant des arbres _phylogénétiques_ et des annotations associées.
+
+*Newick* : format de fichier contenant des arbres _phylogénétiques_.
+
+*Phylip* : format de représentation d'arbres _phylogénétiques_ sous forme de _(syntaxe parenthésée);_.
+
+*Python* : langage de programmation interprété, multi-paradigme, qui favorise la programmation impérative structurée, et orientée objet. Il est doté d'un typage dynamique fort, d'une gestion automatique de la mémoire par ramasse-miettes et d'un système de gestion d'exceptions. Sous licence libre et multi plates-formes.
+
+*SVN / Subversion* : C'est un entrepot de versions temporaires de code qui permettent aux développeurs de tester, partager, modifier, comparer, réinstaller un projet en équipe.
+
+*Template* : c'est un modèle permettant de construire les pages d'un site web selon une trame générale (un squelette) et des zones modifiables. Utile pour les mise à jour et modifications en cascade.
 
 Liens externes
 --------------
