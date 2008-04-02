@@ -211,10 +211,11 @@ class TreeCollection( Taxobject ):
             if not stat.has_key( nbtaxa ):
                 stat[nbtaxa] = 0
             stat[nbtaxa] += 1
+        print "stat>>>", stat
         nbmax = max( stat.keys() )
         ratio = int( nbmax*10.0/100) or 1
         result_stat = {}
-        for i in xrange( 0, nbmax, ratio):
+        for i in xrange( 0, nbmax+1, ratio):
             result_stat[i] = 0
         for i,j in stat.iteritems():
             for key in result_stat.keys():
@@ -236,7 +237,7 @@ class TreeCollection( Taxobject ):
         nbmax = max( stat.values() )
         ratio = int( nbmax*10.0/100) or 1
         result_stat = {}
-        for i in xrange( 0, nbmax, ratio):
+        for i in xrange( 0, nbmax+1, ratio):
             result_stat[i] = 0
         for i in stat.values():
             for key in result_stat.keys():
@@ -488,46 +489,6 @@ class TreeCollection( Taxobject ):
         new_col += "end;\n"
         return new_col
 
-    def filter2( self, taxa_list ):
-        """
-        return the original collection without certains taxa
-        """
-        ori = removeBootStraps( self.orignial_collection )
-        for taxon in taxa_list:
-            ori = re.sub( "\s*"+taxon+"\s*([),])", r"\1", ori, count=0 )
-            for taxon_user in self._d_taxon_user[taxon]:
-                ori = re.sub( "\s*"+taxon_user+"\s*([),])", r"\1", ori, count=0 )
-        while ",," in ori or "(," in ori or ",)" in ori or "()" in ori:
-            ori = ori.replace(",,",",")
-            ori = ori.replace("(,","(")
-            ori = ori.replace(",)",")")
-            ori = ori.replace("()","")
-            ori = re.sub( r"(,\s+\))",")", ori )
-            ori = re.sub( r"(\(\s+,)","(", ori )
-            ori = re.sub( r"(\(\s+\))","", ori )
-            ori = re.sub( r"(,\s+,)",",", ori )
-        while re.findall( r"\((\([^()]+\))\)", ori, re.DOTALL ):
-            ori = re.sub( r"\((\([^()]+\))\)", r"\1", ori, count=0  )
-#        ori = re.sub( r"\(([^,()]+\))[^;]", r"\1", ori, re.DOTALL )
-#        ori = re.sub( r"\((\([^()]+\))\)", r"\1", ori, re.DOTALL )
-#        ori = re.sub( r"\(([^,()]+)\)", r"\1", ori, re.DOTALL )
-#        print "ori_avant_whiles>>>", ori
-#        replace_list = re.findall(r"\((\([^()]+\))\)", ori, re.DOTALL )
-#        while replace_list:
-#            for i in replace_list:
-#                ori = ori.replace( "("+i+")", i )
-#            replace_list = re.findall( r"\((\([^()]+\))\)", ori, re.DOTALL)
-#        print "ori_avant_while2>>>", ori
-#        replace_list =  re.findall( r"\(([^,( )]+)\)[^;]", ori, re.DOTALL )
-#        while replace_list:
-#            for i in replace_list:
-#                print ">>replace", i
-#                ori = ori.replace( "("+i+")", i )
-#            replace_list =  re.findall( r"\(([^,( )]+)\)[^;]", ori, re.DOTALL )
-        return ori
-
-        
-        
 
 if __name__ == "__main__":
     from taxonomyreference import TaxonomyReference
