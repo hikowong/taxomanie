@@ -59,7 +59,8 @@ Structure du projet
 -------------------
 
 Nous n'avons pas voulu enfermer PhyloExplorer dans une utilisation
-particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré en plusieurs parties : 
+particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré
+en plusieurs parties : 
 
 - *PhyloCore* : une batterie de classes et de méthodes qui manipule les
   collections d'arbres phylogénétiques et dialogue avec la base de données du
@@ -69,7 +70,7 @@ particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré 
 
 Cette distinction dans la structure permet aux développeurs de créer d'autres
 applications en se servant de la même base. Des scripts, pipelines ou encore
-des applications QT peuvent être crées à moindre coup.
+des applications QT peuvent être crées à moindre coût.
 
 PhyloCore
 ~~~~~~~~~
@@ -77,12 +78,47 @@ PhyloCore regroupe trois classes (TaxanomyReference, TreeCollection et
 PhylogeneticTree) et une bibliothèque de gestion d'arbres phylogénétiques :
 `phylogelib`.
 
-NOTE: TODO mettre le diagramme de classe
+.Diagramme de classes
+image::phylo1.png[]
 
 Phylogelib
 ^^^^^^^^^^
 
-NOTE: TODO
+Phylogelib est une bibliothèque python qui permet de manipuler des arbres
+phylogénétiques. Très rapide, elle se contente de manipuler des chaines de
+caractères au format newick (on évite ainsi la lourde gestion de graphes).
+
+.Fonctions principales utilisées dans PhyloExplorer
+***************************************************
+checkNwk(nwk)::
+
+Renvoie vrai si la chaine passée en paramètre est au format newick.
+
+getBrothers(tree, node)::
+
+Retourne la liste des frères du noeud.
+
+getChildren(tree)::
+
+Retroune la liste des premiers fils de l'arbre.
+
+getTaxa(tree)::
+
+Renvoie la liste de tous les taxons de l'arbre.
+
+removeBootStraps(tree)::
+
+Supprime les "bootstraps" de l'abres
+
+removeNexusComments(nex)::
+
+Supprime les commentaires d'une collection au format nexus
+
+tidyNwk(nwk)::
+
+Nettoie la chaine au format newick en supprimant tous les espaces superflux.
+******************************************************
+
 
 L'outil preproc.py
 ^^^^^^^^^^^^^^^^^^
@@ -314,7 +350,7 @@ Statistiques
 NOTE: TODO
 
 PhylogeneticTree
-~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^
 
 Cette classe ne permet d'afficher une abre phylogenetic au format HTML. La
 représentation se fait sous forme d'arborescence simple. Par soucis de
@@ -322,6 +358,8 @@ performances, cette classe est chargée uniquement lors de l'affichage d'un
 arbre phylogénétique. Ainsi, toutes les opérations relatives aux arbres se
 trouvent soit dans la bibliothèque Phylogelib, soit dans la classe
 TreeCollection.
+
+image::phylo2.png[]
 
 PhyloWeb
 ~~~~~~~~~
@@ -333,7 +371,29 @@ sont associées.
 
 PhyloExplorer.py
 ^^^^^^^^^^^^^^^^
-NOTE: TODO
+Ce fichier represente en quelque sorte le _main_ du projet. C'est ce script
+qu'il faudra lancer pour exécuter le serveur web. L'application sera alors
+accessible via l'adresse `http://adresse_ip:port` où `adresse_ip` et `port`
+sont définis dans le fichier de configuration `phyloexplorer.conf`.
+
+le fichier `phyloexplorer.py` est composé de la classe PhyloExplorer qui sera
+utilisée par l'outil CherryPy. Cette classe possède plusieurs particularités
+qui sont propres à CherryPy comme l'exposition d'une méthode.
+
+Une méthode exposée est une méthode qui sera accessible via l'URL de
+l'application. Elle est reconnaissable par son décorateur :
+`@cherrypy.expose`. Chaque méthode exposée doit renvoyer une chaine de
+caractère qui sera affiché tel quel à l'utilisateur. Cette chaine doit donc
+être au format HTML.
+
+Pour plus d'information concernant le serveur web, merci de consulter la
+documentation de CherryPy.
+
+Pour renvoyer du HTML, nous utilisons la méthode `self._presentation` qui
+prend en paramètre, le nom de la template à utiliser, un message d'information
+(facultatif) et une petite chaine de caractère qui sera placé en haut de la
+page et qui indiquera où se trouve l'utilisateur (ex : `Home > Statistics`).
+
 
 Les templates
 ^^^^^^^^^^^^^
@@ -410,11 +470,96 @@ produire la bonne template.
 
 Installation
 ------------
+Cette section détaille la procédure d'installation et de configuration de
+l'application web PhyloExplorer. 
+
+Prérequis
+~~~~~~~~~
+Pour une utilisation optimale, PhyloExplorer nécessite au minimum 2 Go de
+mémoire RAM. Prévoir également un processeur cadencé à 2 Ghz et 200 Mo d'espace
+disque pour l'installation.
+
+Installation
+~~~~~~~~~~~~
+
+Installation des dépendances
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+PhyloExplorer nécessite les bibliothèques suivantes :
+
+- Python >= 2.4 : (`http://www.python.org`)
+- CherryPy >= 3.0 (`http://www.cherrypy.org/`)
+- NetworkX >= 0.35 (`https://networkx.lanl.gov/wiki`)
+- Pleet (le paquet est disponible dans tools)
+
+Chacune de ces bibliothèques s'installe très facilement : extraire l'archive
+et taper simplement sous root `$ python setup install.py`.
+
+Installation de PhyloExplorer
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 NOTE: TODO
 
-Difficultés
------------
+Configuration
+~~~~~~~~~~~~
+Le serveur web utilise le fichier `phyloexplorer.conf` pour sa configuration.
+Voici sa structure :
 
-- Problème d'accès concurrent.
-- Problème d'homonymie
+----------------------------------------------
+[global]
+log.screen = 0 
+server.socket_host = "127.0.0.1"
+server.socket_port = 8080
+server.thread_pool = 10
+session.timeout = 1800
+proxy = "www.info-ufr.univ-montp2.fr:3128"
+----------------------------------------------
+
+log.screen::
+
+Cette variable est un booleen. Si elle est vrai (positionnée à 1), des
+informations de débogage seront envoyés sur la sortie standard de la console.
+Cette variable doit être mise à 0 pour un serveur de production.
+Voir la documentation de CherryPy pour plus de détails.
+
+server.socket_host::
+
+Definit l'adresse ip de la machine où est lancé le serveur. 
+Voir la documentation de CherryPy pour plus de détails.
+
+server.socket_port::
+
+Definit le port où devra être accessible l'application.
+Voir la documentation de CherryPy pour plus de détails.
+
+server.thread_pool::
+
+Définit le nombre d'instance à déployer. Plus le nombre de connexion est
+élevé, plus ce chiffre doit augmenter.
+Voir la documentation de CherryPy pour plus de détails.
+
+session.timeout::
+
+Précise la durée de la session d'un utilisateur. Elle se définit en secondes
+et indique la période d'inactivité autorisée de l'utilisateur avant
+l'expiration de sa session.
+
+proxy (facultatif)::
+
+Cette variable est propre à PhyloExplorer (ie ne provient pas de CherryPy).
+Elle permet de spécifier l'adresse du proxy afin d'autoriser l'affichage des
+images et la correction du nom des taxons. Si vous avez un problème avec ces
+fonctionnalités, vous devriez vérifier que cette variable est correctement
+renseignée.
+
+Annexe
+======
+
+Liens externes
+--------------
+
+*Python* : `http://www.python.org`
+
+*NetworkX* : `https://networkx.lanl.gov/wiki`
+
+*CherryPy* : `http://www.cherrypy.org/`
+
 

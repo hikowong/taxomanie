@@ -129,10 +129,10 @@ else:
     tree = _collection_[_index_-1]
     if tree:
         try:
-            from phylogenictree import PhylogenicTree
+            from phylogenetictree import PhylogeneticTree
             htmltree += "<div class='treeName'>Tree Name : "+str(tree["name"])
             if not _cache_.has_key( tree["name"] ):
-                ptree = PhylogenicTree( tree["tree"], _reference_ )
+                ptree = PhylogeneticTree( tree["tree"], _reference_ )
                 _cache_["nbtaxa"] = ptree.nb_taxa
                 _cache_[tree["name"]] = ptree.display()
             htmltree += "  ("+str(_cache_["nbtaxa"])+" taxa)</div><br />"
