@@ -15,7 +15,7 @@ class TaxonomyReference( DiGraph ):
           name in relation
 
     You must provide a csv file which has the bellowed structure:
-        id|name|first_parent|homonym|list_parents|synonyms_list|common_name_list
+        id|name|first_parent|list_parents|synonyms_list|common_name_list
 
     all without spaces.
 
@@ -87,7 +87,7 @@ class TaxonomyReference( DiGraph ):
             return name.split()[0]
         return name
  
-    def getNameFromCommon( self, common_name ): #XXX not used
+    def getNameFromCommon( self, common_name ):
         """
         @return (list): all scientific names which is related with this common name
         """
@@ -97,7 +97,7 @@ class TaxonomyReference( DiGraph ):
                 species_list.append( name )
         return species_list
              
-    def getNameFromSynonym( self, synonym ): # XXX not used
+    def getNameFromSynonym( self, synonym ):
         """
         @return (list): all scientific names which is related with this synonym
         """
@@ -130,6 +130,32 @@ class TaxonomyReference( DiGraph ):
         """
         return self.TAXONOMY.has_key( name.lower() )
 
+    def correct( self, name, guess = False ):
+        """
+        - Check if name is a scientific name
+        - Check if name is a synonym
+        - Check if name is a common name
+        - Check if name is a misspell name
+
+        @return (list): list of names that might corresponds.
+            if the name is a scientific name, return an empty list.
+        """
+        if self.isValid( name ):
+            return []
+        else:
+            synonym_list = self.getNameFromSynonym( name )
+            if synonym_list:
+                return synonym_list
+            else:
+                common_list = self.getNameFromCommon( name )
+                if common_list:
+                    return common_list
+                elif guess:
+                    from lib.spellcheck import SpellCheck
+                    splchk = SpellCheck( self.TAXONOMY.iterkeys() )
+                    return splchk.correct( name )
+                else:
+                    return [0]
 
     def getParents( self, name ):
         """
@@ -157,6 +183,9 @@ class TaxonomyReference( DiGraph ):
         except ValueError:
             raise NameError, "%s is not a parent of %s" % (name1, name2) 
             
+
+    def getParent( self, name ):
+        return self.predecessors( name )[0]
 
     def __getMissSpelledList( self, taxa_list ):
         miss_spelled_list = []
@@ -216,8 +245,44 @@ class TaxonomyReference( DiGraph ):
                     taxon = parent
         return tree
 
+
+    """
+    def getCorrectedTaxa( self, nwk ):
+        from lib.phylogelib import getTaxa
+        taxa = [taxon.lower() for taxon in getTaxa( nwk ) ]
+        rel_dict = {}
+        for taxon in taxa:
+            related_name = self.correct( taxon )
+            if related_name:
+                rel_dict[taxon] = related_name
+        return rel_dict
+    """     
 if __name__ == "__main__":
     ref = TaxonomyReference()
+#    print "rattus>", ref.correct( "rattus" )
+#    print "rats>", ref.correct( "rats" )
+#    print "ratus>", ref.correct( "ratus" )
+#    print ref.getParents( "echinops telfairi" )
+#    print ref.getIntervalParents( "eutheria", "murinae" )
+#    print ref.stripTaxonName( "mus_mus_france" )
+#    print ref.stripTaxonName( "echinops" )
+#    print ref.stripTaxonName( "rattus_rattus" )
+#    print ref.stripTaxonName( "mus_france" )
+#    print ref.stripTaxonName("macropus_eugenii")
+#    print ref.isHomonym( "echinops" )
+#    print ref.isHomonym( "mus" )
+#    print ref.isHomonym( "bos" )
+#    print ref.isHomonym( "rattus" )
+#    print ref.getParents( "eutheria" )
+#    print ref.getIntervalParents( "eukaryota", "eutheria" )
+#    print ref.getIntervalParents( "murinae", "eutheria" )
+#    print
+#    print 
+    print "echinops>", ref.getParents( "echinops" )
+    print "echinops telfairi>", ref.getParents( "echinops telfairi" )
+#    print ref.getNCBIArborescence( ["echinops telfairi", "mus"] ).edges()
+#    print ref._homonym_by_name["echinops"]
+#    print ref.isHomonym( "echinops" )
     print ref.getHomonyms( "echinops" )
 
 

@@ -273,7 +273,6 @@ class PhyloExplorer( Taxobject ):
         ratio = sorted( d_stat.keys() )[1]-sorted( d_stat.keys() )[0]
         result = ""
         nbtaxa_max = max( d_stat.values() ) 
-        print d_stat
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
             bar = " "*( nbtree*70/nbtaxa_max )
@@ -289,7 +288,6 @@ class PhyloExplorer( Taxobject ):
             base = base.replace( " ", "&nbsp;" )
             if base:
                 result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("+str(nbtree)+" taxa)</tt><br />\n"
-                #result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" taxa)</tt><br />\n"
         return result
 
 
