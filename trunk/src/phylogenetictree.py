@@ -1,6 +1,6 @@
 
-from taxonomyreference import TaxonomyReference
-from lib.phylogelib import getTaxa, getBrothers, \
+from phylocore.taxonomyreference import TaxonomyReference
+from phylocore.phylogelib import getTaxa, getBrothers, \
     getChildren, tidyNwk, removeBootStraps, checkNwk
 
 class PhylogeneticTree( object ):
@@ -13,16 +13,13 @@ class PhylogeneticTree( object ):
     NCBI = "http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
     reference = None
 
-    def __init__( self, nwk, reference = None ):
+    def __init__( self, nwk, reference ):
         """
         @nwk (string): string in newick format
         @reference (networkx.DiGraph): The reference tree of NCBI database
         """
         if self.reference is None:
-            if reference is None:
-                PhylogeneticTree.reference = TaxonomyReference()
-            else:
-                PhylogeneticTree.reference = reference
+            PhylogeneticTree.reference = reference
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
         if not checkNwk( self.nwk ):
             raise ValueError, "Your tree is incorrect"

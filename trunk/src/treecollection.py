@@ -1,10 +1,9 @@
 
-from taxobject import Taxobject
-from lib.phylogelib import getTaxa, tidyNwk, removeBootStraps, \
+from phylocore.phylogelib import getTaxa, tidyNwk, removeBootStraps, \
   removeNexusComments, getBrothers
 import re
 
-class TreeCollection( Taxobject ):
+class TreeCollection( object ):
     """
     Manipulate phylogenic tree collection:
         - filtering
@@ -489,7 +488,7 @@ class TreeCollection( Taxobject ):
 
 
 if __name__ == "__main__":
-    from taxonomyreference import TaxonomyReference
+    from phylocore.taxonomyreference import TaxonomyReference
     col = """#nexus
 begin trees;
 tree aa = ((rattus, pan), homo);
