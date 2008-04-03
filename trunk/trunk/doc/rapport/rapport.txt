@@ -90,6 +90,10 @@ Formats des fichiers
 ((homo, rattus), bos ,(pan,mus));
 -----------------------------------
 
+L'arbre est défini entre parenthèse comme suit *(arbre);* ainsi que chaque groupe de taxons *(frère 1, frère 2);*.
+On retrouve aussi les niveaux de profondeur de la façon suivante *(1,(2,(3,3)));*.
+Si l'on applique à l'exemple précédent, on a 3 frères qui sont _(homo, rattus)_, _bos_ et _(pan,mus)_, et 2 niveaux de profondeur.
+
 [caption="Exemple : "]
 .Le format de fichier _Nexus_ pour les collections d'arbres
 --------------------------------------------------------------
@@ -101,6 +105,8 @@ Tree 3 = ((homo,rats),pan);
 Tree 4 = (((((homo,pan),macaca),ratus),dasypus),monodelphi);
 end;
 --------------------------------------------------------------
+
+Le format nexus permet de structurer une collection d'arbres de façon explicite. Il supporte l'ajout d'annotations sous forme de commentaires.
 
 [caption="Exemple : "]
 .données de la base _names.dump_ du NCBI
@@ -114,7 +120,7 @@ end;
 9615    |   Canis canis |		|   synonym             |
 -----------------------------------------------------------
 
-NOTE: TODO (sorel) Nexus translate, commentaire
+Il s'agit d'une nomenclature communément utilisée, l'identifiant permet de retrouver de façon unique un taxon et trouver toutes les informations associées à l'aide de séparateurs définis.
 
 Choix technique
 ---------------
