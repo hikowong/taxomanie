@@ -648,21 +648,26 @@ utilité. Il serait intéressant de savoir si BioPython (qui soutenu par une
 communauté international de développeur) peut remplacer Phylogelib (qui reste
 très jeune).
 
-Interface et visualisation
---------------------------
-
-NOTE: TODO (sorel) css, js, stat, variables serveur pr images et liens
-
 Module phyloWidget
 ------------------
 
 Qu'est ce que c'est?
 ~~~~~~~~~~~~~~~~~~~
-PhyloWidget est une applet java sous libre de droits, servant à visionner et éditer des arbres phylogénétiques en ligne. C'est un outils simple à utiliser mais très complet permettant une grande interaction avec l'utilisateur. Il est possible de créer son arbre, l'importer via les formats Newick ou Nexus, et même de le modifier afin de l'exporter sous forme de fichier ou d'image.
-Entre autres, on note des suppléments d'ergonomie agréables comme les différents types de visualisation (circulaire, rectangulaire, ...), le zoom, la recherche de taxons, ou encore l'affichage des vraies longueurs de branches.
 
-Intégration au projet
+PhyloWidget est une applet java sous libre de droits, servant à visionner et éditer des arbres phylogénétiques en ligne. C'est un outils simple à utiliser mais très complet permettant une grande interaction avec l'utilisateur. 
+Il est possible de créer son arbre, l'importer via les formats Newick ou Nexus, et même de le modifier afin de l'exporter sous forme de fichier ou d'image.
+Entre autres, on note des suppléments d'ergonomie agréables comme les différents types de visualisation (circulaire, rectangulaire, ...), le zoom, la recherche de taxons, ou encore l'affichage des vraies longueurs de branches. A cela vient s'ajouter sur le survol d'un taxon, un tableau d'informations ainsi qu'un large éventail d'interactions (à découvrir).
+
+Cette application requiert l'environnement java 1.5 coté client. 
+Sa réalisation est dûe à Gregory Jordanie (`phylowidget@gmail.com`) sous la tutelle de Bill Piel (Google Summer of Code project). 
+
+Intégration du module
 ~~~~~~~~~~~~~~~~~~~~~
+
+Ce module a été rajouté afin de compléter la visualisation personnalisable des arbres dans notre application.
+Pour ce faire, nous faisons appel à l'applet directement du site source en passant l'arbre à visualiser en paramètre. Ainsi le serveur hébergeant phyloExplorer n'est pas sollicité.
+
+PhyloWidget est la meilleure solution libre, en terme d'utilisation et d'installation (parmis autres solutions comme ATV ou clustalw).
 
 Installation
 ------------
@@ -861,3 +866,5 @@ Liens externes
 *NCBI* : `http://www.ncbi.nlm.nih.gov/`
 
 *Référence biologique* : `http://fr.wikipedia.org`
+
+*Applet PhyloWidget* : `http://www.phylowidget.org`
