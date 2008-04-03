@@ -1,11 +1,12 @@
-PhyloExplorer
-=============
+
+| image:logo.png[] |
 
 :Authors:
 
    Nicolas Auberval
    Nicolas Clairon
    Sorel Diser
+
 
 Présentation du projet
 =======================
