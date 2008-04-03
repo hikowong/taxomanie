@@ -656,7 +656,13 @@ NOTE: TODO (sorel) css, js, stat, variables serveur pr images et liens
 Module phyloWidget
 ------------------
 
-NOTE: TODO (sorel) résumé, spécifications, possibilités, exemples of use, site ref
+Qu'est ce que c'est?
+~~~~~~~~~~~~~~~~~~~
+PhyloWidget est une applet java sous libre de droits, servant à visionner et éditer des arbres phylogénétiques en ligne. C'est un outils simple à utiliser mais très complet permettant une grande interaction avec l'utilisateur. Il est possible de créer son arbre, l'importer via les formats Newick ou Nexus, et même de le modifier afin de l'exporter sous forme de fichier ou d'image.
+Entre autres, on note des suppléments d'ergonomie agréables comme les différents types de visualisation (circulaire, rectangulaire, ...), le zoom, la recherche de taxons, ou encore l'affichage des vraies longueurs de branches.
+
+Intégration au projet
+~~~~~~~~~~~~~~~~~~~~~
 
 Installation
 ------------
@@ -802,11 +808,7 @@ Bilan
 Résultats
 ~~~~~~~~~
 
-NOTE: TODO liste fonctionnalités faites! + fonctionnalités bonus
-
-NOTE: TODO comparaison navigation sur NCBI et phyloexplorer (screenshot)
-
-
+NOTE: TODO (Nico A. la fait si g bien compris) liste fonctionnalités faites! + fonctionnalités bonus
 
 Annexe
 ======
