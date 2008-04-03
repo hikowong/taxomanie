@@ -129,7 +129,7 @@ else:
     tree = _collection_[_index_-1]
     if tree:
         try:
-            from phylogenetictree import PhylogeneticTree
+            from phylocore.phylogenetictree import PhylogeneticTree
             htmltree += "<div class='treeName'>Tree Name : "+str(tree["name"])
             if not _cache_.has_key( tree["name"] ):
                 ptree = PhylogeneticTree( tree["tree"], _reference_ )

@@ -1,17 +1,32 @@
-import os
-localDir = os.path.dirname(__file__)
-absDir = os.path.join(os.getcwd(), localDir)
+#!/usr/bin/env python
 import sys
 sys.path.insert( 0, "lib" )
-
 import cherrypy
-from cherrypy.lib import static
-
-from treecollection import TreeCollection
-from taxobject import Taxobject 
+from phylocore.treecollection import TreeCollection
 import ConfigParser
 import httplib
 import string
+
+from pleet.pleet import Pleet
+import os.path
+
+import os
+localDir = os.path.dirname(__file__)
+absDir = os.path.join(os.getcwd(), localDir)
+
+
+class Taxobject( object ):
+
+    _path_templates = os.path.join( absDir,"..","share","phyloexplorer","templates" )
+    _pleet = Pleet()
+    
+    def _presentation( self, filename, msg="", pagedef="" ):
+        full_path = os.path.join( self._path_templates, filename )
+        self._pleet.setTemplate(
+          self.header() + open(full_path).read() + self.footer() )
+        self._pleet["_msg_"] = msg
+        self._pleet["_pagedef_"] = pagedef
+        return self._pleet.render()
 
 class PhyloExplorer( Taxobject ):
     
@@ -19,20 +34,29 @@ class PhyloExplorer( Taxobject ):
 
     def __init__( self ):
         if self.reference is None:
-            from taxonomyreference import TaxonomyReference
-            PhyloExplorer.reference = TaxonomyReference()
+            from phylocore.taxonomyreference import TaxonomyReference
+            PhyloExplorer.reference = TaxonomyReference( 
+              os.path.join( absDir, "..", "share", "phyloexplorer","data", "taxonomy.csv" ) )
         self._taximage_url = {}
         self.__loadProxy()
 
     def header( self ):
-        return open( "templates/header.html" ).read()
+        return open( os.path.join( absDir, "..",
+          "share","phyloexplorer","templates","header.html" )).read()
 
     def footer( self ):
-        return open( "templates/footer.html" ).read()
+        return open( os.path.join( absDir, "..",
+          "share","phyloexplorer","templates","footer.html" )).read()
 
     def __loadProxy( self ):
         config = ConfigParser.ConfigParser()
-        config.read("phyloexplorer.conf")
+        if os.path.exists( os.path.join( os.environ["HOME"],
+          ".phyloexplorer" )):
+            path = os.path.join( os.environ["HOME"], ".phyloexplorer")
+        else:
+            path = os.path.join(absDir, "..", "share", "phyloexplorer", "etc",
+              "phyloexplorer.conf" )
+        config.read( path )
         try:
             self.proxy = config.get("global","proxy").strip("\"")
         except:
@@ -81,7 +105,8 @@ class PhyloExplorer( Taxobject ):
 
     @cherrypy.expose
     def css( self ):
-        return open( "templates/site.css" ).read()
+        return open( os.path.join( absDir, "..",
+          "share","phyloexplorer","templates","site.css" )).read()
 
     @cherrypy.expose
     def index( self, msg = "" ):
@@ -242,7 +267,9 @@ class PhyloExplorer( Taxobject ):
                     
     @cherrypy.expose
     def getAllSugestions( self ):
-        self._pleet.setTemplate( open("templates/getallsugestions.html").read() )
+        path = os.path.join( absDir, "..",
+          "share","phyloexplorer","templates","getallsugestions.html" )
+        self._pleet.setTemplate( open(path).read() )
         self._pleet["_suggestlist_"] = self.__getNCBIDidYouMean()
         return self._pleet.render()
 
@@ -360,22 +387,27 @@ class PhyloExplorer( Taxobject ):
             "NautilusGrey.jpg", "NautilusGreen.jpg", "NautilusWhite.jpg",\
             "NautilusDarkGreen.jpg"]:
             raise "What do you the fucking do ?!?"
-        return open( "templates/"+imagename, "rb").read()
+        return open( os.path.join( absDir, "..",
+          "share","phyloexplorer","templates",imagename ), "rb").read()
 
     @cherrypy.expose
     def getJquery( self ):
-        return open( "templates/jquery-1.2.3.js").read()
+        return open( os.path.join( absDir, "..",
+          "share","phyloexplorer","templates", "jquery-1.2.3.js" )).read()
 
     @cherrypy.expose
     def getIco( self ):
-        return open( "templates/favicon.ico", "rb").read()
+        return open( os.path.join( absDir, "..",
+          "share","phyloexplorer","templates", "favicon.ico" ), "rb").read()
 
 
     @cherrypy.expose
     def getJavascript( self ):
-        result =  open( "templates/jquery-1.2.3.js").read()
-        result +=  open( "templates/jquery.blockUI.js").read()
-        result += open( "templates/phyloexplorer.js").read()
+        path = os.path.join( absDir, "..",
+          "share","phyloexplorer","templates" )
+        result =  open( os.path.join( path, "jquery-1.2.3.js")).read()
+        result +=  open( os.path.join( path, "jquery.blockUI.js")).read()
+        result += open( os.path.join( path, "phyloexplorer.js")).read()
         #return open( "templates/phyloexplorer.js").read()
         return result
 
@@ -403,11 +435,15 @@ cherrypy.tree.mount(PhyloExplorer())
 
 
 if __name__ == '__main__':
-    import os.path
-    import ConfigParser
     ## Open and parse config file
     config = ConfigParser.ConfigParser()
-    config.read("phyloexplorer.conf")
+    if os.path.exists( os.path.join( os.environ["HOME"],
+      ".phyloexplorer" )):
+        path = os.path.join( os.environ["HOME"], ".phyloexplorer")
+    else:
+        path = os.path.join(absDir, "..", "share", "phyloexplorer", "etc",
+          "phyloexplorer.conf" )
+    config.read( path )
     ## Fill variables
     try:
         log_screen = bool(int(config.get("global","log.screen")))

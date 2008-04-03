@@ -1,6 +1,6 @@
 
 from networkx import DiGraph
-from lib.phylogelib import getTaxa, getBrothers, \
+from phylocore.phylogelib import getTaxa, getBrothers, \
     getChildren, tidyNwk, removeBootStraps, checkNwk
 
 class TaxonomyReference( DiGraph ):
@@ -26,12 +26,14 @@ class TaxonomyReference( DiGraph ):
     This class provides also methods to create Digraph 
     """
 
-    def __init__( self, file = "" ):
+    def __init__( self, file ):
         super( TaxonomyReference, self ).__init__()
-        if file:
+        try:
             taxonomy = open( file )
-        else:
-            taxonomy = open( "tools/taxonomy.csv" )
+        except:
+            raise ValueError, "Cannot find %s file. Please run preproc.py to generate it" % file
+#        else:
+#            taxonomy = open( "tools/taxonomy.csv" )
         # taxonomy reference generation
         self.TAXONOMY = {}
         self._homonym_by_name = {}
@@ -151,7 +153,7 @@ class TaxonomyReference( DiGraph ):
                 if common_list:
                     return common_list
                 elif guess:
-                    from lib.spellcheck import SpellCheck
+                    from phylocore.spellcheck import SpellCheck
                     splchk = SpellCheck( self.TAXONOMY.iterkeys() )
                     return splchk.correct( name )
                 else:
@@ -248,7 +250,7 @@ class TaxonomyReference( DiGraph ):
 
     """
     def getCorrectedTaxa( self, nwk ):
-        from lib.phylogelib import getTaxa
+        from phylocore.phylogelib import getTaxa
         taxa = [taxon.lower() for taxon in getTaxa( nwk ) ]
         rel_dict = {}
         for taxon in taxa:

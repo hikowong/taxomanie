@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Preproc.py
 
@@ -9,10 +10,13 @@ USAGE:
 import sys
 import os
 
-print "Downloading NCBI database on the web"
-os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
+if len( sys.argv ) == 1:
+    print "Downloading NCBI database on the web"
+    os.system( "curl -# ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz > taxdump.tar.gz ")
+    #os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
 print "Extracting database... please wait"
 os.system( "tar xf taxdump.tar.gz names.dmp nodes.dmp" )
+ 
 
 NAMES = "names.dmp"
 NODES = "nodes.dmp"
@@ -127,8 +131,6 @@ for species in TBI.keys():
 
 os.system( "rm taxdump.tar.gz" )
 os.system( "rm names.dmp nodes.dmp" )
-
-TAXONOMY_BY_ID = TBI
-TAXONOMY_BY_NAME = TBN
+os.system( "mv taxonomy.csv ../data" )
 
 print "Done"

@@ -7,30 +7,20 @@ PhyloExplorer
    Nicolas Clairon
    Sorel Diser
 
-//.. contents:: Sommaire
-//.. sectnum::
-//   :depth: 4
-
-Sommaire
-========
-
-NOTE: TODO (sorel) 
-
 Présentation du projet
 =======================
 
 Phylogénie et Taxonomie
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 Comprendre le sujet
-^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~
 
 La phylogénie est l'étude de la formation et de l'évolution des organismes du vivant en vue d'établir leur parenté. Elle formalise la classification sous forme d'arbres phylogénétiques (équivalent à un arbre généalogique) dont les noeuds sont des taxons.
 La taxomanie associée définit l'étude et le regroupement de ces organismes en entité selon leurs critères, caractères et autres similitudes.
 
-Exemple d'arbres phylogénétiques
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
+[caption=""]
+.Exemple d'arbres phylogénétiques
 -----------------------------------------------
 Root
 | +- Hominoidea
@@ -41,7 +31,7 @@ Root
 -----------------------------------------------
 
 Analyse de l'existant
-~~~~~~~~~~~~~~~~~~~~~
+---------------------
 
 Le NCBI _National Center for Biotechnology Information_
 Le site du NCBI est un ensemble d'outils et de bases de données sur les biotechnologie, voir `http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy`.
@@ -54,10 +44,10 @@ Comme tout site de recherche, le NCBI propose beaucoup d'informations via une in
 La navigation sur un arbre apparaît assez fastidueuse et les informations taxonomique complémentaires, certes complètes, deviennent vite illisibles.
 
 Besoins et objectifs
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 Besoins
-^^^^^^^
+~~~~~~~
 
 En perpétuel remaniement grâce/à cause de l'avancée des nouvelles techniques moléculaires et génétiques, les chercheurs ont besoin d'outils concis pour :
 - la visualisation,
@@ -67,7 +57,7 @@ En perpétuel remaniement grâce/à cause de l'avancée des nouvelles techniques
 - le partage d'informations.
 
 Objectifs
-^^^^^^^^^
+~~~~~~~~~
 
 L'objectif principal de ce projet est de pouvoir travailler sur sa propre collection d'arbres et d'appliquer les fonctionnalités suivantes :
 
@@ -78,7 +68,7 @@ L'objectif principal de ce projet est de pouvoir travailler sur sa propre collec
 - produire des statistiques sur la collection.
 
 Exigences
-^^^^^^^^^
+~~~~~~~~~
 
 Les seules exigences interviennent au niveau des formats d'entrée/sortie du projet. Ces derniers prennent en compte une collection d'arbres. On cite _phylip_, _newick_, _nexus_ -> .nwk, et la banque de données _.csv_.
 
@@ -178,6 +168,13 @@ Cette distinction dans la structure permet aux développeurs de créer d'autres
 applications en se servant de la même base. Des scripts, pipelines ou encore
 des applications QT peuvent être crées à moindre coût.
 
+[NOTE]
+[caption="Remarque"]
+Par manque de temps, vous ne trouverez pas _PhyloCore_ et _PhyloWeb_ dans le
+code. Cette séparation n'existe pour une explication plus aisé des différentes
+parties du projet. Il serait bon dans un future proche, de restructurer le
+code projet en utilisant ces deux appellations.
+
 PhyloCore
 ~~~~~~~~~
 PhyloCore regroupe trois classes (TaxanomyReference, TreeCollection et
@@ -267,7 +264,7 @@ les informations nécessaire et générera le fichier `taxonomy.csv`.
 [NOTE]
 .A propos de base de données
 Dans ce projet, il nous a été demandé de s'affranchir totalement de base de
-données classique (MySQL, SQLLite...) pour charger toute la taxonomy du NCBI
+données classique (MySQL, SQLite...) pour charger toute la taxonomy du NCBI
 en RAM. Cependant, pour plus de clareté (et par habitude ?) nous continuerons
 de parler de base de données du NCBI
 
@@ -303,11 +300,11 @@ getIntervalParents(self, name1, name2)::
     >>> self.getIntervalParents( "murinae", "eutheria" )
 
 getNCBIArborescence(self, taxa_list)::
-    Cette méthode prend une liste de taxon et créer l'aborescence du NCBI en
+    cette méthode prend une liste de taxon et créer l'aborescence du NCBI en
     recherchant les parents dans la base de données.
 
 getParents(self, name)::
-    retourn la liste de tous les parents d'un taxon
+    retourne la liste de tous les parents d'un taxon
 
 isHomonym(self, name)::
     retourne vrai si le taxon est un homonyme. \+
@@ -321,7 +318,7 @@ isValid(self, name)::
     base du NCBI
 
 stripTaxonName(self, taxon_name)::
-    Troncate le nom passé dans le but d'en extraire le nom scientifique.
+    tronque le nom passé dans le but d'en extraire le nom scientifique.
     Exemple:
 
     >>> self.stripTaxonName( "rattus" ) -> "rattus"
@@ -371,7 +368,7 @@ sera évaluée :
 displayHomonymList(self)::
     Cette méthode retourne la liste des homonymes au format HTML.
 +
-*Remarque* : __Cette methode doit être réécrite de manière à tenir compte du MVC__
+*Remarque* : __Cette méthode doit être réécrite de manière à tenir compte du MVC__
 
   
 displayStats(self, allparents=False)::
@@ -379,7 +376,7 @@ displayStats(self, allparents=False)::
     des données statistiques qui permet de connaitre le nombre d'occurence
     d'une espèce dans la collection.
 +
-*Remarque* : __Cette methode doit être réécrite de manière à tenir compte du MVC.
+*Remarque* : __Cette méthode doit être réécrite de manière à tenir compte du MVC.
  Elle doit se trouver dans une template__
 
 
@@ -403,7 +400,7 @@ initStat(self)::
     collection. Cette méthode permet de mettre à jour les statistiques.
     
 stat1(self)::
-    Cette méthode aussi sobrement appellé stat1 permet de connaitre le nombre
+    Cette méthode aussi sobrement appelé stat1 permet de connaitre le nombre
     d'arbre à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
     début de l'intervalle. Voir la section statistiques pour plus de détails.
 
@@ -415,7 +412,8 @@ stat2(self)::
 **********************************************************
 
 [python]
-.Utilisation
+[caption=""]
+.Exemple d'utilisation
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 from treecollection import TreeCollection
 
@@ -512,6 +510,7 @@ Une template, bien qu'ayant l'extension `.html`, est un ensemble de code
 python et d'html. Le code python est placé entre les balises `<%` et `%>`.
 
 [python]
+[caption=""]
 .Une template basique
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 <%
@@ -540,6 +539,7 @@ Pleet permet "d'exposer" des objets afin qu'ils puissent être utilisé dans les
 templates.
 
 [python]
+[caption=""]
 .Exposition d'un objet
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 pleet["_civilite_"] = civilite
@@ -549,6 +549,7 @@ Dans cet exemple, on rend accessible la variable `civilite` accessible dans la
 template sous le nom `_civilite_`.
 
 [python]
+[caption=""]
 .Utilisation d'un objet exposé
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Bonjour 
@@ -595,7 +596,12 @@ Difficultés
 Sécurité
 ~~~~~~~~
 
-NOTE: TODO faille soft, critique, charge serveur, amelioration?
+Par manque d'infrastructure et d'outils dédiés, nous n'avons pas pu estimer le
+taux de charge du serveur. En ce qui concerne la sécurité, nous avons fait
+particulièrement attention à éviter la possibilité d'injection et de XSS.
+
+Pour plus d'information concernant la sécurité du serveur, merci de se référer
+à la documentation de CherryPy
 
 Résultats
 ~~~~~~~~~
@@ -607,7 +613,15 @@ NOTE: TODO comparaison navigation sur NCBI et phyloexplorer (screenshot)
 Evolutions
 ~~~~~~~~~~
 
-NOTE: TODO biopython
+Il existe une bibliothèque appellé BioPython qui fournit des classes et
+des méthodes permettant de travailler dans le contexte de la biologie.
+
+Cette bibliothèque est très complète et très complexe. Ayant tout ce dont nous
+avions besoin pour avec la Phylogelib, et découvrant cette bibliothèque
+tardivement dans le projet, nous n'avons pas eu le temps d'appronfondir son
+utilité. Il serait intéressant de savoir si BioPython (qui soutenu par une
+communauté international de développeur) peut remplacer Phylogelib (qui reste
+très jeune).
 
 Installation
 ------------
@@ -637,7 +651,57 @@ et taper simplement sous root `$ python setup install.py`.
 
 Installation de PhyloExplorer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-NOTE: TODO
+
+Taper simplement en root la commande :
+-------------------------
+python setup.py
+-------------------------
+
+Si vous n'avez pas les droits, vous pouvez l'installer dans un répertoire
+définit en tapant :
+------------------------------------------
+python setup.py /chemin/vers/le/répertoire
+------------------------------------------
+
+Voici la structure de l'application:
+
+---------------------------------
+bin:
+    phyloexplorer
+
+share/phyloexplorer/data:
+    taxonomy.csv
+
+share/phyloexplorer/etc:
+    phyloexplorer.conf
+
+share/phyloexplorer/templates:
+    about.html
+    check.html
+    error.html
+    favicon.ico
+    footer.html
+    getallsugestions.html
+    header.html
+    help.html
+    index.html
+    jquery-1.2.3.js
+    jquery.blockUI.js
+    NautilusBlack.jpg
+    NautilusBlue.jpg
+    NautilusDarkBlue.jpg
+    NautilusDarkGreen.jpg
+    NautilusGreen.jpg
+    NautilusGrey.jpg
+    NautilusWhite.jpg
+    phyloexplorer.js
+    site.css
+    statistics.html
+    taxomanie.js
+
+share/phyloexplorer/tools:
+    preproc.py
+----------------------------------
 
 Configuration
 ~~~~~~~~~~~~
@@ -737,4 +801,4 @@ Liens externes
 
 *CherryPy* : `http://www.cherrypy.org/`
 
-
+*BioPython* : `http://biopython.org/wiki/Main_Page`
