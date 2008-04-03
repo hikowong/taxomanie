@@ -24,7 +24,8 @@ class PhylogeneticTree( object ):
             else:
                 PhylogeneticTree.reference = reference
         self.nwk = removeBootStraps( tidyNwk(nwk.lower()) )
-        checkNwk( self.nwk )
+        if not checkNwk( self.nwk ):
+            raise ValueError, "Your tree is incorrect"
         self.root = "root"
         self.nb_taxa = 0
         self._getArborescence()
