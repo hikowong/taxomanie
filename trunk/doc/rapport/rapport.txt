@@ -17,32 +17,42 @@ Phylogénie et Taxonomie
 Comprendre le sujet
 ~~~~~~~~~~~~~~~~~~~
 
-La phylogénie est l'étude de la formation et de l'évolution des organismes du vivant en vue d'établir leur parenté. Elle formalise la classification sous forme d'arbres phylogénétiques (équivalent à un arbre généalogique) dont les noeuds sont des taxons.
-La taxomanie associée définit l'étude et le regroupement de ces organismes en entité selon leurs critères, caractères et autres similitudes.
+La phylogénie est l'étude de la formation et de l'évolution des organismes du vivant en vue d'établir leur parenté. Elle formalise la classification sous forme d'arbres phylogénétiques (équivalent à un arbre généalogique depuis une racine incluant tous les êtres vivants existants ou ayant existé, jusqu'aux individus) dont les noeuds sont appelés _taxons_. Ainsi, la taxomanie associée définit l'étude et le regroupement de ces organismes en entité (familles, genres, espèces, ...) selon leurs critères, caractères et autres similitudes.
 
 [caption=""]
-.Exemple d'arbres phylogénétiques
+.Exemple d'un arbre phylogénétique
 -----------------------------------------------
 Root
-| +- Hominoidea
-| +- Hominidae
-| +- Homo/pan/gorilla group
-| | +- Homo
-| | +- Pan 
+| 
++- Canidae
+| +- Canis
+| |	+- Canis lupus
+| +- Vulpes 
+| +- Lycaon
 -----------------------------------------------
+
+Canis lupus, le loup, est un taxon de rang _espèce_.
+Canis est le taxon immédiatement supérieur de rang _genre_ et regroupe plusieurs espèces _chien, loup, chacal, ..._
+Canidés est le taxon immédiatement supérieur de rang _famille_ et regroupe plusieurs genres _Canis (chien, loup, chacal), Vulpes (renard), Lycaon (lycaon), ..._
+
+L'approche phylogénétique actuelle fait appel aux données de la cladistique, mais ses exigences se résument à n'accepter que des taxons monophylétiques, c'est-à-dire correspondant à un clade donné. Elle demande que les taxons soient limités à ceux qui respectent les deux conditions suivantes :
+
+- tous les individus du taxon descendent d'un individu ancestral particulier,
+- tous les descendants de cet ancêtre particulier sont dans le taxon.
+
+On parle alors seulement de _taxon monophylétique_ ou _clade_. Cette contrainte a amené des modifications fondamentales de la classification scientifique. Ainsi les dinosaures n'ont pas disparu, la systématique moderne inclut les oiseaux dans le groupement « dinosaures ».
+
+Par ailleurs, d'importants progrès en génomique ont été faits grâce à l'analyse génétique automatique et le développement des outils/modèles informatiques. Ils imposent et permettent la redéfinition de certaines espèces ou groupes d'espèces. Ces changements nécessitent donc une meilleure connaissance et suivi des espèces, d'où l'évolution de la phylogénie.
 
 Analyse de l'existant
 ---------------------
 
-Le NCBI _National Center for Biotechnology Information_
-Le site du NCBI est un ensemble d'outils et de bases de données sur les biotechnologie, voir `http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy`.
-En ce qui nous concerne, on retiendra les points qui suivent comme références de départ pour le projet PhyloExplorer :
+Le NCBI _National Center for Biotechnology Information_ est un centre d'informations sur les biotechnologies établi en 1988. Le site du NCBI propose un ensemble d'outils et de bases de données sur la biologie, voir `http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy`. Il est considéré comme une référence pour la recherche en phylogénie et en ce qui nous concerne, on retiendra la partie _taxonomy_ du site comme référence de départ pour le projet PhyloExplorer.
 
-- Les données : base de données taxonomique téléchargeable à disposition du public
-- Les actions de bases : la gestion d'arbres phylogénétiques en ligne
+Dans un premier temps, on utilisera la base de données taxonomique à disposition du public pour créer notre structure conforme à la phylogénie en vigueur. Dans un second temps, les fonctionnalités de bases seront calquées sur la gestion d'arbres phylogénétiques en ligne. Et enfin, le site permettra de valider les résultats obtenus lors du développement de notre projet.
 
 Comme tout site de recherche, le NCBI propose beaucoup d'informations via une interface chargée et peu adaptée au travail personnalisé.
-La navigation sur un arbre apparaît assez fastidueuse et les informations taxonomique complémentaires, certes complètes, deviennent vite illisibles.
+La navigation sur un arbre apparaît assez fastidueuse et les informations taxonomiques, certes complètes, deviennent vite illisibles. En conclusion, l'ergonomie ne sera pas retenue et une interface mieux adaptée devra être mise en place pour faciliter une interaction plus soutenue avec l'utilisateur.
 
 Besoins et objectifs
 --------------------
@@ -50,12 +60,7 @@ Besoins et objectifs
 Besoins
 ~~~~~~~
 
-En perpétuel remaniement grâce/à cause de l'avancée des nouvelles techniques moléculaires et génétiques, les chercheurs ont besoin d'outils concis pour :
-- la visualisation,
-- l'analyse,
-- la modification,
-- la confrontation, 
-- le partage d'informations.
+En perpétuel remaniement grâce/à cause de l'avancée des nouvelles techniques moléculaires et génétiques, les chercheurs ont besoin d'outils concis pour : la visualisation, l'analyse, la modification, la confrontation et le partage d'informations.
 
 Objectifs
 ~~~~~~~~~
@@ -63,15 +68,15 @@ Objectifs
 L'objectif principal de ce projet est de pouvoir travailler sur sa propre collection d'arbres et d'appliquer les fonctionnalités suivantes :
 
 - parcourir et visualiser une collection d'arbres,
-- vérifier la conformité des arbres et taxons,
-- effectuer des requêtes sur une collection (tri),
-- filtrer une collection (garder des sous-arbres),
-- produire des statistiques sur la collection.
+- vérifier la conformité des structures d'arbres et la validité des taxons,
+- effectuer des requêtes sur une collection (tri sur le nombre et/ou la présence de taxons),
+- filtrer une collection (ne garder que les sous-arbres pertinents),
+- produire des statistiques (distribution des taxons et arbres dans une collection).
 
 Exigences
 ~~~~~~~~~
 
-Les seules exigences interviennent au niveau des formats d'entrée/sortie du projet. Ces derniers prennent en compte une collection d'arbres. On cite _phylip_, _newick_, _nexus_ -> .nwk, et la banque de données _.csv_.
+Les seules exigences interviennent au niveau des formats d'entrée et sortie du projet. Ces derniers prennent en compte une collection d'arbres. On cite *phylip*, *newick*, *nexus* sous forme de _fichier.nwk_, et la banque de données stockée dans un _fichier.csv_.
 
 Documentation technique
 =======================
@@ -803,24 +808,24 @@ Annexe
 Glossaire phylogénétique
 ------------------------
 
-*Abre phylogénétique* : équivalent d'un arbre généalogique des taxons.
+*Arbre phylogénétique* : l'équivalent d'un arbre généalogique de taxons.
 
-*Phylogénie* : c'est l'étude de la formation et de l'évolution des organismes vivants en vue d'établir leur parenté. 
+*Phylogénie* : étude de la formation et de l'évolution des organismes vivants afin d'établir leur parenté. 
 
-*Taxon* : Les organismes du vivant sont classés selon des catégories en fonction de leurs similitudes et de leurs relations évolutives. Ces catégories sont des taxons et représentent les noeuds d'un arbre phylogénétique.
+*Taxon* : les organismes du vivant sont classés selon des catégories en fonction de leurs similitudes et de leurs relations évolutives. Ces catégories sont des taxons et représentent les noeuds d'un arbre phylogénétique.
 
 Glossaire technique
 -------------------
 
-*CSS* : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices _id_, _name_, _class_.
+*Css* : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices _id_, _name_, _class_.
 
-*CSV* : _Comma Separated Values_, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.
+*Csv* : _Comma Separated Values_, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.
 
-*Filtrage* : Ici permet de restreindre un arbre en sous arbres.
+*Filtrage* : permet dans le cas présent de restreindre un arbre en sous arbres.
 
-*Jquery* : c'est une bibliothèque Javascript qui porte sur l'interaction entre JavaScript et HTML. La librairie se présente comme un unique fichier décrivant les utilisations _d'évènements multi navigateur_, _DOM_,_Effets et animations_, et surtout _Ajax_.
+*Jquery* : bibliothèque Javascript qui porte sur l'interaction entre JavaScript et HTML. La librairie se présente comme un unique fichier décrivant les utilisations _d'évènements multi navigateur_, _DOM_,_Effets et animations_, et surtout _Ajax_.
 
-*NCBI* : National Center for Biotechnology Information.
+*NCBI* : National Center for Biotechnology Information, référence en matière de biotechnologie, `http://www.ncbi.nlm.nih.gov`.
 
 *Nexus* : format de fichier contenant des arbres _phylogénétiques_ et des annotations associées.
 
@@ -830,9 +835,9 @@ Glossaire technique
 
 *Python* : langage de programmation interprété, multi-paradigme, qui favorise la programmation impérative structurée, et orientée objet. Il est doté d'un typage dynamique fort, d'une gestion automatique de la mémoire par ramasse-miettes et d'un système de gestion d'exceptions. Sous licence libre et multi plates-formes.
 
-*SVN / Subversion* : C'est un entrepot de versions temporaires de code qui permettent aux développeurs de tester, partager, modifier, comparer, réinstaller un projet en équipe.
+*SVN / Subversion* : entrepot de versions temporaires de code qui permet aux développeurs de tester, partager, modifier, comparer, réinstaller un projet en équipe.
 
-*Template* : c'est un modèle permettant de construire les pages d'un site web selon une trame générale (un squelette) et des zones modifiables. Utile pour les mise à jour et modifications en cascade.
+*Template* : modèle permettant de construire les pages d'un site web selon une trame générale (un squelette) et des zones modifiables. Utile pour les mise à jour et modifications en cascade.
 
 Liens externes
 --------------
@@ -846,3 +851,5 @@ Liens externes
 *BioPython* : `http://biopython.org/wiki/Main_Page`
 
 *NCBI* : `http://www.ncbi.nlm.nih.gov/`
+
+*Référence biologique* : `http://fr.wikipedia.org`
