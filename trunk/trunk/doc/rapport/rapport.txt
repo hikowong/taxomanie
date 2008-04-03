@@ -78,14 +78,14 @@ Documentation technique
 Formats des fichiers
 --------------------
 
-- Le format de données et de structure d'arbres phylogénétiques _Phylip/Newick_ 
-
+[caption="Exemple : "]
+.Le format de données et de structure d'arbres phylogénétiques _Phylip/Newick_ 
 -----------------------------------
 ((homo, rattus), bos ,(pan,mus));
 -----------------------------------
 
-- Le format de fichier _Nexus_ pour les collections d'arbres
-
+[caption="Exemple : "]
+.Le format de fichier _Nexus_ pour les collections d'arbres
 --------------------------------------------------------------
 #nexus
 begin trees;
@@ -96,16 +96,16 @@ Tree 4 = (((((homo,pan),macaca),ratus),dasypus),monodelphi);
 end;
 --------------------------------------------------------------
 
-- Exemple de données de la base _taxonomy.csv_ du NCBI
-
+[caption="Exemple : "]
+.données de la base _names.dump_ du NCBI
 -----------------------------------------------------------
-_id_	|	_nom taxon_	| 		|	_type_				|
+    id  |   nom taxon   | 		|           type        |
 
-9611	|	Canis		|		|	scientific name		|
-9612	|	Canis lupus	|		|	scientific name		|
-9612	|	gray wolf	|		|	genbank common name	|
-9614	|	coyote		|		|	genbank common name	|
-9615	|	Canis canis	|		|	synonym				|
+9611    |   Canis       |		|   scientific name     |
+9612    |   Canis lupus |		|   scientific name     |
+9612    |   gray wolf   |		|   genbank common name |
+9614    |   coyote      |		|   genbank common name |
+9615    |   Canis canis |		|   synonym             |
 -----------------------------------------------------------
 
 NOTE: TODO (sorel) Nexus translate, commentaire
@@ -116,7 +116,7 @@ Choix technique
 Langage de programmation::
 
 Tout le projet PhyloExplorer repose sur le langage *Python*. Ce langage a été
-choisi pour sa licence (libre), sa portabilité (multiplateforme), sa robustesse,
+choisi pour sa licence (libre), sa portabilité (il est multiplateforme), sa robustesse,
 et sa syntaxe simple et claire. La facilité avec laquel il manipule les
 chaines de caractères à fait pencher la balance en sa faveur. Enfin, une
 bibliothèque python sur le traitement d'arbres phylogénétiques avait déjà été
@@ -124,12 +124,11 @@ créé par l'un des auteurs : la base était déjà faite.
 
 Serveur Web::
 
-Apache a été envisagé mais nous voulions un serveur web simple et autonome or
-le mod_python d'apache n'est pas trivial à installer et configurer. Nous nous
+Apache a été envisagé mais nous voulions un serveur web simple et autonome ; or
+le mod_python d'apache n'est pas trivial à installer et à configurer. Nous nous
 sommes donc tournés vers *CherryPy* qui est un "__framework HTTP orienté
-objet__". Ainsi, l'installation était grandement facilité et une utilisation
-standalone pouvait être envisagée (lancer le script, ouvrez votre navigateur,
-pointez à l'adresse "localhost:8080", c'est prêt !).
+objet__". Ainsi, l'installation était grandement facilitée et une utilisation
+standalone pouvait être envisagée.
 
 La gestion de graphes::
 
@@ -158,37 +157,30 @@ Nous n'avons pas voulu enfermer PhyloExplorer dans une utilisation
 particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré
 en plusieurs parties : 
 
-- *PhyloCore* : une batterie de classes et de méthodes qui manipule les
-  collections d'arbres phylogénétiques et dialogue avec la base de données du
+- *PhyloCore* : une batterie de classes et de méthodes qui manipulent les
+  collections d'arbres phylogénétiques et dialoguent avec la base de données du
   NCBI.
 - *PhyloWeb* : comprenant un serveur web légé et autonome ainsi qu'un
   ensemble de templates.
 
 Cette distinction dans la structure permet aux développeurs de créer d'autres
-applications en se servant de la même base. Des scripts, pipelines ou encore
-des applications QT peuvent être crées à moindre coût.
-
-[NOTE]
-[caption="Remarque"]
-Par manque de temps, vous ne trouverez pas _PhyloCore_ et _PhyloWeb_ dans le
-code. Cette séparation n'existe pour une explication plus aisé des différentes
-parties du projet. Il serait bon dans un future proche, de restructurer le
-code projet en utilisant ces deux appellations.
+applications en se servant de la même base (PhyloCore). Des scripts, pipelines ou encore
+des applications QT peuvent être créés à moindre coût.
 
 PhyloCore
 ~~~~~~~~~
-PhyloCore regroupe trois classes (TaxanomyReference, TreeCollection et
-PhylogeneticTree) et une bibliothèque de gestion d'arbres phylogénétiques :
-`phylogelib`.
+PhyloCore regroupe trois classes (_TaxanomyReference_, _TreeCollection_ et
+_PhylogeneticTree_) et une bibliothèque de gestion d'arbres phylogénétiques :
+_Phylogelib_.
 
 .Diagramme de classes
-image::phylo1.png[]
+| image:phylo1.png[] |
 
 Phylogelib
 ^^^^^^^^^^
 
 Phylogelib est une bibliothèque python qui permet de manipuler des arbres
-phylogénétiques. Très rapide, elle se contente de manipuler des chaines de
+phylogénétiques. Très rapide, elle se contente de traiter des chaines de
 caractères au format newick (on évite ainsi la lourde gestion de graphes).
 
 .Fonctions principales utilisées dans PhyloExplorer
@@ -235,7 +227,7 @@ comprend plusieurs images de la base du NCBI. Celles qui nous intéressent sont
 - l'id
 - le nom (scientifique)
 - le nom du parent
-- l'homonym auquel il se rapporte
+- l'homonyme auquel il se rapporte
 - la liste de ses parents
 - la liste de ses synonymes
 - la liste de ses noms communs.
@@ -251,15 +243,14 @@ id|nom|nom_du_parent|homonyme|liste!des!parents|liste!des!synonymes|liste!des!no
 -------------------------------------------------------------------------------------------
 
 Les éléments d'une liste sont séparés par un point d'exclamation. l'id est
-très important car il correspond à l'id du NCBI et donc de pouvoir générer les
-liens pointant vers le site du NCBI.
+très important car il permet de générer les liens pointant vers le site du NCBI.
 
 Ainsi, à chaque fois qu'il que l'on veut mettre à jour le fichier
-`taxonomy.csv`, il faudra effectuer cette procédure. Nous avons créer un
+`taxonomy.csv`, il faudra lancer cette procédure. Nous avons créer un
 outil qui l'effectue automatiquement. Il s'appelle `preproc.py`.
 
 Cet outil téléchargera automatiquement l'image de la base du NCBI, extraira
-les informations nécessaire et générera le fichier `taxonomy.csv`.
+les informations nécessaires et générera le fichier `taxonomy.csv`.
 
 [NOTE]
 .A propos de base de données
@@ -273,11 +264,7 @@ TaxonomyReference
 ^^^^^^^^^^^^^^^^^
 
 Cette classe permet d'intéragir avec la base du NCBI et plus particulièrement
-avec le fichier `taxonomy.csv` qu'il prend en paramètre :
-
-----------------------------------------------
-reference = TaxonomyReference( "taxonomy.csv" )
-----------------------------------------------
+avec le fichier `taxonomy.csv` qu'il prend en paramètre.
 
 .Méthodes principales
 ***************************************************
@@ -285,14 +272,14 @@ getCommonParent(self, taxa_list)::
     retourne le premier parent commun de tous les taxons présents dans la liste
 
 getHomonyms(self, name)::
-    retourne la liste des homonymes du nom passé en paramètre.\+
+    retourne la liste des homonymes du nom passé en paramètre. \+
     Exemple:
 
     >>> self.getHonomyms( "echinops" )
     ['echinops <plant>', 'echinops <mammal>']
 
 getIntervalParents(self, name1, name2)::
-    retourne la liste des parents intermédiaire entre deux taxons. \+
+    retourne la liste des parents intermédiaires entre deux taxons. \+
     Exemple:
 
     >>> self.getIntervalParents( "eukaryota", "eutheria" )
@@ -300,7 +287,7 @@ getIntervalParents(self, name1, name2)::
     >>> self.getIntervalParents( "murinae", "eutheria" )
 
 getNCBIArborescence(self, taxa_list)::
-    cette méthode prend une liste de taxon et créer l'aborescence du NCBI en
+    cette méthode prend une liste de taxons et créé l'aborescence du NCBI en
     recherchant les parents dans la base de données.
 
 getParents(self, name)::
@@ -318,7 +305,7 @@ isValid(self, name)::
     base du NCBI
 
 stripTaxonName(self, taxon_name)::
-    tronque le nom passé dans le but d'en extraire le nom scientifique.
+    tronque le nom passé dans le but d'en extraire le nom scientifique. \+
     Exemple:
 
     >>> self.stripTaxonName( "rattus" ) -> "rattus"
@@ -335,7 +322,7 @@ TreeCollection
 Cette classe représente une collection d'arbres phylogénétiques.
 Elle prend en paramètre une collection au format _Phyllip_, _Nexus_ ou
 _Nexus translate_. Elle propose des méthodes permettant de manipuler
-une collection comme effectuer des filtrages et des requêtes.
+une collection comme d'effectuer des filtrages et des requêtes.
 Elle permet également de récupérer les statistiques de la collections.
 
 .Méthodes principales
@@ -381,9 +368,9 @@ displayStats(self, allparents=False)::
 
 
 filter(self, taxa_list)::
-    Cette méthode va supprimer certains taxons de la collection d'arbre. Elle
-    est très utile pour ne travailler que sur une partie de la taxonomy sans
-    être pollué par d'autres taxons.
+    Cette méthode va supprimer certains taxons de la collection d'arbres. Elle
+    est très utile pour ne travailler que sur une partie de la taxonomie sans
+    être polluée par d'autres taxons.
 +
 Cette méthode prends en paramètre  la liste des taxons à supprimer.
 
@@ -400,14 +387,14 @@ initStat(self)::
     collection. Cette méthode permet de mettre à jour les statistiques.
     
 stat1(self)::
-    Cette méthode aussi sobrement appelé stat1 permet de connaitre le nombre
-    d'arbre à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
+    Cette méthode permet de connaitre le nombre
+    d'arbres à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
     début de l'intervalle. Voir la section statistiques pour plus de détails.
 
 stat2(self)::
-    Cette méthode permet de connaître le nombre de taxon à n arbres. Comme
-    stat1, elle renvoie un dictionnaire. Voir la section statistiques pour
-    plus de détails.
+    Cette méthode permet de connaître le nombre de taxon présents dans _n_
+    arbres. Comme _stat1_, elle renvoie un dictionnaire. Voir la section
+    statistiques pour plus de détails.
 
 **********************************************************
 
@@ -451,19 +438,71 @@ On voit bien dans cette exemple que la méthode `query` influera sur la méthode
 Statistiques
 ++++++++++++
 
-NOTE: TODO
+PhyloExplorer fournit deux types de statistiques. La première présente le
+nombre d'arbres à _n_ feuilles :
+
+-------------------------------
+10 feuilles -> 3 arbres
+12 feuilles -> 9 arbres
+16 feuilles -> 3 arbres
+20 feuilles -> 4 arbres
+24 feuilles -> 9 arbres
+26 feuilles -> 8 arbres
+30 feuilles -> 1 arbres
+31 feuilles -> 2 arbres
+32 feuilles -> 1 arbres
+40 feuilles -> 3 arbres
+...
+-------------------------------
+
+Le problème résidait dans le fait qu'il pouvait avoir une quantité
+considérable d'arbre au nombre de feuilles différentes. L'idée ici est de
+regrouper le nombre de feuille par tranche :
+
+[caption=""]
+.Exemple de répartition par tranche de 10
+-------------------------------
+de 0 à 10 feuilles -> 0 arbres
+de 10 à 20 feuilles -> 15 arbres
+de 20 à 30 feuilles -> 21 arbres
+de 30 à 40 feuilles -> 4 arbres
+de 40 à 50 feuilles -> 3 arbres
+...
+-------------------------------
+
+[NOTE]
+[caption="Remarque"]
+L'intervalle ne comprend pas la dernière valeur (de 0 à 10 feuilles
+représentera l'intervalle `[0,10[`)
+
+La grandeur de l'intervalle (que nous appellerons _ratio_) est calculée par
+l'équation : `nbmax*10.0/100` où `nbmax` est le nombre maximum de
+feuilles par arbres présentes dans la collection (ici 40). Cela permet de
+n'avoir qu'une dizaine de barres dans notre diagrame.
+
+Le dictionnaire renvoyé sera du type
+`{__nombre de feuilles__ : __nombre d'arbres__}`
+donc pour l'exemple ci-dessus on aura :
+
+-------------------------------------
+{0:0, 10:15, 20:21, 30:4, 40:3 ...}
+-------------------------------------
+
+La statistique numéro 2 calcule la fréquence de distribution des taxons dans
+la collection. Le ratio est calculé sur le même principe que précédemment.
+
 
 PhylogeneticTree
 ^^^^^^^^^^^^^^^^
 
-Cette classe ne permet d'afficher une abre phylogenetic au format HTML. La
+Cette classe permet d'afficher un arbre phylogénétique au format HTML. La
 représentation se fait sous forme d'arborescence simple. Par soucis de
 performances, cette classe est chargée uniquement lors de l'affichage d'un
 arbre phylogénétique. Ainsi, toutes les opérations relatives aux arbres se
-trouvent soit dans la bibliothèque Phylogelib, soit dans la classe
-TreeCollection.
+trouvent soit dans la bibliothèque _Phylogelib_, soit dans la classe
+_TreeCollection_.
 
-image::phylo2.png[]
+| image:phylo2.png[] |
 
 PhyloWeb
 ~~~~~~~~~
@@ -475,7 +514,7 @@ sont associées.
 
 PhyloExplorer.py
 ^^^^^^^^^^^^^^^^
-Ce fichier represente en quelque sorte le _main_ du projet. C'est ce script
+Ce fichier représente en quelque sorte le _main_ du projet. C'est ce script
 qu'il faudra lancer pour exécuter le serveur web. L'application sera alors
 accessible via l'adresse `http://adresse_ip:port` où `adresse_ip` et `port`
 sont définis dans le fichier de configuration `phyloexplorer.conf`.
@@ -495,8 +534,8 @@ documentation de CherryPy.
 
 Pour renvoyer du HTML, nous utilisons la méthode `self._presentation` qui
 prend en paramètre, le nom de la template à utiliser, un message d'information
-(facultatif) et une petite chaine de caractère qui sera placé en haut de la
-page et qui indiquera où se trouve l'utilisateur (ex : `Home > Statistics`).
+(facultatif) et une petite chaine de caractère qui sera placée en haut de la
+page et indiquera où se trouve l'utilisateur (ex : `Home > Statistics`).
 
 
 Les templates
@@ -507,7 +546,7 @@ les templates sont regroupées dans le répertoire "templates". Ce répertoire
 regroupe aussi les scripts CSS et javascripts.
 
 Une template, bien qu'ayant l'extension `.html`, est un ensemble de code
-python et d'html. Le code python est placé entre les balises `<%` et `%>`.
+python et de HTML. Le code python est placé entre les balises `<%` et `%>`.
 
 [python]
 [caption=""]
@@ -535,7 +574,7 @@ moteur de template si on se trouve toujours dans le `if` ou non.
 
 NOTE: Le fait de placer une ligne de commentaire *(2)* spécifie également l'indentation.
 
-Pleet permet "d'exposer" des objets afin qu'ils puissent être utilisé dans les
+Pleet permet "d'exposer" des objets afin qu'ils puissent être utilisés dans les
 templates.
 
 [python]
@@ -546,7 +585,7 @@ pleet["_civilite_"] = civilite
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Dans cet exemple, on rend accessible la variable `civilite` accessible dans la
-template sous le nom `_civilite_`.
+template sous le nom `\_civilite\_`.
 
 [python]
 [caption=""]
@@ -571,30 +610,11 @@ else:
 <%|%>
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Dans cet exemple, une série de tests sur la variable `_civilite_` permettra de
+Dans cet exemple, une série de tests sur la variable `\_civilite\_` permettra de
 produire la bonne template.
 
-Interface et visualisation
---------------------------
-
-NOTE: TODO (sorel) css, js, stat, variables serveur pr images et liens
-
-Module phyloWidget
-------------------
-
-NOTE: TODO (sorel) résumé, spécifications, possibilités, exemples of use, site ref
-
-Bilan
------
-
-Difficultés
-~~~~~~~~~~~
-
-- Problème d'accès concurrent.
-- Problème d'homonymie
-
 Sécurité
-~~~~~~~~
+--------
 
 Par manque d'infrastructure et d'outils dédiés, nous n'avons pas pu estimer le
 taux de charge du serveur. En ce qui concerne la sécurité, nous avons fait
@@ -603,15 +623,8 @@ particulièrement attention à éviter la possibilité d'injection et de XSS.
 Pour plus d'information concernant la sécurité du serveur, merci de se référer
 à la documentation de CherryPy
 
-Résultats
-~~~~~~~~~
-
-NOTE: TODO liste fonctionnalités faites! + fonctionnalités bonus
-
-NOTE: TODO comparaison navigation sur NCBI et phyloexplorer (screenshot)
-
 Evolutions
-~~~~~~~~~~
+----------
 
 Il existe une bibliothèque appellé BioPython qui fournit des classes et
 des méthodes permettant de travailler dans le contexte de la biologie.
@@ -622,6 +635,16 @@ tardivement dans le projet, nous n'avons pas eu le temps d'appronfondir son
 utilité. Il serait intéressant de savoir si BioPython (qui soutenu par une
 communauté international de développeur) peut remplacer Phylogelib (qui reste
 très jeune).
+
+Interface et visualisation
+--------------------------
+
+NOTE: TODO (sorel) css, js, stat, variables serveur pr images et liens
+
+Module phyloWidget
+------------------
+
+NOTE: TODO (sorel) résumé, spécifications, possibilités, exemples of use, site ref
 
 Installation
 ------------
@@ -663,19 +686,19 @@ définit en tapant :
 python setup.py /chemin/vers/le/répertoire
 ------------------------------------------
 
-Voici la structure de l'application:
+Voici la structure de l'application dans l'arborescence de fichiers:
 
 ---------------------------------
 bin:
-    phyloexplorer
+    phyloexplorer                   <1>
 
 share/phyloexplorer/data:
-    taxonomy.csv
+    taxonomy.csv                    <2>
 
 share/phyloexplorer/etc:
-    phyloexplorer.conf
+    phyloexplorer.conf              <3>
 
-share/phyloexplorer/templates:
+share/phyloexplorer/templates:      <4>
     about.html
     check.html
     error.html
@@ -700,7 +723,13 @@ share/phyloexplorer/templates:
     taxomanie.js
 
 share/phyloexplorer/tools:
-    preproc.py
+    preproc.py                     <5>
+
+<1> Serveur stand-alone du serveur web
+<2> "Base de données" du NCBI
+<3> Fichier de configuration du serveur web
+<4> Répertoire où se situent toutes les templates
+<5> Outil permettant de générer le fichier taxonomy.csv
 ----------------------------------
 
 Configuration
@@ -727,17 +756,17 @@ Voir la documentation de CherryPy pour plus de détails.
 
 server.socket_host::
 
-Definit l'adresse ip de la machine où est lancé le serveur. 
+Défini l'adresse ip de la machine où est lancé le serveur. 
 Voir la documentation de CherryPy pour plus de détails.
 
 server.socket_port::
 
-Definit le port où devra être accessible l'application.
+Défini le port où devra être accessible l'application.
 Voir la documentation de CherryPy pour plus de détails.
 
 server.thread_pool::
 
-Définit le nombre d'instance à déployer. Plus le nombre de connexion est
+Défini le nombre d'instances à déployer. Plus le nombre de connexion est
 élevé, plus ce chiffre doit augmenter.
 Voir la documentation de CherryPy pour plus de détails.
 
@@ -745,7 +774,7 @@ session.timeout::
 
 Précise la durée de la session d'un utilisateur. Elle se définit en secondes
 et indique la période d'inactivité autorisée de l'utilisateur avant
-l'expiration de sa session.
+l'expiration de sa session. Par défault elle est de 30 minutes.
 
 proxy (facultatif)::
 
@@ -754,6 +783,18 @@ Elle permet de spécifier l'adresse du proxy afin d'autoriser l'affichage des
 images et la correction du nom des taxons. Si vous avez un problème avec ces
 fonctionnalités, vous devriez vérifier que cette variable est correctement
 renseignée.
+
+Bilan
+=====
+
+Résultats
+~~~~~~~~~
+
+NOTE: TODO liste fonctionnalités faites! + fonctionnalités bonus
+
+NOTE: TODO comparaison navigation sur NCBI et phyloexplorer (screenshot)
+
+
 
 Annexe
 ======
@@ -770,9 +811,9 @@ Glossaire phylogénétique
 Glossaire technique
 -------------------
 
-*Css* : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices _id_, _name_, _class_.
+*CSS* : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices _id_, _name_, _class_.
 
-*Csv* : _Comma Separated Values_, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.
+*CSV* : _Comma Separated Values_, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.
 
 *Filtrage* : Ici permet de restreindre un arbre en sous arbres.
 
@@ -802,3 +843,5 @@ Liens externes
 *CherryPy* : `http://www.cherrypy.org/`
 
 *BioPython* : `http://biopython.org/wiki/Main_Page`
+
+*NCBI* : `http://www.ncbi.nlm.nih.gov/`

@@ -476,25 +476,13 @@ produire des statistiques sur la collection.
 <h1 id="_documentation_technique">Documentation technique</h1>
 <h2 id="_formats_des_fichiers">1. Formats des fichiers</h2>
 <div class="sectionbody">
-<div class="ilist"><ul>
-<li>
-<p>
-Le format de données et de structure d'arbres phylogénétiques <em>Phylip/Newick</em>
-</p>
-</li>
-</ul></div>
 <div class="listingblock">
+<div class="title">Exemple : Le format de données et de structure d'arbres phylogénétiques <em>Phylip/Newick</em></div>
 <div class="content">
 <pre><tt>((homo, rattus), bos ,(pan,mus));</tt></pre>
 </div></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Le format de fichier <em>Nexus</em> pour les collections d'arbres
-</p>
-</li>
-</ul></div>
 <div class="listingblock">
+<div class="title">Exemple : Le format de fichier <em>Nexus</em> pour les collections d'arbres</div>
 <div class="content">
 <pre><tt>#nexus
 begin trees;
@@ -504,22 +492,16 @@ Tree 3 = ((homo,rats),pan);
 Tree 4 = (((((homo,pan),macaca),ratus),dasypus),monodelphi);
 end;</tt></pre>
 </div></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Exemple de données de la base <em>taxonomy.csv</em> du NCBI
-</p>
-</li>
-</ul></div>
 <div class="listingblock">
+<div class="title">Exemple : données de la base <em>names.dump</em> du NCBI</div>
 <div class="content">
-<pre><tt>_id_    |       _nom taxon_     |               |       _type_                          |
+<pre><tt>    id  |   nom taxon   |               |           type        |
 
-9611    |       Canis           |               |       scientific name         |
-9612    |       Canis lupus     |               |       scientific name         |
-9612    |       gray wolf       |               |       genbank common name     |
-9614    |       coyote          |               |       genbank common name     |
-9615    |       Canis canis     |               |       synonym                         |</tt></pre>
+9611    |   Canis       |               |   scientific name     |
+9612    |   Canis lupus |               |   scientific name     |
+9612    |   gray wolf   |               |   genbank common name |
+9614    |   coyote      |               |   genbank common name |
+9615    |   Canis canis |               |   synonym             |</tt></pre>
 </div></div>
 <div class="admonitionblock">
 <table><tr>
@@ -539,7 +521,7 @@ Langage de programmation
 <dd>
 <p>
 Tout le projet PhyloExplorer repose sur le langage <strong>Python</strong>. Ce langage a été
-choisi pour sa licence (libre), sa portabilité (multiplateforme), sa robustesse,
+choisi pour sa licence (libre), sa portabilité (il est multiplateforme), sa robustesse,
 et sa syntaxe simple et claire. La facilité avec laquel il manipule les
 chaines de caractères à fait pencher la balance en sa faveur. Enfin, une
 bibliothèque python sur le traitement d'arbres phylogénétiques avait déjà été
@@ -551,12 +533,11 @@ Serveur Web
 </dt>
 <dd>
 <p>
-Apache a été envisagé mais nous voulions un serveur web simple et autonome or
-le mod_python d'apache n'est pas trivial à installer et configurer. Nous nous
+Apache a été envisagé mais nous voulions un serveur web simple et autonome ; or
+le mod_python d'apache n'est pas trivial à installer et à configurer. Nous nous
 sommes donc tournés vers <strong>CherryPy</strong> qui est un "<em>framework HTTP orienté
-objet</em>". Ainsi, l'installation était grandement facilité et une utilisation
-standalone pouvait être envisagée (lancer le script, ouvrez votre navigateur,
-pointez à l'adresse "localhost:8080", c'est prêt !).
+objet</em>". Ainsi, l'installation était grandement facilitée et une utilisation
+standalone pouvait être envisagée.
 </p>
 </dd>
 <dt>
@@ -600,8 +581,8 @@ en plusieurs parties :</p></div>
 <div class="ilist"><ul>
 <li>
 <p>
-<strong>PhyloCore</strong> : une batterie de classes et de méthodes qui manipule les
-  collections d'arbres phylogénétiques et dialogue avec la base de données du
+<strong>PhyloCore</strong> : une batterie de classes et de méthodes qui manipulent les
+  collections d'arbres phylogénétiques et dialoguent avec la base de données du
   NCBI.
 </p>
 </li>
@@ -613,32 +594,18 @@ en plusieurs parties :</p></div>
 </li>
 </ul></div>
 <div class="para"><p>Cette distinction dans la structure permet aux développeurs de créer d'autres
-applications en se servant de la même base. Des scripts, pipelines ou encore
-des applications QT peuvent être crées à moindre coût.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Remarque</div>
-</td>
-<td class="content">Par manque de temps, vous ne trouverez pas <em>PhyloCore</em> et <em>PhyloWeb</em> dans le
-code. Cette séparation n'existe pour une explication plus aisé des différentes
-parties du projet. Il serait bon dans un future proche, de restructurer le
-code projet en utilisant ces deux appellations.</td>
-</tr></table>
-</div>
+applications en se servant de la même base (PhyloCore). Des scripts, pipelines ou encore
+des applications QT peuvent être créés à moindre coût.</p></div>
 <h3 id="_phylocore">3.1. PhyloCore</h3><div style="clear:left"></div>
-<div class="para"><p>PhyloCore regroupe trois classes (TaxanomyReference, TreeCollection et
-PhylogeneticTree) et une bibliothèque de gestion d'arbres phylogénétiques :
-<tt>phylogelib</tt>.</p></div>
-<div class="imageblock">
-<div class="content">
-<img src="phylo1.png" alt="phylo1.png"/>
-</div>
-<div class="image-title">Figure: Diagramme de classes</div>
-</div>
+<div class="para"><p>PhyloCore regroupe trois classes (<em>TaxanomyReference</em>, <em>TreeCollection</em> et
+<em>PhylogeneticTree</em>) et une bibliothèque de gestion d'arbres phylogénétiques :
+<em>Phylogelib</em>.</p></div>
+<div class="para"><div class="title">Diagramme de classes</div><p><center> <span class="image">
+<img src="phylo1.png" alt="phylo1.png" />
+</span> </center></p></div>
 <h4 id="_phylogelib">3.1.1. Phylogelib</h4>
 <div class="para"><p>Phylogelib est une bibliothèque python qui permet de manipuler des arbres
-phylogénétiques. Très rapide, elle se contente de manipuler des chaines de
+phylogénétiques. Très rapide, elle se contente de traiter des chaines de
 caractères au format newick (on évite ainsi la lourde gestion de graphes).</p></div>
 <div class="sidebarblock">
 <div class="sidebar-content">
@@ -726,7 +693,7 @@ le nom du parent
 </li>
 <li>
 <p>
-l'homonym auquel il se rapporte
+l'homonyme auquel il se rapporte
 </p>
 </li>
 <li>
@@ -755,13 +722,12 @@ compilation de ces informations et les avons placés dans le fichier
 <pre><tt>id|nom|nom_du_parent|homonyme|liste!des!parents|liste!des!synonymes|liste!des!noms!communs|</tt></pre>
 </div></div>
 <div class="para"><p>Les éléments d'une liste sont séparés par un point d'exclamation. l'id est
-très important car il correspond à l'id du NCBI et donc de pouvoir générer les
-liens pointant vers le site du NCBI.</p></div>
+très important car il permet de générer les liens pointant vers le site du NCBI.</p></div>
 <div class="para"><p>Ainsi, à chaque fois qu'il que l'on veut mettre à jour le fichier
-<tt>taxonomy.csv</tt>, il faudra effectuer cette procédure. Nous avons créer un
+<tt>taxonomy.csv</tt>, il faudra lancer cette procédure. Nous avons créer un
 outil qui l'effectue automatiquement. Il s'appelle <tt>preproc.py</tt>.</p></div>
 <div class="para"><p>Cet outil téléchargera automatiquement l'image de la base du NCBI, extraira
-les informations nécessaire et générera le fichier <tt>taxonomy.csv</tt>.</p></div>
+les informations nécessaires et générera le fichier <tt>taxonomy.csv</tt>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
@@ -769,18 +735,14 @@ les informations nécessaire et générera le fichier <tt>taxonomy.csv</tt>.</p>
 </td>
 <td class="content">
 <div class="title">A propos de base de données</div>Dans ce projet, il nous a été demandé de s'affranchir totalement de base de
-données classique (MySQL, SQLLite&#8230;) pour charger toute la taxonomy du NCBI
+données classique (MySQL, SQLite&#8230;) pour charger toute la taxonomy du NCBI
 en RAM. Cependant, pour plus de clareté (et par habitude ?) nous continuerons
 de parler de base de données du NCBI</td>
 </tr></table>
 </div>
 <h4 id="_taxonomyreference">3.1.3. TaxonomyReference</h4>
 <div class="para"><p>Cette classe permet d'intéragir avec la base du NCBI et plus particulièrement
-avec le fichier <tt>taxonomy.csv</tt> qu'il prend en paramètre :</p></div>
-<div class="listingblock">
-<div class="content">
-<pre><tt>reference = TaxonomyReference( "taxonomy.csv" )</tt></pre>
-</div></div>
+avec le fichier <tt>taxonomy.csv</tt> qu'il prend en paramètre.</p></div>
 <div class="sidebarblock">
 <div class="sidebar-content">
 <div class="sidebar-title">Méthodes principales</div>
@@ -798,7 +760,7 @@ getHomonyms(self, name)
 </dt>
 <dd>
 <p>
-    retourne la liste des homonymes du nom passé en paramètre.+
+    retourne la liste des homonymes du nom passé en paramètre.<br />
     Exemple:
 </p>
 <div class="literalblock">
@@ -812,7 +774,7 @@ getIntervalParents(self, name1, name2)
 </dt>
 <dd>
 <p>
-    retourne la liste des parents intermédiaire entre deux taxons.<br />
+    retourne la liste des parents intermédiaires entre deux taxons.<br />
     Exemple:
 </p>
 <div class="literalblock">
@@ -827,7 +789,7 @@ getNCBIArborescence(self, taxa_list)
 </dt>
 <dd>
 <p>
-    Cette méthode prend une liste de taxon et créer l'aborescence du NCBI en
+    cette méthode prend une liste de taxons et créé l'aborescence du NCBI en
     recherchant les parents dans la base de données.
 </p>
 </dd>
@@ -836,7 +798,7 @@ getParents(self, name)
 </dt>
 <dd>
 <p>
-    retourn la liste de tous les parents d'un taxon
+    retourne la liste de tous les parents d'un taxon
 </p>
 </dd>
 <dt>
@@ -867,7 +829,7 @@ stripTaxonName(self, taxon_name)
 </dt>
 <dd>
 <p>
-    Troncate le nom passé dans le but d'en extraire le nom scientifique.
+    tronque le nom passé dans le but d'en extraire le nom scientifique.<br />
     Exemple:
 </p>
 <div class="literalblock">
@@ -884,7 +846,7 @@ stripTaxonName(self, taxon_name)
 <div class="para"><p>Cette classe représente une collection d'arbres phylogénétiques.
 Elle prend en paramètre une collection au format <em>Phyllip</em>, <em>Nexus</em> ou
 <em>Nexus translate</em>. Elle propose des méthodes permettant de manipuler
-une collection comme effectuer des filtrages et des requêtes.
+une collection comme d'effectuer des filtrages et des requêtes.
 Elle permet également de récupérer les statistiques de la collections.</p></div>
 <div class="sidebarblock">
 <div class="sidebar-content">
@@ -940,7 +902,7 @@ displayHomonymList(self)
 <p>
     Cette méthode retourne la liste des homonymes au format HTML.
 </p>
-<div class="para"><p><strong>Remarque</strong> : <em>Cette methode doit être réécrite de manière à tenir compte du MVC</em></p></div>
+<div class="para"><p><strong>Remarque</strong> : <em>Cette méthode doit être réécrite de manière à tenir compte du MVC</em></p></div>
 </dd>
 <dt>
 displayStats(self, allparents=False)
@@ -951,7 +913,7 @@ displayStats(self, allparents=False)
     des données statistiques qui permet de connaitre le nombre d'occurence
     d'une espèce dans la collection.
 </p>
-<div class="para"><p><strong>Remarque</strong> : <em>Cette methode doit être réécrite de manière à tenir compte du MVC.
+<div class="para"><p><strong>Remarque</strong> : <em>Cette méthode doit être réécrite de manière à tenir compte du MVC.
  Elle doit se trouver dans une template</em></p></div>
 </dd>
 <dt>
@@ -959,9 +921,9 @@ filter(self, taxa_list)
 </dt>
 <dd>
 <p>
-    Cette méthode va supprimer certains taxons de la collection d'arbre. Elle
-    est très utile pour ne travailler que sur une partie de la taxonomy sans
-    être pollué par d'autres taxons.
+    Cette méthode va supprimer certains taxons de la collection d'arbres. Elle
+    est très utile pour ne travailler que sur une partie de la taxonomie sans
+    être polluée par d'autres taxons.
 </p>
 <div class="para"><p>Cette méthode prends en paramètre  la liste des taxons à supprimer.</p></div>
 </dd>
@@ -997,8 +959,8 @@ stat1(self)
 </dt>
 <dd>
 <p>
-    Cette méthode aussi sobrement appellé stat1 permet de connaitre le nombre
-    d'arbre à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
+    Cette méthode permet de connaitre le nombre
+    d'arbres à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
     début de l'intervalle. Voir la section statistiques pour plus de détails.
 </p>
 </dd>
@@ -1007,9 +969,9 @@ stat2(self)
 </dt>
 <dd>
 <p>
-    Cette méthode permet de connaître le nombre de taxon à n arbres. Comme
-    stat1, elle renvoie un dictionnaire. Voir la section statistiques pour
-    plus de détails.
+    Cette méthode permet de connaître le nombre de taxon présents dans <em>n</em>
+    arbres. Comme <em>stat1</em>, elle renvoie un dictionnaire. Voir la section
+    statistiques pour plus de détails.
 </p>
 </dd>
 </dl></div>
@@ -1049,33 +1011,74 @@ nexus_string = mycollection.filter( ["mus", "pan", "homo"] )</tt></pre>
 <tt>getCollection</tt> qui renverra alors qu'une partie de la collection. La méthode
 <tt>clearQuery</tt> permet d'effacer les effets de la requête.</p></div>
 <h5 id="_statistiques">Statistiques</h5>
+<div class="para"><p>PhyloExplorer fournit deux types de statistiques. La première présente le
+nombre d'arbres à <em>n</em> feuilles :</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>10 feuilles -&gt; 3 arbres
+12 feuilles -&gt; 9 arbres
+16 feuilles -&gt; 3 arbres
+20 feuilles -&gt; 4 arbres
+24 feuilles -&gt; 9 arbres
+26 feuilles -&gt; 8 arbres
+30 feuilles -&gt; 1 arbres
+31 feuilles -&gt; 2 arbres
+32 feuilles -&gt; 1 arbres
+40 feuilles -&gt; 3 arbres
+...</tt></pre>
+</div></div>
+<div class="para"><p>Le problème résidait dans le fait qu'il pouvait avoir une quantité
+considérable d'arbre au nombre de feuilles différentes. L'idée ici est de
+regrouper le nombre de feuille par tranche :</p></div>
+<div class="listingblock">
+<div class="title">Exemple de répartition par tranche de 10</div>
+<div class="content">
+<pre><tt>de 0 à 10 feuilles -&gt; 0 arbres
+de 10 à 20 feuilles -&gt; 15 arbres
+de 20 à 30 feuilles -&gt; 21 arbres
+de 30 à 40 feuilles -&gt; 4 arbres
+de 40 à 50 feuilles -&gt; 3 arbres
+...</tt></pre>
+</div></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<div class="title">Note</div>
+<div class="title">Remarque</div>
 </td>
-<td class="content">TODO</td>
+<td class="content">L'intervalle ne comprend pas la dernière valeur (de 0 à 10 feuilles
+représentera l'intervalle <tt>[0,10[</tt>)</td>
 </tr></table>
 </div>
+<div class="para"><p>La grandeur de l'intervalle (que nous appellerons <em>ratio</em>) est calculée par
+l'équation : <tt>nbmax*10.0/100</tt> où <tt>nbmax</tt> est le nombre maximum de
+feuilles par arbres présentes dans la collection (ici 40). Cela permet de
+n'avoir qu'une dizaine de barres dans notre diagrame.</p></div>
+<div class="para"><p>Le dictionnaire renvoyé sera du type
+<tt>{<em>nombre de feuilles</em> : <em>nombre d'arbres</em>}</tt>
+donc pour l'exemple ci-dessus on aura :</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>{0:0, 10:15, 20:21, 30:4, 40:3 ...}</tt></pre>
+</div></div>
+<div class="para"><p>La statistique numéro 2 calcule la fréquence de distribution des taxons dans
+la collection. Le ratio est calculé sur le même principe que précédemment.</p></div>
 <h4 id="_phylogenetictree">3.1.5. PhylogeneticTree</h4>
-<div class="para"><p>Cette classe ne permet d'afficher une abre phylogenetic au format HTML. La
+<div class="para"><p>Cette classe permet d'afficher un arbre phylogénétique au format HTML. La
 représentation se fait sous forme d'arborescence simple. Par soucis de
 performances, cette classe est chargée uniquement lors de l'affichage d'un
 arbre phylogénétique. Ainsi, toutes les opérations relatives aux arbres se
-trouvent soit dans la bibliothèque Phylogelib, soit dans la classe
-TreeCollection.</p></div>
-<div class="imageblock">
-<div class="content">
-<img src="phylo2.png" alt="phylo2.png"/>
-</div>
-</div>
+trouvent soit dans la bibliothèque <em>Phylogelib</em>, soit dans la classe
+<em>TreeCollection</em>.</p></div>
+<div class="para"><p><center> <span class="image">
+<img src="phylo2.png" alt="phylo2.png" />
+</span> </center></p></div>
 <h3 id="_phyloweb">3.2. PhyloWeb</h3><div style="clear:left"></div>
 <div class="para"><p>Dans cette partie, nous allons parler du projet PhyloExplorer à proprement
 parler ; c'est-à-dire la partie applicatif. PhyloWeb est composé de deux
 grands ensemble : le serveur web PhyloExplorer.py et les templates qui lui
 sont associées.</p></div>
 <h4 id="_phyloexplorer_py">3.2.1. PhyloExplorer.py</h4>
-<div class="para"><p>Ce fichier represente en quelque sorte le <em>main</em> du projet. C'est ce script
+<div class="para"><p>Ce fichier représente en quelque sorte le <em>main</em> du projet. C'est ce script
 qu'il faudra lancer pour exécuter le serveur web. L'application sera alors
 accessible via l'adresse <tt>http://adresse_ip:port</tt> où <tt>adresse_ip</tt> et <tt>port</tt>
 sont définis dans le fichier de configuration <tt>phyloexplorer.conf</tt>.</p></div>
@@ -1091,14 +1094,14 @@ caractère qui sera affiché tel quel à l'utilisateur. Cette chaine doit donc
 documentation de CherryPy.</p></div>
 <div class="para"><p>Pour renvoyer du HTML, nous utilisons la méthode <tt>self._presentation</tt> qui
 prend en paramètre, le nom de la template à utiliser, un message d'information
-(facultatif) et une petite chaine de caractère qui sera placé en haut de la
-page et qui indiquera où se trouve l'utilisateur (ex : <tt>Home &gt; Statistics</tt>).</p></div>
+(facultatif) et une petite chaine de caractère qui sera placée en haut de la
+page et indiquera où se trouve l'utilisateur (ex : <tt>Home &gt; Statistics</tt>).</p></div>
 <h4 id="_les_templates">3.2.2. Les templates</h4>
 <div class="para"><p>L'utilisation des templates métite que l'on s'y attarde un petit peu. Toutes
 les templates sont regroupées dans le répertoire "templates". Ce répertoire
 regroupe aussi les scripts CSS et javascripts.</p></div>
 <div class="para"><p>Une template, bien qu'ayant l'extension <tt>.html</tt>, est un ensemble de code
-python et d'html. Le code python est placé entre les balises <tt>&lt;%</tt> et <tt>%&gt;</tt>.</p></div>
+python et de HTML. Le code python est placé entre les balises <tt>&lt;%</tt> et <tt>%&gt;</tt>.</p></div>
 <div class="listingblock">
 <div class="title">Une template basique</div>
 <div class="content">
@@ -1127,7 +1130,7 @@ moteur de template si on se trouve toujours dans le <tt>if</tt> ou non.</p></div
 <td class="content">Le fait de placer une ligne de commentaire <strong>(2)</strong> spécifie également l'indentation.</td>
 </tr></table>
 </div>
-<div class="para"><p>Pleet permet "d'exposer" des objets afin qu'ils puissent être utilisé dans les
+<div class="para"><p>Pleet permet "d'exposer" des objets afin qu'ils puissent être utilisés dans les
 templates.</p></div>
 <div class="listingblock">
 <div class="title">Exposition d'un objet</div>
@@ -1135,7 +1138,7 @@ templates.</p></div>
 <pre><tt>pleet["_civilite_"] = civilite</tt></pre>
 </div></div>
 <div class="para"><p>Dans cet exemple, on rend accessible la variable <tt>civilite</tt> accessible dans la
-template sous le nom <tt><em>civilite</em></tt>.</p></div>
+template sous le nom <tt>_civilite_</tt>.</p></div>
 <div class="listingblock">
 <div class="title">Utilisation d'un objet exposé</div>
 <div class="content">
@@ -1157,10 +1160,29 @@ template sous le nom <tt><em>civilite</em></tt>.</p></div>
     Monsieur,
 &lt;%|%&gt;</tt></pre>
 </div></div>
-<div class="para"><p>Dans cet exemple, une série de tests sur la variable <tt><em>civilite</em></tt> permettra de
+<div class="para"><p>Dans cet exemple, une série de tests sur la variable <tt>_civilite_</tt> permettra de
 produire la bonne template.</p></div>
 </div>
-<h2 id="_interface_et_visualisation">4. Interface et visualisation</h2>
+<h2 id="_s_curit">4. Sécurité</h2>
+<div class="sectionbody">
+<div class="para"><p>Par manque d'infrastructure et d'outils dédiés, nous n'avons pas pu estimer le
+taux de charge du serveur. En ce qui concerne la sécurité, nous avons fait
+particulièrement attention à éviter la possibilité d'injection et de XSS.</p></div>
+<div class="para"><p>Pour plus d'information concernant la sécurité du serveur, merci de se référer
+à la documentation de CherryPy</p></div>
+</div>
+<h2 id="_evolutions">5. Evolutions</h2>
+<div class="sectionbody">
+<div class="para"><p>Il existe une bibliothèque appellé BioPython qui fournit des classes et
+des méthodes permettant de travailler dans le contexte de la biologie.</p></div>
+<div class="para"><p>Cette bibliothèque est très complète et très complexe. Ayant tout ce dont nous
+avions besoin pour avec la Phylogelib, et découvrant cette bibliothèque
+tardivement dans le projet, nous n'avons pas eu le temps d'appronfondir son
+utilité. Il serait intéressant de savoir si BioPython (qui soutenu par une
+communauté international de développeur) peut remplacer Phylogelib (qui reste
+très jeune).</p></div>
+</div>
+<h2 id="_interface_et_visualisation">6. Interface et visualisation</h2>
 <div class="sectionbody">
 <div class="admonitionblock">
 <table><tr>
@@ -1171,7 +1193,7 @@ produire la bonne template.</p></div>
 </tr></table>
 </div>
 </div>
-<h2 id="_module_phylowidget">5. Module phyloWidget</h2>
+<h2 id="_module_phylowidget">7. Module phyloWidget</h2>
 <div class="sectionbody">
 <div class="admonitionblock">
 <table><tr>
@@ -1182,64 +1204,16 @@ produire la bonne template.</p></div>
 </tr></table>
 </div>
 </div>
-<h2 id="_bilan">6. Bilan</h2>
-<div class="sectionbody">
-<h3 id="_difficult_s">6.1. Difficultés</h3><div style="clear:left"></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Problème d'accès concurrent.
-</p>
-</li>
-<li>
-<p>
-Problème d'homonymie
-</p>
-</li>
-</ul></div>
-<h3 id="_s_curit">6.2. Sécurité</h3><div style="clear:left"></div>
-<div class="para"><p>Par manque d'infrastructure et d'outils dédiés, nous n'avons pas pu estimer le
-taux de charge du serveur. En ce qui concerne la sécurité, nous avons fait
-particulièrement attention à éviter la possibilité d'injection et de XSS.</p></div>
-<div class="para"><p>Pour plus d'information concernant la sécurité du serveur, merci de se référer
-à la documentation de CherryPy</p></div>
-<h3 id="_r_sultats">6.3. Résultats</h3><div style="clear:left"></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">TODO liste fonctionnalités faites! + fonctionnalités bonus</td>
-</tr></table>
-</div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">TODO comparaison navigation sur NCBI et phyloexplorer (screenshot)</td>
-</tr></table>
-</div>
-<h3 id="_evolutions">6.4. Evolutions</h3><div style="clear:left"></div>
-<div class="para"><p>Il existe une bibliothèque appellé BioPython qui fournit des classes et
-des méthodes permettant de travailler dans le contexte de la biologie.</p></div>
-<div class="para"><p>Cette bibliothèque est très complète et très complexe. Ayant tout ce dont nous
-avions besoin pour avec la Phylogelib, et découvrant cette bibliothèque
-tardivement dans le projet, nous n'avons pas eu le temps d'appronfondir son
-utilité. Il serait intéressant de savoir si BioPython (qui soutenu par une
-communauté international de développeur) peut remplacer Phylogelib (qui reste
-très jeune).</p></div>
-</div>
-<h2 id="_installation">7. Installation</h2>
+<h2 id="_installation">8. Installation</h2>
 <div class="sectionbody">
 <div class="para"><p>Cette section détaille la procédure d'installation et de configuration de
 l'application web PhyloExplorer.</p></div>
-<h3 id="_pr_requis">7.1. Prérequis</h3><div style="clear:left"></div>
+<h3 id="_pr_requis">8.1. Prérequis</h3><div style="clear:left"></div>
 <div class="para"><p>Pour une utilisation optimale, PhyloExplorer nécessite au minimum 2 Go de
 mémoire RAM. Prévoir également un processeur cadencé à 2 Ghz et 200 Mo d'espace
 disque pour l'installation.</p></div>
-<h3 id="_installation_2">7.2. Installation</h3><div style="clear:left"></div>
-<h4 id="_installation_des_d_pendances">7.2.1. Installation des dépendances</h4>
+<h3 id="_installation_2">8.2. Installation</h3><div style="clear:left"></div>
+<h4 id="_installation_des_d_pendances">8.2.1. Installation des dépendances</h4>
 <div class="para"><p>PhyloExplorer nécessite les bibliothèques suivantes :</p></div>
 <div class="ilist"><ul>
 <li>
@@ -1265,7 +1239,7 @@ Pleet (le paquet est disponible dans tools)
 </ul></div>
 <div class="para"><p>Chacune de ces bibliothèques s'installe très facilement : extraire l'archive
 et taper simplement sous root <tt>$ python setup install.py</tt>.</p></div>
-<h4 id="_installation_de_phyloexplorer">7.2.2. Installation de PhyloExplorer</h4>
+<h4 id="_installation_de_phyloexplorer">8.2.2. Installation de PhyloExplorer</h4>
 <div class="para"><p>Taper simplement en root la commande :</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1277,19 +1251,19 @@ définit en tapant :</p></div>
 <div class="content">
 <pre><tt>python setup.py /chemin/vers/le/répertoire</tt></pre>
 </div></div>
-<div class="para"><p>Voici la structure de l'application:</p></div>
+<div class="para"><p>Voici la structure de l'application dans l'arborescence de fichiers:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>bin:
-    phyloexplorer
+    phyloexplorer                   <b>(1)</b>
 
 share/phyloexplorer/data:
-    taxonomy.csv
+    taxonomy.csv                    <b>(2)</b>
 
 share/phyloexplorer/etc:
-    phyloexplorer.conf
+    phyloexplorer.conf              <b>(3)</b>
 
-share/phyloexplorer/templates:
+share/phyloexplorer/templates:      <b>(4)</b>
     about.html
     check.html
     error.html
@@ -1314,9 +1288,15 @@ share/phyloexplorer/templates:
     taxomanie.js
 
 share/phyloexplorer/tools:
-    preproc.py</tt></pre>
+    preproc.py                     <b>(5)</b>
+
+<b>(1)</b> Serveur stand-alone du serveur web
+<b>(2)</b> "Base de données" du NCBI
+<b>(3)</b> Fichier de configuration du serveur web
+<b>(4)</b> Répertoire où se situent toutes les templates
+<b>(5)</b> Outil permettant de générer le fichier taxonomy.csv</tt></pre>
 </div></div>
-<h3 id="_configuration">7.3. Configuration</h3><div style="clear:left"></div>
+<h3 id="_configuration">8.3. Configuration</h3><div style="clear:left"></div>
 <div class="para"><p>Le serveur web utilise le fichier <tt>phyloexplorer.conf</tt> pour sa configuration.
 Voici sa structure :</p></div>
 <div class="listingblock">
@@ -1346,7 +1326,7 @@ server.socket_host
 </dt>
 <dd>
 <p>
-Definit l'adresse ip de la machine où est lancé le serveur.
+Défini l'adresse ip de la machine où est lancé le serveur.
 Voir la documentation de CherryPy pour plus de détails.
 </p>
 </dd>
@@ -1355,7 +1335,7 @@ server.socket_port
 </dt>
 <dd>
 <p>
-Definit le port où devra être accessible l'application.
+Défini le port où devra être accessible l'application.
 Voir la documentation de CherryPy pour plus de détails.
 </p>
 </dd>
@@ -1364,7 +1344,7 @@ server.thread_pool
 </dt>
 <dd>
 <p>
-Définit le nombre d'instance à déployer. Plus le nombre de connexion est
+Défini le nombre d'instance à déployer. Plus le nombre de connexion est
 élevé, plus ce chiffre doit augmenter.
 Voir la documentation de CherryPy pour plus de détails.
 </p>
@@ -1393,6 +1373,24 @@ renseignée.
 </dd>
 </dl></div>
 </div>
+<h1 id="_bilan">Bilan</h1>
+<h3 id="_r_sultats">0.1. Résultats</h3><div style="clear:left"></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">TODO liste fonctionnalités faites! + fonctionnalités bonus</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">TODO comparaison navigation sur NCBI et phyloexplorer (screenshot)</td>
+</tr></table>
+</div>
 <h1 id="_annexe">Annexe</h1>
 <h2 id="_glossaire_phylog_n_tique">1. Glossaire phylogénétique</h2>
 <div class="sectionbody">
@@ -1402,8 +1400,8 @@ renseignée.
 </div>
 <h2 id="_glossaire_technique">2. Glossaire technique</h2>
 <div class="sectionbody">
-<div class="para"><p><strong>Css</strong> : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices <em>id</em>, <em>name</em>, <em>class</em>.</p></div>
-<div class="para"><p><strong>Csv</strong> : <em>Comma Separated Values</em>, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.</p></div>
+<div class="para"><p><strong>CSS</strong> : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices <em>id</em>, <em>name</em>, <em>class</em>.</p></div>
+<div class="para"><p><strong>CSV</strong> : <em>Comma Separated Values</em>, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.</p></div>
 <div class="para"><p><strong>Filtrage</strong> : Ici permet de restreindre un arbre en sous arbres.</p></div>
 <div class="para"><p><strong>Jquery</strong> : c'est une bibliothèque Javascript qui porte sur l'interaction entre JavaScript et HTML. La librairie se présente comme un unique fichier décrivant les utilisations <em>d'évènements multi navigateur</em>, <em>DOM</em>,<em>Effets et animations</em>, et surtout <em>Ajax</em>.</p></div>
 <div class="para"><p><strong>NCBI</strong> : National Center for Biotechnology Information.</p></div>
@@ -1420,10 +1418,11 @@ renseignée.
 <div class="para"><p><strong>NetworkX</strong> : <tt>https://networkx.lanl.gov/wiki</tt></p></div>
 <div class="para"><p><strong>CherryPy</strong> : <tt>http://www.cherrypy.org/</tt></p></div>
 <div class="para"><p><strong>BioPython</strong> : <tt>http://biopython.org/wiki/Main_Page</tt></p></div>
+<div class="para"><p><strong>NCBI</strong> : <tt>http://www.ncbi.nlm.nih.gov/</tt></p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-04-03 16:31:36 CEST
+Last updated 2008-04-03 19:21:47 CEST
 </div>
 </div>
 </body>
