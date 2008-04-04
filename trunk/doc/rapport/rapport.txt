@@ -33,7 +33,7 @@ Root
 
 Canis lupus, le loup, est un taxon de rang _espèce_.
 Canis est le taxon immédiatement supérieur de rang _genre_ et regroupe plusieurs espèces _chien, loup, chacal, ..._
-Canidés est le taxon immédiatement supérieur de rang _famille_ et regroupe plusieurs genres _Canis (chien, loup, chacal), Vulpes (renard), Lycaon (lycaon), ..._
+Canidae est le taxon immédiatement supérieur de rang _famille_ et regroupe plusieurs genres _Canis (chien, loup, chacal), Vulpes (renard), Lycaon (lycaon), ..._
 
 L'approche phylogénétique actuelle fait appel aux données de la cladistique, mais ses exigences se résument à n'accepter que des taxons monophylétiques, c'est-à-dire correspondant à un clade donné. Elle demande que les taxons soient limités à ceux qui respectent les deux conditions suivantes :
 
@@ -47,12 +47,12 @@ Par ailleurs, d'importants progrès en génomique ont été faits grâce à l'an
 Analyse de l'existant
 ---------------------
 
-Le NCBI _National Center for Biotechnology Information_ est un centre d'informations sur les biotechnologies établi en 1988. Le site du NCBI propose un ensemble d'outils et de bases de données sur la biologie, voir `http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy`. Il est considéré comme une référence pour la recherche en phylogénie et en ce qui nous concerne, on retiendra la partie _taxonomy_ du site comme référence de départ pour le projet PhyloExplorer.
+Le NCBI _National Center for Biotechnology Information_ est un centre d'informations sur les biotechnologies établi en 1988. Le site du NCBI propose un ensemble d'outils et de bases de données sur la biologie, voir link:http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy[`http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy`]. Il est considéré comme une référence pour la recherche en phylogénie et en ce qui nous concerne, on retiendra la partie _taxonomy_ du site comme référence de départ pour le projet PhyloExplorer.
 
 Dans un premier temps, on utilisera la base de données taxonomique à disposition du public pour créer notre structure conforme à la phylogénie en vigueur. Dans un second temps, les fonctionnalités de bases seront calquées sur la gestion d'arbres phylogénétiques en ligne. Et enfin, le site permettra de valider les résultats obtenus lors du développement de notre projet.
 
 Comme tout site de recherche, le NCBI propose beaucoup d'informations via une interface chargée et peu adaptée au travail personnalisé.
-La navigation sur un arbre apparaît assez fastidueuse et les informations taxonomiques, certes complètes, deviennent vite illisibles. En conclusion, l'ergonomie ne sera pas retenue et une interface mieux adaptée devra être mise en place pour faciliter une interaction plus soutenue avec l'utilisateur.
+La navigation sur un arbre apparaît assez fastidieuse et les informations taxonomiques, certes complètes, deviennent vite illisibles. En conclusion, l'ergonomie ne sera pas retenue et une interface mieux adaptée devra être mise en place pour faciliter une interaction plus soutenue avec l'utilisateur.
 
 Besoins et objectifs
 --------------------
@@ -90,7 +90,7 @@ Formats des fichiers
 ((homo, rattus), bos ,(pan,mus));
 -----------------------------------
 
-L'arbre est défini entre parenthèse comme suit *(arbre);* ainsi que chaque groupe de taxons *(frère 1, frère 2);*.
+L'arbre est défini entre parenthèses comme suit *(arbre);* ainsi que chaque groupe de taxons *(frère 1, frère 2);*.
 On retrouve aussi les niveaux de profondeur de la façon suivante *(1,(2,(3,3)));*.
 Si l'on applique à l'exemple précédent, on a 3 frères qui sont _(homo, rattus)_, _bos_ et _(pan,mus)_, et 2 niveaux de profondeur.
 
@@ -120,7 +120,7 @@ Le format nexus permet de structurer une collection d'arbres de façon explicite
 9615    |   Canis canis |		|   synonym             |
 -----------------------------------------------------------
 
-Il s'agit d'une nomenclature communément utilisée, l'identifiant permet de retrouver de façon unique un taxon et trouver toutes les informations associées à l'aide de séparateurs définis.
+Il s'agit d'une nomenclature communément utilisée. L'identifiant permet de retrouver de façon unique un taxon et trouver toutes les informations associées à l'aide de séparateurs définis.
 
 Choix technique
 ---------------
@@ -130,28 +130,28 @@ Langage de programmation::
 Tout le projet PhyloExplorer repose sur le langage *Python*. Ce langage a été
 choisi pour sa licence (libre), sa portabilité (il est multiplateforme), sa robustesse,
 et sa syntaxe simple et claire. La facilité avec laquel il manipule les
-chaines de caractères à fait pencher la balance en sa faveur. Enfin, une
+chaines de caractères a fait pencher la balance en sa faveur. Enfin, une
 bibliothèque python sur le traitement d'arbres phylogénétiques avait déjà été
-créé par l'un des auteurs : la base était déjà faite.
+créée par l'un des auteurs : la base était déjà faite.
 
 Serveur Web::
 
 Apache a été envisagé mais nous voulions un serveur web simple et autonome ; or
-le mod_python d'apache n'est pas trivial à installer et à configurer. Nous nous
+le _mod_python_ d'apache n'est pas trivial à installer et à configurer. Nous nous
 sommes donc tournés vers *CherryPy* qui est un "__framework HTTP orienté
 objet__". Ainsi, l'installation était grandement facilitée et une utilisation
-standalone pouvait être envisagée.
+"standalone" pouvait être envisagée.
 
 La gestion de graphes::
 
-Notre but étant de créer l'aborescence du NCBI à partir d'une liste de taxon,
+Notre but étant de créer l'aborescence du NCBI à partir d'une liste de taxons,
 il nous fallait une bibliothèque de gestion de graphes. Nous utilisons pour
 cela *NetworkX*. Entièrement écrite en python, cette bibliothèque
 multiplateforme s'installe très facilement et est relativement puissante.
 
 Moteur de templates::
 
-Le moteur de templates à été attribué à *Pleet*. Une bibliothèque python
+Le moteur de templates a été attribué à *Pleet*. Une bibliothèque python
 écrite par l'un des auteurs permettant d'embarquer du code python dans du
 HTML. Cette bibliothèque est très simple, rapide et fait bien son travail.
 
@@ -215,7 +215,7 @@ Renvoie la liste de tous les taxons de l'arbre.
 
 removeBootStraps(tree)::
 
-Supprime les "bootstraps" de l'abres
+Supprime les "bootstraps" de l'arbre
 
 removeNexusComments(nex)::
 
@@ -232,7 +232,7 @@ L'outil preproc.py
 
 PhyloExplorer utilise la base de données du NCBI comme base d'information.
 Cette base de données est accessible à l'adresse :
-`ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz`. Cette archive
+link:ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz[`ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz`]. Cette archive
 comprend plusieurs images de la base du NCBI. Celles qui nous intéressent sont
 `names.dump` et `nodes.dump`. Ces images nous permettent de récupérer :
 
@@ -247,7 +247,7 @@ comprend plusieurs images de la base du NCBI. Celles qui nous intéressent sont
 Le problème réside dans le fait que toutes ces informations sont éparpillés
 entre `names.dump` et `nodes.dump` (qui contiennent également beaucoup
 d'informations qui ne nous sont pas utiles). Nous avons alors effectué une
-compilation de ces informations et les avons placés dans le fichier
+compilation de ces informations et les avons placées dans le fichier
 `taxonomy.csv`. Voici sa structure :
 
 -------------------------------------------------------------------------------------------
@@ -257,8 +257,8 @@ id|nom|nom_du_parent|homonyme|liste!des!parents|liste!des!synonymes|liste!des!no
 Les éléments d'une liste sont séparés par un point d'exclamation. l'id est
 très important car il permet de générer les liens pointant vers le site du NCBI.
 
-Ainsi, à chaque fois qu'il que l'on veut mettre à jour le fichier
-`taxonomy.csv`, il faudra lancer cette procédure. Nous avons créer un
+Ainsi, à chaque fois que l'on veut mettre à jour le fichier
+`taxonomy.csv`, il faudra lancer cette procédure. Nous avons créé un
 outil qui l'effectue automatiquement. Il s'appelle `preproc.py`.
 
 Cet outil téléchargera automatiquement l'image de la base du NCBI, extraira
@@ -266,8 +266,8 @@ les informations nécessaires et générera le fichier `taxonomy.csv`.
 
 [NOTE]
 .A propos de base de données
-Dans ce projet, il nous a été demandé de s'affranchir totalement de base de
-données classique (MySQL, SQLite...) pour charger toute la taxonomy du NCBI
+Dans ce projet, il nous a été demandé de s'affranchir totalement de bases de
+données classiques (MySQL, SQLite...) pour charger toute la taxonomie du NCBI
 en RAM. Cependant, pour plus de clareté (et par habitude ?) nous continuerons
 de parler de base de données du NCBI
 
@@ -275,7 +275,7 @@ de parler de base de données du NCBI
 TaxonomyReference
 ^^^^^^^^^^^^^^^^^
 
-Cette classe permet d'intéragir avec la base du NCBI et plus particulièrement
+Cette classe permet d'interagir avec la base du NCBI et plus particulièrement
 avec le fichier `taxonomy.csv` qu'il prend en paramètre.
 
 .Méthodes principales
@@ -313,7 +313,7 @@ isHomonym(self, name)::
     True
 
 isValid(self, name)::
-    retourne vrai si le nom du taxon est un nom scientific présent dans la
+    retourne vrai si le nom du taxon est un nom scientifique présent dans la
     base du NCBI
 
 stripTaxonName(self, taxon_name)::
@@ -332,16 +332,16 @@ TreeCollection
 ^^^^^^^^^^^^^^
 
 Cette classe représente une collection d'arbres phylogénétiques.
-Elle prend en paramètre une collection au format _Phyllip_, _Nexus_ ou
+Elle prend en paramètre une collection au format _Phylip_, _Nexus_ ou
 _Nexus translate_. Elle propose des méthodes permettant de manipuler
-une collection comme d'effectuer des filtrages et des requêtes.
-Elle permet également de récupérer les statistiques de la collections.
+une collection, comme d'effectuer des filtrages et des requêtes.
+Elle permet également de récupérer les statistiques de la collection.
 
 .Méthodes principales
 ************************************************************
 getCollection(self)::
-    Retourne la collection en cours ; c'est-à-dire que si une requête à
-    été lancé, elle renverra la collection filtrée. Sinon, elle renverra la
+    Retourne la collection en cours ; c'est-à-dire que si une requête a
+    été lancée, elle renverra la collection filtrée. Sinon, elle renverra la
     collection initiale.
 
 clearQuery(self)::
@@ -355,11 +355,11 @@ query(self, query)::
 +
     {genre1} > 3 and ( {genre2} == 2 or {genre3} < 4 )
 +
-`genre` peut être soit le nom d'un taxon (_rattus_rattus_) soit le nom
+`genre` peut être : soit le nom d'un taxon (_rattus_rattus_), soit le nom
 d'une espèce (_murinae_). `genre` doit être entre accolade. Le reste de la
 requête est une expression python classique (d'où l'utilisation du `==`).
 En fait, les noms entre accolades seront remplacés par leur occurence dans
-la collection. Nous obtienons donc une expression python classique qui
+la collection. Nous obtenons donc une expression python classique qui
 sera évaluée :
 
         4 > 3 and ( 1 == 2 or 3 < 4 )
@@ -372,7 +372,7 @@ displayHomonymList(self)::
   
 displayStats(self, allparents=False)::
     Cette méthode renvoie l'abre du NCBI au format HTML. Cette arbre contient
-    des données statistiques qui permet de connaitre le nombre d'occurence
+    des données statistiques qui permettent de connaître le nombre d'occurences
     d'une espèce dans la collection.
 +
 *Remarque* : __Cette méthode doit être réécrite de manière à tenir compte du MVC.
@@ -384,27 +384,27 @@ filter(self, taxa_list)::
     est très utile pour ne travailler que sur une partie de la taxonomie sans
     être polluée par d'autres taxons.
 +
-Cette méthode prends en paramètre  la liste des taxons à supprimer.
+Cette méthode prend en paramètre la liste des taxons à supprimer.
 
 getNCBITreeAsNwk(self)::
     Cette méthode renvoie l'arborescence du NCBI de la collection au format
-    Newick. Elle est utilisé si l'on souhaite télécharger l'arbre modèle du
+    Newick. Elle est utilisée si l'on souhaite télécharger l'arbre modèle du
     NCBI.
 
 getNbTrees(self, taxon)::
-    Retourne le nombre d'arbre dans lesquels se trouve un taxon
+    Retourne le nombre d'arbres dans lesquels se trouve un taxon
 
 initStat(self)::
     Lorsque l'on fait des requêtes, on ne travaille que sur une partie de la
     collection. Cette méthode permet de mettre à jour les statistiques.
     
 stat1(self)::
-    Cette méthode permet de connaitre le nombre
+    Cette méthode permet de connaître le nombre
     d'arbres à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
     début de l'intervalle. Voir la section statistiques pour plus de détails.
 
 stat2(self)::
-    Cette méthode permet de connaître le nombre de taxon présents dans _n_
+    Cette méthode permet de connaître le nombre de taxons présents dans _n_
     arbres. Comme _stat1_, elle renvoie un dictionnaire. Voir la section
     statistiques pour plus de détails.
 
@@ -425,7 +425,7 @@ print mycollection.getCollection()
 # Combien d'arbres sont dans la collection
 print len( mycollection.getCollection() )
 
-# Effectue une requête afin de ne garder tous les arbres dont les murinaes
+# Effectue une requête afin de ne garder que les arbres dont les murinaes
 # sont supérieurs à 1
 mycollection.query( "{murinae} > 1" )
 
@@ -438,13 +438,13 @@ mycollection.clearQuery()
 # Récupère la collection originelle
 mycollection.getCollection()
 
-# Filtrage. On supprime tous les taxon "mus", "pan" et "homo" de la
-# collection. Le resultat sera une chaine de caractère au format Nexus.
+# Filtrage. On supprime tous les taxons "mus", "pan" et "homo" de la
+# collection. Le résultat sera une chaine de caractère au format Nexus.
 nexus_string = mycollection.filter( ["mus", "pan", "homo"] )
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 On voit bien dans cette exemple que la méthode `query` influera sur la méthode
-`getCollection` qui renverra alors qu'une partie de la collection. La méthode
+`getCollection` qui ne renverra alors qu'une partie de la collection. La méthode
 `clearQuery` permet d'effacer les effets de la requête.
 
 Statistiques
@@ -467,9 +467,9 @@ nombre d'arbres à _n_ feuilles :
 ...
 -------------------------------
 
-Le problème résidait dans le fait qu'il pouvait avoir une quantité
-considérable d'arbre au nombre de feuilles différentes. L'idée ici est de
-regrouper le nombre de feuille par tranche :
+Le problème résidait dans le fait qu'il pouvait y avoir une quantité
+considérable d'arbres au nombre de feuilles différent. L'idée ici est de
+regrouper le nombre de feuilles par tranches :
 
 [caption=""]
 .Exemple de répartition par tranche de 10
@@ -485,16 +485,16 @@ de 40 à 50 feuilles -> 3 arbres
 [NOTE]
 [caption="Remarque"]
 L'intervalle ne comprend pas la dernière valeur (de 0 à 10 feuilles
-représentera l'intervalle `[0,10[`)
+représentera l'intervalle `[0,10]`)
 
 La grandeur de l'intervalle (que nous appellerons _ratio_) est calculée par
 l'équation : `nbmax*10.0/100` où `nbmax` est le nombre maximum de
-feuilles par arbres présentes dans la collection (ici 40). Cela permet de
-n'avoir qu'une dizaine de barres dans notre diagrame.
+feuilles présentes par arbre dans la collection (ici 40). Cela permet de
+n'avoir qu'une dizaine de barres dans notre histogramme.
 
 Le dictionnaire renvoyé sera du type
-`{__nombre de feuilles__ : __nombre d'arbres__}`
-donc pour l'exemple ci-dessus on aura :
+`{__nombre de feuilles__ : __nombre d'arbres__}`.
+Donc pour l'exemple ci-dessus on aura :
 
 -------------------------------------
 {0:0, 10:15, 20:21, 30:4, 40:3 ...}
@@ -519,9 +519,9 @@ _TreeCollection_.
 PhyloWeb
 ~~~~~~~~~
 
-Dans cette partie, nous allons parler du projet PhyloExplorer à proprement
-parler ; c'est-à-dire la partie applicatif. PhyloWeb est composé de deux
-grands ensemble : le serveur web PhyloExplorer.py et les templates qui lui
+Dans cette partie, nous allons examiner le projet PhyloExplorer à proprement
+parler ; c'est-à-dire la partie applicative. PhyloWeb est composée de deux
+grands ensembles : le serveur web PhyloExplorer.py et les templates qui lui
 sont associées.
 
 PhyloExplorer.py
@@ -531,31 +531,31 @@ qu'il faudra lancer pour exécuter le serveur web. L'application sera alors
 accessible via l'adresse `http://adresse_ip:port` où `adresse_ip` et `port`
 sont définis dans le fichier de configuration `phyloexplorer.conf`.
 
-le fichier `phyloexplorer.py` est composé de la classe PhyloExplorer qui sera
+Le fichier `phyloexplorer.py` est composé de la classe PhyloExplorer, qui sera
 utilisée par l'outil CherryPy. Cette classe possède plusieurs particularités
 qui sont propres à CherryPy comme l'exposition d'une méthode.
 
 Une méthode exposée est une méthode qui sera accessible via l'URL de
 l'application. Elle est reconnaissable par son décorateur :
 `@cherrypy.expose`. Chaque méthode exposée doit renvoyer une chaine de
-caractère qui sera affiché tel quel à l'utilisateur. Cette chaine doit donc
+caractères qui sera affichée telle quelle à l'utilisateur. Cette chaine doit donc
 être au format HTML.
 
-Pour plus d'information concernant le serveur web, merci de consulter la
+Pour plus d'informations concernant le serveur web, consulter la
 documentation de CherryPy.
 
 Pour renvoyer du HTML, nous utilisons la méthode `self._presentation` qui
 prend en paramètre, le nom de la template à utiliser, un message d'information
-(facultatif) et une petite chaine de caractère qui sera placée en haut de la
+(facultatif) et une petite chaine de caractères qui sera placée en haut de la
 page et indiquera où se trouve l'utilisateur (ex : `Home > Statistics`).
 
 
 Les templates
 ^^^^^^^^^^^^^
 
-L'utilisation des templates métite que l'on s'y attarde un petit peu. Toutes
+L'utilisation des templates mérite que l'on s'y attarde un petit peu. Toutes
 les templates sont regroupées dans le répertoire "templates". Ce répertoire
-regroupe aussi les scripts CSS et javascripts.
+regroupe aussi les styles CSS et scripts Javascript.
 
 Une template, bien qu'ayant l'extension `.html`, est un ensemble de code
 python et de HTML. Le code python est placé entre les balises `<%` et `%>`.
@@ -577,7 +577,7 @@ else:
 <%|%>
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Le moteur de template Pleet va evaluer le code python et renverra le resultat.
+Le moteur de template Pleet va évaluer le code python et renverra le résultat.
 Dans cet exemple, `True` est toujours vrai donc `Hello Word` sera toujours
 affiché.  
 
@@ -596,7 +596,7 @@ code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 pleet["_civilite_"] = civilite
 code~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Dans cet exemple, on rend accessible la variable `civilite` accessible dans la
+Dans cet exemple, on rend la variable `civilite` accessible dans la
 template sous le nom `\_civilite\_`.
 
 [python]
@@ -630,9 +630,9 @@ Sécurité
 
 Par manque d'infrastructure et d'outils dédiés, nous n'avons pas pu estimer le
 taux de charge du serveur. En ce qui concerne la sécurité, nous avons fait
-particulièrement attention à éviter la possibilité d'injection et de XSS.
+particulièrement attention à éviter la possibilité d'injection de code et de XSS.
 
-Pour plus d'information concernant la sécurité du serveur, merci de se référer
+Pour plus d'informations concernant la sécurité du serveur, merci de se référer
 à la documentation de CherryPy
 
 Evolutions
@@ -642,11 +642,302 @@ Il existe une bibliothèque appellé BioPython qui fournit des classes et
 des méthodes permettant de travailler dans le contexte de la biologie.
 
 Cette bibliothèque est très complète et très complexe. Ayant tout ce dont nous
-avions besoin pour avec la Phylogelib, et découvrant cette bibliothèque
+avions besoin avec la Phylogelib, et découvrant cette bibliothèque
 tardivement dans le projet, nous n'avons pas eu le temps d'appronfondir son
-utilité. Il serait intéressant de savoir si BioPython (qui soutenu par une
-communauté international de développeur) peut remplacer Phylogelib (qui reste
+utilité. Il serait intéressant de savoir si BioPython (qui est soutenue par une
+communauté internationale de développeurs) peut remplacer Phylogelib (qui reste
 très jeune).
+
+
+
+
+Utilisation détaillée
+---------------------
+
+Dans cette section, nous allons effectuer un parcours des possibilités de PhyloExplorer du point de vue de l'utilisateur.
+
+=== Etape 1: Chargement de données ===
+
+La première page de PhyloExplorer comporte un menu simple :
+
+- *Upload Collection* (qui permet à tout moment de charger une nouvelle collection d'arbres)
+- *Help contents* (qui est une page d'aide, un bref récapitulatif des fonctionnalités et procédures de PhyloExplorer)
+- *About* (qui, comme son nom l'indique, renseigne sur les créateurs et fait une brève description de PhyloExplorer)
+
+L'utilisateur doit :
+
+- soit charger son fichier d'arbres Phylip (Newick), Nexus ou Nexus Translate à partir de cette Homepage 
+
+|image:champ_choose_your_file.png[]|
+
+- soit saisir à la main des arbres Phylip (Newick), Nexus ou Nexus Translate dans le champ prévu à cet effet 
+
+|image:champ_paste_collection.png[]|
+
+Dans notre exemple, nous choisissons une collection de 7 arbres (dans un fichier newick) comportant des erreurs intentionnellement (nous verrons leur utilité par la suite).
+
+Ne pas oublier de préciser, si besoin est, le type de séparateur mis en cause dans la collection sélectionnée. C'est-à-dire le séparateur qui lie les noms qui composent les espèces. 
+
+[caption="Exemple"]
+NOTE: "Macropus eugenii" ou "Macropus_eugenii"
+
+Cliquer alors sur image:bouton_upload.png[] pour envoyer la collection au serveur.
+
+NOTE: Suivant la taille de votre collection, le message ``Please wait'' apparaissant à l'écran peut vous paraître plus ou moins long.
+
+NOTE: Le bouton image:bouton_clear.png[] permet de remettre les champs impactés à zéro.
+
+=== Etape 2: Arrivée sur la page "statistics" ===
+
+==== Résumé ====
+
+//|image:champ_general_informations.png[]|
+|image:page_statistics.png[height=800]|
+
+Cette page est un tableau de bord de la collection utilisateur chargée. Elle indique:
+
+==============================================================================
+- le nombre d'arbres dans la collection
+- le nombre total de taxons 
+- avec en plus le nombre de taxons mal écrits (ils apparaissent en rouge s'il y en a)
+- et aussi le nombre d'homonymes (taxons ambigus apparaissant en orange)
+
+_zone entourée en vert_
+
+==============================================================================
+
+
+==============================================================================
+- les corrections possibles à faire dans la collection
+
+_zone entourée en noir_
+
+==============================================================================
+
+
+==============================================
+- la pondération des arbres
+- la distribution des taxons dans les arbres
+
+_zones entourées en rouge et en orange_
+
+==============================================
+
+
+==============================================================================
+- l'arborescence de tous les taxons de la collection chargée, construite selon le NCBI
+
+_zone entourée et encadrée en gris_
+
+==============================================================================
+
+|image:arbo_ncbi_taxonomy.png[height=1000]|
+
+==============================================================================
+- une visualisation sous forme de graphe de l'arbre représentant la collection (basée uniquement sur le fichier chargé [corrigé ou non])
+
+==============================================================================
+
+|image:arbo_ncbi_phylowidget.png[]|
+
+NOTE: il faut s'assurer d'avoir Java 1.5 minimum installé sur la machine client pour visualiser ce graphe.
+
+Le menu (_zone entourée en bleu_) est adapté à la collection actuellement en cours de traitement.
+
+
+==== Interaction ====
+
+On peut bien sûr interagir avec cette page :
+
+- pour corriger les taxons erronés de la collection (s'il y en a), il suffit de cocher le bouton radio qui convient (situé à droite de chaque taxon)
+- il en est de même pour les homonyms (qui apparaissent en orange)
+- une fois les boutons radio sélectionnés, il suffit de valider la sélection en cliquant sur image:bouton_correct_collection.png[]
+
+[caption="Rmq"]
+NOTE: La correction de la collection a pour effet de faire disparaitre le champ entier "*Correct your collection*" puisqu'elle est corrigée à ce stade.
+
+==== Histogrammes de statistiques ====
+
+- le premier graphique indique le nombre de taxons qui composent les arbres
+
+|image:histogramme1.png[]|
+
+Ici, il y a:::
++
+- 1 arbre qui comporte entre 0 et 2 taxons
++
+- 3 arbres qui comportent entre 3 et 5 taxons
++
+- ... ainsi de suite
+
+# #+
+
+- le second graphique indique le nombre d'arbres dans lesquels se trouve chacun des taxons
+
+|image:histogramme2.png[]|
+
+Ici, il y a:::
++
+- 1 taxon qui se retrouve dans 36 arbres
++
+- 2 taxons qui se retrouvent dans 5 arbres
++
+- ... etc
+
+==== Arborescence NCBI ====
+
+Cet arbre englobe toute la collection construite correctement. Au fur et à mesure des corrections de l'utilisateur, l'arbre est regénéré. En effet, il faut tenir compte des nouveaux taxons corrigés dans la collection.
+
+- Soit le compte des taxons augmente (si le taxon corrigé n'était pas dans l'arbre)
+- Soit le compte des taxons reste inchangé (si le taxon corrigé correspondait à un taxon déjà dans l'arbre)
+
+===== Légende des informations affichées dans l'arbre NCBI =====
+
+. *Code couleur*
+
+- [darkblue]#*Bleu foncé*# : les noms des espèces
+- [#66f]#*Bleu clair*# : les noeuds internes de l'arbre (les parents communs des espèces)
+- [blue]#*Bleu normal*# : chaque noeud et feuille de l'arbre est accompagné de 2 nombres à côté de son nom. Le premier nombre comptabilise le nombre d'espèces représentant le noeud. Le second nombre représente le nombre d'arbres dans lesquels il se trouve
+- [grey]#*Gris*# : effectuer des actions ou afficher un complément d'informations
+
+. *Informations et actions*
+
+.. *_Etiquette "Show parents"_*
++
+On aperçoit sur cet arbre NCBI une étiquette image:etiquette_show_parents.png[] à côté de certains noeuds/feuilles. En cliquant dessus, on a accès à la liste des parents intermédiaires du noeud/feuille concerné(e) jusqu'au parent commun le plus proche affiché juste au dessus de ce noeud/feuille.
++
+[caption="Rmq"]
+NOTE: Cette étiquette a été ajoutée pour une meilleure lisibilité de l'arbre (parents intermédiaires masqués par défaut).
+
+.. *_Informations sur les nombres à droite des noeuds_*
++
+[caption="Exemple"]
+[NOTE]
+==========================================
+image:exemple_murinae_6_4.png[]
+
+En cliquant sur ```6`'', on peut parcourir les 6 arbres qui contiennent des ``Murinae''.
+
+Le survol de ce chiffre informe de cette action.
+
+==========================================
++
+En survolant le chiffre ```4`'', on a brièvement accès cette fois-ci à la liste des 4 Murinae concernés dans ces 6 arbres.
++
+[caption="Rmq"]
+[NOTE]
+===========================================================================================================
+Cette information ne s'affiche pas longtemps! Elle est inscrite dans l'attribut `_TITLE_` des balises _HTML_ qui a un temps d'affichage bref.
+
+Ci-dessous affichées les 9 espèces qui représentent _Haplorrhini_ par exemple.
+image:souris_title.png[]
+
+===========================================================================================================
+
+.. *_Informations sur les taxons et noeuds internes_*
++
+En SURVOLANT à la souris le nom des taxons ou des noeuds internes, on peut apercevoir une image correspondant à ce nom au coin inférieur droit de la page. Le nom survolé est à nouveau inscrit au dessus de l'image.
++
+[caption="Rmq"]
+NOTE: Ces images sont issues de WikiSpecies et WikiPedia.
++
+En cliquant sur les noeuds internes ou les taxons, on est redirigé sur le link:http://www.ncbi.nlm.nih.gov/[NCBI] (dans une nouvelle page) correspondant au taxon ou noeud interne cliqué. On accède alors à plus d'informations sur l'élément.
++
+# #+
+
+.. *_Filtrage_*
++
+L'arbre de la taxonomie du NCBI peut être filtré par l'utilisateur. Pour se faire, chaque élément de l'arbre comporte une case à cocher à sa gauche: il suffit de cocher cette case pour signifier qu'on souhaite enlever tel ou tel élément dans la collection entière. Il ne reste plus qu'à cliquer sur image:bouton_restrict_your_trees.png[] pour appliquer le filtre.
++
+[caption="Rmq"]
+NOTE: Les descendants de l'élément coché sont automatiquement sélectionnés (s'il a des fils).
++
+[caption="Rmq"]
+NOTE: On peut se servir des étiquettes image:etiquette_select_all.png[] et image:etiquette_unselect_all.png[] pour sélectionner/désélectionner tous les éléments de l'arbre suivant la proportion d'éléments de l'arbre que l'on a à filtrer. Ainsi, il est plus facile de décocher/cocher ce que l'on souhaite conserver/enlever dans la collection.
+
+.. *_Graphe_*
++
+Le lien en vert ([green]#Click to visualize this tree as graph#) permet à l'utilisateur d'avoir une vue sous forme de graphe des espèces qui composent sa collection (filtrée ou non). Un clic sur ce lien ouvre une nouvelle page vers le site link:http://www.phylowidget.org[PhyloWidget] en affichant la collection complète (ou filtrée) de l'utilisateur.
+
+==== Les requêtes ====
+
+Le champ de requêtes, que nous n'avons pas détaillé jusque là, permet à l'utilisateur d'extraire des informations sur sa collection. Ces requêtes lui permettent de rechercher, sur l'ensemble des arbres, la présence (ou l'absence) de taxon ou noeuds internes (parents communs). Ces requêtes peuvent être effectuées avec les opérateurs classiques: ">", "<", ">=", "<=", "==", "AND", "OR", "NOT". Les priorités des opérations sont définies par les parenthèses.
+
+NOTE: La casse des requêtes est flexible. Les espaces entre les opérations sont gérés: \{glires\}>3 est équivalent à \{glires\} > 3.
+
+Les taxons ou noeuds internes de la requête doivent être entourés par des accolades. Ceci afin de grouper les éléments comportant des espaces.
+
+Exemple: {echinops telfairi}
+
+[caption="Exemple de requête"]
+[NOTE]
+===========================================================================================================
+
+_\{murinae\} == 2 and not {echinops <plant>} or ( \{homo\} and {homo sapiens} and \{catarrhini\}>2} )_
+
+Ce qui correspond à : sélectionner les arbres qui comportent exactment 2 murinae mais pas d'echinops <plant> ou bien les arbres qui comportent des homo, des homo sapiens et où les catarrhini sont supérieurs à 2.
+
+===========================================================================================================
+
+[NOTE]
+.A propos de requête
+===========================================================================================================
+Effectuer une requête sur ce tableau de bord permet de "filtrer" (ou effectuer des recherches dans) les arbres sans perdre le contenu de sa collection. De plus, les données affichées dans la zone *General informations of the collection* (_entourée en vert dans la capture de la section 6.2.1_) changent évidemment en fonction du résultat de la requête (le nombre d'arbres diminue en conséquence).
+
+Prenons l'exemple de la requête "_\{rodentia\} and \{lagomorpha\}_" sur la collection à 7 arbres. Après la requête, le nombre d'arbres est passé à 3. Ce qui signifie que seuls 3 arbres sur les 7 comportent des _rodentia_ et des _lagommorpha_.
+
+image:champ_general_apres_requete.png[]
+
+Pour annuler les effets de cette requête, il n'y a qu'à cliquer sur [blue]#*Back to full collection*# qui est apparu après l'exécution de la requête.
+
+===========================================================================================================
+
+==== Téléchargement ====
+
+Comme indiqué dans le menu (_zone entourée en bleu ci-dessous_), l'utilisateur a le loisir de télécharger sa collection (filtrée et/ou corrigée et/ou désambiguisée):
+
+- soit construite selon l'arborescence du NCBI (donc un seul arbre, comprenant toutes les espèces de la collection)
+
+|image:menu_download_ncbi.png[]|
+
+- soit toute ou partie des arbres qui composaient sa collection de départ
+
+|image:menu_download_collection.png[]|
+
+
+=== Etape 3: Naviguer dans la collection ===
+
+En cliquant dans le menu sur image:menu_browse_collection.png[], l'utilisateur a tout le loisir de parcourir sa collection arbre par arbre.
+
+Le menu dédié à sa collection actuelle se résume alors à image:menu_bouton_back_statistics.png[] et à image:menu_bouton_download_collection.png[]. La navigation entre les arbres se fait au moyen des boutons [blue]_Next_ et [blue]_Previous_.
+
+A chaque arbre, différentes informations sont affichées :
+
+|image:navigation_arbre.png[]|
+
+- le nom de l'arbre... que l'on peut choisir à l'aide du menu déroulant (_zone entourée en vert sur la capture ci-dessus_)
+- le numéro de l'arbre dans la collection (que l'on peut saisir directement dans le champ text) [_zone entourée en jaune_]
+- des éventuels messages d'erreur (_zone entourée en rouge_). Ici il est indiqué que la collection comporte 3 mauvais taxons. Si on ne les a pas encore corrigés, on peut retourner sur la page des statistiques ("_Back to statistics_") pour le faire.
++
+Autre message d'erreur type :
++
+|image:message_erreur.png[]|
+
+- les taxons marqués en rouge dans l'arbre sont mal écrits (ou inconnus du NCBI)
+- les taxons ambigus (les homonymes) sont marqués en orange (_zone entourée en violet_)
+
+Comme déjà indiqué dans la description des "Statistiques", il est possible de développer les noeuds internes dans l'arbre. On peut les développer tous en même temps en cliquant sur image:etiquette_show_hide_all_parents.png[].
+
+Tout comme l'arborescence du NCBI, on aperçoit le nombre de taxons qui composent l'arbre (_zone entourée en noir_), avec en plus, cette fois-ci, le nom de l'arbre.
+
+L'étiquette image:etiquette_show_hide_internal_nodes.png[] (_zone entourée en bleu_) permet simplement d'effacer de l'affichage les noeuds internes de l'arbre (_en [#66f]#*bleu clair*#_) pour offrir à l'utilisateur la vision de la structure de son arbre (dépourvu des parents communs).
+
+En ce qui concerne les requêtes, leur principe de fonctionnement reste inchangé, si ce n'est que les arbres affichés et navigables ne seront uniquement ceux qui répondent à la requête.
+
+On peut aussi, à partir de cette étape, télécharger la collection d'arbres (qui a été modifiée ou non).
+
+Il est également possible ici d'obtenir la version sous forme de graphe de son arbre en cliquant sur [green]#Click to visualize this tree as graph#.
+
 
 Module phyloWidget
 ------------------
@@ -654,28 +945,30 @@ Module phyloWidget
 Qu'est ce que c'est?
 ~~~~~~~~~~~~~~~~~~~
 
-PhyloWidget est une applet java sous libre de droits, servant à visionner et éditer des arbres phylogénétiques en ligne. C'est un outils simple à utiliser mais très complet permettant une grande interaction avec l'utilisateur. 
+PhyloWidget est une applet Java libre de droits, servant à visionner et éditer des arbres phylogénétiques en ligne. C'est un outil simple à utiliser et très complet, permettant une grande interaction avec l'utilisateur.
 Il est possible de créer son arbre, l'importer via les formats Newick ou Nexus, et même de le modifier afin de l'exporter sous forme de fichier ou d'image.
 Entre autres, on note des suppléments d'ergonomie agréables comme les différents types de visualisation (circulaire, rectangulaire, ...), le zoom, la recherche de taxons, ou encore l'affichage des vraies longueurs de branches. A cela vient s'ajouter sur le survol d'un taxon, un tableau d'informations ainsi qu'un large éventail d'interactions (à découvrir).
 
 Cette application requiert l'environnement java 1.5 coté client. 
-Sa réalisation est dûe à Gregory Jordanie (`phylowidget@gmail.com`) sous la tutelle de Bill Piel (Google Summer of Code project). 
+Sa réalisation est dûe à Gregory Jordanie (mailto:phylowidget@gmail.com[`phylowidget@gmail.com`]) sous la tutelle de Bill Piel (Google Summer of Code project). 
 
 Intégration du module
 ~~~~~~~~~~~~~~~~~~~~~
 
 Ce module a été rajouté afin de compléter la visualisation personnalisable des arbres dans notre application.
-Pour ce faire, nous faisons appel à l'applet directement du site source en passant l'arbre à visualiser en paramètre. Ainsi le serveur hébergeant phyloExplorer n'est pas sollicité.
+Pour ce faire, nous faisons appel à l'applet directement du site source en passant l'arbre à visualiser en paramètre. Ainsi le serveur hébergeant PhyloExplorer n'est pas sollicité.
 
-PhyloWidget est la meilleure solution libre, en terme d'utilisation et d'installation (parmis autres solutions comme ATV ou clustalw).
+PhyloWidget est la meilleure solution libre en terme d'utilisation et d'installation (parmis d'autres solutions comme ATV ou clustalw).
 
-Installation
-------------
+Installation de PhyloExplorer
+-----------------------------
+
 Cette section détaille la procédure d'installation et de configuration de
 l'application web PhyloExplorer. 
 
 Prérequis
 ~~~~~~~~~
+
 Pour une utilisation optimale, PhyloExplorer nécessite au minimum 2 Go de
 mémoire RAM. Prévoir également un processeur cadencé à 2 Ghz et 200 Mo d'espace
 disque pour l'installation.
@@ -687,9 +980,9 @@ Installation des dépendances
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 PhyloExplorer nécessite les bibliothèques suivantes :
 
-- Python >= 2.4 : (`http://www.python.org`)
-- CherryPy >= 3.0 (`http://www.cherrypy.org/`)
-- NetworkX >= 0.35 (`https://networkx.lanl.gov/wiki`)
+- Python >= 2.4 : (link:http://www.python.org[`http://www.python.org`])
+- CherryPy >= 3.0 (link:http://www.cherrypy.org/[`http://www.cherrypy.org/`])
+- NetworkX >= 0.35 (link:https://networkx.lanl.gov/wiki[`https://networkx.lanl.gov/wiki`])
 - Pleet (le paquet est disponible dans tools)
 
 Chacune de ces bibliothèques s'installe très facilement : extraire l'archive
@@ -772,24 +1065,24 @@ proxy = "www.info-ufr.univ-montp2.fr:3128"
 
 log.screen::
 
-Cette variable est un booleen. Si elle est vrai (positionnée à 1), des
-informations de débogage seront envoyés sur la sortie standard de la console.
+Cette variable est un booléen. Si elle est vraie (positionnée à 1), des
+informations de débogage seront envoyées sur la sortie standard de la console.
 Cette variable doit être mise à 0 pour un serveur de production.
 Voir la documentation de CherryPy pour plus de détails.
 
 server.socket_host::
 
-Défini l'adresse ip de la machine où est lancé le serveur. 
+Définit l'adresse IP de la machine où est lancé le serveur. 
 Voir la documentation de CherryPy pour plus de détails.
 
 server.socket_port::
 
-Défini le port où devra être accessible l'application.
+Définit le port où devra être accessible l'application.
 Voir la documentation de CherryPy pour plus de détails.
 
 server.thread_pool::
 
-Défini le nombre d'instances à déployer. Plus le nombre de connexion est
+Définit le nombre d'instances à déployer. Plus le nombre de connexions est
 élevé, plus ce chiffre doit augmenter.
 Voir la documentation de CherryPy pour plus de détails.
 
@@ -801,7 +1094,7 @@ l'expiration de sa session. Par défault elle est de 30 minutes.
 
 proxy (facultatif)::
 
-Cette variable est propre à PhyloExplorer (ie ne provient pas de CherryPy).
+Cette variable est propre à PhyloExplorer (i.e: ne provient pas de CherryPy).
 Elle permet de spécifier l'adresse du proxy afin d'autoriser l'affichage des
 images et la correction du nom des taxons. Si vous avez un problème avec ces
 fonctionnalités, vous devriez vérifier que cette variable est correctement
@@ -811,9 +1104,30 @@ Bilan
 =====
 
 Résultats
-~~~~~~~~~
+---------
 
-NOTE: TODO (Nico A. la fait si g bien compris) liste fonctionnalités faites! + fonctionnalités bonus
+Au cours de ce TER, il nous avait été demandé de :
+
+- pouvoir afficher l'arbre avec les noeuds internes (liste des parents intermédiaires aux parents communs entre chaque noeud)
+- établir des statistiques sur la collection et les afficher
+- afficher des propositions lors de saisie erronée de taxons (_Do you mean?_)
+- filtrer les arbres (la collection) pour ne pouvoir garder que ce qui intéressse l'utilisateur
+
+Ces quatres tâches on été livrées avec succès.
+
+Valeur ajoutée
+--------------
+
+Additionné aux objectifs du TER, nous avons pu proposer en plus de :
+
+- corriger à la volée les taxons erronés (directement dans la collection) 
+- afficher des images des taxons survolés pour offrir à l'utilisateur une perception visuelle des noms qu'il étudie dans ses arbres
+- télécharger la collection entière de l'utilisateur construite sur la taxonomie du NCBI 
+- télécharger des collections filtrées de l'utilisateur
+- visualiser l'arbre utilisateur sous forme de graphe (PhyloWidget)
+
+Toutes ces fonctionnalités s'inscrivant dans une interface conviviale, simple et intuitive.
+
 
 Annexe
 ======
@@ -830,15 +1144,15 @@ Glossaire phylogénétique
 Glossaire technique
 -------------------
 
-*Css* : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices _id_, _name_, _class_.
+*CSS* : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices _id_, _name_, _class_.
 
-*Csv* : _Comma Separated Values_, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.
+*CSV* : _Comma Separated Values_, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banque de données.
 
 *Filtrage* : permet dans le cas présent de restreindre un arbre en sous arbres.
 
-*Jquery* : bibliothèque Javascript qui porte sur l'interaction entre JavaScript et HTML. La librairie se présente comme un unique fichier décrivant les utilisations _d'évènements multi navigateur_, _DOM_,_Effets et animations_, et surtout _Ajax_.
+*JQuery* : bibliothèque Javascript qui porte sur l'interaction entre JavaScript et HTML. La librairie se présente comme un unique fichier décrivant les utilisations _d'évènements multi navigateur_, _DOM_, _Effets et animations_, et surtout _Ajax_.
 
-*NCBI* : National Center for Biotechnology Information, référence en matière de biotechnologie, `http://www.ncbi.nlm.nih.gov`.
+*NCBI* : National Center for Biotechnology Information, référence en matière de biotechnologie, link:http://www.ncbi.nlm.nih.gov[`http://www.ncbi.nlm.nih.gov`].
 
 *Nexus* : format de fichier contenant des arbres _phylogénétiques_ et des annotations associées.
 
@@ -846,25 +1160,25 @@ Glossaire technique
 
 *Phylip* : format de représentation d'arbres _phylogénétiques_ sous forme de _(syntaxe parenthésée);_.
 
-*Python* : langage de programmation interprété, multi-paradigme, qui favorise la programmation impérative structurée, et orientée objet. Il est doté d'un typage dynamique fort, d'une gestion automatique de la mémoire par ramasse-miettes et d'un système de gestion d'exceptions. Sous licence libre et multi plates-formes.
+*Python* : langage de programmation interprété, multi-paradigme, qui favorise la programmation impérative structurée et orientée objet. Il est doté d'un typage dynamique fort, d'une gestion automatique de la mémoire par ramasse-miettes et d'un système de gestion d'exceptions. Sous licence libre et multi plate-formes.
 
-*SVN / Subversion* : entrepot de versions temporaires de code qui permet aux développeurs de tester, partager, modifier, comparer, réinstaller un projet en équipe.
+*SVN / Subversion* : entrepôt de versions temporaires de code qui permet aux développeurs de tester, partager, modifier, comparer, réinstaller un projet en équipe.
 
-*Template* : modèle permettant de construire les pages d'un site web selon une trame générale (un squelette) et des zones modifiables. Utile pour les mise à jour et modifications en cascade.
+*Template* : modèle permettant de construire les pages d'un site web selon une trame générale (un squelette) et des zones modifiables. Utile pour les mises à jour et modifications en cascade.
 
 Liens externes
 --------------
 
-*Python* : `http://www.python.org`
+*Python* : link:http://www.python.org[`http://www.python.org`]
 
-*NetworkX* : `https://networkx.lanl.gov/wiki`
+*NetworkX* : link:https://networkx.lanl.gov/wiki[`https://networkx.lanl.gov/wiki`]
 
-*CherryPy* : `http://www.cherrypy.org/`
+*CherryPy* : link:http://www.cherrypy.org/[`http://www.cherrypy.org/`]
 
-*BioPython* : `http://biopython.org/wiki/Main_Page`
+*BioPython* : link:http://biopython.org/wiki/Main_Page[`http://biopython.org/wiki/Main_Page`]
 
-*NCBI* : `http://www.ncbi.nlm.nih.gov/`
+*NCBI* : link:http://www.ncbi.nlm.nih.gov/[`http://www.ncbi.nlm.nih.gov/`]
 
-*Référence biologique* : `http://fr.wikipedia.org`
+*Référence biologique* : link:http://fr.wikipedia.org[`http://fr.wikipedia.org`]
 
-*Applet PhyloWidget* : `http://www.phylowidget.org`
+*Applet PhyloWidget* : link:http://www.phylowidget.org[`http://www.phylowidget.org`]

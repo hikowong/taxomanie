@@ -17,7 +17,7 @@ body {
 }
 
 a {
-  color: green;
+  color: blue;
   text-decoration: underline;
 }
 a:visited {
@@ -37,7 +37,8 @@ tt {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: green;
+  /*color: #527bbd;*/
+  color: #009900;
   font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
@@ -77,7 +78,7 @@ pre {
 }
 
 span#author {
-  color: green;
+  color: #527bbd;
   font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
@@ -174,7 +175,7 @@ div.admonitionblock .icon {
   font-size: 1.1em;
   font-weight: bold;
   text-decoration: underline;
-  color: green;
+  color: #527bbd;
   padding-right: 0.5em;
 }
 div.admonitionblock td.content {
@@ -216,7 +217,7 @@ div.olist2 ol {
 }
 
 div.tableblock > table {
-  border: 3px solid green;
+  border: 3px solid #527bbd;
 }
 thead {
   font-family: sans-serif;
@@ -247,7 +248,7 @@ td.hlist2 {
 }
 
 div#toctitle {
-  color: green;
+  color: #527bbd;
   font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
@@ -301,12 +302,88 @@ div.exampleblock-content {
 }
 
 /* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: green; }
+div#toc a:visited { color: blue; }
 </style>
+<script type="text/javascript">
+/*<![CDATA[*/
+window.onload = function(){generateToc(2)}
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, October 2006. License: GPL */
+
+function getText(el) {
+  var text = "";
+  for (var i = el.firstChild; i != null; i = i.nextSibling) {
+    if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+      text += i.data;
+    else if (i.firstChild != null)
+      text += getText(i);
+  }
+  return text;
+}
+
+function TocEntry(el, text, toclevel) {
+  this.element = el;
+  this.text = text;
+  this.toclevel = toclevel;
+}
+
+function tocEntries(el, toclevels) {
+  var result = new Array;
+  var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
+  // Function that scans the DOM tree for header elements (the DOM2
+  // nodeIterator API would be a better technique but not supported by all
+  // browsers).
+  var iterate = function (el) {
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+        var mo = re.exec(i.tagName)
+        if (mo)
+          result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+        iterate(i);
+      }
+    }
+  }
+  iterate(el);
+  return result;
+}
+
+// This function does the work. toclevels = 1..4.
+function generateToc(toclevels) {
+  var toc = document.getElementById("toc");
+  var entries = tocEntries(document.getElementsByTagName("body")[0], toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "toc" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+}
+/*]]>*/
+</script>
 <title></title>
 </head>
 <body>
 <div id="header">
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
+</div>
 </div>
 <div class="para"><p><center> <span class="image">
 <img src="logo.png" alt="logo.png" />
@@ -318,52 +395,52 @@ Nicolas Clairon
 Sorel Diser</tt></pre>
 </div></div>
 <h1 id="_pr_sentation_du_projet">Présentation du projet</h1>
-<h2 id="_phylog_nie_et_taxonomie">Phylogénie et Taxonomie</h2>
+<h2 id="_phylog_nie_et_taxonomie">1. Phylogénie et Taxonomie</h2>
 <div class="sectionbody">
-<h3 id="_comprendre_le_sujet">Comprendre le sujet</h3><div style="clear:left"></div>
-<div class="para"><p>La phylogénie est l'étude de la formation et de l'évolution des organismes du vivant en vue d'établir leur parenté. Elle formalise la classification sous forme d'arbres phylogénétiques (équivalent à un arbre généalogique) dont les noeuds sont des taxons.
-La taxomanie associée définit l'étude et le regroupement de ces organismes en entité selon leurs critères, caractères et autres similitudes.</p></div>
+<h3 id="_comprendre_le_sujet">1.1. Comprendre le sujet</h3><div style="clear:left"></div>
+<div class="para"><p>La phylogénie est l'étude de la formation et de l'évolution des organismes du vivant en vue d'établir leur parenté. Elle formalise la classification sous forme d'arbres phylogénétiques (équivalent à un arbre généalogique depuis une racine incluant tous les êtres vivants existants ou ayant existé, jusqu'aux individus) dont les noeuds sont appelés <em>taxons</em>. Ainsi, la taxomanie associée définit l'étude et le regroupement de ces organismes en entité (familles, genres, espèces, &#8230;) selon leurs critères, caractères et autres similitudes.</p></div>
 <div class="listingblock">
-<div class="title">Exemple d'arbres phylogénétiques</div>
+<div class="title">Exemple d'un arbre phylogénétique</div>
 <div class="content">
 <pre><tt>Root
-| +- Hominoidea
-| +- Hominidae
-| +- Homo/pan/gorilla group
-| | +- Homo
-| | +- Pan</tt></pre>
+|
++- Canidae
+| +- Canis
+| |     +- Canis lupus
+| +- Vulpes
+| +- Lycaon</tt></pre>
 </div></div>
-</div>
-<h2 id="_analyse_de_l_existant">Analyse de l'existant</h2>
-<div class="sectionbody">
-<div class="para"><p>Le NCBI <em>National Center for Biotechnology Information</em>
-Le site du NCBI est un ensemble d'outils et de bases de données sur les biotechnologie, voir <tt>http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy</tt>.
-En ce qui nous concerne, on retiendra les points qui suivent comme références de départ pour le projet PhyloExplorer :</p></div>
+<div class="para"><p>Canis lupus, le loup, est un taxon de rang <em>espèce</em>.
+Canis est le taxon immédiatement supérieur de rang <em>genre</em> et regroupe plusieurs espèces <em>chien, loup, chacal, &#8230;</em>
+Canidae est le taxon immédiatement supérieur de rang <em>famille</em> et regroupe plusieurs genres <em>Canis (chien, loup, chacal), Vulpes (renard), Lycaon (lycaon), &#8230;</em></p></div>
+<div class="para"><p>L'approche phylogénétique actuelle fait appel aux données de la cladistique, mais ses exigences se résument à n'accepter que des taxons monophylétiques, c'est-à-dire correspondant à un clade donné. Elle demande que les taxons soient limités à ceux qui respectent les deux conditions suivantes :</p></div>
 <div class="ilist"><ul>
 <li>
 <p>
-Les données : base de données taxonomique téléchargeable à disposition du public
+tous les individus du taxon descendent d'un individu ancestral particulier,
 </p>
 </li>
 <li>
 <p>
-Les actions de bases : la gestion d'arbres phylogénétiques en ligne
+tous les descendants de cet ancêtre particulier sont dans le taxon.
 </p>
 </li>
 </ul></div>
-<div class="para"><p>Comme tout site de recherche, le NCBI propose beaucoup d'informations via une interface chargée et peu adaptée au travail personnalisé.
-La navigation sur un arbre apparaît assez fastidueuse et les informations taxonomique complémentaires, certes complètes, deviennent vite illisibles.</p></div>
+<div class="para"><p>On parle alors seulement de <em>taxon monophylétique</em> ou <em>clade</em>. Cette contrainte a amené des modifications fondamentales de la classification scientifique. Ainsi les dinosaures n'ont pas disparu, la systématique moderne inclut les oiseaux dans le groupement « dinosaures ».</p></div>
+<div class="para"><p>Par ailleurs, d'importants progrès en génomique ont été faits grâce à l'analyse génétique automatique et le développement des outils/modèles informatiques. Ils imposent et permettent la redéfinition de certaines espèces ou groupes d'espèces. Ces changements nécessitent donc une meilleure connaissance et suivi des espèces, d'où l'évolution de la phylogénie.</p></div>
 </div>
-<h2 id="_besoins_et_objectifs">Besoins et objectifs</h2>
+<h2 id="_analyse_de_l_existant">2. Analyse de l'existant</h2>
 <div class="sectionbody">
-<h3 id="_besoins">Besoins</h3><div style="clear:left"></div>
-<div class="para"><p>En perpétuel remaniement grâce/à cause de l'avancée des nouvelles techniques moléculaires et génétiques, les chercheurs ont besoin d'outils concis pour :
-- la visualisation,
-- l'analyse,
-- la modification,
-- la confrontation,
-- le partage d'informations.</p></div>
-<h3 id="_objectifs">Objectifs</h3><div style="clear:left"></div>
+<div class="para"><p>Le NCBI <em>National Center for Biotechnology Information</em> est un centre d'informations sur les biotechnologies établi en 1988. Le site du NCBI propose un ensemble d'outils et de bases de données sur la biologie, voir <a href="http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy"><tt>http://www.ncbi.nlm.nih.gov/sites/entrez?db=taxonomy</tt></a>. Il est considéré comme une référence pour la recherche en phylogénie et en ce qui nous concerne, on retiendra la partie <em>taxonomy</em> du site comme référence de départ pour le projet PhyloExplorer.</p></div>
+<div class="para"><p>Dans un premier temps, on utilisera la base de données taxonomique à disposition du public pour créer notre structure conforme à la phylogénie en vigueur. Dans un second temps, les fonctionnalités de bases seront calquées sur la gestion d'arbres phylogénétiques en ligne. Et enfin, le site permettra de valider les résultats obtenus lors du développement de notre projet.</p></div>
+<div class="para"><p>Comme tout site de recherche, le NCBI propose beaucoup d'informations via une interface chargée et peu adaptée au travail personnalisé.
+La navigation sur un arbre apparaît assez fastidieuse et les informations taxonomiques, certes complètes, deviennent vite illisibles. En conclusion, l'ergonomie ne sera pas retenue et une interface mieux adaptée devra être mise en place pour faciliter une interaction plus soutenue avec l'utilisateur.</p></div>
+</div>
+<h2 id="_besoins_et_objectifs">3. Besoins et objectifs</h2>
+<div class="sectionbody">
+<h3 id="_besoins">3.1. Besoins</h3><div style="clear:left"></div>
+<div class="para"><p>En perpétuel remaniement grâce/à cause de l'avancée des nouvelles techniques moléculaires et génétiques, les chercheurs ont besoin d'outils concis pour : la visualisation, l'analyse, la modification, la confrontation et le partage d'informations.</p></div>
+<h3 id="_objectifs">3.2. Objectifs</h3><div style="clear:left"></div>
 <div class="para"><p>L'objectif principal de ce projet est de pouvoir travailler sur sa propre collection d'arbres et d'appliquer les fonctionnalités suivantes :</p></div>
 <div class="ilist"><ul>
 <li>
@@ -373,36 +450,39 @@ parcourir et visualiser une collection d'arbres,
 </li>
 <li>
 <p>
-vérifier la conformité des arbres et taxons,
+vérifier la conformité des structures d'arbres et la validité des taxons,
 </p>
 </li>
 <li>
 <p>
-effectuer des requêtes sur une collection (tri),
+effectuer des requêtes sur une collection (tri sur le nombre et/ou la présence de taxons),
 </p>
 </li>
 <li>
 <p>
-filtrer une collection (garder des sous-arbres),
+filtrer une collection (ne garder que les sous-arbres pertinents),
 </p>
 </li>
 <li>
 <p>
-produire des statistiques sur la collection.
+produire des statistiques (distribution des taxons et arbres dans une collection).
 </p>
 </li>
 </ul></div>
-<h3 id="_exigences">Exigences</h3><div style="clear:left"></div>
-<div class="para"><p>Les seules exigences interviennent au niveau des formats d'entrée/sortie du projet. Ces derniers prennent en compte une collection d'arbres. On cite <em>phylip</em>, <em>newick</em>, <em>nexus</em> -&gt; .nwk, et la banque de données <em>.csv</em>.</p></div>
+<h3 id="_exigences">3.3. Exigences</h3><div style="clear:left"></div>
+<div class="para"><p>Les seules exigences interviennent au niveau des formats d'entrée et sortie du projet. Ces derniers prennent en compte une collection d'arbres. On cite <strong>phylip</strong>, <strong>newick</strong>, <strong>nexus</strong> sous forme de <em>fichier.nwk</em>, et la banque de données stockée dans un <em>fichier.csv</em>.</p></div>
 </div>
 <h1 id="_documentation_technique">Documentation technique</h1>
-<h2 id="_formats_des_fichiers">Formats des fichiers</h2>
+<h2 id="_formats_des_fichiers">1. Formats des fichiers</h2>
 <div class="sectionbody">
 <div class="listingblock">
 <div class="title">Exemple : Le format de données et de structure d'arbres phylogénétiques <em>Phylip/Newick</em></div>
 <div class="content">
 <pre><tt>((homo, rattus), bos ,(pan,mus));</tt></pre>
 </div></div>
+<div class="para"><p>L'arbre est défini entre parenthèses comme suit <strong>(arbre);</strong> ainsi que chaque groupe de taxons <strong>(frère 1, frère 2);</strong>.
+On retrouve aussi les niveaux de profondeur de la façon suivante <strong>(1,(2,(3,3)));</strong>.
+Si l'on applique à l'exemple précédent, on a 3 frères qui sont <em>(homo, rattus)</em>, <em>bos</em> et <em>(pan,mus)</em>, et 2 niveaux de profondeur.</p></div>
 <div class="listingblock">
 <div class="title">Exemple : Le format de fichier <em>Nexus</em> pour les collections d'arbres</div>
 <div class="content">
@@ -414,6 +494,7 @@ Tree 3 = ((homo,rats),pan);
 Tree 4 = (((((homo,pan),macaca),ratus),dasypus),monodelphi);
 end;</tt></pre>
 </div></div>
+<div class="para"><p>Le format nexus permet de structurer une collection d'arbres de façon explicite. Il supporte l'ajout d'annotations sous forme de commentaires.</p></div>
 <div class="listingblock">
 <div class="title">Exemple : données de la base <em>names.dump</em> du NCBI</div>
 <div class="content">
@@ -425,16 +506,9 @@ end;</tt></pre>
 9614    |   coyote      |               |   genbank common name |
 9615    |   Canis canis |               |   synonym             |</tt></pre>
 </div></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">TODO (sorel) Nexus translate, commentaire</td>
-</tr></table>
+<div class="para"><p>Il s'agit d'une nomenclature communément utilisée. L'identifiant permet de retrouver de façon unique un taxon et trouver toutes les informations associées à l'aide de séparateurs définis.</p></div>
 </div>
-</div>
-<h2 id="_choix_technique">Choix technique</h2>
+<h2 id="_choix_technique">2. Choix technique</h2>
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
@@ -445,9 +519,9 @@ Langage de programmation
 Tout le projet PhyloExplorer repose sur le langage <strong>Python</strong>. Ce langage a été
 choisi pour sa licence (libre), sa portabilité (il est multiplateforme), sa robustesse,
 et sa syntaxe simple et claire. La facilité avec laquel il manipule les
-chaines de caractères à fait pencher la balance en sa faveur. Enfin, une
+chaines de caractères a fait pencher la balance en sa faveur. Enfin, une
 bibliothèque python sur le traitement d'arbres phylogénétiques avait déjà été
-créé par l'un des auteurs : la base était déjà faite.
+créée par l'un des auteurs : la base était déjà faite.
 </p>
 </dd>
 <dt>
@@ -456,10 +530,10 @@ Serveur Web
 <dd>
 <p>
 Apache a été envisagé mais nous voulions un serveur web simple et autonome ; or
-le mod_python d'apache n'est pas trivial à installer et à configurer. Nous nous
+le <em>mod_python</em> d'apache n'est pas trivial à installer et à configurer. Nous nous
 sommes donc tournés vers <strong>CherryPy</strong> qui est un "<em>framework HTTP orienté
 objet</em>". Ainsi, l'installation était grandement facilitée et une utilisation
-standalone pouvait être envisagée.
+"standalone" pouvait être envisagée.
 </p>
 </dd>
 <dt>
@@ -467,7 +541,7 @@ La gestion de graphes
 </dt>
 <dd>
 <p>
-Notre but étant de créer l'aborescence du NCBI à partir d'une liste de taxon,
+Notre but étant de créer l'aborescence du NCBI à partir d'une liste de taxons,
 il nous fallait une bibliothèque de gestion de graphes. Nous utilisons pour
 cela <strong>NetworkX</strong>. Entièrement écrite en python, cette bibliothèque
 multiplateforme s'installe très facilement et est relativement puissante.
@@ -478,7 +552,7 @@ Moteur de templates
 </dt>
 <dd>
 <p>
-Le moteur de templates à été attribué à <strong>Pleet</strong>. Une bibliothèque python
+Le moteur de templates a été attribué à <strong>Pleet</strong>. Une bibliothèque python
 écrite par l'un des auteurs permettant d'embarquer du code python dans du
 HTML. Cette bibliothèque est très simple, rapide et fait bien son travail.
 </p>
@@ -495,7 +569,7 @@ gestionnaire de bugs et un gestionnaire de version (subversion).
 </dd>
 </dl></div>
 </div>
-<h2 id="_structure_du_projet">Structure du projet</h2>
+<h2 id="_structure_du_projet">3. Structure du projet</h2>
 <div class="sectionbody">
 <div class="para"><p>Nous n'avons pas voulu enfermer PhyloExplorer dans une utilisation
 particulière (ici le service web). C'est pourquoi PhyloExplorer est structuré
@@ -518,14 +592,14 @@ en plusieurs parties :</p></div>
 <div class="para"><p>Cette distinction dans la structure permet aux développeurs de créer d'autres
 applications en se servant de la même base (PhyloCore). Des scripts, pipelines ou encore
 des applications QT peuvent être créés à moindre coût.</p></div>
-<h3 id="_phylocore">PhyloCore</h3><div style="clear:left"></div>
+<h3 id="_phylocore">3.1. PhyloCore</h3><div style="clear:left"></div>
 <div class="para"><p>PhyloCore regroupe trois classes (<em>TaxanomyReference</em>, <em>TreeCollection</em> et
 <em>PhylogeneticTree</em>) et une bibliothèque de gestion d'arbres phylogénétiques :
 <em>Phylogelib</em>.</p></div>
 <div class="para"><div class="title">Diagramme de classes</div><p><center> <span class="image">
 <img src="phylo1.png" alt="phylo1.png" />
 </span> </center></p></div>
-<h4 id="_phylogelib">Phylogelib</h4>
+<h4 id="_phylogelib">3.1.1. Phylogelib</h4>
 <div class="para"><p>Phylogelib est une bibliothèque python qui permet de manipuler des arbres
 phylogénétiques. Très rapide, elle se contente de traiter des chaines de
 caractères au format newick (on évite ainsi la lourde gestion de graphes).</p></div>
@@ -570,7 +644,7 @@ removeBootStraps(tree)
 </dt>
 <dd>
 <p>
-Supprime les "bootstraps" de l'abres
+Supprime les "bootstraps" de l'arbre
 </p>
 </dd>
 <dt>
@@ -591,10 +665,10 @@ Nettoie la chaine au format newick en supprimant tous les espaces superflux.
 </dd>
 </dl></div>
 </div></div>
-<h4 id="_l_outil_preproc_py">L'outil preproc.py</h4>
+<h4 id="_l_outil_preproc_py">3.1.2. L'outil preproc.py</h4>
 <div class="para"><p>PhyloExplorer utilise la base de données du NCBI comme base d'information.
 Cette base de données est accessible à l'adresse :
-<tt>ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz</tt>. Cette archive
+<a href="ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz"><tt>ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz</tt></a>. Cette archive
 comprend plusieurs images de la base du NCBI. Celles qui nous intéressent sont
 <tt>names.dump</tt> et <tt>nodes.dump</tt>. Ces images nous permettent de récupérer :</p></div>
 <div class="ilist"><ul>
@@ -637,7 +711,7 @@ la liste de ses noms communs.
 <div class="para"><p>Le problème réside dans le fait que toutes ces informations sont éparpillés
 entre <tt>names.dump</tt> et <tt>nodes.dump</tt> (qui contiennent également beaucoup
 d'informations qui ne nous sont pas utiles). Nous avons alors effectué une
-compilation de ces informations et les avons placés dans le fichier
+compilation de ces informations et les avons placées dans le fichier
 <tt>taxonomy.csv</tt>. Voici sa structure :</p></div>
 <div class="listingblock">
 <div class="content">
@@ -645,8 +719,8 @@ compilation de ces informations et les avons placés dans le fichier
 </div></div>
 <div class="para"><p>Les éléments d'une liste sont séparés par un point d'exclamation. l'id est
 très important car il permet de générer les liens pointant vers le site du NCBI.</p></div>
-<div class="para"><p>Ainsi, à chaque fois qu'il que l'on veut mettre à jour le fichier
-<tt>taxonomy.csv</tt>, il faudra lancer cette procédure. Nous avons créer un
+<div class="para"><p>Ainsi, à chaque fois que l'on veut mettre à jour le fichier
+<tt>taxonomy.csv</tt>, il faudra lancer cette procédure. Nous avons créé un
 outil qui l'effectue automatiquement. Il s'appelle <tt>preproc.py</tt>.</p></div>
 <div class="para"><p>Cet outil téléchargera automatiquement l'image de la base du NCBI, extraira
 les informations nécessaires et générera le fichier <tt>taxonomy.csv</tt>.</p></div>
@@ -656,14 +730,14 @@ les informations nécessaires et générera le fichier <tt>taxonomy.csv</tt>.</p
 <div class="title">Note</div>
 </td>
 <td class="content">
-<div class="title">A propos de base de données</div>Dans ce projet, il nous a été demandé de s'affranchir totalement de base de
-données classique (MySQL, SQLite&#8230;) pour charger toute la taxonomy du NCBI
+<div class="title">A propos de base de données</div>Dans ce projet, il nous a été demandé de s'affranchir totalement de bases de
+données classiques (MySQL, SQLite&#8230;) pour charger toute la taxonomie du NCBI
 en RAM. Cependant, pour plus de clareté (et par habitude ?) nous continuerons
 de parler de base de données du NCBI</td>
 </tr></table>
 </div>
-<h4 id="_taxonomyreference">TaxonomyReference</h4>
-<div class="para"><p>Cette classe permet d'intéragir avec la base du NCBI et plus particulièrement
+<h4 id="_taxonomyreference">3.1.3. TaxonomyReference</h4>
+<div class="para"><p>Cette classe permet d'interagir avec la base du NCBI et plus particulièrement
 avec le fichier <tt>taxonomy.csv</tt> qu'il prend en paramètre.</p></div>
 <div class="sidebarblock">
 <div class="sidebar-content">
@@ -742,7 +816,7 @@ isValid(self, name)
 </dt>
 <dd>
 <p>
-    retourne vrai si le nom du taxon est un nom scientific présent dans la
+    retourne vrai si le nom du taxon est un nom scientifique présent dans la
     base du NCBI
 </p>
 </dd>
@@ -764,12 +838,12 @@ stripTaxonName(self, taxon_name)
 </dl></div>
 </div></div>
 <div class="para"><p>Cette classe est incluse dans toutes les classes de PhyloCore.</p></div>
-<h4 id="_treecollection">TreeCollection</h4>
+<h4 id="_treecollection">3.1.4. TreeCollection</h4>
 <div class="para"><p>Cette classe représente une collection d'arbres phylogénétiques.
-Elle prend en paramètre une collection au format <em>Phyllip</em>, <em>Nexus</em> ou
+Elle prend en paramètre une collection au format <em>Phylip</em>, <em>Nexus</em> ou
 <em>Nexus translate</em>. Elle propose des méthodes permettant de manipuler
-une collection comme d'effectuer des filtrages et des requêtes.
-Elle permet également de récupérer les statistiques de la collections.</p></div>
+une collection, comme d'effectuer des filtrages et des requêtes.
+Elle permet également de récupérer les statistiques de la collection.</p></div>
 <div class="sidebarblock">
 <div class="sidebar-content">
 <div class="sidebar-title">Méthodes principales</div>
@@ -779,8 +853,8 @@ getCollection(self)
 </dt>
 <dd>
 <p>
-    Retourne la collection en cours ; c'est-à-dire que si une requête à
-    été lancé, elle renverra la collection filtrée. Sinon, elle renverra la
+    Retourne la collection en cours ; c'est-à-dire que si une requête a
+    été lancée, elle renverra la collection filtrée. Sinon, elle renverra la
     collection initiale.
 </p>
 </dd>
@@ -806,11 +880,11 @@ query(self, query)
 <div class="content">
 <pre><tt>{genre1} &gt; 3 and ( {genre2} == 2 or {genre3} &lt; 4 )</tt></pre>
 </div></div>
-<div class="para"><p><tt>genre</tt> peut être soit le nom d'un taxon (<em>rattus_rattus</em>) soit le nom
+<div class="para"><p><tt>genre</tt> peut être : soit le nom d'un taxon (<em>rattus_rattus</em>), soit le nom
 d'une espèce (<em>murinae</em>). <tt>genre</tt> doit être entre accolade. Le reste de la
 requête est une expression python classique (d'où l'utilisation du <tt>==</tt>).
 En fait, les noms entre accolades seront remplacés par leur occurence dans
-la collection. Nous obtienons donc une expression python classique qui
+la collection. Nous obtenons donc une expression python classique qui
 sera évaluée :</p></div>
 <div class="literalblock">
 <div class="content">
@@ -832,7 +906,7 @@ displayStats(self, allparents=False)
 <dd>
 <p>
     Cette méthode renvoie l'abre du NCBI au format HTML. Cette arbre contient
-    des données statistiques qui permet de connaitre le nombre d'occurence
+    des données statistiques qui permettent de connaître le nombre d'occurences
     d'une espèce dans la collection.
 </p>
 <div class="para"><p><strong>Remarque</strong> : <em>Cette méthode doit être réécrite de manière à tenir compte du MVC.
@@ -847,7 +921,7 @@ filter(self, taxa_list)
     est très utile pour ne travailler que sur une partie de la taxonomie sans
     être polluée par d'autres taxons.
 </p>
-<div class="para"><p>Cette méthode prends en paramètre  la liste des taxons à supprimer.</p></div>
+<div class="para"><p>Cette méthode prend en paramètre la liste des taxons à supprimer.</p></div>
 </dd>
 <dt>
 getNCBITreeAsNwk(self)
@@ -855,7 +929,7 @@ getNCBITreeAsNwk(self)
 <dd>
 <p>
     Cette méthode renvoie l'arborescence du NCBI de la collection au format
-    Newick. Elle est utilisé si l'on souhaite télécharger l'arbre modèle du
+    Newick. Elle est utilisée si l'on souhaite télécharger l'arbre modèle du
     NCBI.
 </p>
 </dd>
@@ -864,7 +938,7 @@ getNbTrees(self, taxon)
 </dt>
 <dd>
 <p>
-    Retourne le nombre d'arbre dans lesquels se trouve un taxon
+    Retourne le nombre d'arbres dans lesquels se trouve un taxon
 </p>
 </dd>
 <dt>
@@ -881,7 +955,7 @@ stat1(self)
 </dt>
 <dd>
 <p>
-    Cette méthode permet de connaitre le nombre
+    Cette méthode permet de connaître le nombre
     d'arbres à n feuilles. Elle renvoie un dictionnaire qui aura comme clé le
     début de l'intervalle. Voir la section statistiques pour plus de détails.
 </p>
@@ -891,7 +965,7 @@ stat2(self)
 </dt>
 <dd>
 <p>
-    Cette méthode permet de connaître le nombre de taxon présents dans <em>n</em>
+    Cette méthode permet de connaître le nombre de taxons présents dans <em>n</em>
     arbres. Comme <em>stat1</em>, elle renvoie un dictionnaire. Voir la section
     statistiques pour plus de détails.
 </p>
@@ -912,7 +986,7 @@ mycollection = TreeCollection( open("mycol.tre").read() )
 <i># Combien d'arbres sont dans la collection</i>
 <strong>print</strong> len( mycollection.getCollection() )
 
-<i># Effectue une requête afin de ne garder tous les arbres dont les murinaes</i>
+<i># Effectue une requête afin de ne garder que les arbres dont les murinaes</i>
 <i># sont supérieurs à 1</i>
 mycollection.query( "{murinae} &gt; 1" )
 
@@ -925,12 +999,12 @@ mycollection.clearQuery()
 <i># Récupère la collection originelle</i>
 mycollection.getCollection()
 
-<i># Filtrage. On supprime tous les taxon "mus", "pan" et "homo" de la</i>
-<i># collection. Le resultat sera une chaine de caractère au format Nexus.</i>
+<i># Filtrage. On supprime tous les taxons "mus", "pan" et "homo" de la</i>
+<i># collection. Le résultat sera une chaine de caractère au format Nexus.</i>
 nexus_string = mycollection.filter( ["mus", "pan", "homo"] )</tt></pre>
 </div></div>
 <div class="para"><p>On voit bien dans cette exemple que la méthode <tt>query</tt> influera sur la méthode
-<tt>getCollection</tt> qui renverra alors qu'une partie de la collection. La méthode
+<tt>getCollection</tt> qui ne renverra alors qu'une partie de la collection. La méthode
 <tt>clearQuery</tt> permet d'effacer les effets de la requête.</p></div>
 <h5 id="_statistiques">Statistiques</h5>
 <div class="para"><p>PhyloExplorer fournit deux types de statistiques. La première présente le
@@ -949,9 +1023,9 @@ nombre d'arbres à <em>n</em> feuilles :</p></div>
 40 feuilles -&gt; 3 arbres
 ...</tt></pre>
 </div></div>
-<div class="para"><p>Le problème résidait dans le fait qu'il pouvait avoir une quantité
-considérable d'arbre au nombre de feuilles différentes. L'idée ici est de
-regrouper le nombre de feuille par tranche :</p></div>
+<div class="para"><p>Le problème résidait dans le fait qu'il pouvait y avoir une quantité
+considérable d'arbres au nombre de feuilles différent. L'idée ici est de
+regrouper le nombre de feuilles par tranches :</p></div>
 <div class="listingblock">
 <div class="title">Exemple de répartition par tranche de 10</div>
 <div class="content">
@@ -968,23 +1042,23 @@ de 40 à 50 feuilles -&gt; 3 arbres
 <div class="title">Remarque</div>
 </td>
 <td class="content">L'intervalle ne comprend pas la dernière valeur (de 0 à 10 feuilles
-représentera l'intervalle <tt>[0,10[</tt>)</td>
+représentera l'intervalle <tt>[0,10]</tt>)</td>
 </tr></table>
 </div>
 <div class="para"><p>La grandeur de l'intervalle (que nous appellerons <em>ratio</em>) est calculée par
 l'équation : <tt>nbmax*10.0/100</tt> où <tt>nbmax</tt> est le nombre maximum de
-feuilles par arbres présentes dans la collection (ici 40). Cela permet de
-n'avoir qu'une dizaine de barres dans notre diagrame.</p></div>
+feuilles présentes par arbre dans la collection (ici 40). Cela permet de
+n'avoir qu'une dizaine de barres dans notre histogramme.</p></div>
 <div class="para"><p>Le dictionnaire renvoyé sera du type
-<tt>{<em>nombre de feuilles</em> : <em>nombre d'arbres</em>}</tt>
-donc pour l'exemple ci-dessus on aura :</p></div>
+<tt>{<em>nombre de feuilles</em> : <em>nombre d'arbres</em>}</tt>.
+Donc pour l'exemple ci-dessus on aura :</p></div>
 <div class="listingblock">
 <div class="content">
 <pre><tt>{0:0, 10:15, 20:21, 30:4, 40:3 ...}</tt></pre>
 </div></div>
 <div class="para"><p>La statistique numéro 2 calcule la fréquence de distribution des taxons dans
 la collection. Le ratio est calculé sur le même principe que précédemment.</p></div>
-<h4 id="_phylogenetictree">PhylogeneticTree</h4>
+<h4 id="_phylogenetictree">3.1.5. PhylogeneticTree</h4>
 <div class="para"><p>Cette classe permet d'afficher un arbre phylogénétique au format HTML. La
 représentation se fait sous forme d'arborescence simple. Par soucis de
 performances, cette classe est chargée uniquement lors de l'affichage d'un
@@ -994,34 +1068,34 @@ trouvent soit dans la bibliothèque <em>Phylogelib</em>, soit dans la classe
 <div class="para"><p><center> <span class="image">
 <img src="phylo2.png" alt="phylo2.png" />
 </span> </center></p></div>
-<h3 id="_phyloweb">PhyloWeb</h3><div style="clear:left"></div>
-<div class="para"><p>Dans cette partie, nous allons parler du projet PhyloExplorer à proprement
-parler ; c'est-à-dire la partie applicatif. PhyloWeb est composé de deux
-grands ensemble : le serveur web PhyloExplorer.py et les templates qui lui
+<h3 id="_phyloweb">3.2. PhyloWeb</h3><div style="clear:left"></div>
+<div class="para"><p>Dans cette partie, nous allons examiner le projet PhyloExplorer à proprement
+parler ; c'est-à-dire la partie applicative. PhyloWeb est composée de deux
+grands ensembles : le serveur web PhyloExplorer.py et les templates qui lui
 sont associées.</p></div>
-<h4 id="_phyloexplorer_py">PhyloExplorer.py</h4>
+<h4 id="_phyloexplorer_py">3.2.1. PhyloExplorer.py</h4>
 <div class="para"><p>Ce fichier représente en quelque sorte le <em>main</em> du projet. C'est ce script
 qu'il faudra lancer pour exécuter le serveur web. L'application sera alors
 accessible via l'adresse <tt>http://adresse_ip:port</tt> où <tt>adresse_ip</tt> et <tt>port</tt>
 sont définis dans le fichier de configuration <tt>phyloexplorer.conf</tt>.</p></div>
-<div class="para"><p>le fichier <tt>phyloexplorer.py</tt> est composé de la classe PhyloExplorer qui sera
+<div class="para"><p>Le fichier <tt>phyloexplorer.py</tt> est composé de la classe PhyloExplorer, qui sera
 utilisée par l'outil CherryPy. Cette classe possède plusieurs particularités
 qui sont propres à CherryPy comme l'exposition d'une méthode.</p></div>
 <div class="para"><p>Une méthode exposée est une méthode qui sera accessible via l'URL de
 l'application. Elle est reconnaissable par son décorateur :
 <tt>@cherrypy.expose</tt>. Chaque méthode exposée doit renvoyer une chaine de
-caractère qui sera affiché tel quel à l'utilisateur. Cette chaine doit donc
+caractères qui sera affichée telle quelle à l'utilisateur. Cette chaine doit donc
 être au format HTML.</p></div>
-<div class="para"><p>Pour plus d'information concernant le serveur web, merci de consulter la
+<div class="para"><p>Pour plus d'informations concernant le serveur web, consulter la
 documentation de CherryPy.</p></div>
 <div class="para"><p>Pour renvoyer du HTML, nous utilisons la méthode <tt>self._presentation</tt> qui
 prend en paramètre, le nom de la template à utiliser, un message d'information
-(facultatif) et une petite chaine de caractère qui sera placée en haut de la
+(facultatif) et une petite chaine de caractères qui sera placée en haut de la
 page et indiquera où se trouve l'utilisateur (ex : <tt>Home &gt; Statistics</tt>).</p></div>
-<h4 id="_les_templates">Les templates</h4>
-<div class="para"><p>L'utilisation des templates métite que l'on s'y attarde un petit peu. Toutes
+<h4 id="_les_templates">3.2.2. Les templates</h4>
+<div class="para"><p>L'utilisation des templates mérite que l'on s'y attarde un petit peu. Toutes
 les templates sont regroupées dans le répertoire "templates". Ce répertoire
-regroupe aussi les scripts CSS et javascripts.</p></div>
+regroupe aussi les styles CSS et scripts Javascript.</p></div>
 <div class="para"><p>Une template, bien qu'ayant l'extension <tt>.html</tt>, est un ensemble de code
 python et de HTML. Le code python est placé entre les balises <tt>&lt;%</tt> et <tt>%&gt;</tt>.</p></div>
 <div class="listingblock">
@@ -1039,7 +1113,7 @@ python et de HTML. Le code python est placé entre les balises <tt>&lt;%</tt> et
     &lt;i&gt; Hello Me ! &lt;/i&gt;
 &lt;%|%&gt;</tt></pre>
 </div></div>
-<div class="para"><p>Le moteur de template Pleet va evaluer le code python et renverra le resultat.
+<div class="para"><p>Le moteur de template Pleet va évaluer le code python et renverra le résultat.
 Dans cet exemple, <tt>True</tt> est toujours vrai donc <tt>Hello Word</tt> sera toujours
 affiché.</p></div>
 <div class="para"><p>Le symbole <tt>&lt;%|%&gt;</tt> <strong>(1)</strong> permet de spécifier l'indentation. On indique ainsi au
@@ -1059,7 +1133,7 @@ templates.</p></div>
 <div class="content">
 <pre><tt>pleet["_civilite_"] = civilite</tt></pre>
 </div></div>
-<div class="para"><p>Dans cet exemple, on rend accessible la variable <tt>civilite</tt> accessible dans la
+<div class="para"><p>Dans cet exemple, on rend la variable <tt>civilite</tt> accessible dans la
 template sous le nom <tt>_civilite_</tt>.</p></div>
 <div class="listingblock">
 <div class="title">Utilisation d'un objet exposé</div>
@@ -1085,72 +1159,598 @@ template sous le nom <tt>_civilite_</tt>.</p></div>
 <div class="para"><p>Dans cet exemple, une série de tests sur la variable <tt>_civilite_</tt> permettra de
 produire la bonne template.</p></div>
 </div>
-<h2 id="_s_curit">Sécurité</h2>
+<h2 id="_s_curit">4. Sécurité</h2>
 <div class="sectionbody">
 <div class="para"><p>Par manque d'infrastructure et d'outils dédiés, nous n'avons pas pu estimer le
 taux de charge du serveur. En ce qui concerne la sécurité, nous avons fait
-particulièrement attention à éviter la possibilité d'injection et de XSS.</p></div>
-<div class="para"><p>Pour plus d'information concernant la sécurité du serveur, merci de se référer
+particulièrement attention à éviter la possibilité d'injection de code et de XSS.</p></div>
+<div class="para"><p>Pour plus d'informations concernant la sécurité du serveur, merci de se référer
 à la documentation de CherryPy</p></div>
 </div>
-<h2 id="_evolutions">Evolutions</h2>
+<h2 id="_evolutions">5. Evolutions</h2>
 <div class="sectionbody">
 <div class="para"><p>Il existe une bibliothèque appellé BioPython qui fournit des classes et
 des méthodes permettant de travailler dans le contexte de la biologie.</p></div>
 <div class="para"><p>Cette bibliothèque est très complète et très complexe. Ayant tout ce dont nous
-avions besoin pour avec la Phylogelib, et découvrant cette bibliothèque
+avions besoin avec la Phylogelib, et découvrant cette bibliothèque
 tardivement dans le projet, nous n'avons pas eu le temps d'appronfondir son
-utilité. Il serait intéressant de savoir si BioPython (qui soutenu par une
-communauté international de développeur) peut remplacer Phylogelib (qui reste
+utilité. Il serait intéressant de savoir si BioPython (qui est soutenue par une
+communauté internationale de développeurs) peut remplacer Phylogelib (qui reste
 très jeune).</p></div>
 </div>
-<h2 id="_interface_et_visualisation">Interface et visualisation</h2>
+<h2 id="_utilisation_d_taill_e">6. Utilisation détaillée</h2>
 <div class="sectionbody">
+<div class="para"><p>Dans cette section, nous allons effectuer un parcours des possibilités de PhyloExplorer du point de vue de l'utilisateur.</p></div>
+<h3 id="_etape_1_chargement_de_donn_es">6.1. Etape 1: Chargement de données</h3><div style="clear:left"></div>
+<div class="para"><p>La première page de PhyloExplorer comporte un menu simple :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+<strong>Upload Collection</strong> (qui permet à tout moment de charger une nouvelle collection d'arbres)
+</p>
+</li>
+<li>
+<p>
+<strong>Help contents</strong> (qui est une page d'aide, un bref récapitulatif des fonctionnalités et procédures de PhyloExplorer)
+</p>
+</li>
+<li>
+<p>
+<strong>About</strong> (qui, comme son nom l'indique, renseigne sur les créateurs et fait une brève description de PhyloExplorer)
+</p>
+</li>
+</ul></div>
+<div class="para"><p>L'utilisateur doit :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+soit charger son fichier d'arbres Phylip (Newick), Nexus ou Nexus Translate à partir de cette Homepage
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="champ_choose_your_file.png" alt="champ_choose_your_file.png" />
+</span></center></p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+soit saisir à la main des arbres Phylip (Newick), Nexus ou Nexus Translate dans le champ prévu à cet effet
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="champ_paste_collection.png" alt="champ_paste_collection.png" />
+</span></center></p></div>
+<div class="para"><p>Dans notre exemple, nous choisissons une collection de 7 arbres (dans un fichier newick) comportant des erreurs intentionnellement (nous verrons leur utilité par la suite).</p></div>
+<div class="para"><p>Ne pas oublier de préciser, si besoin est, le type de séparateur mis en cause dans la collection sélectionnée. C'est-à-dire le séparateur qui lie les noms qui composent les espèces.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Exemple</div>
+</td>
+<td class="content">"Macropus eugenii" ou "Macropus_eugenii"</td>
+</tr></table>
+</div>
+<div class="para"><p>Cliquer alors sur <span class="image">
+<img src="bouton_upload.png" alt="bouton_upload.png" />
+</span> pour envoyer la collection au serveur.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content">TODO (sorel) css, js, stat, variables serveur pr images et liens</td>
+<td class="content">Suivant la taille de votre collection, le message &#8220;Please wait&#8221; apparaissant à l'écran peut vous paraître plus ou moins long.</td>
 </tr></table>
 </div>
-</div>
-<h2 id="_module_phylowidget">Module phyloWidget</h2>
-<div class="sectionbody">
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <div class="title">Note</div>
 </td>
-<td class="content">TODO (sorel) résumé, spécifications, possibilités, exemples of use, site ref</td>
+<td class="content">Le bouton <span class="image">
+<img src="bouton_clear.png" alt="bouton_clear.png" />
+</span> permet de remettre les champs impactés à zéro.</td>
 </tr></table>
 </div>
+<h3 id="_etape_2_arriv_e_sur_la_page_statistics">6.2. Etape 2: Arrivée sur la page "statistics"</h3><div style="clear:left"></div>
+<h4 id="_r_sum">6.2.1. Résumé</h4>
+<div class="para"><p><center><span class="image">
+<img src="page_statistics.png" alt="page_statistics.png" height="800" />
+</span></center></p></div>
+<div class="para"><p>Cette page est un tableau de bord de la collection utilisateur chargée. Elle indique:</p></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="ilist"><ul>
+<li>
+<p>
+le nombre d'arbres dans la collection
+</p>
+</li>
+<li>
+<p>
+le nombre total de taxons
+</p>
+</li>
+<li>
+<p>
+avec en plus le nombre de taxons mal écrits (ils apparaissent en rouge s'il y en a)
+</p>
+</li>
+<li>
+<p>
+et aussi le nombre d'homonymes (taxons ambigus apparaissant en orange)
+</p>
+</li>
+</ul></div>
+<div class="para"><p><em>zone entourée en vert</em></p></div>
+</div></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="ilist"><ul>
+<li>
+<p>
+les corrections possibles à faire dans la collection
+</p>
+</li>
+</ul></div>
+<div class="para"><p><em>zone entourée en noir</em></p></div>
+</div></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="ilist"><ul>
+<li>
+<p>
+la pondération des arbres
+</p>
+</li>
+<li>
+<p>
+la distribution des taxons dans les arbres
+</p>
+</li>
+</ul></div>
+<div class="para"><p><em>zones entourées en rouge et en orange</em></p></div>
+</div></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="ilist"><ul>
+<li>
+<p>
+l'arborescence de tous les taxons de la collection chargée, construite selon le NCBI
+</p>
+</li>
+</ul></div>
+<div class="para"><p><em>zone entourée et encadrée en gris</em></p></div>
+</div></div>
+<div class="para"><p><center><span class="image">
+<img src="arbo_ncbi_taxonomy.png" alt="arbo_ncbi_taxonomy.png" height="1000" />
+</span></center></p></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="ilist"><ul>
+<li>
+<p>
+une visualisation sous forme de graphe de l'arbre représentant la collection (basée uniquement sur le fichier chargé [corrigé ou non])
+</p>
+</li>
+</ul></div>
+</div></div>
+<div class="para"><p><center><span class="image">
+<img src="arbo_ncbi_phylowidget.png" alt="arbo_ncbi_phylowidget.png" />
+</span></center></p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">il faut s'assurer d'avoir Java 1.5 minimum installé sur la machine client pour visualiser ce graphe.</td>
+</tr></table>
 </div>
-<h2 id="_installation">Installation</h2>
+<div class="para"><p>Le menu (<em>zone entourée en bleu</em>) est adapté à la collection actuellement en cours de traitement.</p></div>
+<h4 id="_interaction">6.2.2. Interaction</h4>
+<div class="para"><p>On peut bien sûr interagir avec cette page :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+pour corriger les taxons erronés de la collection (s'il y en a), il suffit de cocher le bouton radio qui convient (situé à droite de chaque taxon)
+</p>
+</li>
+<li>
+<p>
+il en est de même pour les homonyms (qui apparaissent en orange)
+</p>
+</li>
+<li>
+<p>
+une fois les boutons radio sélectionnés, il suffit de valider la sélection en cliquant sur <span class="image">
+<img src="bouton_correct_collection.png" alt="bouton_correct_collection.png" />
+</span>
+</p>
+</li>
+</ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Rmq</div>
+</td>
+<td class="content">La correction de la collection a pour effet de faire disparaitre le champ entier "<strong>Correct your collection</strong>" puisqu'elle est corrigée à ce stade.</td>
+</tr></table>
+</div>
+<h4 id="_histogrammes_de_statistiques">6.2.3. Histogrammes de statistiques</h4>
+<div class="ilist"><ul>
+<li>
+<p>
+le premier graphique indique le nombre de taxons qui composent les arbres
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="histogramme1.png" alt="histogramme1.png" />
+</span></center></p></div>
+<div class="vlist"><dl>
+<dt>
+Ici, il y a:
+</dt>
+<dd>
+<div class="ilist"><ul>
+<li>
+<p>
+1 arbre qui comporte entre 0 et 2 taxons
+</p>
+</li>
+<li>
+<p>
+3 arbres qui comportent entre 3 et 5 taxons
+</p>
+</li>
+<li>
+<p>
+&#8230; ainsi de suite
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+<div class="para"><p><br /></p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+le second graphique indique le nombre d'arbres dans lesquels se trouve chacun des taxons
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="histogramme2.png" alt="histogramme2.png" />
+</span></center></p></div>
+<div class="vlist"><dl>
+<dt>
+Ici, il y a:
+</dt>
+<dd>
+<div class="ilist"><ul>
+<li>
+<p>
+1 taxon qui se retrouve dans 36 arbres
+</p>
+</li>
+<li>
+<p>
+2 taxons qui se retrouvent dans 5 arbres
+</p>
+</li>
+<li>
+<p>
+&#8230; etc
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+<h4 id="_arborescence_ncbi">6.2.4. Arborescence NCBI</h4>
+<div class="para"><p>Cet arbre englobe toute la collection construite correctement. Au fur et à mesure des corrections de l'utilisateur, l'arbre est regénéré. En effet, il faut tenir compte des nouveaux taxons corrigés dans la collection.</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+Soit le compte des taxons augmente (si le taxon corrigé n'était pas dans l'arbre)
+</p>
+</li>
+<li>
+<p>
+Soit le compte des taxons reste inchangé (si le taxon corrigé correspondait à un taxon déjà dans l'arbre)
+</p>
+</li>
+</ul></div>
+<h5 id="_l_gende_des_informations_affich_es_dans_l_arbre_ncbi">Légende des informations affichées dans l'arbre NCBI</h5>
+<div class="olist"><ol>
+<li>
+<p>
+<strong>Code couleur</strong>
+</p>
+<div class="ilist"><ul>
+<li>
+<p>
+<span style="color: darkblue;"><strong>Bleu foncé</strong></span> : les noms des espèces
+</p>
+</li>
+<li>
+<p>
+<span style="color: #66f;"><strong>Bleu clair</strong></span> : les noeuds internes de l'arbre (les parents communs des espèces)
+</p>
+</li>
+<li>
+<p>
+<span style="color: blue;"><strong>Bleu normal</strong></span> : chaque noeud et feuille de l'arbre est accompagné de 2 nombres à côté de son nom. Le premier nombre comptabilise le nombre d'espèces représentant le noeud. Le second nombre représente le nombre d'arbres dans lesquels il se trouve
+</p>
+</li>
+<li>
+<p>
+<span style="color: grey;"><strong>Gris</strong></span> : effectuer des actions ou afficher un complément d'informations
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+<strong>Informations et actions</strong>
+</p>
+<div class="olist2"><ol>
+<li>
+<p>
+<strong><em>Etiquette "Show parents"</em></strong>
+</p>
+<div class="para"><p>On aperçoit sur cet arbre NCBI une étiquette <span class="image">
+<img src="etiquette_show_parents.png" alt="etiquette_show_parents.png" />
+</span> à côté de certains noeuds/feuilles. En cliquant dessus, on a accès à la liste des parents intermédiaires du noeud/feuille concerné(e) jusqu'au parent commun le plus proche affiché juste au dessus de ce noeud/feuille.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Rmq</div>
+</td>
+<td class="content">Cette étiquette a été ajoutée pour une meilleure lisibilité de l'arbre (parents intermédiaires masqués par défaut).</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+<strong><em>Informations sur les nombres à droite des noeuds</em></strong>
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Exemple</div>
+</td>
+<td class="content">
+<div class="para"><p><span class="image">
+<img src="exemple_murinae_6_4.png" alt="exemple_murinae_6_4.png" />
+</span></p></div>
+<div class="para"><p>En cliquant sur &#8220;<tt>6</tt>&#8221;, on peut parcourir les 6 arbres qui contiennent des &#8220;Murinae&#8221;.</p></div>
+<div class="para"><p>Le survol de ce chiffre informe de cette action.</p></div>
+</td>
+</tr></table>
+</div>
+<div class="para"><p>En survolant le chiffre &#8220;<tt>4</tt>&#8221;, on a brièvement accès cette fois-ci à la liste des 4 Murinae concernés dans ces 6 arbres.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Rmq</div>
+</td>
+<td class="content">
+<div class="para"><p>Cette information ne s'affiche pas longtemps! Elle est inscrite dans l'attribut <tt><em>TITLE</em></tt> des balises <em>HTML</em> qui a un temps d'affichage bref.</p></div>
+<div class="para"><p>Ci-dessous affichées les 9 espèces qui représentent <em>Haplorrhini</em> par exemple.
+<span class="image">
+<img src="souris_title.png" alt="souris_title.png" />
+</span></p></div>
+</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+<strong><em>Informations sur les taxons et noeuds internes</em></strong>
+</p>
+<div class="para"><p>En SURVOLANT à la souris le nom des taxons ou des noeuds internes, on peut apercevoir une image correspondant à ce nom au coin inférieur droit de la page. Le nom survolé est à nouveau inscrit au dessus de l'image.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Rmq</div>
+</td>
+<td class="content">Ces images sont issues de WikiSpecies et WikiPedia.</td>
+</tr></table>
+</div>
+<div class="para"><p>En cliquant sur les noeuds internes ou les taxons, on est redirigé sur le <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a> (dans une nouvelle page) correspondant au taxon ou noeud interne cliqué. On accède alors à plus d'informations sur l'élément.</p></div>
+<div class="para"><p><br /></p></div>
+</li>
+<li>
+<p>
+<strong><em>Filtrage</em></strong>
+</p>
+<div class="para"><p>L'arbre de la taxonomie du NCBI peut être filtré par l'utilisateur. Pour se faire, chaque élément de l'arbre comporte une case à cocher à sa gauche: il suffit de cocher cette case pour signifier qu'on souhaite enlever tel ou tel élément dans la collection entière. Il ne reste plus qu'à cliquer sur <span class="image">
+<img src="bouton_restrict_your_trees.png" alt="bouton_restrict_your_trees.png" />
+</span> pour appliquer le filtre.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Rmq</div>
+</td>
+<td class="content">Les descendants de l'élément coché sont automatiquement sélectionnés (s'il a des fils).</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Rmq</div>
+</td>
+<td class="content">On peut se servir des étiquettes <span class="image">
+<img src="etiquette_select_all.png" alt="etiquette_select_all.png" />
+</span> et <span class="image">
+<img src="etiquette_unselect_all.png" alt="etiquette_unselect_all.png" />
+</span> pour sélectionner/désélectionner tous les éléments de l'arbre suivant la proportion d'éléments de l'arbre que l'on a à filtrer. Ainsi, il est plus facile de décocher/cocher ce que l'on souhaite conserver/enlever dans la collection.</td>
+</tr></table>
+</div>
+</li>
+<li>
+<p>
+<strong><em>Graphe</em></strong>
+</p>
+<div class="para"><p>Le lien en vert (<span style="color: green;">Click to visualize this tree as graph</span>) permet à l'utilisateur d'avoir une vue sous forme de graphe des espèces qui composent sa collection (filtrée ou non). Un clic sur ce lien ouvre une nouvelle page vers le site <a href="http://www.phylowidget.org">PhyloWidget</a> en affichant la collection complète (ou filtrée) de l'utilisateur.</p></div>
+</li>
+</ol></div>
+</li>
+</ol></div>
+<h4 id="_les_requ_tes">6.2.5. Les requêtes</h4>
+<div class="para"><p>Le champ de requêtes, que nous n'avons pas détaillé jusque là, permet à l'utilisateur d'extraire des informations sur sa collection. Ces requêtes lui permettent de rechercher, sur l'ensemble des arbres, la présence (ou l'absence) de taxon ou noeuds internes (parents communs). Ces requêtes peuvent être effectuées avec les opérateurs classiques: "&gt;", "&lt;", "&gt;=", "&lt;=", "==", "AND", "OR", "NOT". Les priorités des opérations sont définies par les parenthèses.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">La casse des requêtes est flexible. Les espaces entre les opérations sont gérés: {glires}&gt;3 est équivalent à {glires} &gt; 3.</td>
+</tr></table>
+</div>
+<div class="para"><p>Les taxons ou noeuds internes de la requête doivent être entourés par des accolades. Ceci afin de grouper les éléments comportant des espaces.</p></div>
+<div class="para"><p>Exemple: {echinops telfairi}</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Exemple de requête</div>
+</td>
+<td class="content">
+<div class="para"><p><em>{murinae} == 2 and not {echinops &lt;plant&gt;} or ( {homo} and {homo sapiens} and {catarrhini}&gt;2} )</em></p></div>
+<div class="para"><p>Ce qui correspond à : sélectionner les arbres qui comportent exactment 2 murinae mais pas d'echinops &lt;plant&gt; ou bien les arbres qui comportent des homo, des homo sapiens et où les catarrhini sont supérieurs à 2.</p></div>
+</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">
+<div class="title">A propos de requête</div>
+<div class="para"><p>Effectuer une requête sur ce tableau de bord permet de "filtrer" (ou effectuer des recherches dans) les arbres sans perdre le contenu de sa collection. De plus, les données affichées dans la zone <strong>General informations of the collection</strong> (<em>entourée en vert dans la capture de la section 6.2.1</em>) changent évidemment en fonction du résultat de la requête (le nombre d'arbres diminue en conséquence).</p></div>
+<div class="para"><p>Prenons l'exemple de la requête "<em>{rodentia} and {lagomorpha}</em>" sur la collection à 7 arbres. Après la requête, le nombre d'arbres est passé à 3. Ce qui signifie que seuls 3 arbres sur les 7 comportent des <em>rodentia</em> et des <em>lagommorpha</em>.</p></div>
+<div class="para"><p><span class="image">
+<img src="champ_general_apres_requete.png" alt="champ_general_apres_requete.png" />
+</span></p></div>
+<div class="para"><p>Pour annuler les effets de cette requête, il n'y a qu'à cliquer sur <span style="color: blue;"><strong>Back to full collection</strong></span> qui est apparu après l'exécution de la requête.</p></div>
+</td>
+</tr></table>
+</div>
+<h4 id="_t_l_chargement">6.2.6. Téléchargement</h4>
+<div class="para"><p>Comme indiqué dans le menu (<em>zone entourée en bleu ci-dessous</em>), l'utilisateur a le loisir de télécharger sa collection (filtrée et/ou corrigée et/ou désambiguisée):</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+soit construite selon l'arborescence du NCBI (donc un seul arbre, comprenant toutes les espèces de la collection)
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="menu_download_ncbi.png" alt="menu_download_ncbi.png" />
+</span></center></p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+soit toute ou partie des arbres qui composaient sa collection de départ
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="menu_download_collection.png" alt="menu_download_collection.png" />
+</span></center></p></div>
+<h3 id="_etape_3_naviguer_dans_la_collection">6.3. Etape 3: Naviguer dans la collection</h3><div style="clear:left"></div>
+<div class="para"><p>En cliquant dans le menu sur <span class="image">
+<img src="menu_browse_collection.png" alt="menu_browse_collection.png" />
+</span>, l'utilisateur a tout le loisir de parcourir sa collection arbre par arbre.</p></div>
+<div class="para"><p>Le menu dédié à sa collection actuelle se résume alors à <span class="image">
+<img src="menu_bouton_back_statistics.png" alt="menu_bouton_back_statistics.png" />
+</span> et à <span class="image">
+<img src="menu_bouton_download_collection.png" alt="menu_bouton_download_collection.png" />
+</span>. La navigation entre les arbres se fait au moyen des boutons <em style="color: blue;">Next</em> et <em style="color: blue;">Previous</em>.</p></div>
+<div class="para"><p>A chaque arbre, différentes informations sont affichées :</p></div>
+<div class="para"><p><center><span class="image">
+<img src="navigation_arbre.png" alt="navigation_arbre.png" />
+</span></center></p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+le nom de l'arbre&#8230; que l'on peut choisir à l'aide du menu déroulant (<em>zone entourée en vert sur la capture ci-dessus</em>)
+</p>
+</li>
+<li>
+<p>
+le numéro de l'arbre dans la collection (que l'on peut saisir directement dans le champ text) [<em>zone entourée en jaune</em>]
+</p>
+</li>
+<li>
+<p>
+des éventuels messages d'erreur (<em>zone entourée en rouge</em>). Ici il est indiqué que la collection comporte 3 mauvais taxons. Si on ne les a pas encore corrigés, on peut retourner sur la page des statistiques ("<em>Back to statistics</em>") pour le faire.
+</p>
+<div class="para"><p>Autre message d'erreur type :</p></div>
+<div class="para"><p><center><span class="image">
+<img src="message_erreur.png" alt="message_erreur.png" />
+</span></center></p></div>
+</li>
+<li>
+<p>
+les taxons marqués en rouge dans l'arbre sont mal écrits (ou inconnus du NCBI)
+</p>
+</li>
+<li>
+<p>
+les taxons ambigus (les homonymes) sont marqués en orange (<em>zone entourée en violet</em>)
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Comme déjà indiqué dans la description des "Statistiques", il est possible de développer les noeuds internes dans l'arbre. On peut les développer tous en même temps en cliquant sur <span class="image">
+<img src="etiquette_show_hide_all_parents.png" alt="etiquette_show_hide_all_parents.png" />
+</span>.</p></div>
+<div class="para"><p>Tout comme l'arborescence du NCBI, on aperçoit le nombre de taxons qui composent l'arbre (<em>zone entourée en noir</em>), avec en plus, cette fois-ci, le nom de l'arbre.</p></div>
+<div class="para"><p>L'étiquette <span class="image">
+<img src="etiquette_show_hide_internal_nodes.png" alt="etiquette_show_hide_internal_nodes.png" />
+</span> (<em>zone entourée en bleu</em>) permet simplement d'effacer de l'affichage les noeuds internes de l'arbre (<em>en <span style="color: #66f;"><strong>bleu clair</strong></span></em>) pour offrir à l'utilisateur la vision de la structure de son arbre (dépourvu des parents communs).</p></div>
+<div class="para"><p>En ce qui concerne les requêtes, leur principe de fonctionnement reste inchangé, si ce n'est que les arbres affichés et navigables ne seront uniquement ceux qui répondent à la requête.</p></div>
+<div class="para"><p>On peut aussi, à partir de cette étape, télécharger la collection d'arbres (qui a été modifiée ou non).</p></div>
+<div class="para"><p>Il est également possible ici d'obtenir la version sous forme de graphe de son arbre en cliquant sur <span style="color: green;">Click to visualize this tree as graph</span>.</p></div>
+</div>
+<h2 id="_module_phylowidget">7. Module phyloWidget</h2>
+<div class="sectionbody">
+<h3 id="_qu_est_ce_que_c_est">7.1. Qu'est ce que c'est?</h3><div style="clear:left"></div>
+<div class="para"><p>PhyloWidget est une applet Java libre de droits, servant à visionner et éditer des arbres phylogénétiques en ligne. C'est un outil simple à utiliser et très complet, permettant une grande interaction avec l'utilisateur.
+Il est possible de créer son arbre, l'importer via les formats Newick ou Nexus, et même de le modifier afin de l'exporter sous forme de fichier ou d'image.
+Entre autres, on note des suppléments d'ergonomie agréables comme les différents types de visualisation (circulaire, rectangulaire, &#8230;), le zoom, la recherche de taxons, ou encore l'affichage des vraies longueurs de branches. A cela vient s'ajouter sur le survol d'un taxon, un tableau d'informations ainsi qu'un large éventail d'interactions (à découvrir).</p></div>
+<div class="para"><p>Cette application requiert l'environnement java 1.5 coté client.
+Sa réalisation est dûe à Gregory Jordanie (<a href="mailto:phylowidget@gmail.com"><tt>phylowidget@gmail.com</tt></a>) sous la tutelle de Bill Piel (Google Summer of Code project).</p></div>
+<h3 id="_int_gration_du_module">7.2. Intégration du module</h3><div style="clear:left"></div>
+<div class="para"><p>Ce module a été rajouté afin de compléter la visualisation personnalisable des arbres dans notre application.
+Pour ce faire, nous faisons appel à l'applet directement du site source en passant l'arbre à visualiser en paramètre. Ainsi le serveur hébergeant PhyloExplorer n'est pas sollicité.</p></div>
+<div class="para"><p>PhyloWidget est la meilleure solution libre en terme d'utilisation et d'installation (parmis d'autres solutions comme ATV ou clustalw).</p></div>
+</div>
+<h2 id="_installation_de_phyloexplorer">8. Installation de PhyloExplorer</h2>
 <div class="sectionbody">
 <div class="para"><p>Cette section détaille la procédure d'installation et de configuration de
 l'application web PhyloExplorer.</p></div>
-<h3 id="_pr_requis">Prérequis</h3><div style="clear:left"></div>
+<h3 id="_pr_requis">8.1. Prérequis</h3><div style="clear:left"></div>
 <div class="para"><p>Pour une utilisation optimale, PhyloExplorer nécessite au minimum 2 Go de
 mémoire RAM. Prévoir également un processeur cadencé à 2 Ghz et 200 Mo d'espace
 disque pour l'installation.</p></div>
-<h3 id="_installation_2">Installation</h3><div style="clear:left"></div>
-<h4 id="_installation_des_d_pendances">Installation des dépendances</h4>
+<h3 id="_installation">8.2. Installation</h3><div style="clear:left"></div>
+<h4 id="_installation_des_d_pendances">8.2.1. Installation des dépendances</h4>
 <div class="para"><p>PhyloExplorer nécessite les bibliothèques suivantes :</p></div>
 <div class="ilist"><ul>
 <li>
 <p>
-Python &gt;= 2.4 : (<tt>http://www.python.org</tt>)
+Python &gt;= 2.4 : (<a href="http://www.python.org"><tt>http://www.python.org</tt></a>)
 </p>
 </li>
 <li>
 <p>
-CherryPy &gt;= 3.0 (<tt>http://www.cherrypy.org/</tt>)
+CherryPy &gt;= 3.0 (<a href="http://www.cherrypy.org/"><tt>http://www.cherrypy.org/</tt></a>)
 </p>
 </li>
 <li>
 <p>
-NetworkX &gt;= 0.35 (<tt>https://networkx.lanl.gov/wiki</tt>)
+NetworkX &gt;= 0.35 (<a href="https://networkx.lanl.gov/wiki"><tt>https://networkx.lanl.gov/wiki</tt></a>)
 </p>
 </li>
 <li>
@@ -1161,7 +1761,7 @@ Pleet (le paquet est disponible dans tools)
 </ul></div>
 <div class="para"><p>Chacune de ces bibliothèques s'installe très facilement : extraire l'archive
 et taper simplement sous root <tt>$ python setup install.py</tt>.</p></div>
-<h4 id="_installation_de_phyloexplorer">Installation de PhyloExplorer</h4>
+<h4 id="_installation_de_phyloexplorer_2">8.2.2. Installation de PhyloExplorer</h4>
 <div class="para"><p>Taper simplement en root la commande :</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1218,7 +1818,7 @@ share/phyloexplorer/tools:
 <b>(4)</b> Répertoire où se situent toutes les templates
 <b>(5)</b> Outil permettant de générer le fichier taxonomy.csv</tt></pre>
 </div></div>
-<h3 id="_configuration">Configuration</h3><div style="clear:left"></div>
+<h3 id="_configuration">8.3. Configuration</h3><div style="clear:left"></div>
 <div class="para"><p>Le serveur web utilise le fichier <tt>phyloexplorer.conf</tt> pour sa configuration.
 Voici sa structure :</p></div>
 <div class="listingblock">
@@ -1237,8 +1837,8 @@ log.screen
 </dt>
 <dd>
 <p>
-Cette variable est un booleen. Si elle est vrai (positionnée à 1), des
-informations de débogage seront envoyés sur la sortie standard de la console.
+Cette variable est un booléen. Si elle est vraie (positionnée à 1), des
+informations de débogage seront envoyées sur la sortie standard de la console.
 Cette variable doit être mise à 0 pour un serveur de production.
 Voir la documentation de CherryPy pour plus de détails.
 </p>
@@ -1248,7 +1848,7 @@ server.socket_host
 </dt>
 <dd>
 <p>
-Défini l'adresse ip de la machine où est lancé le serveur.
+Définit l'adresse IP de la machine où est lancé le serveur.
 Voir la documentation de CherryPy pour plus de détails.
 </p>
 </dd>
@@ -1257,7 +1857,7 @@ server.socket_port
 </dt>
 <dd>
 <p>
-Défini le port où devra être accessible l'application.
+Définit le port où devra être accessible l'application.
 Voir la documentation de CherryPy pour plus de détails.
 </p>
 </dd>
@@ -1266,7 +1866,7 @@ server.thread_pool
 </dt>
 <dd>
 <p>
-Défini le nombre d'instances à déployer. Plus le nombre de connexion est
+Définit le nombre d'instances à déployer. Plus le nombre de connexions est
 élevé, plus ce chiffre doit augmenter.
 Voir la documentation de CherryPy pour plus de détails.
 </p>
@@ -1286,7 +1886,7 @@ proxy (facultatif)
 </dt>
 <dd>
 <p>
-Cette variable est propre à PhyloExplorer (ie ne provient pas de CherryPy).
+Cette variable est propre à PhyloExplorer (i.e: ne provient pas de CherryPy).
 Elle permet de spécifier l'adresse du proxy afin d'autoriser l'affichage des
 images et la correction du nom des taxons. Si vous avez un problème avec ces
 fonctionnalités, vous devriez vérifier que cette variable est correctement
@@ -1296,55 +1896,99 @@ renseignée.
 </dl></div>
 </div>
 <h1 id="_bilan">Bilan</h1>
-<h3 id="_r_sultats">Résultats</h3><div style="clear:left"></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">TODO liste fonctionnalités faites! + fonctionnalités bonus</td>
-</tr></table>
+<h2 id="_r_sultats">1. Résultats</h2>
+<div class="sectionbody">
+<div class="para"><p>Au cours de ce TER, il nous avait été demandé de :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+pouvoir afficher l'arbre avec les noeuds internes (liste des parents intermédiaires aux parents communs entre chaque noeud)
+</p>
+</li>
+<li>
+<p>
+établir des statistiques sur la collection et les afficher
+</p>
+</li>
+<li>
+<p>
+afficher des propositions lors de saisie erronée de taxons (<em>Do you mean?</em>)
+</p>
+</li>
+<li>
+<p>
+filtrer les arbres (la collection) pour ne pouvoir garder que ce qui intéressse l'utilisateur
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Ces quatres tâches on été livrées avec succès.</p></div>
 </div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">TODO comparaison navigation sur NCBI et phyloexplorer (screenshot)</td>
-</tr></table>
+<h2 id="_valeur_ajout_e">2. Valeur ajoutée</h2>
+<div class="sectionbody">
+<div class="para"><p>Additionné aux objectifs du TER, nous avons pu proposer en plus de :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+corriger à la volée les taxons erronés (directement dans la collection)
+</p>
+</li>
+<li>
+<p>
+afficher des images des taxons survolés pour offrir à l'utilisateur une perception visuelle des noms qu'il étudie dans ses arbres
+</p>
+</li>
+<li>
+<p>
+télécharger la collection entière de l'utilisateur construite sur la taxonomie du NCBI
+</p>
+</li>
+<li>
+<p>
+télécharger des collections filtrées de l'utilisateur
+</p>
+</li>
+<li>
+<p>
+visualiser l'arbre utilisateur sous forme de graphe (PhyloWidget)
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Toutes ces fonctionnalités s'inscrivant dans une interface conviviale, simple et intuitive.</p></div>
 </div>
 <h1 id="_annexe">Annexe</h1>
-<h2 id="_glossaire_phylog_n_tique">Glossaire phylogénétique</h2>
+<h2 id="_glossaire_phylog_n_tique">1. Glossaire phylogénétique</h2>
 <div class="sectionbody">
-<div class="para"><p><strong>Abre phylogénétique</strong> : équivalent d'un arbre généalogique des taxons.</p></div>
-<div class="para"><p><strong>Phylogénie</strong> : c'est l'étude de la formation et de l'évolution des organismes vivants en vue d'établir leur parenté.</p></div>
-<div class="para"><p><strong>Taxon</strong> : Les organismes du vivant sont classés selon des catégories en fonction de leurs similitudes et de leurs relations évolutives. Ces catégories sont des taxons et représentent les noeuds d'un arbre phylogénétique.</p></div>
+<div class="para"><p><strong>Arbre phylogénétique</strong> : l'équivalent d'un arbre généalogique de taxons.</p></div>
+<div class="para"><p><strong>Phylogénie</strong> : étude de la formation et de l'évolution des organismes vivants afin d'établir leur parenté.</p></div>
+<div class="para"><p><strong>Taxon</strong> : les organismes du vivant sont classés selon des catégories en fonction de leurs similitudes et de leurs relations évolutives. Ces catégories sont des taxons et représentent les noeuds d'un arbre phylogénétique.</p></div>
 </div>
-<h2 id="_glossaire_technique">Glossaire technique</h2>
+<h2 id="_glossaire_technique">2. Glossaire technique</h2>
 <div class="sectionbody">
 <div class="para"><p><strong>CSS</strong> : feuille de style, dans notre cas externe, décrivant le style des balises d'une page HTML la référençant. Elle personnalise l'aspect visuel des pages à l'aide des indices <em>id</em>, <em>name</em>, <em>class</em>.</p></div>
-<div class="para"><p><strong>CSV</strong> : <em>Comma Separated Values</em>, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banques de données.</p></div>
-<div class="para"><p><strong>Filtrage</strong> : Ici permet de restreindre un arbre en sous arbres.</p></div>
-<div class="para"><p><strong>Jquery</strong> : c'est une bibliothèque Javascript qui porte sur l'interaction entre JavaScript et HTML. La librairie se présente comme un unique fichier décrivant les utilisations <em>d'évènements multi navigateur</em>, <em>DOM</em>,<em>Effets et animations</em>, et surtout <em>Ajax</em>.</p></div>
-<div class="para"><p><strong>NCBI</strong> : National Center for Biotechnology Information.</p></div>
+<div class="para"><p><strong>CSV</strong> : <em>Comma Separated Values</em>, valeurs séparées par des virgules ou  un séparateur défini. C'est un type de banque de données.</p></div>
+<div class="para"><p><strong>Filtrage</strong> : permet dans le cas présent de restreindre un arbre en sous arbres.</p></div>
+<div class="para"><p><strong>JQuery</strong> : bibliothèque Javascript qui porte sur l'interaction entre JavaScript et HTML. La librairie se présente comme un unique fichier décrivant les utilisations <em>d'évènements multi navigateur</em>, <em>DOM</em>, <em>Effets et animations</em>, et surtout <em>Ajax</em>.</p></div>
+<div class="para"><p><strong>NCBI</strong> : National Center for Biotechnology Information, référence en matière de biotechnologie, <a href="http://www.ncbi.nlm.nih.gov"><tt>http://www.ncbi.nlm.nih.gov</tt></a>.</p></div>
 <div class="para"><p><strong>Nexus</strong> : format de fichier contenant des arbres <em>phylogénétiques</em> et des annotations associées.</p></div>
 <div class="para"><p><strong>Newick</strong> : format de fichier contenant des arbres <em>phylogénétiques</em>.</p></div>
 <div class="para"><p><strong>Phylip</strong> : format de représentation d'arbres <em>phylogénétiques</em> sous forme de <em>(syntaxe parenthésée);</em>.</p></div>
-<div class="para"><p><strong>Python</strong> : langage de programmation interprété, multi-paradigme, qui favorise la programmation impérative structurée, et orientée objet. Il est doté d'un typage dynamique fort, d'une gestion automatique de la mémoire par ramasse-miettes et d'un système de gestion d'exceptions. Sous licence libre et multi plates-formes.</p></div>
-<div class="para"><p><strong>SVN / Subversion</strong> : C'est un entrepot de versions temporaires de code qui permettent aux développeurs de tester, partager, modifier, comparer, réinstaller un projet en équipe.</p></div>
-<div class="para"><p><strong>Template</strong> : c'est un modèle permettant de construire les pages d'un site web selon une trame générale (un squelette) et des zones modifiables. Utile pour les mise à jour et modifications en cascade.</p></div>
+<div class="para"><p><strong>Python</strong> : langage de programmation interprété, multi-paradigme, qui favorise la programmation impérative structurée et orientée objet. Il est doté d'un typage dynamique fort, d'une gestion automatique de la mémoire par ramasse-miettes et d'un système de gestion d'exceptions. Sous licence libre et multi plate-formes.</p></div>
+<div class="para"><p><strong>SVN / Subversion</strong> : entrepôt de versions temporaires de code qui permet aux développeurs de tester, partager, modifier, comparer, réinstaller un projet en équipe.</p></div>
+<div class="para"><p><strong>Template</strong> : modèle permettant de construire les pages d'un site web selon une trame générale (un squelette) et des zones modifiables. Utile pour les mises à jour et modifications en cascade.</p></div>
 </div>
-<h2 id="_liens_externes">Liens externes</h2>
+<h2 id="_liens_externes">3. Liens externes</h2>
 <div class="sectionbody">
-<div class="para"><p><strong>Python</strong> : <tt>http://www.python.org</tt></p></div>
-<div class="para"><p><strong>NetworkX</strong> : <tt>https://networkx.lanl.gov/wiki</tt></p></div>
-<div class="para"><p><strong>CherryPy</strong> : <tt>http://www.cherrypy.org/</tt></p></div>
-<div class="para"><p><strong>BioPython</strong> : <tt>http://biopython.org/wiki/Main_Page</tt></p></div>
-<div class="para"><p><strong>NCBI</strong> : <tt>http://www.ncbi.nlm.nih.gov/</tt></p></div>
+<div class="para"><p><strong>Python</strong> : <a href="http://www.python.org"><tt>http://www.python.org</tt></a></p></div>
+<div class="para"><p><strong>NetworkX</strong> : <a href="https://networkx.lanl.gov/wiki"><tt>https://networkx.lanl.gov/wiki</tt></a></p></div>
+<div class="para"><p><strong>CherryPy</strong> : <a href="http://www.cherrypy.org/"><tt>http://www.cherrypy.org/</tt></a></p></div>
+<div class="para"><p><strong>BioPython</strong> : <a href="http://biopython.org/wiki/Main_Page"><tt>http://biopython.org/wiki/Main_Page</tt></a></p></div>
+<div class="para"><p><strong>NCBI</strong> : <a href="http://www.ncbi.nlm.nih.gov/"><tt>http://www.ncbi.nlm.nih.gov/</tt></a></p></div>
+<div class="para"><p><strong>Référence biologique</strong> : <a href="http://fr.wikipedia.org"><tt>http://fr.wikipedia.org</tt></a></p></div>
+<div class="para"><p><strong>Applet PhyloWidget</strong> : <a href="http://www.phylowidget.org"><tt>http://www.phylowidget.org</tt></a></p></div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-04-03 19:30:28 CEST
+Last updated 2008-04-04 06:17:36 CEST
 </div>
 </div>
 </body>
