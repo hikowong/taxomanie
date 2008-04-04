@@ -385,7 +385,7 @@ class PhyloExplorer( Taxobject ):
     def getImageFond( self, imagename ): #XXX not used
         if imagename not in ["Raster.gif", "NautilusBlack.jpg",\
             "NautilusGrey.jpg", "NautilusGreen.jpg", "NautilusWhite.jpg",\
-            "NautilusDarkGreen.jpg"]:
+            "NautilusDarkGreen.jpg","logo-um2.jpg","logoIsem.jpg"]:
             raise "What do you the fucking do ?!?"
         return open( os.path.join( absDir, "..",
           "share","phyloexplorer","templates",imagename ), "rb").read()
