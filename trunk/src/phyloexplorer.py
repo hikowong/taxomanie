@@ -35,8 +35,8 @@ class PhyloExplorer( Taxobject ):
     def __init__( self ):
         if self.reference is None:
             from phylocore.taxonomyreference import TaxonomyReference
-            PhyloExplorer.reference = TaxonomyReference( 
-              os.path.join( absDir, "..", "share", "phyloexplorer","data", "taxonomy.csv" ) )
+            PhyloExplorer.reference = TaxonomyReference()
+#              os.path.join( absDir, "..", "share", "phyloexplorer","data", "taxonomy.csv" ) )
         self._taximage_url = {}
         self.__loadProxy()
 
@@ -280,7 +280,7 @@ class PhyloExplorer( Taxobject ):
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = " "*( nbtree*70/nbtaxa_max )
+            bar = " "*( nbtree*70/nbtaxa_max ) # 70 is an abitrary taken number
             bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
@@ -302,7 +302,7 @@ class PhyloExplorer( Taxobject ):
         nbtaxa_max = max( d_stat.values() ) 
         for nbtaxon, nbtree in sorted(d_stat.items()):
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = " "*( nbtree*70/nbtaxa_max )
+            bar = " "*( nbtree*70/nbtaxa_max )# 70 is an abitrary taken number
             bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
