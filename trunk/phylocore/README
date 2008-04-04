@@ -1,0 +1,13 @@
+PhyloCore
+=========
+
+This library provide classes and methodes to manipulate phylogenetic trees.
+
+Install
+-------
+
+$ python setup.py install
+
+Please, after installing phylocore, lanch the `preproc.py` tools in order
+to build the NCBI database. Then, put the file `taxonomy.py` generated in
+`/usr/share/phyloexplorer/data` path.
