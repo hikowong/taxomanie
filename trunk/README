@@ -24,12 +24,25 @@ first:
  - Networkx >=0.35 (https://networkx.lanl.gov/wiki)
  - Pleet (package is provided in tools/)
 
- 
+Install
+-------
+
+Type
+-----------------
+$ python setup.py
+-----------------
+as root or if you don't have the permissions, you can specify a folder :
+
+-------------------------------
+$ python setup.py /path/to/the/folder
+-------------------------------
+
 Working Usage
 -------------
 
-To lanch the serveur, juste type: `python phyloexplorer.py`
+To lanch the serveur, juste type: `phyloexplorer`.
 
 Open browser and type `http://localhost:8080` and you should see the
 application at work. If not, please edit the file `phyloexplorer.conf` 
+or `.phyloexplorer`.
 
