@@ -1221,37 +1221,39 @@ d'installation (parmis d'autres solutions comme ATV ou Clustalw).
 Bilan
 =====
 
-Résultats
----------
-
-Au cours de ce TER, il nous avait été demandé de :
+Notre principale préoccupation a été de fournir les fonctionnalités 
+demandées dans les délais impartis. De fréquentes interactions (réunions,
+emails) avec le client nous ont permis de définir plus précisément
+ses besoins. Ainsi, les cinq objectifs suivants ont été livrés
+avec succès :
 
 - pouvoir afficher l'arbre avec les noeuds internes (liste des parents
   intermédiaires aux parents communs entre chaque noeud),
 - avoir accès aux informations d'un taxon via un lien vers le site du NCBI
 - établir des statistiques sur la collection et les afficher,
-- afficher des propositions lors de saisie erronée de taxons (_Do you mean?_),
+- afficher des propositions lors de saisie erronée de taxons
+  (_Do you mean?_),
 - filtrer les arbres (la collection) pour ne pouvoir garder que ce qui
   intéressse l'utilisateur.
 
-Ces quatres tâches on été livrées avec succès.
+Nous avons dépassé ces objectifs de ce TER en proposant avec l'accord
+de l'utilisateur :
 
-Valeur ajoutée
---------------
-
-Nous avons dépassé les objectifs du TER en proposant à l'utilisateur :
-
-- la correction à la volée les taxons erronés et/ou ambigus (directement dans la collection),
-- l'affichage des images des taxons survolés pour offrir à l'utilisateur une
-  perception visuelle des noms qu'il étudie dans ses arbres,
+- la correction à la volée les taxons erronés et/ou ambigus
+  (directement dans la collection),
+- l'affichage des images des taxons survolés pour offrir à l'utilisateur
+  une perception visuelle des noms qu'il étudie dans ses arbres,
 - un affichage de la liste des taxons représentant un noeud interne,
 - un accès à la liste des arbres contenant un noeud de l'arbre NCBI,
 - le téléchargement de l'arborescence du NCBI restreinte aux taxons fournis
   par l'utilisateur,
-- le téléchargement des collections filtrées et modifiées par l'utilisateur,
-- la visualisation et manipulations des arbres sous forme de graphe (PhyloWidget).
+- le téléchargement des collections filtrées et modifiées par
+  l'utilisateur,
+- la visualisation et la manipulation des arbres sous forme de
+  graphe (PhyloWidget).
 
-Toutes ces fonctionnalités s'inscrivant dans une interface conviviale, simple et intuitive.
+Toutes ces fonctionnalités s'inscrivent dans une interface conviviale,
+simple et intuitive.
 
 
 Annexe
