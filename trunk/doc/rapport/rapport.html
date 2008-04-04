@@ -17,7 +17,7 @@ body {
 }
 
 a {
-  color: blue;
+  color: green;
   text-decoration: underline;
 }
 a:visited {
@@ -37,8 +37,7 @@ tt {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  /*color: #527bbd;*/
-  color: #009900;
+  color: green;
   font-family: sans-serif;
   margin-top: 1.2em;
   margin-bottom: 0.5em;
@@ -78,7 +77,7 @@ pre {
 }
 
 span#author {
-  color: #527bbd;
+  color: green;
   font-family: sans-serif;
   font-weight: bold;
   font-size: 1.1em;
@@ -175,7 +174,7 @@ div.admonitionblock .icon {
   font-size: 1.1em;
   font-weight: bold;
   text-decoration: underline;
-  color: #527bbd;
+  color: green;
   padding-right: 0.5em;
 }
 div.admonitionblock td.content {
@@ -217,7 +216,7 @@ div.olist2 ol {
 }
 
 div.tableblock > table {
-  border: 3px solid #527bbd;
+  border: 3px solid green;
 }
 thead {
   font-family: sans-serif;
@@ -248,7 +247,7 @@ td.hlist2 {
 }
 
 div#toctitle {
-  color: #527bbd;
+  color: green;
   font-family: sans-serif;
   font-size: 1.1em;
   font-weight: bold;
@@ -302,97 +301,102 @@ div.exampleblock-content {
 }
 
 /* IE6 sets dynamically generated links as visited. */
-div#toc a:visited { color: blue; }
+div#toc a:visited { color: green; }
 </style>
-<script type="text/javascript">
-/*<![CDATA[*/
-window.onload = function(){generateToc(2)}
-/* Author: Mihai Bazon, September 2002
- * http://students.infoiasi.ro/~mishoo
- *
- * Table Of Content generator
- * Version: 0.4
- *
- * Feel free to use this script under the terms of the GNU General Public
- * License, as long as you do not remove or alter this notice.
- */
-
- /* modified by Troy D. Hanson, September 2006. License: GPL */
- /* modified by Stuart Rackham, October 2006. License: GPL */
-
-function getText(el) {
-  var text = "";
-  for (var i = el.firstChild; i != null; i = i.nextSibling) {
-    if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
-      text += i.data;
-    else if (i.firstChild != null)
-      text += getText(i);
-  }
-  return text;
-}
-
-function TocEntry(el, text, toclevel) {
-  this.element = el;
-  this.text = text;
-  this.toclevel = toclevel;
-}
-
-function tocEntries(el, toclevels) {
-  var result = new Array;
-  var re = new RegExp('[hH]([2-'+(toclevels+1)+'])');
-  // Function that scans the DOM tree for header elements (the DOM2
-  // nodeIterator API would be a better technique but not supported by all
-  // browsers).
-  var iterate = function (el) {
-    for (var i = el.firstChild; i != null; i = i.nextSibling) {
-      if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
-        var mo = re.exec(i.tagName)
-        if (mo)
-          result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
-        iterate(i);
-      }
-    }
-  }
-  iterate(el);
-  return result;
-}
-
-// This function does the work. toclevels = 1..4.
-function generateToc(toclevels) {
-  var toc = document.getElementById("toc");
-  var entries = tocEntries(document.getElementsByTagName("body")[0], toclevels);
-  for (var i = 0; i < entries.length; ++i) {
-    var entry = entries[i];
-    if (entry.element.id == "")
-      entry.element.id = "toc" + i;
-    var a = document.createElement("a");
-    a.href = "#" + entry.element.id;
-    a.appendChild(document.createTextNode(entry.text));
-    var div = document.createElement("div");
-    div.appendChild(a);
-    div.className = "toclevel" + entry.toclevel;
-    toc.appendChild(div);
-  }
-}
-/*]]>*/
-</script>
 <title></title>
 </head>
 <body>
 <div id="header">
-<div id="toc">
-  <div id="toctitle">Table of Contents</div>
-  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
-</div>
 </div>
 <div class="para"><p><center> <span class="image">
 <img src="logo.png" alt="logo.png" />
 </span> </center></p></div>
-<div class="literalblock">
-<div class="content">
-<pre><tt>Nicolas Auberval
-Nicolas Clairon
-Sorel Diser</tt></pre>
+<div class="para"><p><br /></p></div>
+<div class="para"><p><center> <strong>Auteurs:</strong> </center>
+<center> <em>Nicolas Auberval</em> </center>
+<center>   <em>Nicolas Clairon</em> </center>
+<center>   <em>Sorel Diser</em> </center></p></div>
+<div class="para"><p><br /></p></div>
+<div class="para"><p>Dans le cadre d'un TER de fin d'étude (Master 2 Informatique), nous avons
+développé un projet permettant d'aider les biologistes à manipuler des
+collections d'arbres phylogénétiques. Cette application ce nomme <em>PhyloExplorer</em>.</p></div>
+<div class="para"><p>Vous trouverez dans ce rapport :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+une présentation du contexte du projet : présentation de la phylogénie et de
+  la taxonomie, explication de l'intérêt du NCBI,
+</p>
+</li>
+<li>
+<p>
+une documentation technique destinée aux développeurs et présentant la
+  structure interne du projet,
+</p>
+</li>
+<li>
+<p>
+un manuel d'installation à destination des administrateurs système,
+</p>
+</li>
+<li>
+<p>
+un guide d'utilisation du projet PhyloExplorer. Ce guide est destiné aux
+  biologistes et utilisateurs finaux,
+</p>
+</li>
+<li>
+<p>
+un bilan de ce qui a été réalisé et des discussions concernant les
+  évolutions du projet.
+</p>
+</li>
+</ul></div>
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="sidebar-title">Sommaire</div>
+<div class="para"><p><strong>Partie 1 : Présentation du projet</strong></p></div>
+<div class="para"><p>  1. Phylogénie et Taxonomie</p></div>
+<div class="para"><p>  1.1. Comprendre le sujet</p></div>
+<div class="para"><p>  2. Analyse de l'existant</p></div>
+<div class="para"><p>  3. Besoins et objectifs</p></div>
+<div class="para"><p>  3.1. Besoins</p></div>
+<div class="para"><p>  3.2. Objectifs</p></div>
+<div class="para"><p>  3.3. Exigences</p></div>
+<div class="para"><p><strong>Partie 2 : Documentation technique</strong></p></div>
+<div class="para"><p>  1. Formats des fichiers</p></div>
+<div class="para"><p>  2. Choix techniques</p></div>
+<div class="para"><p>  3. Structure du projet</p></div>
+<div class="para"><p>  3.1. PhyloCore</p></div>
+<div class="para"><p>  3.2. PhyloWeb</p></div>
+<div class="para"><p>  4. Sécurité</p></div>
+<div class="para"><p>  5. Evolutions futures</p></div>
+<div class="para"><p><strong>Partie 3 : Guide d'installation</strong></p></div>
+<div class="para"><p>  1. Prérequis</p></div>
+<div class="para"><p>  2. Installation</p></div>
+<div class="para"><p>  2.1. Installation des dépendances</p></div>
+<div class="para"><p>  2.2. Installation de PhyloExplorer</p></div>
+<div class="para"><p>  3. Configuration</p></div>
+<div class="para"><p><strong>Partie 4 : Guide de l'utilisateur</strong></p></div>
+<div class="para"><p>  1. Etape 1: Chargement de données</p></div>
+<div class="para"><p>  2. Etape 2: Arrivée sur la page "statistics"</p></div>
+<div class="para"><p>  2.1. Résumé</p></div>
+<div class="para"><p>  2.2. Interaction</p></div>
+<div class="para"><p>  2.3. Histogrammes de statistiques</p></div>
+<div class="para"><p>  2.4. Arborescence NCBI</p></div>
+<div class="para"><p>  2.5. Les requêtes</p></div>
+<div class="para"><p>  2.6. Téléchargement</p></div>
+<div class="para"><p>  3. Etape 3: Naviguer dans la collection</p></div>
+<div class="para"><p>  4. Module phyloWidget</p></div>
+<div class="para"><p>  4.1. Qu'est ce que c'est?</p></div>
+<div class="para"><p>  4.2. Intégration du module</p></div>
+<div class="para"><p><strong>Partie 5 : Bilan</strong></p></div>
+<div class="para"><p>  1. Résultats</p></div>
+<div class="para"><p>  2. Valeur ajoutée</p></div>
+<div class="para"><p><strong>Annexe</strong></p></div>
+<div class="para"><p>  1. Glossaire phylogénétique</p></div>
+<div class="para"><p>  2. Glossaire technique</p></div>
+<div class="para"><p>  3. Liens externes</p></div>
 </div></div>
 <h1 id="_pr_sentation_du_projet">Présentation du projet</h1>
 <h2 id="_phylog_nie_et_taxonomie">1. Phylogénie et Taxonomie</h2>
@@ -508,7 +512,7 @@ end;</tt></pre>
 </div></div>
 <div class="para"><p>Il s'agit d'une nomenclature communément utilisée. L'identifiant permet de retrouver de façon unique un taxon et trouver toutes les informations associées à l'aide de séparateurs définis.</p></div>
 </div>
-<h2 id="_choix_technique">2. Choix technique</h2>
+<h2 id="_choix_techniques">2. Choix techniques</h2>
 <div class="sectionbody">
 <div class="vlist"><dl>
 <dt>
@@ -1167,7 +1171,7 @@ particulièrement attention à éviter la possibilité d'injection de code et de
 <div class="para"><p>Pour plus d'informations concernant la sécurité du serveur, merci de se référer
 à la documentation de CherryPy</p></div>
 </div>
-<h2 id="_evolutions">5. Evolutions</h2>
+<h2 id="_evolutions_futures">5. Evolutions futures</h2>
 <div class="sectionbody">
 <div class="para"><p>Il existe une bibliothèque appellé BioPython qui fournit des classes et
 des méthodes permettant de travailler dans le contexte de la biologie.</p></div>
@@ -1178,564 +1182,18 @@ utilité. Il serait intéressant de savoir si BioPython (qui est soutenue par un
 communauté internationale de développeurs) peut remplacer Phylogelib (qui reste
 très jeune).</p></div>
 </div>
-<h2 id="_utilisation_d_taill_e">6. Utilisation détaillée</h2>
-<div class="sectionbody">
-<div class="para"><p>Dans cette section, nous allons effectuer un parcours des possibilités de PhyloExplorer du point de vue de l'utilisateur.</p></div>
-<h3 id="_etape_1_chargement_de_donn_es">6.1. Etape 1: Chargement de données</h3><div style="clear:left"></div>
-<div class="para"><p>La première page de PhyloExplorer comporte un menu simple :</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-<strong>Upload Collection</strong> (qui permet à tout moment de charger une nouvelle collection d'arbres)
-</p>
-</li>
-<li>
-<p>
-<strong>Help contents</strong> (qui est une page d'aide, un bref récapitulatif des fonctionnalités et procédures de PhyloExplorer)
-</p>
-</li>
-<li>
-<p>
-<strong>About</strong> (qui, comme son nom l'indique, renseigne sur les créateurs et fait une brève description de PhyloExplorer)
-</p>
-</li>
-</ul></div>
-<div class="para"><p>L'utilisateur doit :</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-soit charger son fichier d'arbres Phylip (Newick), Nexus ou Nexus Translate à partir de cette Homepage
-</p>
-</li>
-</ul></div>
-<div class="para"><p><center><span class="image">
-<img src="champ_choose_your_file.png" alt="champ_choose_your_file.png" />
-</span></center></p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-soit saisir à la main des arbres Phylip (Newick), Nexus ou Nexus Translate dans le champ prévu à cet effet
-</p>
-</li>
-</ul></div>
-<div class="para"><p><center><span class="image">
-<img src="champ_paste_collection.png" alt="champ_paste_collection.png" />
-</span></center></p></div>
-<div class="para"><p>Dans notre exemple, nous choisissons une collection de 7 arbres (dans un fichier newick) comportant des erreurs intentionnellement (nous verrons leur utilité par la suite).</p></div>
-<div class="para"><p>Ne pas oublier de préciser, si besoin est, le type de séparateur mis en cause dans la collection sélectionnée. C'est-à-dire le séparateur qui lie les noms qui composent les espèces.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Exemple</div>
-</td>
-<td class="content">"Macropus eugenii" ou "Macropus_eugenii"</td>
-</tr></table>
-</div>
-<div class="para"><p>Cliquer alors sur <span class="image">
-<img src="bouton_upload.png" alt="bouton_upload.png" />
-</span> pour envoyer la collection au serveur.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">Suivant la taille de votre collection, le message &#8220;Please wait&#8221; apparaissant à l'écran peut vous paraître plus ou moins long.</td>
-</tr></table>
-</div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">Le bouton <span class="image">
-<img src="bouton_clear.png" alt="bouton_clear.png" />
-</span> permet de remettre les champs impactés à zéro.</td>
-</tr></table>
-</div>
-<h3 id="_etape_2_arriv_e_sur_la_page_statistics">6.2. Etape 2: Arrivée sur la page "statistics"</h3><div style="clear:left"></div>
-<h4 id="_r_sum">6.2.1. Résumé</h4>
-<div class="para"><p><center><span class="image">
-<img src="page_statistics.png" alt="page_statistics.png" height="800" />
-</span></center></p></div>
-<div class="para"><p>Cette page est un tableau de bord de la collection utilisateur chargée. Elle indique:</p></div>
-<div class="exampleblock">
-<div class="exampleblock-content">
-<div class="ilist"><ul>
-<li>
-<p>
-le nombre d'arbres dans la collection
-</p>
-</li>
-<li>
-<p>
-le nombre total de taxons
-</p>
-</li>
-<li>
-<p>
-avec en plus le nombre de taxons mal écrits (ils apparaissent en rouge s'il y en a)
-</p>
-</li>
-<li>
-<p>
-et aussi le nombre d'homonymes (taxons ambigus apparaissant en orange)
-</p>
-</li>
-</ul></div>
-<div class="para"><p><em>zone entourée en vert</em></p></div>
-</div></div>
-<div class="exampleblock">
-<div class="exampleblock-content">
-<div class="ilist"><ul>
-<li>
-<p>
-les corrections possibles à faire dans la collection
-</p>
-</li>
-</ul></div>
-<div class="para"><p><em>zone entourée en noir</em></p></div>
-</div></div>
-<div class="exampleblock">
-<div class="exampleblock-content">
-<div class="ilist"><ul>
-<li>
-<p>
-la pondération des arbres
-</p>
-</li>
-<li>
-<p>
-la distribution des taxons dans les arbres
-</p>
-</li>
-</ul></div>
-<div class="para"><p><em>zones entourées en rouge et en orange</em></p></div>
-</div></div>
-<div class="exampleblock">
-<div class="exampleblock-content">
-<div class="ilist"><ul>
-<li>
-<p>
-l'arborescence de tous les taxons de la collection chargée, construite selon le NCBI
-</p>
-</li>
-</ul></div>
-<div class="para"><p><em>zone entourée et encadrée en gris</em></p></div>
-</div></div>
-<div class="para"><p><center><span class="image">
-<img src="arbo_ncbi_taxonomy.png" alt="arbo_ncbi_taxonomy.png" height="1000" />
-</span></center></p></div>
-<div class="exampleblock">
-<div class="exampleblock-content">
-<div class="ilist"><ul>
-<li>
-<p>
-une visualisation sous forme de graphe de l'arbre représentant la collection (basée uniquement sur le fichier chargé [corrigé ou non])
-</p>
-</li>
-</ul></div>
-</div></div>
-<div class="para"><p><center><span class="image">
-<img src="arbo_ncbi_phylowidget.png" alt="arbo_ncbi_phylowidget.png" />
-</span></center></p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">il faut s'assurer d'avoir Java 1.5 minimum installé sur la machine client pour visualiser ce graphe.</td>
-</tr></table>
-</div>
-<div class="para"><p>Le menu (<em>zone entourée en bleu</em>) est adapté à la collection actuellement en cours de traitement.</p></div>
-<h4 id="_interaction">6.2.2. Interaction</h4>
-<div class="para"><p>On peut bien sûr interagir avec cette page :</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-pour corriger les taxons erronés de la collection (s'il y en a), il suffit de cocher le bouton radio qui convient (situé à droite de chaque taxon)
-</p>
-</li>
-<li>
-<p>
-il en est de même pour les homonyms (qui apparaissent en orange)
-</p>
-</li>
-<li>
-<p>
-une fois les boutons radio sélectionnés, il suffit de valider la sélection en cliquant sur <span class="image">
-<img src="bouton_correct_collection.png" alt="bouton_correct_collection.png" />
-</span>
-</p>
-</li>
-</ul></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Rmq</div>
-</td>
-<td class="content">La correction de la collection a pour effet de faire disparaitre le champ entier "<strong>Correct your collection</strong>" puisqu'elle est corrigée à ce stade.</td>
-</tr></table>
-</div>
-<h4 id="_histogrammes_de_statistiques">6.2.3. Histogrammes de statistiques</h4>
-<div class="ilist"><ul>
-<li>
-<p>
-le premier graphique indique le nombre de taxons qui composent les arbres
-</p>
-</li>
-</ul></div>
-<div class="para"><p><center><span class="image">
-<img src="histogramme1.png" alt="histogramme1.png" />
-</span></center></p></div>
-<div class="vlist"><dl>
-<dt>
-Ici, il y a:
-</dt>
-<dd>
-<div class="ilist"><ul>
-<li>
-<p>
-1 arbre qui comporte entre 0 et 2 taxons
-</p>
-</li>
-<li>
-<p>
-3 arbres qui comportent entre 3 et 5 taxons
-</p>
-</li>
-<li>
-<p>
-&#8230; ainsi de suite
-</p>
-</li>
-</ul></div>
-</dd>
-</dl></div>
-<div class="para"><p><br /></p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-le second graphique indique le nombre d'arbres dans lesquels se trouve chacun des taxons
-</p>
-</li>
-</ul></div>
-<div class="para"><p><center><span class="image">
-<img src="histogramme2.png" alt="histogramme2.png" />
-</span></center></p></div>
-<div class="vlist"><dl>
-<dt>
-Ici, il y a:
-</dt>
-<dd>
-<div class="ilist"><ul>
-<li>
-<p>
-1 taxon qui se retrouve dans 36 arbres
-</p>
-</li>
-<li>
-<p>
-2 taxons qui se retrouvent dans 5 arbres
-</p>
-</li>
-<li>
-<p>
-&#8230; etc
-</p>
-</li>
-</ul></div>
-</dd>
-</dl></div>
-<h4 id="_arborescence_ncbi">6.2.4. Arborescence NCBI</h4>
-<div class="para"><p>Cet arbre englobe toute la collection construite correctement. Au fur et à mesure des corrections de l'utilisateur, l'arbre est regénéré. En effet, il faut tenir compte des nouveaux taxons corrigés dans la collection.</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-Soit le compte des taxons augmente (si le taxon corrigé n'était pas dans l'arbre)
-</p>
-</li>
-<li>
-<p>
-Soit le compte des taxons reste inchangé (si le taxon corrigé correspondait à un taxon déjà dans l'arbre)
-</p>
-</li>
-</ul></div>
-<h5 id="_l_gende_des_informations_affich_es_dans_l_arbre_ncbi">Légende des informations affichées dans l'arbre NCBI</h5>
-<div class="olist"><ol>
-<li>
-<p>
-<strong>Code couleur</strong>
-</p>
-<div class="ilist"><ul>
-<li>
-<p>
-<span style="color: darkblue;"><strong>Bleu foncé</strong></span> : les noms des espèces
-</p>
-</li>
-<li>
-<p>
-<span style="color: #66f;"><strong>Bleu clair</strong></span> : les noeuds internes de l'arbre (les parents communs des espèces)
-</p>
-</li>
-<li>
-<p>
-<span style="color: blue;"><strong>Bleu normal</strong></span> : chaque noeud et feuille de l'arbre est accompagné de 2 nombres à côté de son nom. Le premier nombre comptabilise le nombre d'espèces représentant le noeud. Le second nombre représente le nombre d'arbres dans lesquels il se trouve
-</p>
-</li>
-<li>
-<p>
-<span style="color: grey;"><strong>Gris</strong></span> : effectuer des actions ou afficher un complément d'informations
-</p>
-</li>
-</ul></div>
-</li>
-<li>
-<p>
-<strong>Informations et actions</strong>
-</p>
-<div class="olist2"><ol>
-<li>
-<p>
-<strong><em>Etiquette "Show parents"</em></strong>
-</p>
-<div class="para"><p>On aperçoit sur cet arbre NCBI une étiquette <span class="image">
-<img src="etiquette_show_parents.png" alt="etiquette_show_parents.png" />
-</span> à côté de certains noeuds/feuilles. En cliquant dessus, on a accès à la liste des parents intermédiaires du noeud/feuille concerné(e) jusqu'au parent commun le plus proche affiché juste au dessus de ce noeud/feuille.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Rmq</div>
-</td>
-<td class="content">Cette étiquette a été ajoutée pour une meilleure lisibilité de l'arbre (parents intermédiaires masqués par défaut).</td>
-</tr></table>
-</div>
-</li>
-<li>
-<p>
-<strong><em>Informations sur les nombres à droite des noeuds</em></strong>
-</p>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Exemple</div>
-</td>
-<td class="content">
-<div class="para"><p><span class="image">
-<img src="exemple_murinae_6_4.png" alt="exemple_murinae_6_4.png" />
-</span></p></div>
-<div class="para"><p>En cliquant sur &#8220;<tt>6</tt>&#8221;, on peut parcourir les 6 arbres qui contiennent des &#8220;Murinae&#8221;.</p></div>
-<div class="para"><p>Le survol de ce chiffre informe de cette action.</p></div>
-</td>
-</tr></table>
-</div>
-<div class="para"><p>En survolant le chiffre &#8220;<tt>4</tt>&#8221;, on a brièvement accès cette fois-ci à la liste des 4 Murinae concernés dans ces 6 arbres.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Rmq</div>
-</td>
-<td class="content">
-<div class="para"><p>Cette information ne s'affiche pas longtemps! Elle est inscrite dans l'attribut <tt><em>TITLE</em></tt> des balises <em>HTML</em> qui a un temps d'affichage bref.</p></div>
-<div class="para"><p>Ci-dessous affichées les 9 espèces qui représentent <em>Haplorrhini</em> par exemple.
-<span class="image">
-<img src="souris_title.png" alt="souris_title.png" />
-</span></p></div>
-</td>
-</tr></table>
-</div>
-</li>
-<li>
-<p>
-<strong><em>Informations sur les taxons et noeuds internes</em></strong>
-</p>
-<div class="para"><p>En SURVOLANT à la souris le nom des taxons ou des noeuds internes, on peut apercevoir une image correspondant à ce nom au coin inférieur droit de la page. Le nom survolé est à nouveau inscrit au dessus de l'image.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Rmq</div>
-</td>
-<td class="content">Ces images sont issues de WikiSpecies et WikiPedia.</td>
-</tr></table>
-</div>
-<div class="para"><p>En cliquant sur les noeuds internes ou les taxons, on est redirigé sur le <a href="http://www.ncbi.nlm.nih.gov/">NCBI</a> (dans une nouvelle page) correspondant au taxon ou noeud interne cliqué. On accède alors à plus d'informations sur l'élément.</p></div>
-<div class="para"><p><br /></p></div>
-</li>
-<li>
-<p>
-<strong><em>Filtrage</em></strong>
-</p>
-<div class="para"><p>L'arbre de la taxonomie du NCBI peut être filtré par l'utilisateur. Pour se faire, chaque élément de l'arbre comporte une case à cocher à sa gauche: il suffit de cocher cette case pour signifier qu'on souhaite enlever tel ou tel élément dans la collection entière. Il ne reste plus qu'à cliquer sur <span class="image">
-<img src="bouton_restrict_your_trees.png" alt="bouton_restrict_your_trees.png" />
-</span> pour appliquer le filtre.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Rmq</div>
-</td>
-<td class="content">Les descendants de l'élément coché sont automatiquement sélectionnés (s'il a des fils).</td>
-</tr></table>
-</div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Rmq</div>
-</td>
-<td class="content">On peut se servir des étiquettes <span class="image">
-<img src="etiquette_select_all.png" alt="etiquette_select_all.png" />
-</span> et <span class="image">
-<img src="etiquette_unselect_all.png" alt="etiquette_unselect_all.png" />
-</span> pour sélectionner/désélectionner tous les éléments de l'arbre suivant la proportion d'éléments de l'arbre que l'on a à filtrer. Ainsi, il est plus facile de décocher/cocher ce que l'on souhaite conserver/enlever dans la collection.</td>
-</tr></table>
-</div>
-</li>
-<li>
-<p>
-<strong><em>Graphe</em></strong>
-</p>
-<div class="para"><p>Le lien en vert (<span style="color: green;">Click to visualize this tree as graph</span>) permet à l'utilisateur d'avoir une vue sous forme de graphe des espèces qui composent sa collection (filtrée ou non). Un clic sur ce lien ouvre une nouvelle page vers le site <a href="http://www.phylowidget.org">PhyloWidget</a> en affichant la collection complète (ou filtrée) de l'utilisateur.</p></div>
-</li>
-</ol></div>
-</li>
-</ol></div>
-<h4 id="_les_requ_tes">6.2.5. Les requêtes</h4>
-<div class="para"><p>Le champ de requêtes, que nous n'avons pas détaillé jusque là, permet à l'utilisateur d'extraire des informations sur sa collection. Ces requêtes lui permettent de rechercher, sur l'ensemble des arbres, la présence (ou l'absence) de taxon ou noeuds internes (parents communs). Ces requêtes peuvent être effectuées avec les opérateurs classiques: "&gt;", "&lt;", "&gt;=", "&lt;=", "==", "AND", "OR", "NOT". Les priorités des opérations sont définies par les parenthèses.</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">La casse des requêtes est flexible. Les espaces entre les opérations sont gérés: {glires}&gt;3 est équivalent à {glires} &gt; 3.</td>
-</tr></table>
-</div>
-<div class="para"><p>Les taxons ou noeuds internes de la requête doivent être entourés par des accolades. Ceci afin de grouper les éléments comportant des espaces.</p></div>
-<div class="para"><p>Exemple: {echinops telfairi}</p></div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Exemple de requête</div>
-</td>
-<td class="content">
-<div class="para"><p><em>{murinae} == 2 and not {echinops &lt;plant&gt;} or ( {homo} and {homo sapiens} and {catarrhini}&gt;2} )</em></p></div>
-<div class="para"><p>Ce qui correspond à : sélectionner les arbres qui comportent exactment 2 murinae mais pas d'echinops &lt;plant&gt; ou bien les arbres qui comportent des homo, des homo sapiens et où les catarrhini sont supérieurs à 2.</p></div>
-</td>
-</tr></table>
-</div>
-<div class="admonitionblock">
-<table><tr>
-<td class="icon">
-<div class="title">Note</div>
-</td>
-<td class="content">
-<div class="title">A propos de requête</div>
-<div class="para"><p>Effectuer une requête sur ce tableau de bord permet de "filtrer" (ou effectuer des recherches dans) les arbres sans perdre le contenu de sa collection. De plus, les données affichées dans la zone <strong>General informations of the collection</strong> (<em>entourée en vert dans la capture de la section 6.2.1</em>) changent évidemment en fonction du résultat de la requête (le nombre d'arbres diminue en conséquence).</p></div>
-<div class="para"><p>Prenons l'exemple de la requête "<em>{rodentia} and {lagomorpha}</em>" sur la collection à 7 arbres. Après la requête, le nombre d'arbres est passé à 3. Ce qui signifie que seuls 3 arbres sur les 7 comportent des <em>rodentia</em> et des <em>lagommorpha</em>.</p></div>
-<div class="para"><p><span class="image">
-<img src="champ_general_apres_requete.png" alt="champ_general_apres_requete.png" />
-</span></p></div>
-<div class="para"><p>Pour annuler les effets de cette requête, il n'y a qu'à cliquer sur <span style="color: blue;"><strong>Back to full collection</strong></span> qui est apparu après l'exécution de la requête.</p></div>
-</td>
-</tr></table>
-</div>
-<h4 id="_t_l_chargement">6.2.6. Téléchargement</h4>
-<div class="para"><p>Comme indiqué dans le menu (<em>zone entourée en bleu ci-dessous</em>), l'utilisateur a le loisir de télécharger sa collection (filtrée et/ou corrigée et/ou désambiguisée):</p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-soit construite selon l'arborescence du NCBI (donc un seul arbre, comprenant toutes les espèces de la collection)
-</p>
-</li>
-</ul></div>
-<div class="para"><p><center><span class="image">
-<img src="menu_download_ncbi.png" alt="menu_download_ncbi.png" />
-</span></center></p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-soit toute ou partie des arbres qui composaient sa collection de départ
-</p>
-</li>
-</ul></div>
-<div class="para"><p><center><span class="image">
-<img src="menu_download_collection.png" alt="menu_download_collection.png" />
-</span></center></p></div>
-<h3 id="_etape_3_naviguer_dans_la_collection">6.3. Etape 3: Naviguer dans la collection</h3><div style="clear:left"></div>
-<div class="para"><p>En cliquant dans le menu sur <span class="image">
-<img src="menu_browse_collection.png" alt="menu_browse_collection.png" />
-</span>, l'utilisateur a tout le loisir de parcourir sa collection arbre par arbre.</p></div>
-<div class="para"><p>Le menu dédié à sa collection actuelle se résume alors à <span class="image">
-<img src="menu_bouton_back_statistics.png" alt="menu_bouton_back_statistics.png" />
-</span> et à <span class="image">
-<img src="menu_bouton_download_collection.png" alt="menu_bouton_download_collection.png" />
-</span>. La navigation entre les arbres se fait au moyen des boutons <em style="color: blue;">Next</em> et <em style="color: blue;">Previous</em>.</p></div>
-<div class="para"><p>A chaque arbre, différentes informations sont affichées :</p></div>
-<div class="para"><p><center><span class="image">
-<img src="navigation_arbre.png" alt="navigation_arbre.png" />
-</span></center></p></div>
-<div class="ilist"><ul>
-<li>
-<p>
-le nom de l'arbre&#8230; que l'on peut choisir à l'aide du menu déroulant (<em>zone entourée en vert sur la capture ci-dessus</em>)
-</p>
-</li>
-<li>
-<p>
-le numéro de l'arbre dans la collection (que l'on peut saisir directement dans le champ text) [<em>zone entourée en jaune</em>]
-</p>
-</li>
-<li>
-<p>
-des éventuels messages d'erreur (<em>zone entourée en rouge</em>). Ici il est indiqué que la collection comporte 3 mauvais taxons. Si on ne les a pas encore corrigés, on peut retourner sur la page des statistiques ("<em>Back to statistics</em>") pour le faire.
-</p>
-<div class="para"><p>Autre message d'erreur type :</p></div>
-<div class="para"><p><center><span class="image">
-<img src="message_erreur.png" alt="message_erreur.png" />
-</span></center></p></div>
-</li>
-<li>
-<p>
-les taxons marqués en rouge dans l'arbre sont mal écrits (ou inconnus du NCBI)
-</p>
-</li>
-<li>
-<p>
-les taxons ambigus (les homonymes) sont marqués en orange (<em>zone entourée en violet</em>)
-</p>
-</li>
-</ul></div>
-<div class="para"><p>Comme déjà indiqué dans la description des "Statistiques", il est possible de développer les noeuds internes dans l'arbre. On peut les développer tous en même temps en cliquant sur <span class="image">
-<img src="etiquette_show_hide_all_parents.png" alt="etiquette_show_hide_all_parents.png" />
-</span>.</p></div>
-<div class="para"><p>Tout comme l'arborescence du NCBI, on aperçoit le nombre de taxons qui composent l'arbre (<em>zone entourée en noir</em>), avec en plus, cette fois-ci, le nom de l'arbre.</p></div>
-<div class="para"><p>L'étiquette <span class="image">
-<img src="etiquette_show_hide_internal_nodes.png" alt="etiquette_show_hide_internal_nodes.png" />
-</span> (<em>zone entourée en bleu</em>) permet simplement d'effacer de l'affichage les noeuds internes de l'arbre (<em>en <span style="color: #66f;"><strong>bleu clair</strong></span></em>) pour offrir à l'utilisateur la vision de la structure de son arbre (dépourvu des parents communs).</p></div>
-<div class="para"><p>En ce qui concerne les requêtes, leur principe de fonctionnement reste inchangé, si ce n'est que les arbres affichés et navigables ne seront uniquement ceux qui répondent à la requête.</p></div>
-<div class="para"><p>On peut aussi, à partir de cette étape, télécharger la collection d'arbres (qui a été modifiée ou non).</p></div>
-<div class="para"><p>Il est également possible ici d'obtenir la version sous forme de graphe de son arbre en cliquant sur <span style="color: green;">Click to visualize this tree as graph</span>.</p></div>
-</div>
-<h2 id="_module_phylowidget">7. Module phyloWidget</h2>
-<div class="sectionbody">
-<h3 id="_qu_est_ce_que_c_est">7.1. Qu'est ce que c'est?</h3><div style="clear:left"></div>
-<div class="para"><p>PhyloWidget est une applet Java libre de droits, servant à visionner et éditer des arbres phylogénétiques en ligne. C'est un outil simple à utiliser et très complet, permettant une grande interaction avec l'utilisateur.
-Il est possible de créer son arbre, l'importer via les formats Newick ou Nexus, et même de le modifier afin de l'exporter sous forme de fichier ou d'image.
-Entre autres, on note des suppléments d'ergonomie agréables comme les différents types de visualisation (circulaire, rectangulaire, &#8230;), le zoom, la recherche de taxons, ou encore l'affichage des vraies longueurs de branches. A cela vient s'ajouter sur le survol d'un taxon, un tableau d'informations ainsi qu'un large éventail d'interactions (à découvrir).</p></div>
-<div class="para"><p>Cette application requiert l'environnement java 1.5 coté client.
-Sa réalisation est dûe à Gregory Jordanie (<a href="mailto:phylowidget@gmail.com"><tt>phylowidget@gmail.com</tt></a>) sous la tutelle de Bill Piel (Google Summer of Code project).</p></div>
-<h3 id="_int_gration_du_module">7.2. Intégration du module</h3><div style="clear:left"></div>
-<div class="para"><p>Ce module a été rajouté afin de compléter la visualisation personnalisable des arbres dans notre application.
-Pour ce faire, nous faisons appel à l'applet directement du site source en passant l'arbre à visualiser en paramètre. Ainsi le serveur hébergeant PhyloExplorer n'est pas sollicité.</p></div>
-<div class="para"><p>PhyloWidget est la meilleure solution libre en terme d'utilisation et d'installation (parmis d'autres solutions comme ATV ou clustalw).</p></div>
-</div>
-<h2 id="_installation_de_phyloexplorer">8. Installation de PhyloExplorer</h2>
-<div class="sectionbody">
-<div class="para"><p>Cette section détaille la procédure d'installation et de configuration de
+<h1 id="_guide_d_installation">Guide d'installation</h1>
+<div class="para"><p>Cette partie détaille la procédure d'installation et de configuration de
 l'application web PhyloExplorer.</p></div>
-<h3 id="_pr_requis">8.1. Prérequis</h3><div style="clear:left"></div>
+<h2 id="_pr_requis">1. Prérequis</h2>
+<div class="sectionbody">
 <div class="para"><p>Pour une utilisation optimale, PhyloExplorer nécessite au minimum 2 Go de
 mémoire RAM. Prévoir également un processeur cadencé à 2 Ghz et 200 Mo d'espace
 disque pour l'installation.</p></div>
-<h3 id="_installation">8.2. Installation</h3><div style="clear:left"></div>
-<h4 id="_installation_des_d_pendances">8.2.1. Installation des dépendances</h4>
+</div>
+<h2 id="_installation">2. Installation</h2>
+<div class="sectionbody">
+<h3 id="_installation_des_d_pendances">2.1. Installation des dépendances</h3><div style="clear:left"></div>
 <div class="para"><p>PhyloExplorer nécessite les bibliothèques suivantes :</p></div>
 <div class="ilist"><ul>
 <li>
@@ -1761,7 +1219,7 @@ Pleet (le paquet est disponible dans tools)
 </ul></div>
 <div class="para"><p>Chacune de ces bibliothèques s'installe très facilement : extraire l'archive
 et taper simplement sous root <tt>$ python setup install.py</tt>.</p></div>
-<h4 id="_installation_de_phyloexplorer_2">8.2.2. Installation de PhyloExplorer</h4>
+<h3 id="_installation_de_phyloexplorer">2.2. Installation de PhyloExplorer</h3><div style="clear:left"></div>
 <div class="para"><p>Taper simplement en root la commande :</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1818,7 +1276,9 @@ share/phyloexplorer/tools:
 <b>(4)</b> Répertoire où se situent toutes les templates
 <b>(5)</b> Outil permettant de générer le fichier taxonomy.csv</tt></pre>
 </div></div>
-<h3 id="_configuration">8.3. Configuration</h3><div style="clear:left"></div>
+</div>
+<h2 id="_configuration">3. Configuration</h2>
+<div class="sectionbody">
 <div class="para"><p>Le serveur web utilise le fichier <tt>phyloexplorer.conf</tt> pour sa configuration.
 Voici sa structure :</p></div>
 <div class="listingblock">
@@ -1895,6 +1355,517 @@ renseignée.
 </dd>
 </dl></div>
 </div>
+<h1 id="_guide_de_l_utilisateur">Guide de l'utilisateur</h1>
+<div class="para"><p>Dans cette section, nous allons effectuer un parcours des possibilités de
+PhyloExplorer du point de vue de l'utilisateur.</p></div>
+<h2 id="_etape_1_chargement_de_donn_es">1. Etape 1: Chargement de données</h2>
+<div class="sectionbody">
+<div class="para"><p>La première page de PhyloExplorer comporte un menu simple :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+<strong>Upload Collection</strong> (qui permet à tout moment de charger une nouvelle collection d'arbres)
+</p>
+</li>
+<li>
+<p>
+<strong>Help contents</strong> (qui est une page d'aide, un bref récapitulatif des fonctionnalités et procédures de PhyloExplorer)
+</p>
+</li>
+<li>
+<p>
+<strong>About</strong> (qui, comme son nom l'indique, renseigne sur les créateurs et fait une brève description de PhyloExplorer)
+</p>
+</li>
+</ul></div>
+<div class="para"><p>L'utilisateur doit :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+soit charger son fichier d'arbres Phylip (Newick), Nexus ou Nexus Translate à partir de cette Homepage
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="champ_choose_your_file.png" alt="champ_choose_your_file.png" />
+</span></center></p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+soit saisir à la main des arbres Phylip (Newick), Nexus ou Nexus Translate dans le champ prévu à cet effet
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="champ_paste_collection.png" alt="champ_paste_collection.png" />
+</span></center></p></div>
+<div class="para"><p>Dans notre exemple, nous choisissons une collection de 7 arbres (dans un fichier newick) comportant des erreurs intentionnellement (nous verrons leur utilité par la suite).</p></div>
+<div class="para"><p>Ne pas oublier de préciser, si besoin est, le type de séparateur mis en cause dans la collection sélectionnée. C'est-à-dire le séparateur qui lie les noms qui composent les espèces.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Exemple</div>
+</td>
+<td class="content">"Macropus eugenii" ou "Macropus_eugenii"</td>
+</tr></table>
+</div>
+<div class="para"><p>Cliquer alors sur <span class="image">
+<img src="bouton_upload.png" alt="bouton_upload.png" />
+</span> pour envoyer la collection au serveur.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">Suivant la taille de votre collection, le message &#8220;Please wait&#8221; apparaissant à l'écran peut vous paraître plus ou moins long.</td>
+</tr></table>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">Le bouton <span class="image">
+<img src="bouton_clear.png" alt="bouton_clear.png" />
+</span> permet de remettre les champs impactés à zéro.</td>
+</tr></table>
+</div>
+</div>
+<h2 id="_etape_2_arriv_e_sur_la_page_statistics">2. Etape 2: Arrivée sur la page "statistics"</h2>
+<div class="sectionbody">
+<h3 id="_r_sum">2.1. Résumé</h3><div style="clear:left"></div>
+<div class="para"><p><center><span class="image">
+<img src="page_statistics.png" alt="page_statistics.png" height="800" />
+</span></center></p></div>
+<div class="para"><p>Cette page est un tableau de bord de la collection utilisateur chargée. Elle indique:</p></div>
+<div class="vlist"><dl>
+<dt>
+<strong>zone entourée en vert</strong>
+</dt>
+<dd>
+<div class="ilist"><ul>
+<li>
+<p>
+le nombre d'arbres dans la collection
+</p>
+</li>
+<li>
+<p>
+le nombre total de taxons
+</p>
+</li>
+<li>
+<p>
+avec en plus le nombre de taxons mal écrits (ils apparaissent en rouge s'il y en a)
+</p>
+</li>
+<li>
+<p>
+et aussi le nombre d'homonymes (taxons ambigus apparaissant en orange)
+</p>
+</li>
+</ul></div>
+</dd>
+<dt>
+<strong>zone entourée en noir</strong>
+</dt>
+<dd>
+<p>
+les corrections possibles à faire dans la collection
+</p>
+</dd>
+<dt>
+<strong>zones entourées en rouge et en orange</strong>
+</dt>
+<dd>
+<div class="ilist"><ul>
+<li>
+<p>
+la pondération des arbres
+</p>
+</li>
+<li>
+<p>
+la distribution des taxons dans les arbres
+</p>
+</li>
+</ul></div>
+</dd>
+<dt>
+<strong>zone entourée et encadrée en gris</strong>
+</dt>
+<dd>
+</dd>
+</dl></div>
+<div class="exampleblock">
+<div class="exampleblock-content">
+<div class="ilist"><ul>
+<li>
+<p>
+l'arborescence de tous les taxons de la collection chargée, construite selon le NCBI
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="arbo_ncbi_taxonomy.png" alt="arbo_ncbi_taxonomy.png" height="1000" />
+</span></center></p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+une visualisation sous forme de graphe de l'arbre représentant la collection (basée uniquement sur le fichier chargé [corrigé ou non])
+</p>
+</li>
+</ul></div>
+<div class="para"><p><center><span class="image">
+<img src="arbo_ncbi_phylowidget.png" alt="arbo_ncbi_phylowidget.png" />
+</span></center></p></div>
+</div></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">il faut s'assurer d'avoir Java 1.5 minimum installé sur la machine client pour visualiser ce graphe.</td>
+</tr></table>
+</div>
+<div class="para"><p>Le menu (<em>zone entourée en bleu</em>) est adapté à la collection actuellement en cours de traitement.</p></div>
+<h3 id="_interaction">2.2. Interaction</h3><div style="clear:left"></div>
+<div class="para"><p>On peut bien sûr interagir avec cette page :</p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+pour corriger les taxons erronés de la collection (s'il y en a), il suffit de cocher le bouton radio qui convient (situé à droite de chaque taxon)
+</p>
+</li>
+<li>
+<p>
+il en est de même pour les homonyms (qui apparaissent en orange)
+</p>
+</li>
+<li>
+<p>
+une fois les boutons radio sélectionnés, il suffit de valider la sélection en cliquant sur <span class="image">
+<img src="bouton_correct_collection.png" alt="bouton_correct_collection.png" />
+</span>
+</p>
+</li>
+</ul></div>
+<div class="para"><p>La correction de la collection a pour effet de faire disparaitre le champ
+entier "<strong>Correct your collection</strong>" puisqu'elle est corrigée à ce stade.</p></div>
+<h3 id="_histogrammes_de_statistiques">2.3. Histogrammes de statistiques</h3><div style="clear:left"></div>
+<div class="para"><p>Le premier graphique indique le nombre de taxons qui composent les arbres.
+C'est un graphique à bâtons se lisant à l'horizontale.</p></div>
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="para"><p><center><span class="image">
+<img src="histogramme1.png" alt="histogramme1.png" />
+</span></center></p></div>
+<div class="vlist"><dl>
+<dt>
+Nous avons ici:
+</dt>
+<dd>
+<div class="ilist"><ul>
+<li>
+<p>
+1 arbre qui comporte entre 0 et 2 taxons
+</p>
+</li>
+<li>
+<p>
+3 arbres qui comportent entre 3 et 5 taxons
+</p>
+</li>
+<li>
+<p>
+&#8230; ainsi de suite
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+</div></div>
+<div class="para"><p>Le second graphique indique le nombre d'arbres dans lesquels se trouve chacun des taxons.</p></div>
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="para"><p><center><span class="image">
+<img src="histogramme2.png" alt="histogramme2.png" />
+</span></center></p></div>
+<div class="vlist"><dl>
+<dt>
+Dans ce graphique, nous voyons:
+</dt>
+<dd>
+<div class="ilist"><ul>
+<li>
+<p>
+1 taxon qui se retrouve dans 36 arbres
+</p>
+</li>
+<li>
+<p>
+2 taxons qui se retrouvent dans 5 arbres
+</p>
+</li>
+<li>
+<p>
+&#8230; etc
+</p>
+</li>
+</ul></div>
+</dd>
+</dl></div>
+</div></div>
+<h3 id="_arborescence_ncbi">2.4. Arborescence NCBI</h3><div style="clear:left"></div>
+<div class="para"><p>Cet arbre englobe toute la collection construite correctement. Au fur et à
+mesure des corrections de l'utilisateur, l'arbre est regénéré. En effet, il
+faut tenir compte des nouveaux taxons corrigés dans la collection.</p></div>
+<div class="para"><p>L'utilisateur pourra remarquer que le nombre de taxons augmente si le taxon corrigé n'était pas dans l'arbre,
+ou bien reste inchangé si le taxon corrigé correspondait à un taxon déjà dans l'arbre.</p></div>
+<h4 id="_l_gende_des_informations_affich_es_dans_l_arbre_ncbi">2.4.1. Légende des informations affichées dans l'arbre NCBI</h4>
+<h5 id="_code_couleur">Code couleur</h5>
+<div class="ilist"><ul>
+<li>
+<p>
+<span style="color: darkblue;"><strong>Bleu foncé</strong></span> : les noms des espèces
+</p>
+</li>
+<li>
+<p>
+<span style="color: #66f;"><strong>Bleu clair</strong></span> : les noeuds internes de l'arbre (les parents communs des espèces)
+</p>
+</li>
+<li>
+<p>
+<span style="color: blue;"><strong>Bleu normal</strong></span> : chaque noeud et feuille de l'arbre est accompagné de 2 nombres à côté de son nom. Le premier nombre comptabilise le nombre d'espèces représentant le noeud. Le second nombre représente le nombre d'arbres dans lesquels il se trouve
+</p>
+</li>
+<li>
+<p>
+<span style="color: grey;"><strong>Gris</strong></span> : effectuer des actions ou afficher un complément d'informations
+</p>
+</li>
+</ul></div>
+<h5 id="_informations_et_actions">Informations et actions</h5>
+<div class="vlist"><dl>
+<dt>
+Etiquette "Show parents"
+</dt>
+<dd>
+<p>
+On aperçoit sur cet arbre NCBI une étiquette <span class="image">
+<img src="etiquette_show_parents.png" alt="etiquette_show_parents.png" />
+</span> à côté de certains noeuds/feuilles. En cliquant dessus, on a accès à la liste des parents intermédiaires du noeud/feuille concerné(e) jusqu'au parent commun le plus proche affiché juste au dessus de ce noeud/feuille.
+</p>
+<div class="para"><p>Cette étiquette a été ajoutée pour une meilleure lisibilité de l'arbre (parents intermédiaires masqués par défaut).</p></div>
+</dd>
+<dt>
+Informations sur les nombres à droite des noeuds
+</dt>
+<dd>
+<p>
+Le chiffre de gauche correspond au nombre d'occurences de l'espèce dans la
+collection. Celui de droite représente le nombre d'arbres qui contiennent
+l'espèce.
+</p>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Exemple</div>
+</td>
+<td class="content">
+<div class="para"><p><span class="image">
+<img src="exemple_murinae_6_4.png" alt="exemple_murinae_6_4.png" />
+</span></p></div>
+<div class="para"><p>En cliquant sur &#8220;<tt>6</tt>&#8221;, on peut parcourir les 6 arbres qui contiennent des &#8220;Murinae&#8221;.
+Le survol de ce chiffre informe de cette action.</p></div>
+<div class="para"><p>En survolant le chiffre &#8220;<tt>4</tt>&#8221;, on a brièvement accès cette fois-ci à la
+liste des quatre Murinaes concernés dans ces six arbres.
+Attention, cette information ne s'affiche pas longtemps.</p></div>
+<div class="para"><p>Ci-dessous affichées les 9 espèces qui représentent <em>Haplorrhini</em> par exemple.
+<span class="image">
+<img src="souris_title.png" alt="souris_title.png" />
+</span></p></div>
+</td>
+</tr></table>
+</div>
+</dd>
+<dt>
+Informations sur les taxons et noeuds internes
+</dt>
+<dd>
+<p>
+En survolant à la souris le nom des taxons ou des noeuds internes, on peut
+apercevoir une image correspondant à ce nom au coin inférieur droit de la
+page. Le nom survolé est à nouveau inscrit au dessus de l'image.
+Ces images sont issues de WikiSpecies et Wikipedia.
+</p>
+<div class="para"><p>En cliquant sur les noeuds internes ou les taxons, on est redirigé sur le
+<a href="http://www.ncbi.nlm.nih.gov/">NCBI</a> (dans une nouvelle page) correspondant
+au taxon ou noeud interne cliqué. On accède alors à plus d'informations sur
+l'élément.</p></div>
+</dd>
+<dt>
+Filtrage
+</dt>
+<dd>
+<p>
+L'arbre de la taxonomie du NCBI peut être filtré par l'utilisateur. Pour se
+faire, chaque élément de l'arbre comporte une case à cocher à sa gauche ; il
+suffit de cocher cette case pour signifier qu'on souhaite enlever tel ou tel
+élément dans la collection entière. Les descendants de l'élément coché sont
+automatiquement sélectionnés (s'il a des fils). Il ne reste plus qu'à cliquer
+sur <span class="image">
+<img src="bouton_restrict_your_trees.png" alt="bouton_restrict_your_trees.png" />
+</span> pour appliquer le filtre.
+</p>
+<div class="para"><p>On peut se servir des étiquettes <span class="image">
+<img src="etiquette_select_all.png" alt="etiquette_select_all.png" />
+</span> et
+<span class="image">
+<img src="etiquette_unselect_all.png" alt="etiquette_unselect_all.png" />
+</span> pour sélectionner/désélectionner tous les
+éléments de l'arbre suivant la proportion d'éléments de l'arbre que l'on a à
+filtrer. Ainsi, il est plus facile de décocher/cocher ce que l'on souhaite
+conserver/enlever dans la collection.</p></div>
+</dd>
+<dt>
+Graphe
+</dt>
+<dd>
+<p>
+Le lien en vert (<span style="color: green;">Click to visualize this tree as graph</span>) permet à
+l'utilisateur d'avoir une vue sous forme de graphe des espèces qui composent
+sa collection (filtrée ou non). Un clic sur ce lien ouvre une nouvelle page
+vers le site <a href="http://www.phylowidget.org">PhyloWidget</a> en affichant la
+collection complète (ou filtrée) de l'utilisateur.
+</p>
+</dd>
+</dl></div>
+<h3 id="_les_requ_tes">2.5. Les requêtes</h3><div style="clear:left"></div>
+<div class="para"><p>Le champ de requêtes, que nous n'avons pas détaillé jusque là, permet à
+l'utilisateur d'extraire des informations sur sa collection. Ces requêtes lui
+permettent de rechercher, sur l'ensemble des arbres, la présence (ou
+l'absence) de taxon ou noeuds internes (parents communs). Ces requêtes peuvent
+être effectuées avec les opérateurs classiques: <tt>&gt;</tt>, <tt>&lt;</tt>, <tt>&gt;=</tt>, <tt>&lt;=</tt>, <tt>==</tt>,
+<tt>AND</tt>, <tt>OR</tt>, <tt>NOT</tt>. Les priorités des opérations sont définies par les
+parenthèses. La casse n'a pas d'importance, de même que les espaces entre les
+opérateurs.</p></div>
+<div class="para"><p>Les taxons ou noeuds internes de la requête doivent être entourés par des
+accolades. Ceci afin de grouper les éléments comportant des espaces.</p></div>
+<div class="sidebarblock">
+<div class="sidebar-content">
+<div class="sidebar-title">Exemple de requête</div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>{murinae} == 2 and not {echinops &lt;plant&gt;} or ( {homo} and {homo sapiens} and {catarrhini}&gt;2} )</tt></pre>
+</div></div>
+<div class="para"><p>Dans cet exemple, on cherche à sélectionner les arbres qui comportent
+exactement deux <em>murinae</em> mais pas d'<em>echinops &lt;plant&gt;</em> ou bien les arbres qui
+comportent des <em>homo</em>, des <em>homo sapiens</em> et où les <em>catarrhini</em> sont supérieurs à
+2.</p></div>
+</div></div>
+<div class="para"><p>Effectuer une requête sur ce tableau de bord permet de "filtrer" (ou effectuer
+des recherches dans) les arbres sans perdre le contenu de sa collection. De
+plus, les données affichées dans la zone <strong>General informations of the
+collection</strong> (<em>entourée en vert dans la capture précédente</em>) changent
+évidemment en fonction du résultat de la requête (le nombre d'arbres diminue
+en conséquence).</p></div>
+<div class="para"><p>Prenons l'exemple de la requête <tt>{rodentia} and {lagomorpha}</tt> sur la
+collection à 7 arbres. Après la requête, le nombre d'arbres est passé à 3. Ce
+qui signifie que seuls 3 arbres sur les 7 comportent des <em>rodentia</em> et des
+<em>lagommorpha</em>.</p></div>
+<div class="para"><p><span class="image">
+<img src="champ_general_apres_requete.png" alt="champ_general_apres_requete.png" />
+</span></p></div>
+<div class="para"><p>Pour annuler les effets de cette requête, il faut cliquer sur <span style="color: blue;"><strong>Back to
+full collection</strong></span> qui est apparu après l'exécution de la requête.</p></div>
+<h3 id="_t_l_chargement">2.6. Téléchargement</h3><div style="clear:left"></div>
+<div class="para"><p>Après avoir corrigé, désambiguisé ou filtré sa collection, l'utilisateur peut la
+télécharger.</p></div>
+<div class="para"><p><center><span class="image">
+<img src="menu_download_collection.png" alt="menu_download_collection.png" />
+</span></center></p></div>
+<div class="para"><p>Il peut également télécharger l'arborecence du NCBI restreinte à la liste des
+taxons présents dans la collection.</p></div>
+<div class="para"><p><center><span class="image">
+<img src="menu_download_ncbi.png" alt="menu_download_ncbi.png" />
+</span></center></p></div>
+</div>
+<h2 id="_etape_3_naviguer_dans_la_collection">3. Etape 3: Naviguer dans la collection</h2>
+<div class="sectionbody">
+<div class="para"><p>En cliquant dans le menu sur <span class="image">
+<img src="menu_browse_collection.png" alt="menu_browse_collection.png" />
+</span>, l'utilisateur a tout le loisir de parcourir sa collection arbre par arbre.</p></div>
+<div class="para"><p>Le menu dédié à sa collection actuelle se résume alors à
+<span class="image">
+<img src="menu_bouton_back_statistics.png" alt="menu_bouton_back_statistics.png" />
+</span> et à
+<span class="image">
+<img src="menu_bouton_download_collection.png" alt="menu_bouton_download_collection.png" />
+</span>. La navigation entre les arbres se
+fait au moyen des boutons [blue]Next et [blue]Previous.</p></div>
+<div class="para"><p>A chaque arbre, différentes informations sont affichées :</p></div>
+<div class="para"><p><center><span class="image">
+<img src="navigation_arbre.png" alt="navigation_arbre.png" />
+</span></center></p></div>
+<div class="ilist"><ul>
+<li>
+<p>
+le nom de l'arbre&#8230; que l'on peut choisir à l'aide du menu déroulant (<em>zone
+  entourée en vert sur la capture ci-dessus</em>)
+</p>
+</li>
+<li>
+<p>
+le numéro de l'arbre dans la collection que l'on peut saisir directement
+  dans le champ text (<em>zone entourée en jaune</em>)
+</p>
+</li>
+<li>
+<p>
+des éventuels messages d'erreur (<em>zone entourée en rouge</em>). Ici il est
+  indiqué que la collection comporte trois mauvais taxons. Si on ne les a pas
+  encore corrigés, on peut retourner sur la page des statistiques ("<em>Back to
+  statistics</em>") pour le faire.
+</p>
+</li>
+<li>
+<p>
+les taxons marqués en rouge dans l'arbre sont mal écrits (ou inconnus du NCBI)
+</p>
+</li>
+<li>
+<p>
+les taxons ambigus (les homonymes) sont marqués en orange (<em>zone entourée en violet</em>)
+</p>
+</li>
+</ul></div>
+<div class="para"><p>Comme déjà indiqué dans la description des "Statistiques", il est possible de développer les noeuds internes dans l'arbre. On peut les développer tous en même temps en cliquant sur <span class="image">
+<img src="etiquette_show_hide_all_parents.png" alt="etiquette_show_hide_all_parents.png" />
+</span>.</p></div>
+<div class="para"><p>Tout comme l'arborescence du NCBI, on aperçoit le nombre de taxons qui composent l'arbre (<em>zone entourée en noir</em>), avec en plus, cette fois-ci, le nom de l'arbre.</p></div>
+<div class="para"><p>L'étiquette <span class="image">
+<img src="etiquette_show_hide_internal_nodes.png" alt="etiquette_show_hide_internal_nodes.png" />
+</span> (<em>zone entourée en bleu</em>) permet simplement d'effacer de l'affichage les noeuds internes de l'arbre (<em>en <span style="color: #66f;"><strong>bleu clair</strong></span></em>) pour offrir à l'utilisateur la vision de la structure de son arbre (dépourvu des parents communs).</p></div>
+<div class="para"><p>En ce qui concerne les requêtes, leur principe de fonctionnement reste inchangé, si ce n'est que les arbres affichés et navigables ne seront uniquement ceux qui répondent à la requête.</p></div>
+<div class="para"><p>On peut aussi, à partir de cette étape, télécharger la collection d'arbres (qui a été modifiée ou non).</p></div>
+<div class="para"><p>Il est également possible ici d'obtenir la version sous forme de graphe de son arbre en cliquant sur <span style="color: green;">Click to visualize this tree as graph</span>.</p></div>
+</div>
+<h2 id="_module_phylowidget">4. Module phyloWidget</h2>
+<div class="sectionbody">
+<h3 id="_qu_est_ce_que_c_est">4.1. Qu'est ce que c'est?</h3><div style="clear:left"></div>
+<div class="para"><p>PhyloWidget est une applet Java libre de droits, servant à visionner et éditer des arbres phylogénétiques en ligne. C'est un outil simple à utiliser et très complet, permettant une grande interaction avec l'utilisateur.
+Il est possible de créer son arbre, l'importer via les formats Newick ou Nexus, et même de le modifier afin de l'exporter sous forme de fichier ou d'image.
+Entre autres, on note des suppléments d'ergonomie agréables comme les différents types de visualisation (circulaire, rectangulaire, &#8230;), le zoom, la recherche de taxons, ou encore l'affichage des vraies longueurs de branches. A cela vient s'ajouter sur le survol d'un taxon, un tableau d'informations ainsi qu'un large éventail d'interactions (à découvrir).</p></div>
+<div class="para"><p>Cette application requiert l'environnement java 1.5 coté client.
+Sa réalisation est dûe à Gregory Jordanie (<a href="mailto:phylowidget@gmail.com"><tt>phylowidget@gmail.com</tt></a>) sous la tutelle de Bill Piel (Google Summer of Code project).</p></div>
+<h3 id="_int_gration_du_module">4.2. Intégration du module</h3><div style="clear:left"></div>
+<div class="para"><p>Ce module a été rajouté afin de compléter la visualisation personnalisable des arbres dans notre application.
+Pour ce faire, nous faisons appel à l'applet directement du site source en passant l'arbre à visualiser en paramètre. Ainsi le serveur hébergeant PhyloExplorer n'est pas sollicité.</p></div>
+<div class="para"><p>PhyloWidget est la meilleure solution libre en terme d'utilisation et
+d'installation (parmis d'autres solutions comme ATV ou Clustalw).</p></div>
+</div>
 <h1 id="_bilan">Bilan</h1>
 <h2 id="_r_sultats">1. Résultats</h2>
 <div class="sectionbody">
@@ -1902,22 +1873,29 @@ renseignée.
 <div class="ilist"><ul>
 <li>
 <p>
-pouvoir afficher l'arbre avec les noeuds internes (liste des parents intermédiaires aux parents communs entre chaque noeud)
+pouvoir afficher l'arbre avec les noeuds internes (liste des parents
+  intermédiaires aux parents communs entre chaque noeud),
 </p>
 </li>
 <li>
 <p>
-établir des statistiques sur la collection et les afficher
+avoir accès aux informations d'un taxon via un lien vers le site du NCBI
 </p>
 </li>
 <li>
 <p>
-afficher des propositions lors de saisie erronée de taxons (<em>Do you mean?</em>)
+établir des statistiques sur la collection et les afficher,
 </p>
 </li>
 <li>
 <p>
-filtrer les arbres (la collection) pour ne pouvoir garder que ce qui intéressse l'utilisateur
+afficher des propositions lors de saisie erronée de taxons (<em>Do you mean?</em>),
+</p>
+</li>
+<li>
+<p>
+filtrer les arbres (la collection) pour ne pouvoir garder que ce qui
+  intéressse l'utilisateur.
 </p>
 </li>
 </ul></div>
@@ -1925,31 +1903,43 @@ filtrer les arbres (la collection) pour ne pouvoir garder que ce qui intéressse
 </div>
 <h2 id="_valeur_ajout_e">2. Valeur ajoutée</h2>
 <div class="sectionbody">
-<div class="para"><p>Additionné aux objectifs du TER, nous avons pu proposer en plus de :</p></div>
+<div class="para"><p>Nous avons dépassé les objectifs du TER en proposant à l'utilisateur :</p></div>
 <div class="ilist"><ul>
 <li>
 <p>
-corriger à la volée les taxons erronés (directement dans la collection)
+la correction à la volée les taxons erronés et/ou ambigus (directement dans la collection),
 </p>
 </li>
 <li>
 <p>
-afficher des images des taxons survolés pour offrir à l'utilisateur une perception visuelle des noms qu'il étudie dans ses arbres
+l'affichage des images des taxons survolés pour offrir à l'utilisateur une
+  perception visuelle des noms qu'il étudie dans ses arbres,
 </p>
 </li>
 <li>
 <p>
-télécharger la collection entière de l'utilisateur construite sur la taxonomie du NCBI
+un affichage de la liste des taxons représentant un noeud interne,
 </p>
 </li>
 <li>
 <p>
-télécharger des collections filtrées de l'utilisateur
+un accès à la liste des arbres contenant un noeud de l'arbre NCBI,
 </p>
 </li>
 <li>
 <p>
-visualiser l'arbre utilisateur sous forme de graphe (PhyloWidget)
+le téléchargement de l'arborescence du NCBI restreinte aux taxons fournis
+  par l'utilisateur,
+</p>
+</li>
+<li>
+<p>
+le téléchargement des collections filtrées et modifiées par l'utilisateur,
+</p>
+</li>
+<li>
+<p>
+la visualisation et manipulations des arbres sous forme de graphe (PhyloWidget).
 </p>
 </li>
 </ul></div>
@@ -1988,7 +1978,7 @@ visualiser l'arbre utilisateur sous forme de graphe (PhyloWidget)
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2008-04-04 06:17:36 CEST
+Last updated 2008-04-04 11:47:53 CEST
 </div>
 </div>
 </body>
