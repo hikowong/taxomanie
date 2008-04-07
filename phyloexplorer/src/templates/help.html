@@ -32,88 +32,92 @@ end;
 <h3> What can I do with PhyloExplorer ? </h3>
 <ul><b>You can check <font color="blue">PHYLOGENETIC TREES</font> (on the Homepage):</b>
 <pre>
-- by uploading a Newick or simple Nexus format file
-- by entering a Newick or simple Nexus format tree in the textfield
+- by uploading a file containing a collection of trees written in Newick or Nexus
+- by entering a collection of trees written in Newick or Nexus in the textfield
 
 </pre>
 </ul>
 
-<ul><b>You can get <font color="blue">STATISTICS</font> about your collection of trees as soon as your collection is sent:</b>
+<ul><b>You can get <font color="blue">STATISTICS</font> describing your collection of trees (as soon as your collection is loaded):</b>
 <pre>
-- <u>General informations</u>: shows the number of trees, the number of taxa (including bad taxa and homonyms).
-- <u>Correct your collection</u>: enables you to set the right name of bad taxa and homonyms.
-                                  Then click "<u>Correct collection</u>".
+- <u>General information</u>: shows the number of trees and the number of taxa present in this collection
+              --> Taxa whose names are not found in the NCBI taxonomy are highlighted in red and those with
+                  ambiguous names are highlighted in orange.
+- <u>Correct your collection</u>: decide how to correct or refine problematic taxon names based on the NCBI
+                                  proposition of closely matching names and then click "<u>Correct collection</u>".
 - <u>Chart area</u>: 2 charts are displayed
-              --> <i>The 1st one</i> displays how full trees are.
-              --> <i>The 2nd one</i> displays the distribution frequency of a taxon.
-- <u>NCBI taxonomy</u>: every node of the whole collection are displayed with the NCBI arborescence.
-              --> Every node has 2 numbers --> (number of its representatives, number of trees in which it is).
-              --> <i>Dark blue</i> names are the species that are in YOUR collection.
-              --> <i>Light blue</i> names are the commom parents of species.
+              --> The 1st one displays tree size distribution.
+              --> The 2nd one displays taxon frequency distribution.
+- <u>NCBI taxonomy</u>: every taxon present in the whole collection is displayed using the NCBI taxonomy as a base.
+              --> For every taxonomic group 2 numbers are provided --> (the number of representatives found
+                  within the tree collection and the number of user trees where it is represented).
+              --> <i>Dark blue</i> names represent taxa that are within YOUR collection.
+              --> <i>Light blue</i> names represent the smallest taxonomic group containing the taxa of the clade.
               --> You can <font color="blue">FILTER YOUR COLLECTION</font> thanks to the checkbox next to each name.
-                  (If you check a box, it means you don't want this node in your collection.
-                  Its children are automatically checked. Uncheck the children you want to display.)
+                  (A checked box means will remove this node from all your trees.
+                  All boxes within the clade are automatically checked but these can be manually unchecked.)
                   Then click "<u>Restrict your tree</u>" to filter.
-              --> You can visualize the NCBI tree (restricted or not) as a graph by clicking the link above
+              --> You can visualize the NCBI tree (restricted or not) as a phylogram by clicking the link above
                   the tree. It opens a new page of the <a href = "http://www.phylowidget.org/" style="font-size:10px">PhyloWidget</a> site.
 
 </pre>
 </ul>
 
-<ul><b>You can see a picture of a taxon when you put the mouse over its name</b>
+<ul><b>You can see a picture of a taxon when you put the cursor over its name</b>
 <pre>
 - Pictures are taken from WikiSpecies and/or WikiPedia
 
 </pre>
 </ul>
 
-<ul><b>You can <font color="blue">QUERY</font> the collection</b>
+<ul><b>You can <font color="blue">QUERY</font> the collection to search for trees containing a group of taxa</b>
 <pre>
-- To search a taxon or node in the collection
-- Example of query: <i>{catarrhini}>3 and {murinae} and {bos} and not {glires}</i>
+- <u>Example of query</u>: <i>{catarrhini}>3 and {murinae} and {bos} and not {glires}</i>
                     i.e: get every tree where "murinae" and "bos" are, but not "glires" 
                     and where the number of "catarrhini" is up to 3
 - <u>Syntax of query</u> (upper or lower case is accepted):
-            --> <b>{...}</b>        {name you want to search}</b> must be between braces. e.g: <b>{mus musculus}</b>
-            --> <b>OR</b>           {name 1} <b>or</b> {name 2} <b>or</b> {name 3} ...
-            --> <b>AND</b>          {name 1} <b>and</b> {name 2} <b>and</b> {name 3} ...
-            --> <b>NOT</b>          {name 1} and <b>not</b> {name 2} and <b>not</b> {name 3} ...
-            --> <b>(...)</b>        not {name 1} and not <b>(</b>{name 2} or {name 3}<b>)</b> ... use brackets for priority operations
-            --> <b><, >, <=, >=</b> {name 1} <b>></b> 2 and {name 2} <b><</b> 4 ... e.g: {eutheria} <b>></b> 4 and {murinae} <b><</b> 3
-            --> <b>==</b>           {name 1} <b>==</b> 3 ... e.g: {laurasiatheria} <b>==</b> 2
-  Spaces between operands are accepted: <b>{glires}>3</b> is equivalent to <b>{glires} > 3</b>. It's the same for <b>==</b>, <b><=</b>, <b>>=</b>...
+        --> <b>{...}</b>        {name you want to search}</b> must be between braces e.g: <b>{mus musculus}</b>
+        --> <b>OR</b>           {name 1} <b>or</b> {name 2} <b>or</b> {name 3} ...
+        --> <b>AND</b>          {name 1} <b>and</b> {name 2} <b>and</b> {name 3} ...
+        --> <b>NOT</b>          {name 1} and <b>not</b> {name 2} and <b>not</b> {name 3} ...
+        --> <b>(...)</b>        not {name 1} and not <b>(</b>{name 2} or {name 3}<b>)</b> ... use brackets for priority operations
+        --> <b><, >, <=, >=</b> {name 1} <b>></b> 2 and {name 2} <b><</b> 4 ... e.g: {eutheria} <b>></b> 4 and {murinae} <b><</b> 3
+        --> <b>==</b>           {name 1} <b>==</b> 3 ... e.g: {laurasiatheria} <b>==</b> 2
+  Spaces between operands are allowed: <b>{glires}>3</b> is equivalent to <b>{glires} > 3</b>.
+  The same is true for <b>==</b>, <b><=</b>, <b>>=</b>...
 
 </pre>
 </ul>
 
-<ul><b>You can obviously <font color="blue">BROWSE YOUR COLLECTION</font></b>
+<ul><b>You can <font color="blue">BROWSE YOUR COLLECTION</font></b>
 <pre>
-- Just click the "<u>Browse collection</u>" button
-- <u>Display tree</u>: choose the tree you want to display thanks to the select menu
-- <u>Show parents</u>: show intermediate parents of an intern node (<i>usually hidden for visual comfort</i>)
-- <u>Show/hide all parents</u>: expand/hide all intermediate parents
+- Click the "<u>Browse collection</u>" button
+- <u>Display tree</u>: choose the tree you want to display using the select menu
+- <u>Show parents</u>: show intermediate taxonomic groups between two nodes (<i>usually hidden for visual comfort</i>)
+- <u>Show/hide all parents</u>: expand/hide all intermediate taxonomic groups 
 
 </pre>
 </ul>
 
-<ul><b>You can hide/show intern nodes in trees</b>
+<ul><b>You can hide/show internal nodes in trees</b>
 <pre>
-- Just click the "<u>Show/hide intern nodes</u>" button above the Tree Name
-- The tree will be displayed with/without the intern nodes (just show the structure of the user's original tree)
+- Click the "<u>Show/hide intern nodes</u>" button above the tree name
+- The tree will be displayed with/without the internal nodes
+  showing just the structure of the user's original tree
 
 </pre>
 </ul>
 
 <ul><b>You can <font color="blue">DOWNLOAD</font> your <font color="blue">filtered collection</font></b>
 <pre>
-- Just click the "<u>Download collection</u>" button
+- Click the "<u>Download collection</u>" button
 
 </pre>
 </ul>
 
 <ul><b>You can <font color="blue">DOWNLOAD</font> the <font color="blue">NCBI taxonomy</font></b>
 <pre>
-- Just click the "<u>Download NCBI tree</u>" button
+- Click the "<u>Download NCBI tree</u>" button
 </pre>
 </ul>
 <!-- CONTENT : END -->

@@ -70,7 +70,7 @@ os.system( "cp -vf src/etc/phyloexplorer.conf "+data_path+"/etc" )
 
 print
 print "Installation completed"
-#print "Please update the NCBI database by launching preproc.py ins %s/tools" % data_path
+#print "Please update the NCBI database by launching preproc.py in %s/tools" % data_path
 
 
 
