@@ -1,6 +1,6 @@
 """A library for dealing with phylogenetic trees
 
-This library provide classes and methodes to manipulate phylogenetic trees.
+This library provides classes and methods to manipulate phylogenetic trees.
 """
 
 import sys
