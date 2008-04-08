@@ -373,6 +373,20 @@ td.links a:active
 	color: #ff0;
     }
 
+.logo3
+    { 
+    position:fixed; 
+    z-index:3; 
+    float:bottom;
+    bottom:105px;
+    left:10px; 
+    color: #fff;
+    background: #FFF;
+    width: 50px; /* image width on mouseover */
+    border-style:solid;
+    border-width: 0px;
+    }
+
 .logo1 
     { 
     position:fixed; 
@@ -400,6 +414,7 @@ td.links a:active
     border-style:solid;
     border-width: 0px;
     }
+
 
 /*-------------------------Stats--------------------------------------*/
 .statMetric {

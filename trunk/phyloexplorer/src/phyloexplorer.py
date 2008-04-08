@@ -382,10 +382,11 @@ class PhyloExplorer( Taxobject ):
         return self._presentation( "help.html", pagedef = "Home > Help" )
 
     @cherrypy.expose
-    def getImageFond( self, imagename ): #XXX not used
+    def getImageFond( self, imagename ):
         if imagename not in ["Raster.gif", "NautilusBlack.jpg",\
             "NautilusGrey.jpg", "NautilusGreen.jpg", "NautilusWhite.jpg",\
-            "NautilusDarkGreen.jpg","logo-um2.jpg","logoIsem.jpg"]:
+            "NautilusDarkGreen.jpg","logo-um2.jpg","logoIsem.jpg", \
+            "logo-cnrs.jpg"]:
             raise "What do you the fucking do ?!?"
         return open( os.path.join( absDir, "..",
           "share","phyloexplorer","templates",imagename ), "rb").read()
