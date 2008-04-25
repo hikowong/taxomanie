@@ -1,7 +1,8 @@
 
+import re, string
 from phylocore.phylogelib import getTaxa, tidyNwk, removeBootStraps, \
   removeNexusComments, getBrothers
-import re
+from taxonomyreference import TaxonomyReference
 
 class TreeCollection( object ):
     """
@@ -14,13 +15,16 @@ class TreeCollection( object ):
 
     NCBI = "http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id="
     
-    def __init__( self, nwk_collection, reference ):
+    def __init__( self, nwk_collection, reference=None ):
         """
         @nwk_collection (string): collection in phylip or nexus format
         """
         #super( TreeCollection, self ).__init__()
         self.orignial_collection = nwk_collection.lower()
-        self.reference = reference
+        if reference is None:
+            self.reference = TaxonomyReference()
+        else:
+            self.reference = reference
         self.collection = []
         self.query_collection = None
         self.last_query = ""
@@ -106,6 +110,7 @@ class TreeCollection( object ):
                     elif not self.reference.isHomonym( taxon ):
                         self.species_count["XXX"] += 1
                         self.bad_taxa_list.add( taxon )
+        self.need_initstat = False
 
     def initStat( self ):
         """
@@ -132,6 +137,32 @@ class TreeCollection( object ):
                         if not self._d_reprtaxon.has_key( taxon ):#stats
                             self._d_reprtaxon[taxon] = set()#stats
                         self._d_reprtaxon[taxon].add( old_taxon_name )#stats
+        self.need_initstat = False
+
+    def __str__( self ):
+        if self.need_initstat:
+            self.initStat()
+        return "<trees: %s, taxa: %s, bad taxa: %s, homonyms: %s>" % (
+          len(self.getCollection()), len(self.getTaxaList()),
+          len(self.getBadTaxaList()), len(self.getHomonyms()) )
+
+    def getTaxaList( self ):
+        """ return the list of taxa of the collection """
+        return self.taxa_list
+
+    def getBadTaxaList( self ):
+        """
+        return the bad taxa list
+        """
+        return self.bad_taxa_list
+
+    def getHomonyms( self ):
+        """
+        return a dict of homonyms :
+        {homonym_present_in_collection: [related_taxa_list]}
+        """
+        return self.homonyms
+        
 
     def getNbTrees( self, taxon ):
         """
@@ -200,9 +231,57 @@ class TreeCollection( object ):
         self.last_query = self.last_query.replace("<", "&lt;" )
         self.last_query = self.last_query.replace(">", "&gt;" )
         self.last_query = self.last_query.replace("=", "%3D" )
+        self.need_initstat = True
         return new_list
 
+    def printStat1( self ):
+        d_stat = self.stat1()
+        ratio = sorted( d_stat.keys() )[1]-sorted( d_stat.keys() )[0]
+        result = ""
+        nbtaxa_max = max( d_stat.values() ) 
+        for nbtaxon, nbtree in sorted(d_stat.items()):
+            nbtreepourcent = nbtree*100/nbtaxa_max
+            bar = " "*( nbtree*70/nbtaxa_max ) # 70 is an abitrary taken number
+            bar = bar.replace( " ", "|" )#.replace( "-", "&nbsp;")
+            if nbtaxon == nbtaxon + ratio-1:
+                if nbtaxon:
+                    base = "["+string.center( str(nbtaxon), 7)+"]"
+                else:
+                    base = ""
+            else:
+                base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
+            if base:
+                result += base+" "+bar+" ("+str(nbtree)+" trees)\n"
+        return result
+
+    def printStat2( self ):
+        d_stat = self.stat2()
+        ratio = sorted( d_stat.keys() )[1]-sorted( d_stat.keys() )[0]
+        result = ""
+        nbtaxa_max = max( d_stat.values() ) 
+        for nbtaxon, nbtree in sorted(d_stat.items()):
+            nbtreepourcent = nbtree*100/nbtaxa_max
+            bar = " "*( nbtree*70/nbtaxa_max )# 70 is an abitrary taken number
+            bar = bar.replace( " ", "|" )#.replace( "-", "&nbsp;")
+            if nbtaxon == nbtaxon + ratio-1:
+                if nbtaxon:
+                    base = "["+string.center( str(nbtaxon), 7)+"]"
+                else:
+                    base = ""
+            else:
+                base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
+            if base:
+                result += base+" "+bar+" ("+str(nbtree)+" taxa)\n"
+        return result
+
     def stat1( self ):
+        """ backward compatibility api """
+        return self.getTreeSizeDistribution()
+
+    def getTreeSizeDistribution( self ):
+        """ this is stat of Tree Size Distribution """
+        if self.need_initstat:
+            self.initStat()
         stat = {}
         for tree in self.getCollection():
             nbtaxa = len(getTaxa( tree["tree"] ) )
@@ -221,6 +300,12 @@ class TreeCollection( object ):
         return result_stat
 
     def stat2( self ):
+        """ backward compatibility api """
+        return self.getTaxonFrequencyDistribution()
+
+    def getTaxonFrequencyDistribution( self ):
+        if self.need_initstat:
+            self.initStat()
         stat = {}
         for tree in self.getCollection():
             already_done = set()
@@ -486,6 +571,14 @@ class TreeCollection( object ):
         new_col += "end;\n"
         return new_col
 
+    def getNexus( self ):
+        """ return the collection in nexus format (string) """
+        body = "#nexus\nbegin trees;\n"
+        for tree in self.getCollection():
+            body += "Tree %s = %s;\n" % (tree["name"], tree["tree"])
+            body += "end;\n"
+        return body
+
 
 if __name__ == "__main__":
     from phylocore.taxonomyreference import TaxonomyReference
@@ -526,7 +619,7 @@ end;
 """
     import time
 #    col = open( "../data/omm_cds_nex.tre" ).read()
-    col = open("../data/tree.nwk").read()
+#    col = open("../data/tree.nwk").read()
 #    col = "((rattus,mus),bos,(pan,homo));(mus musculus,(pan,bos));"
 #    col = '((((bos,canis),(((homo,pan),macaca),((mus,rattus),oryctolagus))),dasypus),(echinops,loxodonta),monodelphis);'
     d = time.time()
@@ -544,8 +637,14 @@ end;
 #    print treecol.homonyms
 #    print treecol.displayHomonymList()
 #    print treecol.statNbTreeWithNbNodes()
-    print ">"*20
-    print treecol.filter( ["mus musculus"] )
-    print "<"*20
-    print "collection generee en ", f-d
-    print "requete generee en ", fr-dr
+#    print ">"*20
+#    print treecol.filter( ["mus musculus"] )
+#    print "<"*20
+#    print "collection generee en ", f-d
+#    print "requete generee en ", fr-dr
+    print "="*20
+    print treecol
+    print treecol.getHomonyms()
+    print treecol.getTaxaList()
+    print treecol.printStat2()
+    print treecol.getNexus()
