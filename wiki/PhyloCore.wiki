@@ -1,0 +1,5 @@
+#summary Ideas about PhyloCore.
+#labels Featured,Phase-Requirements
+
+ * The Phylogelib is not enough tested and sanitized... Let's try [http://code.google.com/p/lagrange/ Lagrange]
+ * We need a good web framework. Let's use [http://www.djangoproject.com/ Django]
