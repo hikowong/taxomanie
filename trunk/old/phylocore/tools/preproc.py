@@ -10,12 +10,13 @@ USAGE:
 import sys
 import os
 
-if len( sys.argv ) == 1:
-    print "Downloading NCBI database on the web"
-    os.system( "curl -# ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz > taxdump.tar.gz ")
-    #os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
-print "Extracting database... please wait"
-os.system( "tar xf taxdump.tar.gz names.dmp nodes.dmp" )
+if not os.path.exists( './names.dmp' ) and not os.path.exists( './nodes.dmp' ):
+    if not os.path.exists( './taxdump.tar.gz' ):
+        print "Downloading NCBI database on the web"
+        os.system( "curl -# ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz > taxdump.tar.gz ")
+        #os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
+    print "Extracting database... please wait"
+    os.system( "tar xf taxdump.tar.gz names.dmp nodes.dmp" )
  
 
 NAMES = "names.dmp"
