@@ -1,5 +1,24 @@
-#summary Ideas about PhyloCore.
-#labels Featured,Phase-Requirements
+#summary PhyloCore presentation page
+#labels Featured
 
- * The Phylogelib is not enough tested and sanitized... Let's try [http://code.google.com/p/lagrange/ Lagrange]
- * We need a good web framework. Let's use [http://www.djangoproject.com/ Django]
+PhyloCore aims to be a good library for dealing with taxonomy. It use [http://www.sp2000.org/index.php Species 2000] database (with contains [http://www.itis.gov/ Itis database]) to get all informations staff.
+
+Here are some features of PhyloCore:
+ * Taxa manipulations:  
+   * Getting all scientific names of taxa
+   * Getting synonyms, homonyms and commons name from a scientific taxa name
+   * Getting parents and children  
+   * Getting rank
+ * Trees manipulations:
+   * Getting all taxa (Taxa objects) from newick tree format
+   * Getting synonyms, commons names and homonyms from tree
+   * Getting NetworkX arborescence (useful for graph manipulations)
+ * Trees collections mapulations:
+   * Support of phylip and nexus format
+   * Getting bad formated tree names
+   * Getting statistics (number for taxa, number of synonyms...)
+
+= Getting started =
+See how to [PhyloCoreInstallation install] Phylocore.
+
+Next, follow the [PhyloCoreTutorial tutorial].
