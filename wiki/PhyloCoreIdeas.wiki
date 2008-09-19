@@ -1,13 +1,6 @@
-#summary Here are PhyloCore ideas
+#summary Ideas about PhyloCore.
+#labels Phase-Design
 
-= Introduction =
-
-Add your content here.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+ * use `./manage.py` command for updating from itis database
+ * use template tags to display tree in html format
+ * [http://code.google.com/p/django-rest-interface/ restify] phylocore
