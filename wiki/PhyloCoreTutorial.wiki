@@ -1,0 +1,102 @@
+#summary PhyloCore usage tutorial
+
+= Introduction =
+
+First of all, you'll have to import Django setting. So all of your scripts may begin like that :
+
+{{{
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+import os
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+
+from phylocore.models import *
+}}}
+
+Note that phylocore must be in your python path
+
+= Working with Taxa =
+
+To get a taxa from his name do:
+
+{{{
+>>> taxa = Taxa.objects.get( name = 'mus musculus' )
+>>> taxa
+<Taxa: mus musculus>
+}}}
+
+from this taxa, you will be able to get all the homonym, synonym and common names:
+
+{{{
+>>> taxa.homonyms.all()
+[]
+>>> taxa.synonyms.all()
+[]
+>>> taxa.commons.all()
+[<CommonName: mouse (english)>, <CommonName: rat noir (french)>]
+}}}
+
+== Dealing with parents ==
+
+Getting the first parent:
+
+{{{
+>>> taxa.parent
+<Taxa: mus>
+}}}
+
+Parents can be chained:
+
+{{{
+>>> taxa.parent.parent
+<Taxa: murinae>
+}}}
+
+Get all parents by order (closest to furthest). 'parents' attribute is a
+simple liste containing Taxa
+
+{{{
+>>> taxa.parents
+[<Taxa: mus>, <Taxa: murinae>, <Taxa: eukaryota>, <Taxa: root>]
+>>> list( reversed( taxa.parents ) )
+[<Taxa: root>, <Taxa: eukaryota>, <Taxa: murinae>, <Taxa: mus>]
+}}}
+
+'root' doesn't have parents
+
+{{{
+>>> root = Taxa.objects.get( name = 'root' )
+>>> root.parents
+[]
+}}}
+
+== About the source ==
+
+Each taxa are 'traced'. Then we can know where he come from, what was its id and name in the source database.
+
+{{{
+# get info from sources
+>>> taxa.get_id_in_source( 'itis' )
+u'2334'
+}}}
+
+== Dealing with rank == 
+
+You can know the rank of a taxa.
+
+{{{
+>>> taxa.rank
+<Rank: species>
+}}}
+
+and you can get all taxa from a specify rank
+
+{{{
+>>> species = Rank.objects.get( name = 'species' )
+>>> species.taxas.all()
+[<Taxa: echinops <plant>>, <Taxa: echinops <mammal>>, <Taxa: mus musculus>]
+
+>>> genus = Rank.objects.get( name = 'genus' )
+>>> genus.taxas.all()
+[<Taxa: rattus>, <Taxa: mus>]
+}}}
