@@ -100,3 +100,57 @@ and you can get all taxa from a specify rank
 >>> genus.taxas.all()
 [<Taxa: rattus>, <Taxa: mus>]
 }}}
+
+== Working with tree ==
+
+Now we know about taxa, we can create trees. A Tree object is created by passing a newick format string. In the following example, we create a newick tree with one homonym (echinops), 3 scientific names, and one bad taxa name
+
+{{{
+>>> nwk_tree = "(echinops,(rattus,(mus,(mus musculus),badname)))"
+}}}
+
+Now we can create our tree:
+
+{{{
+>>> tree = Tree.objects.create( tree_string = nwk_tree, name = "example1")
+}}}
+
+The `is_valid` attribute tell us if our tree was well formated or not
+
+{{{
+>>> tree.is_valid
+True
+}}}
+
+Now we want all (good named) taxa list:
+
+{{{
+>>> tree.taxas.all()
+[<Taxa: rattus>, <Taxa: mus>, <Taxa: mus musculus>]
+}}}
+
+We can get informations from bad taxa names and homonyms:
+
+{{{
+>>> tree.bad_taxas.all()
+[<BadTaxa: badname>]
+>>> tree.homonyms.all()
+[<HomonymName: echinops>]
+}}}
+
+There is no synonyms or commons names:
+
+{{{
+>>> tree.synonyms.count()
+0L
+>>> tree.commons.count()
+0L
+}}}
+
+Let's try now to get all taxa wich correspond to echinops :
+
+{{{
+>>> homonym = tree.homonyms.all()[0]
+>>> homonym.taxas.all()
+[<Taxa: echinops <animalia>], [Taxa: echinops <plantae>]
+}}}
