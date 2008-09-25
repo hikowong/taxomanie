@@ -1,5 +1,7 @@
 #summary PhyloCore usage tutorial
 
+./manage.py syncdb ;./manage.py loadtaxonomy;./manage.py generateparents
+
 = Introduction =
 
 First of all, you'll have to import Django setting. So all of your scripts may begin like that :
