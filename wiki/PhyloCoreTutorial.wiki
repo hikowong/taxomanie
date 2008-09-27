@@ -191,6 +191,13 @@ More interresting, we can get all invalid trees :
 [<Tree: 2>]
 }}}
 
+or good
+
+{{{
+>>> col.trees.filter( is_valid = True )
+[<Tree: 1>]
+}}}
+
 == Adding trees in the collection ==
 
 We can add a tree into our collection realy easily:
@@ -211,4 +218,35 @@ And get a nexus format string from this new collection :
 
 {{{
 >>> tree_col.get_collection_string()
+}}}
+
+== Making queries ==
+
+We can make queries to get some trees that match it.
+
+{{{
+>>> simple_col = "(mus,echinops <plantae>,rattus);(mus, rattus);"
+>>> col = TreeCollection.objects.create( name = 'query_col', original_collection_string = simple_col )
+}}}
+
+Get all trees wich contain at least on taxa wich are a muridae
+
+{{{
+>>> col.query( '{muridae} > 1' )
+[<Tree: 1>, <Tree: 2>]
+}}}
+
+Get all trees wich contain at least on taxa wich are a muridae and wich not have plantae taxa
+
+{{{
+>>> col.query( '{muridae}> 1 and not {plantae}' )
+[<Tree: 2>]
+}}}
+
+All of those previous results are list objects. Sometime it's necessary to get a collection instead :
+
+{{{
+>>> filtered_col = col.get_collection_from_query( '{plantae}' )
+>>> filtered_col.trees.all()
+[<Tree: 1>]
 }}}
