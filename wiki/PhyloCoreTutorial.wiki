@@ -1,4 +1,5 @@
 #summary PhyloCore usage tutorial
+#labels Featured
 
 = Introduction =
 
@@ -144,4 +145,39 @@ We can list all taxa (including homonyms, synonyms, commons name and bad taxa na
 {{{
 >>> tree.all_taxa_list
 [<HomonymName: echinops>,<Taxa: rattus>, <Taxa: mus>, <Taxa: mus musculus>, <BadTaxa: badname>]
+}}}
+
+= Working with TreeCollection =
+
+== Creation of a simple collection ==
+
+A TreeCollection can take a collection in a nexus or phylip format
+
+{{{
+>>> simple_col = "(mus,antilocapra anteflexa,rat noir,echinops,blabla);(mus, rat noir);"
+>>> col = TreeCollection.objects.create( name = 'simple', original_collection_string = simple_col )
+}}}
+
+Juste like Tree objects, we have access to all taxa:
+{{{
+>>> col.all_taxa_list
+[<Taxa: mus>, <SynonymName: antilocapra anteflexa>, <BadTaxa: blabla (1)>, <HomonymName: echinops>, <CommonName: rat noir (french)>]
+>>> col.taxas.all()
+[<Taxa: mus>]
+>>> col.homonyms.all()
+[<HomonymName: echinops>]
+>>> col.synonyms.all()
+[<SynonymName: antilocapra anteflexa>]
+>>> col.commons.all()
+[<CommonName: rat noir (french)>]
+>>> col.bad_taxas.all()
+[<BadTaxa: blabla (1)>]
+}}}
+
+We can have also informations about trees :
+{{{
+>>> col.trees.all()
+[<Tree: 1>, <Tree: 2>]
+>>> col.trees.count()
+2L
 }}}
