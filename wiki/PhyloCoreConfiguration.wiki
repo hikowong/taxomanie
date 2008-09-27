@@ -45,4 +45,4 @@ python -c "from phylocore import *;print Taxa.objects.all().count()"
 
 wich will return the number of taxa present in the taxonomy (>800000).
 
-Congratulation !
+Congratulation ! Now you can follow the [PhyloCoreTutorial tutorial]
