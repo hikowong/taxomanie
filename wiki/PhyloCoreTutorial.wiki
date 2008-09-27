@@ -154,11 +154,12 @@ We can list all taxa (including homonyms, synonyms, commons name and bad taxa na
 A TreeCollection can take a collection in a nexus or phylip format
 
 {{{
->>> simple_col = "(mus,antilocapra anteflexa,rat noir,echinops,blabla);(mus, rat noir);"
+>>> simple_col = "(mus,antilocapra anteflexa,rat noir,echinops,blabla);(mus, (rat noir);"
 >>> col = TreeCollection.objects.create( name = 'simple', original_collection_string = simple_col )
 }}}
 
 Juste like Tree objects, we have access to all taxa:
+
 {{{
 >>> col.all_taxa_list
 [<Taxa: mus>, <SynonymName: antilocapra anteflexa>, <BadTaxa: blabla (1)>, <HomonymName: echinops>, <CommonName: rat noir (french)>]
@@ -175,9 +176,39 @@ Juste like Tree objects, we have access to all taxa:
 }}}
 
 We can have also informations about trees :
+
 {{{
 >>> col.trees.all()
 [<Tree: 1>, <Tree: 2>]
 >>> col.trees.count()
 2L
+}}}
+
+More interresting, we can get all invalid trees :
+
+{{{
+>>> col.trees.filter( is_valid = False )
+[<Tree: 2>]
+}}}
+
+== Adding trees in the collection ==
+
+We can add a tree into our collection realy easily:
+
+{{{
+>>> tree = Tree.objects.create( name = 'newtree', tree_string = "(mus musculus, rattus rattus )" )
+>>> col.trees.add( tree )
+}}}
+
+Tree collection can be created by insering trees
+
+{{{
+>>> newcol = TreeCollection.object.create()
+>>> newcol.trees = [tree1, tree2, tree3, tree4]
+}}}
+
+And get a nexus format string from this new collection :
+
+{{{
+>>> tree_col.get_collection_string()
 }}}
