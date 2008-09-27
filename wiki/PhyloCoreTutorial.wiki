@@ -85,7 +85,7 @@ and you can get all taxa from a specify rank
 [<Taxa: rattus>, <Taxa: mus>]
 }}}
 
-== Working with tree ==
+= Working with tree =
 
 Now we know about taxa, we can create trees. A Tree object is created by passing a newick format string. In the following example, we create a newick tree with one homonym (echinops), 3 scientific names, and one bad taxa name
 
