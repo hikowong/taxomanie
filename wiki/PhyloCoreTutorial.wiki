@@ -1,7 +1,5 @@
 #summary PhyloCore usage tutorial
 
-./manage.py syncdb ;./manage.py loadtaxonomy;./manage.py generateparents
-
 = Introduction =
 
 First of all, you'll have to import Django setting. So all of your scripts may begin like that :
@@ -9,13 +7,8 @@ First of all, you'll have to import Django setting. So all of your scripts may b
 {{{
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
-
 from phylocore.models import *
 }}}
-
-Note that phylocore must be in your python path
 
 = Working with Taxa =
 
@@ -54,13 +47,12 @@ Parents can be chained:
 <Taxa: murinae>
 }}}
 
-Get all parents by order (closest to furthest). 'parents' attribute is a
-simple liste containing Taxa
+Get all parents by order (closest to furthest).
 
 {{{
->>> taxa.parents
+>>> taxa.parents.all()
 [<Taxa: mus>, <Taxa: murinae>, <Taxa: eukaryota>, <Taxa: root>]
->>> list( reversed( taxa.parents ) )
+>>> list( reversed( taxa.parents.all() ) )
 [<Taxa: root>, <Taxa: eukaryota>, <Taxa: murinae>, <Taxa: mus>]
 }}}
 
@@ -70,16 +62,6 @@ simple liste containing Taxa
 >>> root = Taxa.objects.get( name = 'root' )
 >>> root.parents
 []
-}}}
-
-== About the source ==
-
-Each taxa are 'traced'. Then we can know where he come from, what was its id and name in the source database.
-
-{{{
-# get info from sources
->>> taxa.get_id_in_source( 'itis' )
-u'2334'
 }}}
 
 == Dealing with rank == 
@@ -155,4 +137,11 @@ Let's try now to get all taxa wich correspond to echinops :
 >>> homonym = tree.homonyms.all()[0]
 >>> homonym.taxas.all()
 [<Taxa: echinops <animalia>], [Taxa: echinops <plantae>]
+}}}
+
+We can list all taxa (including homonyms, synonyms, commons name and bad taxa names) like this :
+
+{{{
+>>> tree.all_taxa_list
+[<HomonymName: echinops>,<Taxa: rattus>, <Taxa: mus>, <Taxa: mus musculus>, <BadTaxa: badname>]
 }}}
