@@ -18,7 +18,19 @@ Here are some features of PhyloCore:
    * Getting bad formated tree names
    * Getting statistics (number for taxa, number of synonyms...)
 
-= Getting started =
+= DjangoPhylocore vs PhyloCore =
+
+DjangoPhylocore and PhyloCore are providing the same librairy. The difference relies on the django dependancies for DjangoPhylocore. That's mean that you can't use DjangoPhylocore outside of your django project. That's why we create PhyloCore wich is a wrapper against DjangoPhylocore that allow to use the librairy anywhere.
+
+In short, if you developpe a web app apon django, use DjangoPhylocore. If not, use PhyloCore.
+
+= Installation =
+
+== Dependancies ==
+
+svn checkout http://taxomanie.googlecode.com/svn/trunk/ taxomanie
+
+
 See how to [PhyloCoreInstallation install] Phylocore.
 
 Next, follow the [PhyloCoreTutorial tutorial].
