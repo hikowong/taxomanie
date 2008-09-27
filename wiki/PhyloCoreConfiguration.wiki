@@ -1,0 +1,45 @@
+#summary how-to configure phylocore
+
+Phylocore needs a database. In this section, you'll see how-to configure phylocore and how-to prepopulate the database.
+
+Go to the folder phylocore. You should see a file named 'settings.py'. This is the "control center" of PhyloCore. Open this file. And you should see something like that:
+
+{{{
+DATABASE_ENGINE = 'sqlite3'    # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3'
+DATABASE_NAME = ''             # Or path to database file if using sqlite3.
+DATABASE_USER = ''             # Not used with sqlite3.
+DATABASE_PASSWORD = ''         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+}}}
+
+ * choose your database backend (sqlite3 by default) in the DATABASE_ENGIN.
+ * put the name of the database or the full path of the sqlite3 file
+
+if you're using mysql you must fill the following fields:
+
+ * DATABASE_USER the user of the database
+ * DATABASE_PASSWORD no comment...
+
+and optionnaly the DATABASE_HOST and DATABASE_PORT is there different than default values.
+
+Now we can create the database structure (note that if you use mysql, the database must be created : `create database thename;`):
+
+{{{
+python manage.py syncdb
+}}}
+
+Then, we have to load the taxonomy into our fresh database:
+
+{{{
+python manage.py loadtaxonomy
+}}}
+
+This will load all data from the `dumps` folder provides by djangophylocore.
+Loading taxonomy can take a while (half hour with a core 2 duo) so please, be patient...
+
+When it's done, you can test your configuration with
+{{{
+python -c "from phylocore import *;print Taxa.objects.all().count()"
+}}}
+
