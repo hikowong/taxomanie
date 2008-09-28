@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+
+import os
+print "extracting dumps..."
+os.system( " (cd djangophylocore; tar xvzf dumps.tar.gz )" )
+
+python_version = ".".join( "".join( os.popen("python -V 2>&1").read().split()).split(".")[:-1]).lower()
+python_path = "/usr/local/lib/%s/site-packages/djangophylocore" % python_version
+print "installing djangophylocore into %s" % python_path
+os.system( "ln -sf `pwd`/djangophylocore %s" % python_path )
+
+print "intalling phylocore"
+os.system( "( cd phylocore; sudo ./install )" )
