@@ -213,7 +213,7 @@ class TaxonomyReference( object ):
         difference = set( taxa2.parents ).difference( set( taxa1.parents ) )
         return sorted( list( difference ), self.__sort )[:-1]
 
-    def get_ncbi_arborescence( self, taxa_list ):
+    def get_reference_arborescence( self, taxa_list ):
         """
         Take a taxa list, search in reference all parents names and
         return a networkx.DiGraph tree.
@@ -653,7 +653,7 @@ class TreeCollection( models.Model ):
         # TODO mettre un signal sur cette method quand
         # original_collection_string change
         if self.trees.count():
-            Tree.objects.filter( tree_collection = self ).delete()
+            Tree.objects.filter( collections = self ).delete()
         nwk_collection = self.original_collection_string
         # Nexus collection
         if nwk_collection[:6].lower().strip() == "#nexus":
@@ -782,6 +782,11 @@ class TreeCollection( models.Model ):
                     result_stat[key] += 1
         return result_stat
 
+    def get_taxa_from_genus( self, genus ):
+        """
+        return taxa in collection wich are for parent 'genus'
+        """
+        return self.taxas.filter( parents_relation_taxas__parent__name = genus )
 
 #############################################
 #                Signals                    #
