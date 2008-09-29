@@ -24,13 +24,19 @@ if you're using mysql you must fill the following fields:
 
 and optionnaly the DATABASE_HOST and DATABASE_PORT is there different than default values.
 
-Now we can create the database structure (note that if you use mysql, the database must be created : `create database thename;`):
+Now we can create the database structure. Note that if you use mysql, the database must be created :
+
+{{{
+CREATE DATABASE <dbname> CHARACTER SET utf8;
+}}}
+
+Utf-8 is important as django stores all it's data into this charset.
 
 {{{
 python manage.py syncdb
 }}}
 
-Then, we have to load the taxonomy into our fresh database:
+Then, we have to load the taxonomy into our fresh database: Then launch
 
 {{{
 python manage.py loadtaxonomy
