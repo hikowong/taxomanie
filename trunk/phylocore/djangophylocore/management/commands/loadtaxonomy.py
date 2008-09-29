@@ -35,4 +35,8 @@ class Command(NoArgsCommand):
                   settings.DATABASE_USER, settings.DATABASE_PASSWORD, db_name, map_dumps[name],  name )
             print cmd
             os.system( cmd )
+        if not os.path.exists( 
+          os.path.join( path_dumps, 'parentsrelation.dmp' ) ):
+            print "no parent relations found, generating..."
+            os.system( 'python manage.py generateparents' )
 

@@ -6,7 +6,6 @@ from djangophylocore.models import *
 
 import os
 
-
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--verbose', '-v', action='store_true', dest='verbose', 
