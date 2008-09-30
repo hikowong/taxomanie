@@ -493,6 +493,7 @@ class Tree( models.Model, TaxonomyReference ):
             self.is_valid = True
             self.save( dont_generate = True )
         for taxa_name in set( getTaxa( tree ) ):
+            taxa_name = self.strip_taxa_name( taxa_name )
             taxo_list = Taxonomy.objects.filter( name = taxa_name )
             if not taxo_list:
                 t, created = BadTaxa.objects.get_or_create( name = taxa_name )
@@ -782,11 +783,11 @@ class TreeCollection( models.Model ):
                     result_stat[key] += 1
         return result_stat
 
-    def get_taxa_from_genus( self, genus ):
+    def get_taxa_from_parents( self, parent_name ):
         """
-        return taxa in collection wich are for parent 'genus'
+        return taxa in collection wich are for parent 'parent_name'
         """
-        return self.taxas.filter( parents_relation_taxas__parent__name = genus )
+        return self.taxas.filter( parents_relation_taxas__parent__name = parent_name )
 
 #############################################
 #                Signals                    #
