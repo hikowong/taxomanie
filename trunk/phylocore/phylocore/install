@@ -20,4 +20,4 @@ except:
 #open( './__init__.py', 'w' ).write( init )
 
 python_version = ".".join( "".join( os.popen("python -V 2>&1").read().split()).split(".")[:-1]).lower()
-os.system( "(cd ..; ln -sf `pwd`/phylocore /usr/local/lib/%s/site-packages/phylocore )" % python_version )
+os.system( "(cd ..; ln -sf `pwd`/phylocore /usr/lib/%s/site-packages/phylocore )" % python_version )
