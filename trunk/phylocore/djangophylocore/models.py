@@ -493,37 +493,38 @@ class Tree( models.Model, TaxonomyReference ):
             self.is_valid = True
             self.save( dont_generate = True )
         for taxa_name in set( getTaxa( tree ) ):
-            taxa_name = self.strip_taxa_name( taxa_name )
-            taxo_list = Taxonomy.objects.filter( name = taxa_name )
-            if not taxo_list:
-                t, created = BadTaxa.objects.get_or_create( name = taxa_name )
-                # Enable login of reccurence
-                # TODO mettre un signal pour incrementer l'occurence
-                t.nb_occurence += 1
-                t.save()
-                ###
-                self.bad_taxas.add( t )
-            else:
-                for taxo in taxo_list:
-                    if taxo.type_name == 'scientific name':
-                        #taxa = Taxa.objects.get( name = taxo.name )
-                        taxa = Taxa.objects.filter( name = taxo.name )[0]
-                        self.taxas.add( taxa )
-                    elif taxo.type_name == 'synonym':
-                        #taxa = SynonymName.objects.get( name = taxo.name )
-                        taxa = SynonymName.objects.filter( name = taxo.name)[0]
-                        self.synonyms.add( taxa )
-                    elif taxo.type_name == 'homonym':
-                        #taxa = HomonymName.objects.get( name = taxo.name)
-                        taxa = HomonymName.objects.filter( name = taxo.name)[0]
-                        self.homonyms.add( taxa )
-                    elif taxo.type_name == 'common':
-                        #taxa = CommonName.objects.get( name = taxo.name )
-                        taxa = CommonName.objects.filter( name = taxo.name)[0]
-                        self.commons.add( taxa )
-                    else:
-                        raise RuntimeError, "%s has no or bad type_name" % taxo.name
-        
+            if taxa_name.strip():
+                taxa_name = self.strip_taxa_name( taxa_name )
+                taxo_list = Taxonomy.objects.filter( name = taxa_name )
+                if not taxo_list:
+                    t, created = BadTaxa.objects.get_or_create( name = taxa_name )
+                    # Enable login of reccurence
+                    # TODO mettre un signal pour incrementer l'occurence
+                    t.nb_occurence += 1
+                    t.save()
+                    ###
+                    self.bad_taxas.add( t )
+                else:
+                    for taxo in taxo_list:
+                        if taxo.type_name == 'scientific name':
+                            #taxa = Taxa.objects.get( name = taxo.name )
+                            taxa = Taxa.objects.filter( name = taxo.name )[0]
+                            self.taxas.add( taxa )
+                        elif taxo.type_name == 'synonym':
+                            #taxa = SynonymName.objects.get( name = taxo.name )
+                            taxa = SynonymName.objects.filter( name = taxo.name)[0]
+                            self.synonyms.add( taxa )
+                        elif taxo.type_name == 'homonym':
+                            #taxa = HomonymName.objects.get( name = taxo.name)
+                            taxa = HomonymName.objects.filter( name = taxo.name)[0]
+                            self.homonyms.add( taxa )
+                        elif taxo.type_name == 'common':
+                            #taxa = CommonName.objects.get( name = taxo.name )
+                            taxa = CommonName.objects.filter( name = taxo.name)[0]
+                            self.commons.add( taxa )
+                        else:
+                            raise RuntimeError, "%s has no or bad type_name" % taxo.name
+            
 
     def __get_scientific_taxa( self, taxa_list ):
         return [taxa for taxa in taxa_list if taxa._meta.module_name == 'taxa']
@@ -537,6 +538,14 @@ class Tree( models.Model, TaxonomyReference ):
         all_taxa.extend( self.bad_taxas.all() )
         return all_taxa
     all_taxa_list = property( get_all_taxas )
+
+    def get_ambiguous_list( self ):
+        ambiguous_list = set([])
+        ambiguous_list.update( self.synonyms.all() )
+        ambiguous_list.update( self.homonyms.all() )
+        ambiguous_list.update( self.commons.all() )
+        return list( ambiguous_list )
+    ambiguous_list = property( get_ambiguous_list )
         
     def __generate_arborescence( self, tree=None ):
         if tree is None:
@@ -630,6 +639,13 @@ class TreeCollection( models.Model ):
             all_taxa.update( set(tree.all_taxa_list) )
         return list(all_taxa)
     all_taxa_list = property( get_all_taxas )
+
+    def get_ambiguous_list( self ):
+        ambiguous_list = set()
+        for tree in self.trees.all():
+            ambiguous_list.update( set( tree.ambiguous_list ) )
+        return list( ambiguous_list )
+    ambiguous_list = property( get_ambiguous_list )
 
     def save( self, collection_changed = False, dont_regenerate = False,  **kwargs ):
         collection_string_changed = False
@@ -794,50 +810,53 @@ class TreeCollection( models.Model ):
 #############################################
 
 
-def generate_tree_infos( sender, instance, signal, *args, **kwargs ):
-    if  [i for i in ('(',')',',') if i in instance.delimiter]:
-        raise ValueError, '"%s" is a bad delimiter' % instance.delimiter
-    if not hasattr( instance, "__infos_generated" ):
-        setattr( instance, '__infos_generated', True )
-        tree = instance.tree_string.lower()
-        if checkNwk( tidyNwk( tree ) ):
-            instance.is_valid = True
-            instance.save()
-        for taxa_name in set( getTaxa( tree ) ):
-            taxa_name = taxa_name.replace( instance.delimiter, ' ' )
-            taxo_list = Taxonomy.objects.filter( name = taxa_name )
-            if not taxo_list:
-                t, created = BadTaxa.objects.get_or_create( name = taxa_name )
-                # Enable login of reccurence
-                # TODO mettre un signal pour incrementer l'occurence
-                t.nb_occurence += 1
-                t.save()
-                ###
-                instance.bad_taxas.add( t )
-            else:
-                for taxo in taxo_list:
-                    if taxo.type_name == 'scientific name':
-                        taxa = Taxa.objects.get( name = taxo.name )
-                        instance.taxas.add( taxa )
-                    elif taxo.type_name == 'synonym':
-                        taxa = SynonymName.objects.get( name = taxo.name )
-                        instance.synonyms.add( taxa )
-                    elif taxo.type_name == 'homonym':
-                        taxa = HomonymName.objects.get( name = taxo.name )
-                        instance.homonyms.add( taxa )
-                    elif taxo.type_name == 'common':
-                        taxa = CommonName.objects.get( name = taxo.name )
-                        instance.commons.add( taxa )
-                    else:
-                        raise RuntimeError, "%s has no or bad type_name" % taxo.name
-#signals.post_save.connect(generate_tree_infos, sender=Tree)
+#def generate_tree_infos( sender, instance, signal, *args, **kwargs ):
+#    if  [i for i in ('(',')',',') if i in instance.delimiter]:
+#        raise ValueError, '"%s" is a bad delimiter' % instance.delimiter
+#    if not hasattr( instance, "__infos_generated" ):
+#        setattr( instance, '__infos_generated', True )
+#        tree = instance.tree_string.lower()
+#        if checkNwk( tidyNwk( tree ) ):
+#            instance.is_valid = True
+#            instance.save()
+#        for taxa_name in set( getTaxa( tree ) ):
+#            taxa_name = taxa_name.replace( instance.delimiter, ' ' )
+#            taxo_list = Taxonomy.objects.filter( name = taxa_name )
+#            if not taxo_list:
+#                t, created = BadTaxa.objects.get_or_create( name = taxa_name )
+#                # Enable login of reccurence
+#                # TODO mettre un signal pour incrementer l'occurence
+#                t.nb_occurence += 1
+#                t.save()
+#                ###
+#                instance.bad_taxas.add( t )
+#            else:
+#                for taxo in taxo_list:
+#                    if taxo.type_name == 'scientific name':
+#                        taxa = Taxa.objects.get( name = taxo.name )
+#                        instance.taxas.add( taxa )
+#                    elif taxo.type_name == 'synonym':
+#                        taxa = SynonymName.objects.get( name = taxo.name )
+#                        instance.synonyms.add( taxa )
+#                    elif taxo.type_name == 'homonym':
+#                        taxa = HomonymName.objects.get( name = taxo.name )
+#                        instance.homonyms.add( taxa )
+#                    elif taxo.type_name == 'common':
+#                        taxa = CommonName.objects.get( name = taxo.name )
+#                        instance.commons.add( taxa )
+#                    else:
+#                        raise RuntimeError, "%s has no or bad type_name" % taxo.name
+##signals.post_save.connect(generate_tree_infos, sender=Tree)
+#
+#def generate_from_original_collection_string(  sender, instance, signal, *args, **kwargs ):
+#    if not hasattr( instance, '_generated_from_collection_string' ):
+#        setattr( instance, '_generated_from_collection_string', True )
+#        if instance.original_collection_string:
+#            instance.regenerate_from_original_collection_string()
+##signals.post_save.connect(generate_from_original_collection_string, sender=TreeCollection)
 
-def generate_from_original_collection_string(  sender, instance, signal, *args, **kwargs ):
-    if not hasattr( instance, '_generated_from_collection_string' ):
-        setattr( instance, '_generated_from_collection_string', True )
-        if instance.original_collection_string:
-            instance.regenerate_from_original_collection_string()
-#signals.post_save.connect(generate_from_original_collection_string, sender=TreeCollection)
+#def delete_collection( sender, instance, signal, *args, **kwargs ):
+#    if instance.name == 'bla':
 
 def fill_created_updated_fields( sender, instance, signal, *args, **kwargs ):
     if not instance.id:
