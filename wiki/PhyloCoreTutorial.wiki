@@ -140,11 +140,18 @@ Let's try now to get all taxa wich correspond to echinops :
 [<Taxa: echinops <animalia>], [Taxa: echinops <plantae>]
 }}}
 
-We can list all taxa (including homonyms, synonyms, commons name and bad taxa names) like this :
+We can list all taxa (including homonyms, synonyms, commons name) like this :
 
 {{{
->>> tree.all_taxa_list
-[<HomonymName: echinops>,<Taxa: rattus>, <Taxa: mus>, <Taxa: mus musculus>, <BadTaxa: badname>]
+>>> tree.taxonomy_objects.all()
+[<Taxonomy: echinops (homonym)>,<Taxonomy: rattus (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>]
+}}}
+
+we can retrieve all ambiguous name easyly:
+
+{{{
+>>> tree.ambiguous.all()
+[<Taxonomy: echinops (homonym)>]
 }}}
 
 = Working with TreeCollection =
@@ -161,8 +168,10 @@ A TreeCollection can take a collection in a nexus or phylip format
 Juste like Tree objects, we have access to all taxa:
 
 {{{
->>> col.all_taxa_list
-[<Taxa: mus>, <SynonymName: antilocapra anteflexa>, <BadTaxa: blabla (1)>, <HomonymName: echinops>, <CommonName: rat noir (french)>]
+>>> col.taxonomy_objects.all()
+[<Taxonomy: antilocapra anteflexa (synonym)>, <Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: rat noir (common)>]
+>>> col.ambiguous.all()
+[<Taxonomy: antilocapra anteflexa (synonym)>, <Taxonomy: echinops (homonym)>, <Taxonomy: rat noir (common)>]
 >>> col.taxas.all()
 [<Taxa: mus>]
 >>> col.homonyms.all()
