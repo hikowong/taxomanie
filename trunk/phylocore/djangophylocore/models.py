@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 
 from django.db import models
-from django.db.models import signals
+from django.db.models import signals, Q
 
 from lib.phylogelib import getTaxa, getChildren, removeBootStraps, removeNexusComments
 from lib.phylogelib import tidyNwk, checkNwk
@@ -598,13 +598,39 @@ class Tree( models.Model, TaxonomyReference ):
         return self.taxas.filter( 
           parents_relation_taxas__parent__name = parent_name ).count()
 
-    def eval_query( self, query ):
+    def eval_query( self, query, usertaxa_list=[] ):
+        """
+        test if a query match the tree. The query format is a python
+        boolean expression with taxa name beetween braces :
+
+        tree.eval_query( "{muridae} > 2 and {primates}" )
+
+        will return true if tree have more than 2 taxas wich have muridae as parents
+        and at least 1 taxa wich have a primate as parents.
+
+        if a taxa_list is not null, the query can have another variable
+        {usertaxa}. this variable represente all taxa passed in the list.
+
+        tree.eval_query( "{muridae} => 4 and {usertaxa} > 2", ['rattus', 'mus', 'pan', 'boss'] )
+
+        will return true if tree have at least 4 taxa wich are muridae and
+        more than 2 taxa wich are in the usertaxa_list 
+        """
         res = query.strip()
         for pattern in re.findall("{([^}]+)}", query):
             striped_pattern = pattern.strip().lower()
-            if not self.is_valid_name( striped_pattern ):
+            if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
                 raise NameError, striped_pattern
-            nb_occurence = self.get_nb_taxa_from_parent( striped_pattern )
+            if striped_pattern == 'usertaxa':
+                if usertaxa_list:
+                    query = Q()
+                    for taxa_name in usertaxa_list:
+                        query |= Q( name = taxa_name )
+                    nb_occurence = self.taxas.filter( query ).count()
+                else:
+                    nb_occurence = 0
+            else:
+                nb_occurence = self.get_nb_taxa_from_parent( striped_pattern )
             res = res.replace("{"+pattern+"}", str(nb_occurence) )
         if res:
             try:
@@ -733,13 +759,15 @@ class TreeCollection( models.Model ):
         return self.trees.filter( is_valid = False )
     bad_trees = property( get_bad_trees )
 
-    def query( self, query ):
+    def query( self, query, usertaxa_list = [] ):
         """
-        return a list of trees matching the query
+        return a list of trees matching the query. You can pass usertaxa_list
+        in order to use the {usertaxa} variable (see Tree.eval_query for more
+        details)
         """
         trees_list = set([])
         for tree in self.trees.all():
-            if tree.eval_query( query ):
+            if tree.eval_query( query, usertaxa_list ):
                 trees_list.add( tree )
         return list( trees_list )
 
