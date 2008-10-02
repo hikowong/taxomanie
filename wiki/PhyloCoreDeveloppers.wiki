@@ -7,62 +7,65 @@ You'll find in this page all information for programming with PhyloCore.
 
 = Filling Database =
 
+
 The database is fill with the `./manage.py loadtaxonomy` command. This command
 will search for dumps files (actually csv files) in djangophylocore/dumps.
+
+== Generating dumps files ==
 
 If you want to include your database into phyloexplorer, you must create your dump file and follow certains rules when creating those dump files.
 
 Note that you don't have to create the `parentsrelation.dmp` will be automatiquely 
 created while executing `./manage.py loadtaxonomy`
 
-== taxonomy.dmp ==
+=== taxonomy.dmp ===
 {{{
 id|taxa_name|type_name
 }}}
 
 `type_name` must be 'scientific name', 'synonym', 'common' or 'homonym'
 
-== rank.dmp ==
+=== rank.dmp ===
 {{{
 id|name
 }}}
 
 you must have an 'unknown' rank
 
-== taxa.dumps ==
+=== taxa.dumps ===
 {{{
 taxa_id|taxa_name|rank_id|parents_id
 }}}
 
 note that if you don't have rank put the unknown rank id
 
-== synonymname.dmp ==
+=== synonymname.dmp ===
 
 {{{
 id|name
 }}}
 
-== synonym.dmp ==
+=== synonym.dmp ===
 {{{
 id|synonym_id|taxa_id
 }}}
 
-== homonymname.dmp ==
+=== homonymname.dmp ===
 {{{
 id|name
 }}}
 
-== homonymname.dmp ==
+=== homonymname.dmp ===
 {{{
 id|name
 }}}
 
-== homonym.dmp ==
+=== homonym.dmp ===
 {{{
 id|homonym_id|taxa_id
 }}}
 
-== commonname.dmp ==
+=== commonname.dmp ===
 {{{
 id|name|language
 }}}
@@ -72,7 +75,7 @@ exemple:
 1|rats noir|french
 }}}
 
-== common.dmp ==
+=== common.dmp ===
 {{{
 id|common_id|taxa_id
 }}}
