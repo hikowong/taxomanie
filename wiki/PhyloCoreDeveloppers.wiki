@@ -1,0 +1,21 @@
+#summary Places for developpers
+#labels Featured
+
+= Introduction =
+
+You'll find in this page all information for programming with PhyloCore.
+
+= Filling Database =
+
+The database is fill with the `./manage.py loadtaxonomy` command. This command
+will search for dumps files (actually csv files) in djangophylocore/dumps.
+
+If you want to include your database into phyloexplorer, you must follow certains
+rules when creating dumps files.
+
+== taxa.dumps ==
+{{{
+taxa_id|taxa_name|rank_id|parents_id
+}}}
+
+note that if you don't have rank, rank_id is 10 (unknown)
