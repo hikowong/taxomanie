@@ -30,14 +30,14 @@ id|taxa_name|type_name
 id|name
 }}}
 
-you must have an 'unknown' rank
+you must have an 'no rank' rank
 
 === taxa.dumps ===
 {{{
 taxa_id|taxa_name|rank_id|parents_id
 }}}
 
-note that if you don't have rank put the unknown rank id
+note that if you don't have rank put the 'no rank' rank id
 
 === synonymname.dmp ===
 
