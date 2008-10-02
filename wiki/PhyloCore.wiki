@@ -60,3 +60,5 @@ if nothing show up then you're good. Congratulation !
 See how to [PhyloCoreConfiguration configure] Phylocore.
 
 Next, follow the [PhyloCoreTutorial tutorial].
+
+Developpers, follow the [PhyloCoreDeveloppers developpers guide].
