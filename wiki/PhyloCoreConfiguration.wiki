@@ -17,6 +17,28 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
  * choose your database backend (sqlite3 by default) in the DATABASE_ENGIN.
  * put the name of the database or the full path of the sqlite3 file
 
+exemple with sqlite3:
+
+{{{
+DATABASE_ENGINE = 'sqlite3'    # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3'
+DATABASE_NAME = '/path/to/database_name.db'             # Or path to database file if using sqlite3.
+DATABASE_USER = ''             # Not used with sqlite3.
+DATABASE_PASSWORD = ''         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+}}}
+
+with mysql :
+
+{{{
+DATABASE_ENGINE = 'mysql'    # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3'
+DATABASE_NAME = 'database_name'             # Or path to database file if using sqlite3.
+DATABASE_USER = 'root'             # Not used with sqlite3.
+DATABASE_PASSWORD = 'passwd'         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+}}}
+
 if you're using mysql you must fill the following fields:
 
  * DATABASE_USER the user of the database
