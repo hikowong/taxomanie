@@ -31,7 +31,7 @@ PhyloCore is using a database for dealing with taxonomy. Please install SQLite3 
 and their python wrapper : [http://sourceforge.net/projects/mysql-python mysql-python] for MySQL or [http://initd.org/pub/software/pysqlite/ pysqlite] for sqlite...
 
 
-You must install NetworkX for the graph manipulations.
+You can install NetworkX for the graph manipulations (recommended).
 
 = Installation =
 First of all, download an install [http://www.djangoproject.com/download/ Django 1.0].
