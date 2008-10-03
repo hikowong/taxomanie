@@ -49,7 +49,7 @@ and optionnaly the DATABASE_HOST and DATABASE_PORT is there different than defau
 Now we can create the database structure. Note that if you use mysql, the database must be created :
 
 {{{
-CREATE DATABASE <dbname> CHARACTER SET utf8;
+mysql -e "CREATE DATABASE database_name CHARACTER SET utf8;"
 }}}
 
 Utf-8 is important as django stores all it's data into this charset.
