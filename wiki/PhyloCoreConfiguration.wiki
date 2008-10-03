@@ -17,6 +17,8 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
  * choose your database backend (sqlite3 by default) in the DATABASE_ENGIN.
  * put the name of the database or the full path of the sqlite3 file
 
+
+== With a sqlite database ==
 exemple with sqlite3:
 
 {{{
@@ -28,7 +30,7 @@ DATABASE_HOST = ''             # Set to empty string for localhost. Not used wit
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 }}}
 
-with mysql :
+== With a mysql database ==
 
 {{{
 DATABASE_ENGINE = 'mysql'    # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3'
