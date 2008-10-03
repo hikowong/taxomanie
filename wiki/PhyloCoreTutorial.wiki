@@ -8,7 +8,7 @@ First of all, you'll have to import Django setting. So all of your scripts may b
 {{{
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from phylocore.models import *
+from phylocore import *
 }}}
 
 = Working with Taxa =
