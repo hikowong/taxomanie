@@ -3,6 +3,8 @@
 
 Phylocore needs a database. In this section, you'll see how-to configure phylocore and how-to prepopulate the database.
 
+= Prepare settings =
+
 Go to the folder phylocore. You should see a file named 'settings.py'. This is the "control center" of PhyloCore. Open this file. And you should see something like that:
 
 {{{
@@ -56,14 +58,10 @@ mysql -u user -p -e "CREATE DATABASE database_name CHARACTER SET utf8;"
 
 Utf-8 is important as django stores all it's data into this charset.
 
-{{{
-python manage.py syncdb
-}}}
-
-Then, we have to load the taxonomy into our fresh database: Then launch
+= Install data into the database =
 
 {{{
-python manage.py loadtaxonomy
+python manage.py installncbi
 }}}
 
 This will load all data from the `dumps` folder provides by djangophylocore.
