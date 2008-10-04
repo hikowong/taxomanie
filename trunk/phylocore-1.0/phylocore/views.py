@@ -1,20 +1,10 @@
 #!/usr/bin/env python
 import sys
-#sys.path.insert( 0, "lib" )
 from djangophylocore.models import *
 import httplib
 import string
 
-#from pleet.pleet import Pleet
-import os.path
-
-import os
-localDir = os.path.dirname(__file__)
-absDir = os.path.join(os.getcwd(), localDir)
-
 from django.core.paginator import Paginator
-
-
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 
@@ -37,12 +27,17 @@ from django.shortcuts import render_to_response
 
 TAXOREF = TaxonomyReference()
 
+import os.path
+localDir = os.path.dirname(__file__)
+absDir = os.path.join(os.getcwd(), localDir)
+
+
 def index( request ):
     return render_to_response( 'index.html', {'msg':''} )
 
 def about( request ):
     context = {}
-    if request.session['original_collection_id']:
+    if 'original_collection_id' in request.session:
         context['collection'] = True
     else:
         context['collection'] = False
@@ -50,7 +45,7 @@ def about( request ):
 
 def help( request ):
     context = {}
-    if request.session['original_collection_id']:
+    if 'original_collection_id' in request.session:
         context['collection'] = True
     else:
         context['collection'] = False
