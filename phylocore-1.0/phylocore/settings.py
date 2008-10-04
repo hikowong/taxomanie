@@ -76,7 +76,7 @@ ROOT_URLCONF = 'phylocore.urls'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 
-SESSION_FILE_PATH = '/tmp'
+#SESSION_FILE_PATH = '/tmp'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -91,6 +91,6 @@ INSTALLED_APPS = (
 #    'django.contrib.contenttypes',
 #    'django.contrib.sessions',
 #    'django.contrib.sites',
-#    'django_extensions',
+    'django_extensions',
     'djangophylocore',
 )
