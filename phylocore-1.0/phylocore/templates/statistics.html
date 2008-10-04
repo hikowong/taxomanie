@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block pagedef %} Home > Statistics {% endblock %}
+
+{% block script %}
+<script type="text/javascript"> 
+$(document).ready(function() { 
+    $('#sugestions').text('Processing...');
+    $('#sugestions').load( "getAllSugestions" ); 
+}); 
+$(document).ready(function(){
+//    $("#exemplequery").hide();
+    $("#exemplelink").click(function () {
+        $("#exemplequery").slideToggle("slow");
+    });
+});
+function unselectAll(){
+    $(document).ready( function(){
+       $("input.restrict").removeAttr( "checked" );
+    });
+}
+function selectAll(){
+    $(document).ready( function(){
+       $("input.restrict").attr( "checked", "checked" );
+    });
+}
+function selectGenre( genre ){
+    $(document).ready( function(){
+        if( $("span[genre="+genre+"] input").attr("check")){
+           $("span[genre="+genre+"] input").removeAttr( "check" );
+           $("span[genre="+genre+"] input").removeAttr( "checked" );
+        }
+        else{
+            $("span[genre="+genre+"]  input").attr("check", "check");
+            $("span[genre="+genre+"]  input").attr("checked", "checked");
+        }
+    });
+}
+</script>
+{% endblock %}
+
+{% block menu %}
+<!-- <a href="home" class="path" title="Go home">Home</a> -->
+<center> <b> Home </b> </center>
+<a href="." class="path" title="Go to upload collection page">Upload Collection</a>
+<a href="help" class="path" title="(?) Help contents">Help Contents</a>
+<a href="about" class="path" title="About PhyloExplorer project...">About</a>
+<br />
+{% if not_empty_collection %}
+<center> <b>Current collection</b> </center>
+<a href="/browse" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
+<a href="/downloadNCBITree" class="path" title="Download the NCBI arborescence">
+Download NCBI tree </a>
+<a href="/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
+<br />
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+<br />
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
+<div class="stat">
+<!-- query panel -->
+<div class="query">
+<form action="statistics" class="nopadding">
+<!-- <a onclick="javascript:toggleExemple();" id="exemplelink"> View exemple </a>&nbsp; -->
+<input size=60  type=text 
+onfocus="if(this.value=='Your query...'){this.value='';}" 
+onblur="if(this.value==''){this.value='Your query...';}"
+{% if query %} value="{{query}}" {% else %} value="Your query..." {% endif %}
+name="query" /> 
+<input type="submit" value="Search" class="button" blockui="wait"> <br>
+<tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
+<br /> 
+<i>You can download your result after your query</i></tt>
+</form>
+{% if query %}
+    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=statistics?clear_query=1>Back to full collection</a>
+{% endif %}
+</div>
+<!-- end query panel -->
+{% if error_msg %} <div  class="error">{{ error_msg }}</div>{% endif %}
+{% if not_empty_collection %}
+</div>
+    <br />
+    <a name="arbo"></a>
+    <fieldset>
+        <legend> General information </legend>
+        {{ nb_trees}} trees <br />
+        {{ nb_taxa }} taxa &nbsp;
+
+    {% if nb_badtaxa %}
+        <font color="red"> {{ nb_badtaxa }} bad taxa </font>&nbsp;
+    {% endif %}
+    {% if nb_homonyms %}
+        <font color="orange">{{ nb_homonyms}} homonyms </font>
+    {% endif %}
+    {% if nb_synonyms %}
+        <font color="orange">{{ nb_synonyms}} synonyms </font>
+    {% endif %}
+</fieldset>
+<br />
+
+{% if nb_homonyms %}
+    <!-- Collection correction -->
+    <fieldset>
+    <legend> Correct your collection </legend>
+    <form action="recreate_collection">
+    <!-- homonym fieldset -->
+    {% if nb_homonyms %}
+        <span class="homonymlist">
+        <fieldset>
+        <legend> {{ nb_homonyms }} homonym(s) </legend>
+        {% for homonym_name, suggestions in dict_homonyms.iteritems %}
+            <font color="orange">{{ homonym_name }}</font> :
+            {% for sugg in suggestions %}
+                {{ sugg }}
+                <input type="radio" name="{{homonym_name}}" value="{{ sugg }}" />
+            {% endfor %}
+            <br />
+        {% endfor %}
+        </fieldset>
+        </span>
+    {% endif %}
+    <!-- end homonym fieldset -->
+    <input type="submit" value="Correct collection"/>
+    </form>
+    </fieldset><br />
+    <!-- end collection correction -->
+{% endif %}
+
+
+{% comment %}
+<%
+    if len(_badtaxalist_) or len(_homonymlist_):
+        #
+%>
+        <fieldset>
+        <legend> Correct your collection </legend>
+        <form action="recreateCollection">
+        <!-- badtaxa fieldset -->
+<%
+        if len(_badtaxalist_):
+            #
+%>
+        <fieldset class="sugestions">
+            <legend> <%$ len( _badtaxalist_)%> bad taxa </legend>
+            <span id="sugestions"> </span>
+            <span id="graph"> </span>
+        </fieldset>
+        <!-- end badtaxa fieldset -->
+        <%|%>
+        <!-- homonym fieldset -->
+<%
+        if len(_homonymlist_):
+            #
+%>
+            <span class="homonymlist">
+            <fieldset>
+            <legend> <%$ len(_treecollection_.homonyms.keys()) %> homonym(s) </legend>
+<%
+            for homonym, taxa in _treecollection_.homonyms.iteritems():
+                #
+%>
+                <font color="orange"><%$ homonym %></font> :
+<%
+                for taxon in taxa:
+                    dispnode = taxon.split("|")[0].replace(_treecollection_.reference.delimiter, " ")
+                    dispnode = dispnode.replace( "<", "&lt;" )
+                    dispnode = dispnode.replace( ">", "&gt;" )
+                    #
+%>
+                    <%$ _treecollection_._TreeCollection__linkSpecies( dispnode, taxon) %>
+                    <input type="radio" name="<%$ homonym %>" value="<%$ dispnode %>" />
+                <%|%>
+                <br />
+            <%|%>
+            </fieldset>
+            </span>
+        <!-- end homonym fieldset -->
+        <%|%>
+        <input type="submit" value="Correct collection"/>
+        </form>
+        </fieldset><br />
+    <%|%>
+<!-- end collection fieldset -->
+{% endcomment %}
+
+<!-- stat1 -->
+    <fieldset>
+        <legend> Tree size distribution </legend>
+        {{ tree_size_distributions|safe }}
+    </fieldset>
+<!-- end stat1 -->
+
+<!-- stat2 -->
+    <fieldset>
+        <legend> Taxon frequency distribution </legend>
+        <tt>
+        {{taxon_frequency_distribution|safe}}
+        </tt>
+    </fieldset><br />
+<!-- end stat2 -->
+
+<!-- NCBI tree -->
+    <fieldset>
+        <legend> NCBI taxonomy</legend>
+        <a target="_blank" style="color:green"
+        href="http://www.phylowidget.org/full/index.html?tree='<%$ _NCBItree_ %>'"
+        title="Display the ncbi tree as graph"> Click to visualize this tree using PhyloWidget </a>
+        <br />
+        <br />
+        <form action="createFilteredCollection">
+            <a class="selectall" onclick="javascript:selectAll();"> Select all</a> &nbsp; &nbsp;
+            <a class="selectall" onclick="javascript:unselectAll();"> Unselect all </a>
+            <br />
+            <tt>
+             {{ stats_tree|safe }}
+            </tt>
+        <b> Select the taxa you want to exclude and </b> <br />
+        <input type="submit" value="Restrict your trees" />
+        </form>
+    </fieldset><br />
+<!-- end NCBI tree -->
+</div>
+            <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+    <!-- div preview -->
+    <div id="preview"></div>
+<!-- CONTENT : END -->
+{% endif %}
+{% endblock %}
