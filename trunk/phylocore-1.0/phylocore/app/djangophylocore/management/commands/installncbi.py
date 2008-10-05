@@ -22,11 +22,9 @@ class Command(NoArgsCommand):
         if verbose:
             print "building ncbi dumps"
         os.system( 'python manage.py buildncbi %s' % verbose_string )
-        noinput = ''
         if verbose:
             print "creating database"
-            noinput = '--noinput'
-        os.system( 'python manage.py reset_db %s' % noinput )
+        os.system( 'python manage.py reset_db --noinput' )
         os.system( 'python manage.py syncdb' )
         if verbose:
             print "loading taxonomy"
