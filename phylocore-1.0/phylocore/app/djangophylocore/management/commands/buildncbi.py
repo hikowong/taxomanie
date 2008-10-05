@@ -17,7 +17,7 @@ class Command(NoArgsCommand):
     help = "Download and build the ncbi database"
     requires_model_validation = False
 
-    TEST = True
+    TEST = False
     TBI = {}
     TBN = {}
     NAMES = "names.dmp"

@@ -14,7 +14,7 @@ if settings.DEBUG:
       {'document_root': os.path.join( ROOT_PATH, 'templates' )}),
     )
 else:
-    urlpatterns = patterns('', () )
+    urlpatterns = patterns('')
 
 urlpatterns += patterns('phylocore.views',
     # Example:

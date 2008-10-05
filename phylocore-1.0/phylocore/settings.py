@@ -3,7 +3,14 @@
 import os
 ROOT_PATH = os.path.join(os.getcwd(), os.path.dirname(__file__) )
 
-DEBUG = True
+# This is useful for apache
+try:
+    import matplotlib
+    matplotlib.use('Agg')
+except:
+    pass
+
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -13,16 +20,14 @@ ADMINS = (
 MANAGERS = ADMINS
 
 # For sqlite3
-DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = os.path.join( ROOT_PATH, 'test.db' )    # Or path to database file if using sqlite3.
-
-# For mysql
-#DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-#DATABASE_NAME = 'phylocore_ncbi'    # Or path to database file if using sqlite3.
-#DATABASE_USER = 'root'             # Not used with sqlite3.
-#DATABASE_PASSWORD = 'mysql'         # Not used with sqlite3.
-#DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-#DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+#DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+#DATABASE_NAME = os.path.join( ROOT_PATH, 'test.db' )    # Or path to database file if using sqlite3.
+DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'phylocore_ncbi'    # Or path to database file if using sqlite3.
+DATABASE_USER = 'root'             # Not used with sqlite3.
+DATABASE_PASSWORD = 'mysql'         # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -76,13 +81,14 @@ ROOT_URLCONF = 'phylocore.urls'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'
 
-#SESSION_FILE_PATH = '/tmp'
+SESSION_FILE_PATH = '/tmp'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
     os.path.join( ROOT_PATH, "templates" ),
+#    '/var/www/site_media/',
     #"/home/taxomanie/phyloexplorer/templates",
 )
 
@@ -91,6 +97,5 @@ INSTALLED_APPS = (
 #    'django.contrib.contenttypes',
 #    'django.contrib.sessions',
 #    'django.contrib.sites',
-    'django_extensions',
     'djangophylocore',
 )
