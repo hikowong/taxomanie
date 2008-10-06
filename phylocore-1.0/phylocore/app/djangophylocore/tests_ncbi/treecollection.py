@@ -215,12 +215,44 @@ Filter and restrict collection
 ------------------------------
 
 >>> simple_col = "(mus musculus, rattus, glis);( glis, mus, rattus rattus);(mus, rattus);"
->>> col = TreeCollection.objects.create( name = 'filter', original_collection_string = simple_col )
+>>> col = TreeCollection.objects.create( original_collection_string = simple_col )
 >>> col.get_filtered_collection_string( ['mus', 'glis'] )
-u'(mus musculus,rattus);\n(rattus rattus);\n(rattus);\n'
+u'(mus musculus,rattus);\\n(rattus rattus);\\n(rattus);\\n'
 >>> col.get_filtered_collection_string( ['mus', 'rattus'] )
 u'(mus musculus,glis);\\n(glis,rattus rattus);\\n'
 >>> '' is col.get_filtered_collection_string( ['mus musculus', 'rattus rattus', 'glis', 'mus', 'rattus'] )
 True
+
+>>> restricted_col = col.get_restricted_collection( ['mus', 'glis'] )
+>>> restricted_col.taxas.all()
+[<Taxa: mus>]
+>>> restricted_col.bad_taxas.all()
+[<BadTaxa: glis (4)>]
+>>> restricted_col = col.get_restricted_collection( ['mus musculus', 'rattus'] )
+>>> restricted_col.taxas.all()
+[<Taxa: mus musculus>, <Taxa: rattus>]
+
+
+Correct the collection
+----------------------
+
+>>> simple_col = "(mus musculus, (rattus, echinops));((echinops, mis), rattis rattus);(mus, (rattus));"
+>>> col = TreeCollection.objects.create( original_collection_string = simple_col )
+>>> col.taxas.all()
+[<Taxa: mus>, <Taxa: mus musculus>, <Taxa: rattus>]
+>>> col.bad_taxas.all()
+[<BadTaxa: mis (1)>, <BadTaxa: rattis (1)>]
+>>> col.homonyms.all()
+[<HomonymName: echinops>]
+>>> col.get_corrected_collection_string( [('mis', 'mus'), ('rattis rattus','rattus rattus'), ('echinops', 'echinops <plant>')] )
+u'(mus musculus,(rattus,echinops <plant>));\\n((mus,echinops <plant>),rattus rattus);\\n(mus,(rattus));\\n'
+
+>>> corrected_col = col.get_corrected_collection([('mis', 'mus'), ('rattis rattus','rattus rattus'), ('echinops', 'echinops <plant>')] )
+>>> corrected_col.bad_taxas.all()
+[]
+>>> corrected_col.homonyms.all()
+[]
+>>> corrected_col.taxas.all()
+[<Taxa: echinops <plant>>, <Taxa: mus>, <Taxa: mus musculus>, <Taxa: rattus>, <Taxa: rattus rattus>]
 
 """
