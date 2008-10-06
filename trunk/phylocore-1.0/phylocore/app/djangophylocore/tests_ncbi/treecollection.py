@@ -211,4 +211,16 @@ Making queries
 >>> col.trees.all()
 [<Tree: 1>, <Tree: 2>]
 
+Filter and restrict collection
+------------------------------
+
+>>> simple_col = "(mus musculus, rattus, glis);( glis, mus, rattus rattus);(mus, rattus);"
+>>> col = TreeCollection.objects.create( name = 'filter', original_collection_string = simple_col )
+>>> col.get_filtered_collection_string( ['mus', 'glis'] )
+u'(mus musculus,rattus);\n(rattus rattus);\n(rattus);\n'
+>>> col.get_filtered_collection_string( ['mus', 'rattus'] )
+u'(mus musculus,glis);\\n(glis,rattus rattus);\\n'
+>>> '' is col.get_filtered_collection_string( ['mus musculus', 'rattus rattus', 'glis', 'mus', 'rattus'] )
+True
+
 """

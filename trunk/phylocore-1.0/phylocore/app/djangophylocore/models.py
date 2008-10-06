@@ -5,7 +5,8 @@ from django.db.models import signals, Q
 from django.conf import settings
 from django.db import transaction
 
-from lib.phylogelib import getTaxa, getChildren, removeBootStraps, removeNexusComments
+from lib.phylogelib import getTaxa, getChildren, removeBootStraps
+from lib.phylogelib import getBrothers, removeNexusComments
 from lib.phylogelib import tidyNwk, checkNwk
 from lib.nexus import Nexus
 import datetime, re, sys
@@ -452,7 +453,7 @@ class TaxonomyTreeOccurence( models.Model ):
     user_taxa_name = models.CharField( max_length = 200, null = True )
     nb_occurence = models.IntegerField( default = 0 )
     class Meta:
-        unique_together = ( 'taxonomy', 'tree' )
+        unique_together = ( 'taxonomy', 'tree', 'user_taxa_name' )
 
     def __unicode__( self ):
         return u'%s (%s) %s' % ( self.taxonomy, self.nb_occurence, self.tree )
@@ -492,6 +493,7 @@ class Tree( models.Model, TaxonomyReference ):
             objects_list.append( self.get_object_from_name( taxa_name ) )
         return objects_list
 
+    @transaction.commit_on_success
     def save( self, dont_generate = False, **kwargs ):
         regenerate = False
         if not self.id: # if instance is not in the database
@@ -509,6 +511,7 @@ class Tree( models.Model, TaxonomyReference ):
             self.save( dont_generate = True )
         for taxa_name in getTaxa( tree ):#set( getTaxa( tree ) ):
             if taxa_name.strip():
+                user_taxa_name = taxa_name
                 taxa_name = self.strip_taxa_name( taxa_name )
                 taxo_list = Taxonomy.objects.filter( name = taxa_name )
                 if not taxo_list:
@@ -521,7 +524,8 @@ class Tree( models.Model, TaxonomyReference ):
                     self.bad_taxas.add( t )
                 else:
                     for taxo in taxo_list:
-                        tto, created = TaxonomyTreeOccurence.objects.get_or_create( taxonomy = taxo, tree = self )
+                        tto, created = TaxonomyTreeOccurence.objects.get_or_create( 
+                          taxonomy = taxo, tree = self, user_taxa_name = user_taxa_name )
                         tto.nb_occurence += 1
                         tto.save()
                         if taxo.type_name == 'scientific name':
@@ -650,7 +654,7 @@ class Tree( models.Model, TaxonomyReference ):
 # col.trees.filter( taxas__parents_relation_taxas__parent__name = 'muridae' )
 
 class TreeCollection( models.Model ):
-    name = models.CharField( max_length = 80, null= True, unique=True )
+    name = models.CharField( max_length = 80, null= True )
     original_collection_string = models.TextField( null = True )
     delimiter = models.CharField( max_length = 5, default=' ' )
     description = models.TextField( null = True)
@@ -661,13 +665,6 @@ class TreeCollection( models.Model ):
 
     def __unicode__( self ):
         return "%s (%s)" % ( self.name, self.format )
-
-    def get_ambiguous( self ):
-        """
-        return a queryset of non scientific name taxonomy objects
-        """
-        return self.taxonomy_objects.exclude( type_name = 'scientific name' )
-    ambiguous = property( get_ambiguous )
 
     @transaction.commit_on_success
     def save( self, collection_changed = False, dont_regenerate = False,  **kwargs ):
@@ -751,6 +748,13 @@ class TreeCollection( models.Model ):
             return "#NEXUS\n\nBEGIN TREES;\n\n"+";\n".join( result )+"\n\nEND;\n"
         else:
             return ";\n".join( result )+';'
+
+    def get_ambiguous( self ):
+        """
+        return a queryset of non scientific name taxonomy objects
+        """
+        return self.taxonomy_objects.exclude( type_name = 'scientific name' )
+    ambiguous = property( get_ambiguous )
 
     def get_taxas( self ):
         return Taxa.objects.filter( trees__collections = self ).distinct()
@@ -850,6 +854,81 @@ class TreeCollection( models.Model ):
         return taxa in collection wich are for parent 'parent_name'
         """
         return self.taxas.filter( parents_relation_taxas__parent__name = parent_name )
+
+    def get_filtered_collection_string( self, taxa_name_list ):
+        """
+        return a collections string wich have been striped of all taxa present
+        in the taxa_name_list
+        """
+        if self.format == 'nexus':
+            new_col = "#NEXUS\nBEGIN TREES;\n"
+        else:
+            new_col = ''
+        for tree in self.trees.all():
+            new_tree = tidyNwk( tree.tree_string ).lower()
+            for taxa_name in taxa_name_list:
+                user_taxa_list = [i.user_taxa_name for i in \
+                  tree.taxonomy_occurences.filter( taxonomy__name = taxa_name )]
+                if not user_taxa_list: # if taxa_name not in taxonomy (bad taxa)
+                    user_taxa_list = [taxa_name] # buid user_taxa_list from scratch
+                for taxon in user_taxa_list:  # For taxa in user_name taxon
+                    # while taxa user name exists, remove it
+                    while taxon in getTaxa( new_tree ):
+                        list_taxa = getBrothers(new_tree, taxon )
+                        list_brother = getBrothers(new_tree, taxon )
+                        if taxon in list_brother:
+                            list_brother.remove( taxon )
+                            if len( list_brother ) > 1:
+                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
+                            else:
+                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
+                        else:
+                            new_tree = ""
+            # Recreate nexus collection
+            if new_tree:
+                if len( getTaxa( new_tree ) ) == 1:
+                    if self.format == 'nexus':
+                        new_col += "Tree "+str(tree.name)+" = ("+new_tree+");\n"
+                    else:
+                        new_col += "("+new_tree+");\n"
+                else:
+                    if self.format == 'nexus':
+                        new_col += "Tree "+str(tree.name)+" = "+new_tree+";\n"
+                    else:
+                        new_col += new_tree+";\n"
+        if self.format == 'nexus':
+            new_col += "END;\n"
+        return new_col
+
+    def get_restricted_collection( self, taxa_name_list ):
+        """
+        return a new collection wich contains only the taxa present in
+        taxa_list
+        """
+        remove_taxa_list = [i.name for i in self.taxonomy_objects.exclude( name__in = taxa_name_list )] 
+        new_nwk = self.get_filtered_collection_string( remove_taxa_list )
+        return TreeCollection.objects.create( original_collection_string = new_nwk )
+
+    def get_corrected_collection( self, tuple_list ):
+        """
+        return a collection with correction from tuple_list:
+
+        newcol = col.get_corrected_collection( [('echinops', 'echinops <plant>'), ('ratis', 'rattus' )] )
+        """
+        new_tree = tidyNwk( tree.tree_string ).lower()
+        for taxon in user_list_taxa:
+            while taxon in getTaxa( new_tree ):
+                list_taxa = getBrothers(new_tree, taxon )
+                list_brother = getBrothers(new_tree, taxon )
+                if taxon in list_brother:
+                    list_brother.remove( taxon )
+                    if len( list_brother ) > 1:
+                        new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
+                    else:
+                        new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
+                else:
+                    new_tree = ""
+
 
 #############################################
 #                Signals                    #
