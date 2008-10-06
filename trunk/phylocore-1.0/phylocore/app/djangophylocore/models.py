@@ -902,33 +902,63 @@ class TreeCollection( models.Model ):
 
     def get_restricted_collection( self, taxa_name_list ):
         """
-        return a new collection wich contains only the taxa present in
+        return a collection string wich contains only the taxa present in
         taxa_list
         """
         remove_taxa_list = [i.name for i in self.taxonomy_objects.exclude( name__in = taxa_name_list )] 
         new_nwk = self.get_filtered_collection_string( remove_taxa_list )
         return TreeCollection.objects.create( original_collection_string = new_nwk )
 
-    def get_corrected_collection( self, tuple_list ):
+    def get_corrected_collection_string( self, tuple_list ):
         """
         return a collection with correction from tuple_list:
 
+        col_string = col.get_corrected_collection_string( [('echinops', 'echinops <plant>'), ('ratis', 'rattus' )] )
+        """
+        if self.format == 'nexus':
+            new_col = "#NEXUS\nBEGIN TREES;\n"
+        else:
+            new_col = ''
+        for tree in self.trees.all():
+            new_tree = tidyNwk( tree.tree_string ).lower()
+            for bad_taxon, taxon in tuple_list:
+                while bad_taxon in getTaxa( new_tree ):
+                    list_taxa = getBrothers(new_tree, bad_taxon )
+                    list_brother = getBrothers(new_tree, bad_taxon )
+                    if bad_taxon in list_brother:
+                        list_brother.remove( bad_taxon )
+                        list_brother.append( taxon )
+                        if len( list_brother ) > 1:
+                            new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
+                        else:
+                            new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
+                    else:
+                        new_tree = ""
+            # Recreate nexus collection
+            if new_tree:
+                if len( getTaxa( new_tree ) ) == 1:
+                    if self.format == 'nexus':
+                        new_col += "Tree "+str(tree.name)+" = ("+new_tree+");\n"
+                    else:
+                        new_col += "("+new_tree+");\n"
+                else:
+                    if self.format == 'nexus':
+                        new_col += "Tree "+str(tree.name)+" = "+new_tree+";\n"
+                    else:
+                        new_col += new_tree+";\n"
+        if self.format == 'nexus':
+            new_col += "END;\n"
+        return new_col
+
+    def get_corrected_collection( self, tuple_list ):
+        """
+        return a collection with correction from tuple_list. tuple_list take
+        the following format : [(bad_name1, good_name1), (bad_name2, good_name2)...]
+
         newcol = col.get_corrected_collection( [('echinops', 'echinops <plant>'), ('ratis', 'rattus' )] )
         """
-        new_tree = tidyNwk( tree.tree_string ).lower()
-        for taxon in user_list_taxa:
-            while taxon in getTaxa( new_tree ):
-                list_taxa = getBrothers(new_tree, taxon )
-                list_brother = getBrothers(new_tree, taxon )
-                if taxon in list_brother:
-                    list_brother.remove( taxon )
-                    if len( list_brother ) > 1:
-                        new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
-                    else:
-                        new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
-                else:
-                    new_tree = ""
-
+        new_nwk = self.get_corrected_collection_string( tuple_list )
+        return TreeCollection.objects.create( original_collection_string = new_nwk )
 
 #############################################
 #                Signals                    #
