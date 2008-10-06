@@ -16,6 +16,10 @@ def tidyNwk( nwk ):
     nwk = nwk.replace( "\n", " " )
     while "  " in nwk:
         nwk = nwk.replace( "  ", " " )
+    while '( ' in nwk:
+        nwk = nwk.replace( '( ', '(' )
+    while ' )' in nwk:
+        nwk = nwk.replace( ' )', ')' )
     nwk = nwk.replace( ", (", ",(" )
     nwk = nwk.replace( " ,", "," )
     nwk = nwk.replace( ", ", "," )
