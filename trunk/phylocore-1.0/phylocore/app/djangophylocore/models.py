@@ -2,11 +2,13 @@
 
 from django.db import models
 from django.db.models import signals, Q
+from django.conf import settings
+from django.db import transaction
 
 from lib.phylogelib import getTaxa, getChildren, removeBootStraps, removeNexusComments
 from lib.phylogelib import tidyNwk, checkNwk
 from lib.nexus import Nexus
-import datetime, re
+import datetime, re, sys
 
 ##################################################
 #             TaxonomyReference                  #
@@ -667,6 +669,7 @@ class TreeCollection( models.Model ):
         return self.taxonomy_objects.exclude( type_name = 'scientific name' )
     ambiguous = property( get_ambiguous )
 
+    @transaction.commit_on_success
     def save( self, collection_changed = False, dont_regenerate = False,  **kwargs ):
         collection_string_changed = False
         if not collection_changed and not dont_regenerate:
@@ -697,22 +700,39 @@ class TreeCollection( models.Model ):
             nex = Nexus( nwk_collection )
             self.format = 'nexus'
             self.save( dont_regenerate = True )
+            if settings.DEBUG:
+                nb_trees = len( nex.collection.keys() )
+                i = 0
             for name, (tree, rooted) in nex.collection.iteritems():
                 t = Tree.objects.create( name = name, tree_string = tree,
                   rooted = rooted, delimiter = self.delimiter )
                 self.trees.add( t )
+                if settings.DEBUG:
+                    i += 1
+                    sys.stdout.write("\r[%s] %s%% " % (
+                      str(i), str( i*100.0/nb_trees )  ) )
+                    sys.stdout.flush()
         # Phylip collection
         else:
             self.format = 'phylip'
             self.save( dont_regenerate = True )
             name = 0
-            for nwktree in nwk_collection.strip().split(";"):
+            l_trees = nwk_collection.strip().split(";")
+            if settings.DEBUG:
+                nb_trees = len( l_trees )
+                i = 0
+            for nwktree in l_trees:
                 tree = removeBootStraps( tidyNwk( nwktree.strip().lower())).strip()
                 if tree:
                     name += 1
                     t = Tree.objects.create( name = name, tree_string = tree,
                       rooted = False, delimiter = self.delimiter )
                     self.trees.add( t )
+                    if settings.DEBUG:
+                        i += 1
+                        sys.stdout.write("\r[%s] %s%% " % (
+                          str(i), str( i*100.0/nb_trees )  ) )
+                        sys.stdout.flush()
 
     def get_collection_string( self ):
         """
