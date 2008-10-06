@@ -960,6 +960,43 @@ class TreeCollection( models.Model ):
         new_nwk = self.get_corrected_collection_string( tuple_list )
         return TreeCollection.objects.create( original_collection_string = new_nwk )
 
+    def get_reference_arborescence( self ):
+        """
+        Take a taxa list, search in reference all parents names and
+        return a networkx.DiGraph tree.
+        """
+        import networkx as NX
+        tree = NX.DiGraph() 
+        taxa_list = self.taxas.all().iterator
+        #parents_list = set([Taxa.objects.get(
+        #  id =i) for (i,) in ParentsRelation.objects.filter(
+        #  taxa__trees = t ).values_list( 'parent' )])
+        already_done = set([])
+        for taxa in taxa_list():
+            while taxa.name != 'root' and taxa not in already_done:
+                if taxa.parent in already_done:
+                    break
+                tree.add_edge( taxa.parent, taxa )
+                already_done.add( taxa )
+                taxa = taxa.parent
+            return tree
+
+    def get_reference_arborescence2( self ):
+        """
+        obsolete
+        """
+        import networkx as NX
+        tree = NX.DiGraph()
+        taxa_list = self.taxas.all().iterator
+        for taxa in taxa_list():
+            parents = taxa.parents
+            for parent in parents:
+                tree.add_edge( parent, taxa )
+                taxa = parent
+        return tree
+
+
+
 #############################################
 #                Signals                    #
 #############################################
