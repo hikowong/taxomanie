@@ -22,45 +22,67 @@ class Command(NoArgsCommand):
     TBN = {}
     NAMES = "names.dmp"
     NODES = "nodes.dmp"
-        
+
+    def __generate_test_fixtures( self ):
+       #
+        # Test TBI
+        #
+        self.list_id = set([])
+        TAXOTEST = open( 'taxonomy_test.csv' ).readlines()
+        for line in TAXOTEST:
+            taxa_id, taxa_name, parent_name, homonym_name, parents_list, synonym_list, common_list = line.split( '|' )
+            self.list_id.add( taxa_id )
+            for parent_id in self.TBI[taxa_id]['parents']:
+                self.list_id.add( parent_id )
+        #
+        #
+        #
+ 
     def handle_noargs(self, **options):
         global DUMP_PATH
         verbose = options.get("verbose", False)
         if verbose:
             print "loading taxonomy, please wait, it can take a while..."
-        os.system( 'rm %s/*' % DUMP_PATH )
+        if not os.path.exists( DUMP_PATH ):
+            os.system( 'mkdir %s' % DUMP_PATH )
+        else:
+            os.system( 'rm %s/*' % DUMP_PATH )
         self.download_ncbi( verbose )
         self.generate_structure( verbose )
+        if self.TEST:
+            self.__generate_test_fixtures()
         if verbose:
             print "making rank.dmp"
         self.make_rank()
         if verbose:
-            print "making taxa.dmp"
+            print "making taxonomy.dmp"
         self.make_taxa()
-        if verbose:
-            print "making synonym"
-        self.make_taxonomy( 'synonym', 'synonymname.dmp', 'synonym.dmp' )
-        if verbose:
-            print "making homonym"
-        self.make_taxonomy( 'homonym', 'homonymname.dmp', 'homonym.dmp' )
-        if verbose:
-            print "making common"
-        self.make_taxonomy( 'common', 'commonname.dmp', 'common.dmp' )
+        self.make_taxonomy_plus( verbose )
+#        if verbose:
+#            print "making synonym"
+        #self.make_taxonomy( 'synonym', 'synonymname.dmp', 'synonym.dmp' )
+#        self.make_taxonomy( 'synonym', 'relsynonymtaxa.dmp' )
+#        if verbose:
+#            print "making homonym"
+#        self.make_taxonomy( 'homonym', 'relhomonymtaxa.dmp' )
+#        if verbose:
+#            print "making common"
+#        self.make_taxonomy( 'common', 'relcommontaxa.dmp' )
         if verbose:
             print "making parents"
         self.make_parents()
         # generate taxonomy
-        if verbose:
-            print "making taxonomy"
-        open( os.path.join( DUMP_PATH, './taxonomy.dmp' ), 'w').write( '' )
-        file = open( os.path.join( DUMP_PATH, './taxonomy.dmp' ), 'a' )
-        index = 1
-        index = self.generate_homonyms(file, index)
-        index = self.generate_synonyms(file, index)
-        index = self.generate_commons(file, index)
-        index = self.generate_scientific(file, index)
-        if verbose:
-            print '%s items in the taxonomy' % index
+#        if verbose:
+#            print "making taxonomy"
+#        open( os.path.join( DUMP_PATH, './taxonomy.dmp' ), 'w').write( '' )
+#        file = open( os.path.join( DUMP_PATH, './taxonomy.dmp' ), 'a' )
+#        index = 1
+#        index = self.generate_homonyms(file, index)
+#        index = self.generate_synonyms(file, index)
+#        index = self.generate_commons(file, index)
+#        index = self.generate_scientific(file, index)
+#        if verbose:
+#            print '%s items in the taxonomy' % index
         os.system( 'rm nodes.dmp names.dmp' )
         os.system( 'rm taxdump.tar.gz' )
  
@@ -87,6 +109,7 @@ class Command(NoArgsCommand):
         if verbose:
             print "Generating structure..."
         # Retrieving all scientific names
+        index = 0
         for line in file( self.NAMES ).readlines():
             id = line.split("|")[0].strip()
             name = line.split("|")[1].strip().lower()
@@ -94,6 +117,7 @@ class Command(NoArgsCommand):
             type_name = line.split("|")[3].strip()
             synonym = "synonym" in type_name
             common = "common name" in type_name
+            self.index = int(id)
             if type_name == "scientific name":
                 # Creating TAXONOMY_BY_ID
                 self.TBI[id] = {}
@@ -106,6 +130,7 @@ class Command(NoArgsCommand):
                 self.TBI[id]["synonym"] = []
                 self.TBI[id]["parent"] = []
                 self.TBI[id]["parents"] = []
+                self.TBI[id]["type_name"] = 'scientific name'
                 # Creating TAXONOMY_BY_NAME
                 if homonym:
                     self.TBN[homonym] = {}
@@ -114,35 +139,6 @@ class Command(NoArgsCommand):
                 else:
                     self.TBN[name] = {}
                     self.TBN[name]["id"] = id
-        if verbose:
-            print "Adding synonyms, homonyms and common names..."
-        # Adding synonyms, homonyms and common names
-        for line in file( self.NAMES ).readlines():
-            type_name = line.split("|")[3].strip()
-            synonym = "synonym" in type_name
-            common = "common name" in type_name
-            homonym = line.split("|")[2].strip().lower()
-            id = line.split("|")[0].strip()
-            if synonym or common:
-                name = line.split("|")[1].strip().lower()
-                base_name = self.TBI[id]["name"]
-                if synonym:
-                    if not self.TBN[base_name].has_key( "synonym" ):
-                        self.TBN[base_name]["synonym"] = []
-                    if not self.TBI[id].has_key( "synonym" ):
-                        self.TBI[id]["synonym"] = []
-                    self.TBN[base_name]["synonym"].append( name )
-                    self.TBI[id]["synonym"].append( name )
-                if common:
-                    if not self.TBN[base_name].has_key( "common" ):
-                        self.TBN[base_name]["common"] = []
-                    if not self.TBI[id].has_key( "common" ):
-                        self.TBI[id]["common"] = []
-                    self.TBN[base_name]["common"].append( name )
-                    self.TBI[id]["common"].append( name )
-            if type_name == "scientific name" and homonym:
-                name = line.split("|")[1].strip().lower()
-                self.TBI[id]["homonym"].append( name )
         if verbose:
             print "Extracting parents..."
         for node in file( self.NODES ).readlines():
@@ -162,18 +158,73 @@ class Command(NoArgsCommand):
         for node in file( self.NODES ).readlines():
             id = node.split("|")[0].strip()
             self.TBI[id]["parents"] = getParents( id, self.TBI )
-        #
-        # Test TBI
-        #
-        if self.TEST:
-            TBT = {}
-            TAXOTEST = open( 'taxonomy_test.csv' ).readlines()
-            for line in TAXOTEST:
-                taxa_id, taxa_name, parent_name, homonym_name, parents_list, synonym_list, common_list = line.split( '|' )
-                TBT[taxa_id] = self.TBI[taxa_id]
-                for parent_id in self.TBI[taxa_id]['parents']:
-                    TBT[parent_id] = self.TBI[parent_id]
-            self.TBI = TBT
+
+    def make_taxonomy_plus( self, verbose ):
+        if verbose:
+            print "Adding synonyms, homonyms and common names..."
+        # Adding synonyms, homonyms and common names
+        index = self.index
+        list_synonym = []
+        list_common = []
+        list_homonym = []
+        list_relsynonymtaxa = []
+        list_relcommontaxa = []
+        list_relhomonymtaxa = []
+        index_relsynonym = 0
+        index_relcommon = 0
+        index_relhomonym = 0
+        homonym_toc = {}
+        common_toc = {}
+        synonym_toc = {}
+        for line in file( self.NAMES ).readlines():
+            type_name = line.split("|")[3].strip()
+            synonym = "synonym" in type_name
+            common = "common name" in type_name
+            homonym = line.split("|")[2].strip().lower()
+            id = line.split("|")[0].strip()
+            if self.TEST:
+                if id not in self.list_id:
+                    continue
+            name = line.split("|")[1].strip().lower()
+            if synonym or common:
+                if homonym: # We do not want synonym wich have homonym
+                    continue
+                base_name = self.TBI[id]["name"]
+                if synonym:
+                    if name not in synonym_toc:
+                        index += 1
+                        list_synonym.append( "%s|%s|synonym|2|\n" % ( index, name ) )
+                        synonym_toc[name] = index
+                    index_relsynonym += 1
+                    list_relsynonymtaxa.append(
+                      "%s|%s|%s\n" % ( index_relsynonym, index, id ) )
+                if common:
+                    if name not in common_toc:
+                        index += 1
+                        list_common.append( "%s|%s|common|2|\n" % ( index, name ) )
+                        common_toc[name] = index
+                    index_relcommon += 1
+                    list_relcommontaxa.append(
+                      "%s|%s|%s|english\n" % ( index_relcommon, index, id ) )
+            if type_name == "scientific name" and homonym:
+                if name not in homonym_toc:
+                    index += 1
+                    list_homonym.append( '%s|%s|homonym|2|\n' % ( index, name ) )
+                    homonym_toc[name] = index
+                index_relhomonym += 1
+                list_relhomonymtaxa.append(
+                  "%s|%s|%s\n" % ( index_relhomonym, homonym_toc[name], id ) )
+        taxonomy_file = open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' )
+        taxonomy_file.write( ''.join( list_synonym ) )
+        taxonomy_file.write( ''.join( list_common ) )
+        taxonomy_file.write( ''.join( list_homonym ) )
+        taxonomy_file.close()
+        open( os.path.join( DUMP_PATH, 'relsynonymtaxa.dmp' ), 'w' ).write(
+          ''.join( list_relsynonymtaxa ) )
+        open( os.path.join( DUMP_PATH, 'relcommontaxa.dmp' ), 'w' ).write(
+          ''.join( list_relcommontaxa ) )
+        open( os.path.join( DUMP_PATH, 'relhomonymtaxa.dmp' ), 'w' ).write(
+          ''.join( list_relhomonymtaxa ) )
 
     ################################################
     #               Generating dumps               #
@@ -194,52 +245,23 @@ class Command(NoArgsCommand):
                 self.RANK[rank] = index
         open( os.path.join( DUMP_PATH, 'rank.dmp' ), 'w' ).write( '\n'.join( list_line ) )
 
-    def make_taxa( self ):
+    def make_taxa( self  ):
         global DUMP_PATH
         # Taxa.dmp
         list_line = []
         for species in self.TBI.keys():
-            line = '%s|%s|%s|%s' % (
+            if self.TEST:
+                if species not in self.list_id:
+                    continue
+            line = '%s|%s|%s|%s|%s\n' % (
               species,
               self.TBI[species]['name'],
+              self.TBI[species]['type_name'],
               self.RANK[self.TBI[species]['rank']],
               self.TBI[species]['parent']
             )
             list_line.append( line )
-        open( os.path.join( DUMP_PATH, 'taxa.dmp' ), 'w' ).write( '\n'.join( list_line ) )
-
-    def make_taxonomy( self, name, name_file, relation_file ):
-        global DUMP_PATH
-        # synonymname.dmp
-        synonym_index = {}
-        list_synonymname = []
-        index = 0
-        for species in self.TBI.keys():
-            for synonym in self.TBI[species][name]:
-                index += 1
-                if synonym not in synonym_index:
-                    synonym_index[synonym] = index
-                    if name == 'common':
-                        line = '%s|%s|english' % ( index, synonym.strip("'") )
-                    else:
-                        line = '%s|%s' % ( index, synonym.strip("'") )
-                    list_synonymname.append( line )
-        open( os.path.join( DUMP_PATH, name_file ), 'w' ).write( '\n'.join( list_synonymname ) )
-        # synonym.dmp
-        list_synonym = []
-        already_done = []
-        index = 0
-        for species in self.TBI.keys():
-            for synonym in self.TBI[species][name]:
-                if name == 'common':
-                    if (synonym_index[synonym], species) in already_done:
-                        continue
-                index += 1
-                line = '%s|%s|%s' % ( index, synonym_index[synonym], species )
-                list_synonym.append( line )
-                if name == 'common':
-                    already_done.append( (synonym_index[synonym], species ) )
-        open( os.path.join( DUMP_PATH, relation_file ), 'w' ).write( '\n'.join( list_synonym ) )
+        open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'w' ).write( ''.join( list_line ) )
 
     def make_parents( self ):
         global DUMP_PATH
@@ -247,55 +269,13 @@ class Command(NoArgsCommand):
         list_parents = []
         for species in self.TBI.keys():
             index = 0
+            if self.TEST:
+                if species not in self.list_id:
+                    continue
             for parent_id in self.TBI[species]["parents"]:
                 id_rel += 1
-                line = '%s|%s|%s|%s' % ( id_rel,species, parent_id, index ) 
+                line = '%s|%s|%s|%s\n' % ( id_rel,species, parent_id, index ) 
                 list_parents.append( line )
                 index += 1
-        open( os.path.join( DUMP_PATH, 'parentsrelation.dmp' ), 'w' ).write( '\n'.join( list_parents ) )
-                    
-    def generate_homonyms( self, file, index):
-        global DUMP_PATH
-        homonyms = open( os.path.join( DUMP_PATH, 'homonymname.dmp') ).readlines()
-        my_set = set()
-        for homonym in homonyms:
-            homonym_name = homonym.split('|')[1].strip()
-            if not homonym_name in my_set:
-                index += 1
-                file.write( '%s|%s|%s\n' % ( index, homonym_name,  'homonym' ) )
-                my_set.add( homonym_name )
-        return index
-
-    def generate_synonyms( self, file, index):
-        global DUMP_PATH
-        synonyms = open( os.path.join( DUMP_PATH, 'synonymname.dmp') ).readlines()
-        my_set = set()
-        for synonym in synonyms:
-            synonym_name = synonym.split('|')[1].strip()
-            if not synonym_name in my_set:
-                index += 1
-                file.write( '%s|%s|%s\n' % ( index, synonym_name, 'synonym' ) )
-                my_set.add( synonym_name )
-        return index
-
-    def generate_commons( self, file, index ):
-        global DUMP_PATH
-        commons = open(os.path.join( DUMP_PATH,  'commonname.dmp') ).readlines()
-        my_set = set()
-        for common in commons:
-            common_name = common.split('|')[1].strip()
-            if not common_name in my_set:
-                index += 1
-                file.write( '%s|%s|%s\n' % ( index, common_name, 'common' ) )
-                my_set.add( common_name )
-        return index
-
-    def generate_scientific( self, file, index ):
-        global DUMP_PATH
-        taxas = open( os.path.join( DUMP_PATH, 'taxa.dmp' )).readlines()
-        for taxa in taxas:
-            index += 1
-            file.write( '%s|%s|%s\n' % ( index, taxa.split('|')[1].strip(), 'scientific name' ) )
-        return index
-
+        open( os.path.join( DUMP_PATH, 'parentsrelation.dmp' ), 'w' ).write( ''.join( list_parents ) )
 

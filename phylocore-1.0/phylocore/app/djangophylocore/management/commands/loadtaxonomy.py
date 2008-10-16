@@ -36,9 +36,9 @@ class Command(NoArgsCommand):
             if verbose:
                 print cmd
             os.system( cmd )
-        if not os.path.exists( 
-          os.path.join( path_dumps, 'parentsrelation.dmp' ) ):
-            if verbose:
-                print "no parent relations found, generating..."
-            os.system( 'python manage.py generateparents' )
+#        if not os.path.exists( 
+#          os.path.join( path_dumps, 'parentsrelation.dmp' ) ):
+#            if verbose:
+#                print "no parent relations found, generating..."
+#            os.system( 'python manage.py generateparents' )
 

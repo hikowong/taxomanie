@@ -59,6 +59,7 @@ def getParent(tree,node):
       parent = getParent(child,node)
   return parent
 
+
 def getChildren(tree):
   """ Extract all first child of tree to a list """
   p = 0
@@ -80,6 +81,7 @@ def getChildren(tree):
 
 def getBrothers( tree, node ):
   """ return all node brothers in tree """
+  tree = removeBootStraps( tree )
   return getChildren( getParent( tree, node ) )
  
 def getNodes(tree):
@@ -120,13 +122,15 @@ def removeBootStraps(tree):
   """ Remove all bootstraps from tree """
   chaine = ""
   ignore = False
-  for i in tree:
-    if i == ":":
+  for i in range(len(tree)):
+    if tree[i] == ":":
       ignore = True
-    if i == "," or i == ")":
+    if tree[i] == "," or tree[i] == ")":
       ignore = False
+    if i > 0 and tree[i-1] == ')' and tree[i] not in "),":
+      ignore = True
     if not ignore:
-      chaine += i
+      chaine += tree[i]
   return chaine
 
 #def getTaxa(tree):

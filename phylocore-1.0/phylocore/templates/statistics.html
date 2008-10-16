@@ -102,7 +102,7 @@ name="query" />
 </fieldset>
 <br />
 
-{% if nb_homonyms %}
+{% if nb_homonyms or nb_synonym or nb_badtaxa %}
     <!-- Collection correction -->
     <fieldset>
     <legend> Correct your collection </legend>
@@ -124,6 +124,45 @@ name="query" />
         </span>
     {% endif %}
     <!-- end homonym fieldset -->
+    <!-- synonym fieldset -->
+    {% if nb_synonyms %}
+        <span class="homonymlist">
+        <fieldset>
+        <legend> {{ nb_synonym }} synonym(s) </legend>
+        {% for synonym_name, suggestions in dict_synonym.iteritems %}
+            <font color="orange">{{ synonym_name }}</font> :
+            {% for sugg in suggestions %}
+                {{ sugg }}
+                <input type="radio" name="{{synonym_name}}" value="{{ sugg }}" />
+            {% endfor %}
+            <br />
+        {% endfor %}
+        </fieldset>
+        </span>
+    {% endif %}
+    <!-- end synonym fieldset -->
+    <!-- badtaxa fieldset -->
+    {% if nb_badtaxa %}
+        <span class="homonymlist">
+        <fieldset>
+        <legend> {{ nb_badtaxa }} taxa(s) </legend>
+        {% for bad_name, suggestions in dict_bad_taxas.iteritems %}
+            <font color="red">{{ bad_name }}</font> :
+            {% if suggestions %}
+                {% for sugg in suggestions %}
+                    {{ sugg }}
+                    <input type="radio" name="{{bad_name}}" value="{{ sugg }}" />
+                {% endfor %}
+            {% else %}
+                <input type='text' name="{{bad_name}}" />
+            {% endif %}
+            <br />
+        {% endfor %}
+        </fieldset>
+        </span>
+    {% endif %}
+    <!-- end badtaxa fieldset -->
+
     <input type="submit" value="Correct collection"/>
     </form>
     </fieldset><br />

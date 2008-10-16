@@ -25,7 +25,7 @@ True
 >>> taxoref.is_scientific_name( 'antilocapra anteflexa' )
 False
 
->>> taxoref.is_common( 'rat' )
+>>> taxoref.is_common( 'black rat' )
 True
 >>> taxoref.is_common( 'rat noir' )
 False
@@ -49,17 +49,17 @@ True
 True
 
 >>> taxoref.get_name_from_common( 'mouse' )
-[<Taxa: mus musculus>]
+[<Taxonomy: mus musculus (scientific name)>]
 >>> taxoref.get_name_from_common( 'mus' )
 []
 
 >>> taxoref.get_name_from_synonym( 'nannomys' )
-[<Taxa: mus>]
+[<Taxonomy: mus (scientific name)>]
 >>> taxoref.get_name_from_synonym( 'mus' )
 []
 
 >>> taxoref.get_name_from_homonym( 'echinops' )
-[<Taxa: echinops <mammal>>, <Taxa: echinops <plant>>]
+[<Taxonomy: echinops <mammal> (scientific name)>, <Taxonomy: echinops <plant> (scientific name)>]
 >>> taxoref.get_name_from_homonym( 'homo' )
 []
 
@@ -84,22 +84,22 @@ True
 >>> taxoref.correct( 'rattus' ) is None
 True
 >>> taxoref.correct( 'house mouse' )
-[<Taxa: mus musculus>]
+[<Taxonomy: mus musculus (scientific name)>]
 >>> taxoref.correct( 'echinops' )
-[<Taxa: echinops <mammal>>, <Taxa: echinops <plant>>]
+[<Taxonomy: echinops <mammal> (scientific name)>, <Taxonomy: echinops <plant> (scientific name)>]
 >>> taxoref.correct( 'nannomys' )
-[<Taxa: mus>]
+[<Taxonomy: mus (scientific name)>]
 >>> taxoref.correct( 'taxa not in database' )
 [0]
 
 Getting django objects from name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 >>> taxoref.get_object_from_name( 'mus' )
-<Taxa: mus>
+[<Taxonomy: mus (scientific name)>]
 >>> taxoref.get_object_from_name( 'nannomys' )
-<SynonymName: nannomys>
+[<Taxonomy: nannomys (synonym)>]
 >>> taxoref.get_object_from_name( 'echinops' )
-<HomonymName: echinops>
+[<Taxonomy: echinops (homonym)>]
 >>> taxoref.get_object_from_name( 'badname' )
 <BadTaxa: badname (1)>
 
@@ -114,13 +114,13 @@ ValueError('very badname not found in the database',)
 Working with taxa
 -----------------
 
->>> root = Taxa.objects.get( name = 'root' )
->>> muridae = Taxa.objects.get( name = 'muridae' )
->>> mus = Taxa.objects.get( name = 'mus' )
->>> mus_musculus = Taxa.objects.get( name = 'mus musculus' )
->>> rattus = Taxa.objects.get( name = 'rattus' )
->>> echinops_plantae = Taxa.objects.get( name = 'echinops <plant>' )
->>> mammalia = Taxa.objects.get( name = 'mammalia' )
+>>> root = Taxonomy.objects.get( name = 'root' )
+>>> muridae = Taxonomy.objects.get( name = 'muridae' )
+>>> mus = Taxonomy.objects.get( name = 'mus' )
+>>> mus_musculus = Taxonomy.objects.get( name = 'mus musculus' )
+>>> rattus = Taxonomy.objects.get( name = 'rattus' )
+>>> echinops_plantae = Taxonomy.objects.get( name = 'echinops <plant>' )
+>>> mammalia = Taxonomy.objects.get( name = 'mammalia' )
 
 Getting interval parents
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -129,16 +129,18 @@ Getting interval parents
 ...    taxoref.get_interval_parents( mus, rattus )
 ... except AssertionError,e:
 ...    str(e)
-'mus is not a parent of rattus'
+'mus (scientific name) is not a parent of rattus (scientific name)'
 >>> try:
 ...     taxoref.get_interval_parents( mus_musculus, muridae )
 ... except AssertionError,e:
 ...     str(e)
-'mus musculus is not a parent of muridae'
+'mus musculus (scientific name) is not a parent of muridae (scientific name)'
+
 >>> taxoref.get_interval_parents( muridae, mus_musculus )
-[<Taxa: mus>, <Taxa: murinae>]
+[<Taxonomy: mus (scientific name)>, <Taxonomy: murinae (scientific name)>]
+
 >>> taxoref.get_interval_parents( mammalia, mus_musculus )
-[<Taxa: mus>, <Taxa: murinae>, <Taxa: muridae>, <Taxa: muroidea>, <Taxa: sciurognathi>, <Taxa: rodentia>, <Taxa: glires>, <Taxa: euarchontoglires>, <Taxa: eutheria>, <Taxa: theria>]
+[<Taxonomy: mus (scientific name)>, <Taxonomy: murinae (scientific name)>, <Taxonomy: muridae (scientific name)>, <Taxonomy: muroidea (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: theria (scientific name)>]
 
 
 Getting common parents
@@ -147,27 +149,30 @@ Getting common parents
 >>> taxoref.get_common_parents( [root] )
 []
 >>> taxoref.get_common_parents( [muridae] )
-[<Taxa: muroidea>, <Taxa: sciurognathi>, <Taxa: rodentia>, <Taxa: glires>, <Taxa: euarchontoglires>, <Taxa: eutheria>, <Taxa: theria>, <Taxa: mammalia>, <Taxa: amniota>, <Taxa: tetrapoda>, <Taxa: sarcopterygii>, <Taxa: euteleostomi>, <Taxa: teleostomi>, <Taxa: gnathostomata <vertebrate>>, <Taxa: vertebrata>, <Taxa: craniata <chordata>>, <Taxa: chordata>, <Taxa: deuterostomia>, <Taxa: coelomata>, <Taxa: bilateria>, <Taxa: eumetazoa>, <Taxa: metazoa>, <Taxa: fungi/metazoa group>, <Taxa: eukaryota>, <Taxa: cellular organisms>, <Taxa: root>]
+[<Taxonomy: muroidea (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: theria (scientific name)>, <Taxonomy: mammalia (scientific name)>, <Taxonomy: amniota (scientific name)>, <Taxonomy: tetrapoda (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: euteleostomi (scientific name)>, <Taxonomy: teleostomi (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: vertebrata (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: chordata (scientific name)>, <Taxonomy: deuterostomia (scientific name)>, <Taxonomy: coelomata (scientific name)>, <Taxonomy: bilateria (scientific name)>, <Taxonomy: eumetazoa (scientific name)>, <Taxonomy: metazoa (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: eukaryota (scientific name)>, <Taxonomy: cellular organisms (scientific name)>, <Taxonomy: root (scientific name)>]
+
 >>> taxoref.get_common_parents( [muridae, mus] )
-[<Taxa: muroidea>, <Taxa: sciurognathi>, <Taxa: rodentia>, <Taxa: glires>, <Taxa: euarchontoglires>, <Taxa: eutheria>, <Taxa: theria>, <Taxa: mammalia>, <Taxa: amniota>, <Taxa: tetrapoda>, <Taxa: sarcopterygii>, <Taxa: euteleostomi>, <Taxa: teleostomi>, <Taxa: gnathostomata <vertebrate>>, <Taxa: vertebrata>, <Taxa: craniata <chordata>>, <Taxa: chordata>, <Taxa: deuterostomia>, <Taxa: coelomata>, <Taxa: bilateria>, <Taxa: eumetazoa>, <Taxa: metazoa>, <Taxa: fungi/metazoa group>, <Taxa: eukaryota>, <Taxa: cellular organisms>, <Taxa: root>]
+[<Taxonomy: muroidea (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: theria (scientific name)>, <Taxonomy: mammalia (scientific name)>, <Taxonomy: amniota (scientific name)>, <Taxonomy: tetrapoda (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: euteleostomi (scientific name)>, <Taxonomy: teleostomi (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: vertebrata (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: chordata (scientific name)>, <Taxonomy: deuterostomia (scientific name)>, <Taxonomy: coelomata (scientific name)>, <Taxonomy: bilateria (scientific name)>, <Taxonomy: eumetazoa (scientific name)>, <Taxonomy: metazoa (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: eukaryota (scientific name)>, <Taxonomy: cellular organisms (scientific name)>, <Taxonomy: root (scientific name)>]
+
 >>> taxoref.get_common_parents( [mus, mus_musculus] )
-[<Taxa: murinae>, <Taxa: muridae>, <Taxa: muroidea>, <Taxa: sciurognathi>, <Taxa: rodentia>, <Taxa: glires>, <Taxa: euarchontoglires>, <Taxa: eutheria>, <Taxa: theria>, <Taxa: mammalia>, <Taxa: amniota>, <Taxa: tetrapoda>, <Taxa: sarcopterygii>, <Taxa: euteleostomi>, <Taxa: teleostomi>, <Taxa: gnathostomata <vertebrate>>, <Taxa: vertebrata>, <Taxa: craniata <chordata>>, <Taxa: chordata>, <Taxa: deuterostomia>, <Taxa: coelomata>, <Taxa: bilateria>, <Taxa: eumetazoa>, <Taxa: metazoa>, <Taxa: fungi/metazoa group>, <Taxa: eukaryota>, <Taxa: cellular organisms>, <Taxa: root>]
+[<Taxonomy: murinae (scientific name)>, <Taxonomy: muridae (scientific name)>, <Taxonomy: muroidea (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: theria (scientific name)>, <Taxonomy: mammalia (scientific name)>, <Taxonomy: amniota (scientific name)>, <Taxonomy: tetrapoda (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: euteleostomi (scientific name)>, <Taxonomy: teleostomi (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: vertebrata (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: chordata (scientific name)>, <Taxonomy: deuterostomia (scientific name)>, <Taxonomy: coelomata (scientific name)>, <Taxonomy: bilateria (scientific name)>, <Taxonomy: eumetazoa (scientific name)>, <Taxonomy: metazoa (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: eukaryota (scientific name)>, <Taxonomy: cellular organisms (scientific name)>, <Taxonomy: root (scientific name)>]
+
 >>> taxoref.get_common_parents( [mus_musculus, mus] )
-[<Taxa: murinae>, <Taxa: muridae>, <Taxa: muroidea>, <Taxa: sciurognathi>, <Taxa: rodentia>, <Taxa: glires>, <Taxa: euarchontoglires>, <Taxa: eutheria>, <Taxa: theria>, <Taxa: mammalia>, <Taxa: amniota>, <Taxa: tetrapoda>, <Taxa: sarcopterygii>, <Taxa: euteleostomi>, <Taxa: teleostomi>, <Taxa: gnathostomata <vertebrate>>, <Taxa: vertebrata>, <Taxa: craniata <chordata>>, <Taxa: chordata>, <Taxa: deuterostomia>, <Taxa: coelomata>, <Taxa: bilateria>, <Taxa: eumetazoa>, <Taxa: metazoa>, <Taxa: fungi/metazoa group>, <Taxa: eukaryota>, <Taxa: cellular organisms>, <Taxa: root>]
+[<Taxonomy: murinae (scientific name)>, <Taxonomy: muridae (scientific name)>, <Taxonomy: muroidea (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: theria (scientific name)>, <Taxonomy: mammalia (scientific name)>, <Taxonomy: amniota (scientific name)>, <Taxonomy: tetrapoda (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: euteleostomi (scientific name)>, <Taxonomy: teleostomi (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: vertebrata (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: chordata (scientific name)>, <Taxonomy: deuterostomia (scientific name)>, <Taxonomy: coelomata (scientific name)>, <Taxonomy: bilateria (scientific name)>, <Taxonomy: eumetazoa (scientific name)>, <Taxonomy: metazoa (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: eukaryota (scientific name)>, <Taxonomy: cellular organisms (scientific name)>, <Taxonomy: root (scientific name)>]
 
 Getting the first common parent
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 >>> taxoref.get_first_common_parent( [mus] )
-<Taxa: murinae>
+<Taxonomy: murinae (scientific name)>
 >>> taxoref.get_first_common_parent( [mus, rattus] )
-<Taxa: murinae>
+<Taxonomy: murinae (scientific name)>
 >>> taxoref.get_first_common_parent( [rattus, mus] )
-<Taxa: murinae>
+<Taxonomy: murinae (scientific name)>
 >>> taxoref.get_first_common_parent( [mus, rattus, muridae] )
-<Taxa: muroidea>
+<Taxonomy: muroidea (scientific name)>
 >>> taxoref.get_first_common_parent( [mus, muridae] )
-<Taxa: muroidea>
+<Taxonomy: muroidea (scientific name)>
 
 Root has no parents
 >>> taxoref.get_first_common_parent( [root] ) is None
@@ -180,14 +185,17 @@ Working with networkx.DiGraph
 
 >>> graph = taxoref.get_reference_arborescence( [mus, rattus, echinops_plantae] )
 >>> graph.nodes()
-[<Taxa: root>, <Taxa: fungi/metazoa group>, <Taxa: eutheria>, <Taxa: rodentia>, <Taxa: tetrapoda>, <Taxa: amniota>, <Taxa: theria>, <Taxa: sciurognathi>, <Taxa: euteleostomi>, <Taxa: streptophytina>, <Taxa: muroidea>, <Taxa: chordata>, <Taxa: euarchontoglires>, <Taxa: glires>, <Taxa: coelomata>, <Taxa: streptophyta>, <Taxa: tracheophyta>, <Taxa: spermatophyta>, <Taxa: echinops <plant>>, <Taxa: euphyllophyta>, <Taxa: core eudicotyledons>, <Taxa: eumetazoa>, <Taxa: carduoideae>, <Taxa: bilateria>, <Taxa: vertebrata>, <Taxa: teleostomi>, <Taxa: murinae>, <Taxa: magnoliophyta>, <Taxa: eukaryota>, <Taxa: eudicotyledons>, <Taxa: viridiplantae>, <Taxa: cardueae>, <Taxa: metazoa>, <Taxa: muridae>, <Taxa: embryophyta>, <Taxa: sarcopterygii>, <Taxa: gnathostomata <vertebrate>>, <Taxa: mammalia>, <Taxa: deuterostomia>, <Taxa: mus>, <Taxa: campanulids>, <Taxa: cellular organisms>, <Taxa: asterales>, <Taxa: asteraceae>, <Taxa: craniata <chordata>>, <Taxa: asterids>, <Taxa: rattus>]
+[<Taxonomy: root (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: tetrapoda (scientific name)>, <Taxonomy: amniota (scientific name)>, <Taxonomy: theria (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: euteleostomi (scientific name)>, <Taxonomy: streptophytina (scientific name)>, <Taxonomy: muroidea (scientific name)>, <Taxonomy: chordata (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: coelomata (scientific name)>, <Taxonomy: streptophyta (scientific name)>, <Taxonomy: tracheophyta (scientific name)>, <Taxonomy: spermatophyta (scientific name)>, <Taxonomy: echinops <plant> (scientific name)>, <Taxonomy: euphyllophyta (scientific name)>, <Taxonomy: core eudicotyledons (scientific name)>, <Taxonomy: eumetazoa (scientific name)>, <Taxonomy: carduoideae (scientific name)>, <Taxonomy: bilateria (scientific name)>, <Taxonomy: vertebrata (scientific name)>, <Taxonomy: teleostomi (scientific name)>, <Taxonomy: murinae (scientific name)>, <Taxonomy: magnoliophyta (scientific name)>, <Taxonomy: eukaryota (scientific name)>, <Taxonomy: eudicotyledons (scientific name)>, <Taxonomy: viridiplantae (scientific name)>, <Taxonomy: cardueae (scientific name)>, <Taxonomy: metazoa (scientific name)>, <Taxonomy: muridae (scientific name)>, <Taxonomy: embryophyta (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: mammalia (scientific name)>, <Taxonomy: deuterostomia (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: campanulids (scientific name)>, <Taxonomy: cellular organisms (scientific name)>, <Taxonomy: asterales (scientific name)>, <Taxonomy: asteraceae (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: asterids (scientific name)>, <Taxonomy: rattus (scientific name)>]
+
 >>> graph.edges()
-[(<Taxa: root>, <Taxa: cellular organisms>), (<Taxa: fungi/metazoa group>, <Taxa: metazoa>), (<Taxa: eutheria>, <Taxa: euarchontoglires>), (<Taxa: rodentia>, <Taxa: sciurognathi>), (<Taxa: tetrapoda>, <Taxa: amniota>), (<Taxa: amniota>, <Taxa: mammalia>), (<Taxa: theria>, <Taxa: eutheria>), (<Taxa: sciurognathi>, <Taxa: muroidea>), (<Taxa: euteleostomi>, <Taxa: sarcopterygii>), (<Taxa: streptophytina>, <Taxa: embryophyta>), (<Taxa: muroidea>, <Taxa: muridae>), (<Taxa: chordata>, <Taxa: craniata <chordata>>), (<Taxa: euarchontoglires>, <Taxa: glires>), (<Taxa: glires>, <Taxa: rodentia>), (<Taxa: coelomata>, <Taxa: deuterostomia>), (<Taxa: streptophyta>, <Taxa: streptophytina>), (<Taxa: tracheophyta>, <Taxa: euphyllophyta>), (<Taxa: spermatophyta>, <Taxa: magnoliophyta>), (<Taxa: euphyllophyta>, <Taxa: spermatophyta>), (<Taxa: core eudicotyledons>, <Taxa: asterids>), (<Taxa: eumetazoa>, <Taxa: bilateria>), (<Taxa: carduoideae>, <Taxa: cardueae>), (<Taxa: bilateria>, <Taxa: coelomata>), (<Taxa: vertebrata>, <Taxa: gnathostomata <vertebrate>>), (<Taxa: teleostomi>, <Taxa: euteleostomi>), (<Taxa: murinae>, <Taxa: mus>), (<Taxa: murinae>, <Taxa: rattus>), (<Taxa: magnoliophyta>, <Taxa: eudicotyledons>), (<Taxa: eukaryota>, <Taxa: fungi/metazoa group>), (<Taxa: eukaryota>, <Taxa: viridiplantae>), (<Taxa: eudicotyledons>, <Taxa: core eudicotyledons>), (<Taxa: viridiplantae>, <Taxa: streptophyta>), (<Taxa: cardueae>, <Taxa: echinops <plant>>), (<Taxa: metazoa>, <Taxa: eumetazoa>), (<Taxa: muridae>, <Taxa: murinae>), (<Taxa: embryophyta>, <Taxa: tracheophyta>), (<Taxa: sarcopterygii>, <Taxa: tetrapoda>), (<Taxa: gnathostomata <vertebrate>>, <Taxa: teleostomi>), (<Taxa: mammalia>, <Taxa: theria>), (<Taxa: deuterostomia>, <Taxa: chordata>), (<Taxa: campanulids>, <Taxa: asterales>), (<Taxa: cellular organisms>, <Taxa: eukaryota>), (<Taxa: asterales>, <Taxa: asteraceae>), (<Taxa: asteraceae>, <Taxa: carduoideae>), (<Taxa: craniata <chordata>>, <Taxa: vertebrata>), (<Taxa: asterids>, <Taxa: campanulids>)]
+[(<Taxonomy: root (scientific name)>, <Taxonomy: cellular organisms (scientific name)>), (<Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: metazoa (scientific name)>), (<Taxonomy: eutheria (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>), (<Taxonomy: rodentia (scientific name)>, <Taxonomy: sciurognathi (scientific name)>), (<Taxonomy: tetrapoda (scientific name)>, <Taxonomy: amniota (scientific name)>), (<Taxonomy: amniota (scientific name)>, <Taxonomy: mammalia (scientific name)>), (<Taxonomy: theria (scientific name)>, <Taxonomy: eutheria (scientific name)>), (<Taxonomy: sciurognathi (scientific name)>, <Taxonomy: muroidea (scientific name)>), (<Taxonomy: euteleostomi (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>), (<Taxonomy: streptophytina (scientific name)>, <Taxonomy: embryophyta (scientific name)>), (<Taxonomy: muroidea (scientific name)>, <Taxonomy: muridae (scientific name)>), (<Taxonomy: chordata (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>), (<Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: glires (scientific name)>), (<Taxonomy: glires (scientific name)>, <Taxonomy: rodentia (scientific name)>), (<Taxonomy: coelomata (scientific name)>, <Taxonomy: deuterostomia (scientific name)>), (<Taxonomy: streptophyta (scientific name)>, <Taxonomy: streptophytina (scientific name)>), (<Taxonomy: tracheophyta (scientific name)>, <Taxonomy: euphyllophyta (scientific name)>), (<Taxonomy: spermatophyta (scientific name)>, <Taxonomy: magnoliophyta (scientific name)>), (<Taxonomy: euphyllophyta (scientific name)>, <Taxonomy: spermatophyta (scientific name)>), (<Taxonomy: core eudicotyledons (scientific name)>, <Taxonomy: asterids (scientific name)>), (<Taxonomy: eumetazoa (scientific name)>, <Taxonomy: bilateria (scientific name)>), (<Taxonomy: carduoideae (scientific name)>, <Taxonomy: cardueae (scientific name)>), (<Taxonomy: bilateria (scientific name)>, <Taxonomy: coelomata (scientific name)>), (<Taxonomy: vertebrata (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>), (<Taxonomy: teleostomi (scientific name)>, <Taxonomy: euteleostomi (scientific name)>), (<Taxonomy: murinae (scientific name)>, <Taxonomy: mus (scientific name)>), (<Taxonomy: murinae (scientific name)>, <Taxonomy: rattus (scientific name)>), (<Taxonomy: magnoliophyta (scientific name)>, <Taxonomy: eudicotyledons (scientific name)>), (<Taxonomy: eukaryota (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>), (<Taxonomy: eukaryota (scientific name)>, <Taxonomy: viridiplantae (scientific name)>), (<Taxonomy: eudicotyledons (scientific name)>, <Taxonomy: core eudicotyledons (scientific name)>), (<Taxonomy: viridiplantae (scientific name)>, <Taxonomy: streptophyta (scientific name)>), (<Taxonomy: cardueae (scientific name)>, <Taxonomy: echinops <plant> (scientific name)>), (<Taxonomy: metazoa (scientific name)>, <Taxonomy: eumetazoa (scientific name)>), (<Taxonomy: muridae (scientific name)>, <Taxonomy: murinae (scientific name)>), (<Taxonomy: embryophyta (scientific name)>, <Taxonomy: tracheophyta (scientific name)>), (<Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: tetrapoda (scientific name)>), (<Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: teleostomi (scientific name)>), (<Taxonomy: mammalia (scientific name)>, <Taxonomy: theria (scientific name)>), (<Taxonomy: deuterostomia (scientific name)>, <Taxonomy: chordata (scientific name)>), (<Taxonomy: campanulids (scientific name)>, <Taxonomy: asterales (scientific name)>), (<Taxonomy: cellular organisms (scientific name)>, <Taxonomy: eukaryota (scientific name)>), (<Taxonomy: asterales (scientific name)>, <Taxonomy: asteraceae (scientific name)>), (<Taxonomy: asteraceae (scientific name)>, <Taxonomy: carduoideae (scientific name)>), (<Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: vertebrata (scientific name)>), (<Taxonomy: asterids (scientific name)>, <Taxonomy: campanulids (scientific name)>)]
 
 >>> graph = taxoref.get_reference_arborescence( [mus, rattus, muridae] )
 >>> graph.nodes()
-[<Taxa: root>, <Taxa: fungi/metazoa group>, <Taxa: eutheria>, <Taxa: rodentia>, <Taxa: tetrapoda>, <Taxa: amniota>, <Taxa: theria>, <Taxa: sciurognathi>, <Taxa: euteleostomi>, <Taxa: muroidea>, <Taxa: chordata>, <Taxa: euarchontoglires>, <Taxa: glires>, <Taxa: coelomata>, <Taxa: eumetazoa>, <Taxa: bilateria>, <Taxa: vertebrata>, <Taxa: teleostomi>, <Taxa: murinae>, <Taxa: eukaryota>, <Taxa: metazoa>, <Taxa: muridae>, <Taxa: sarcopterygii>, <Taxa: gnathostomata <vertebrate>>, <Taxa: mammalia>, <Taxa: deuterostomia>, <Taxa: mus>, <Taxa: cellular organisms>, <Taxa: craniata <chordata>>, <Taxa: rattus>]
+[<Taxonomy: root (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: tetrapoda (scientific name)>, <Taxonomy: amniota (scientific name)>, <Taxonomy: theria (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: euteleostomi (scientific name)>, <Taxonomy: muroidea (scientific name)>, <Taxonomy: chordata (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: coelomata (scientific name)>, <Taxonomy: eumetazoa (scientific name)>, <Taxonomy: bilateria (scientific name)>, <Taxonomy: vertebrata (scientific name)>, <Taxonomy: teleostomi (scientific name)>, <Taxonomy: murinae (scientific name)>, <Taxonomy: eukaryota (scientific name)>, <Taxonomy: metazoa (scientific name)>, <Taxonomy: muridae (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: mammalia (scientific name)>, <Taxonomy: deuterostomia (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: cellular organisms (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: rattus (scientific name)>]
+
+
 >>> graph.edges()
-[(<Taxa: root>, <Taxa: cellular organisms>), (<Taxa: fungi/metazoa group>, <Taxa: metazoa>), (<Taxa: eutheria>, <Taxa: euarchontoglires>), (<Taxa: rodentia>, <Taxa: sciurognathi>), (<Taxa: tetrapoda>, <Taxa: amniota>), (<Taxa: amniota>, <Taxa: mammalia>), (<Taxa: theria>, <Taxa: eutheria>), (<Taxa: sciurognathi>, <Taxa: muroidea>), (<Taxa: euteleostomi>, <Taxa: sarcopterygii>), (<Taxa: muroidea>, <Taxa: muridae>), (<Taxa: chordata>, <Taxa: craniata <chordata>>), (<Taxa: euarchontoglires>, <Taxa: glires>), (<Taxa: glires>, <Taxa: rodentia>), (<Taxa: coelomata>, <Taxa: deuterostomia>), (<Taxa: eumetazoa>, <Taxa: bilateria>), (<Taxa: bilateria>, <Taxa: coelomata>), (<Taxa: vertebrata>, <Taxa: gnathostomata <vertebrate>>), (<Taxa: teleostomi>, <Taxa: euteleostomi>), (<Taxa: murinae>, <Taxa: mus>), (<Taxa: murinae>, <Taxa: rattus>), (<Taxa: eukaryota>, <Taxa: fungi/metazoa group>), (<Taxa: metazoa>, <Taxa: eumetazoa>), (<Taxa: muridae>, <Taxa: murinae>), (<Taxa: sarcopterygii>, <Taxa: tetrapoda>), (<Taxa: gnathostomata <vertebrate>>, <Taxa: teleostomi>), (<Taxa: mammalia>, <Taxa: theria>), (<Taxa: deuterostomia>, <Taxa: chordata>), (<Taxa: cellular organisms>, <Taxa: eukaryota>), (<Taxa: craniata <chordata>>, <Taxa: vertebrata>)]
+[(<Taxonomy: root (scientific name)>, <Taxonomy: cellular organisms (scientific name)>), (<Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: metazoa (scientific name)>), (<Taxonomy: eutheria (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>), (<Taxonomy: rodentia (scientific name)>, <Taxonomy: sciurognathi (scientific name)>), (<Taxonomy: tetrapoda (scientific name)>, <Taxonomy: amniota (scientific name)>), (<Taxonomy: amniota (scientific name)>, <Taxonomy: mammalia (scientific name)>), (<Taxonomy: theria (scientific name)>, <Taxonomy: eutheria (scientific name)>), (<Taxonomy: sciurognathi (scientific name)>, <Taxonomy: muroidea (scientific name)>), (<Taxonomy: euteleostomi (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>), (<Taxonomy: muroidea (scientific name)>, <Taxonomy: muridae (scientific name)>), (<Taxonomy: chordata (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>), (<Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: glires (scientific name)>), (<Taxonomy: glires (scientific name)>, <Taxonomy: rodentia (scientific name)>), (<Taxonomy: coelomata (scientific name)>, <Taxonomy: deuterostomia (scientific name)>), (<Taxonomy: eumetazoa (scientific name)>, <Taxonomy: bilateria (scientific name)>), (<Taxonomy: bilateria (scientific name)>, <Taxonomy: coelomata (scientific name)>), (<Taxonomy: vertebrata (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>), (<Taxonomy: teleostomi (scientific name)>, <Taxonomy: euteleostomi (scientific name)>), (<Taxonomy: murinae (scientific name)>, <Taxonomy: mus (scientific name)>), (<Taxonomy: murinae (scientific name)>, <Taxonomy: rattus (scientific name)>), (<Taxonomy: eukaryota (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>), (<Taxonomy: metazoa (scientific name)>, <Taxonomy: eumetazoa (scientific name)>), (<Taxonomy: muridae (scientific name)>, <Taxonomy: murinae (scientific name)>), (<Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: tetrapoda (scientific name)>), (<Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: teleostomi (scientific name)>), (<Taxonomy: mammalia (scientific name)>, <Taxonomy: theria (scientific name)>), (<Taxonomy: deuterostomia (scientific name)>, <Taxonomy: chordata (scientific name)>), (<Taxonomy: cellular organisms (scientific name)>, <Taxonomy: eukaryota (scientific name)>), (<Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: vertebrata (scientific name)>)]
 
 """
