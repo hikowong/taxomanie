@@ -14,7 +14,7 @@ def test_tree():
 >>> tree.is_valid
 True
 >>> tree.taxas.all()
-[<Taxa: echinops <plant>>, <Taxa: mus>, <Taxa: mus musculus>, <Taxa: rattus>]
+[<Taxonomy: echinops <plant> (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus (scientific name)>]
 >>> tree.bad_taxas.all()
 []
 >>> tree.synonyms.all()
@@ -26,37 +26,37 @@ True
 
 # In this tree, there's bad taxas, common names, synonyms and homonyms
 
->>> nwk_tree = "( echinops, (rattus, ( mus, azerty, rat ), nannomys ))"
+>>> nwk_tree = "( echinops, (rattus, ( mus, azerty, black rat ), nannomys ))"
 >>> tree = Tree.objects.create( tree_string = nwk_tree, name = "bla")
 
 >>> tree.is_valid
 True
->>> tree.taxas.all()
-[<Taxa: mus>, <Taxa: rattus>]
+>>> tree.scientifics.all()
+[<Taxonomy: mus (scientific name)>, <Taxonomy: rattus (scientific name)>]
 >>> tree.bad_taxas.all()
 [<BadTaxa: azerty (1)>]
 >>> tree.synonyms.all()
-[<SynonymName: nannomys>]
+[<Taxonomy: nannomys (synonym)>]
 >>> tree.homonyms.all()
-[<HomonymName: echinops>]
+[<Taxonomy: echinops (homonym)>]
 >>> tree.commons.all()
-[<CommonName: rat (english)>]
+[<Taxonomy: black rat (common)>]
 
 # Getting all taxa list
->>> tree.taxonomy_objects.all()
-[<Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: nannomys (synonym)>, <Taxonomy: rat (common)>, <Taxonomy: rattus (scientific name)>]
+>>> tree.taxas.all()
+[<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: nannomys (synonym)>, <Taxonomy: rattus (scientific name)>]
 
 # Getting ambiguous taxa (synonms, commons, homonyms...)
 >>> tree.ambiguous.all()
-[<Taxonomy: echinops (homonym)>, <Taxonomy: nannomys (synonym)>, <Taxonomy: rat (common)>]
+[<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: nannomys (synonym)>]
 
 # getting arborescence
 >>> tree.arborescence.edges()
-[(<Taxa: root>, <HomonymName: echinops>), (<Taxa: root>, <Taxa: murinae>), (<Taxa: murinae>, <Taxa: mus>), (<Taxa: murinae>, <BadTaxa: azerty (1)>), (<Taxa: murinae>, <Taxa: rattus>), (<Taxa: murinae>, <SynonymName: nannomys>), (<Taxa: murinae>, <CommonName: rat (english)>)]
+[(<Taxa: root>, <HomonymName: echinops>), (<Taxa: root>, <Taxa: murinae>), (<Taxa: murinae>, <Taxa: mus>), (<Taxa: murinae>, <BadTaxa: azerty (1)>), (<Taxa: murinae>, <Taxa: rattus>), (<Taxa: murinae>, <SynonymName: nannomys>), (<Taxa: murinae>, <CommonName: black rat (english)>)]
 
 # we can know the number of occurence of each bad taxa
 
->>> nwk_tree = "(rattus, ( azerty, rat ), badname)"
+>>> nwk_tree = "(rattus, ( azerty, black rat ), badname)"
 >>> tree = Tree.objects.create( tree_string = nwk_tree, name = "bla")
 
 >>> tree.bad_taxas.all()
@@ -65,7 +65,7 @@ True
 # and getting arborescence even with bad taxa
 
 >>> tree.arborescence.edges()
-[(<Taxa: root>, <CommonName: rat (english)>), (<Taxa: root>, <BadTaxa: azerty (2)>), (<Taxa: root>, <Taxa: rattus>), (<Taxa: root>, <BadTaxa: badname (1)>)]
+[(<Taxa: root>, <CommonName: black rat (english)>), (<Taxa: root>, <BadTaxa: azerty (2)>), (<Taxa: root>, <Taxa: rattus>), (<Taxa: root>, <BadTaxa: badname (1)>)]
 
 Going further
 -------------
@@ -78,7 +78,7 @@ This is useful to get statistics of the tree anyway.
 
 >>> bad_nwk = "(mus,(,("
 >>> bad_tree = Tree.objects.create( name = 'badtree', tree_string = bad_nwk )
->>> bad_tree.taxonomy_objects.all()
+>>> bad_tree.taxas.all()
 [<Taxonomy: mus (scientific name)>]
 
 To know if a tree is valid or not, check the `is_valid` attribute
@@ -91,7 +91,7 @@ Working with delimiter
 
 >>> nwk_tree = "(rattus_rattus, (mus, mus_musculus ))"
 >>> tree2 = Tree.objects.create( tree_string = nwk_tree, name = "blu", delimiter = '_')
->>> tree2.taxonomy_objects.all()
+>>> tree2.taxas.all()
 [<Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus rattus (scientific name)>]
 
 # delimiter can't contain  '(', ')' or ','
@@ -146,9 +146,7 @@ ValueError(u'bla not found in the database',)
 
 >>> taxa_list = tree._Tree__get_django_objects_from_nwk( '(rattus,(mus,(echinops,badname)))')
 >>> taxa_list
-[<Taxa: rattus>, <Taxa: mus>, <HomonymName: echinops>, <BadTaxa: badname (1)>]
->>> tree._Tree__get_scientific_taxa( taxa_list )
-[<Taxa: rattus>, <Taxa: mus>]
+[[<Taxonomy: rattus (scientific name)>], [<Taxonomy: mus (scientific name)>], [<Taxonomy: echinops (homonym)>], <BadTaxa: badname (1)>]
 
 
 

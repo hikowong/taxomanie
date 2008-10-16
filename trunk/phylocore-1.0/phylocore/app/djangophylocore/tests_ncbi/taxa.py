@@ -1,30 +1,37 @@
 #
-# Taxa
+# Taxonomy
 #
 
 def test_taxa():
     return """
 >>> from djangophylocore.models import *
 
->>> taxa = Taxa.objects.get( name = 'echinops <plant>' )
+>>> taxa = Taxonomy.objects.get( name = 'echinops <plant>' )
 >>> taxa.homonyms.all()
-[<HomonymName: echinops>]
+[<Taxonomy: echinops (homonym)>]
 >>> taxa.rank
 <Rank: genus>
 
->>> taxa = Taxa.objects.get( name = 'mus' )
->>> taxa.synonyms.all()
-[<SynonymName: nannomys>]
+>>> taxa = Taxonomy.objects.get( name = 'echinops' )
+>>> taxa.scientifics.all()
+[<Taxonomy: echinops <mammal> (scientific name)>, <Taxonomy: echinops <plant> (scientific name)>]
 
->>> taxa = Taxa.objects.get( name = 'mus musculus' )
+
+>>> taxa = Taxonomy.objects.get( name = 'mus' )
+>>> taxa.children.all()
+[<Taxonomy: mus musculus (scientific name)>]
+>>> taxa.synonyms.all()
+[<Taxonomy: nannomys (synonym)>]
+
+>>> taxa = Taxonomy.objects.get( name = 'mus musculus' )
 >>> taxa
-<Taxa: mus musculus>
+<Taxonomy: mus musculus (scientific name)>
 >>> taxa.homonyms.all()
 []
 >>> taxa.synonyms.all()
 []
 >>> taxa.commons.all()
-[<CommonName: house mouse (english)>, <CommonName: mouse (english)>]
+[<Taxonomy: house mouse (common)>, <Taxonomy: mouse (common)>]
 >>> taxa.rank
 <Rank: species>
 
@@ -34,24 +41,26 @@ Dealing with parents
 Get the first parent
 
 >>> taxa.parent
-<Taxa: mus>
+<Taxonomy: mus (scientific name)>
 
 Parent can be chained
 
 >>> taxa.parent.parent
-<Taxa: murinae>
+<Taxonomy: murinae (scientific name)>
 
 Get all parents by order (closest to furthest). 'parents' attribute is a
-simple liste containing Taxa
+simple liste containing taxa
 
 >>> taxa.parents
-[<Taxa: mus>, <Taxa: murinae>, <Taxa: muridae>, <Taxa: muroidea>, <Taxa: sciurognathi>, <Taxa: rodentia>, <Taxa: glires>, <Taxa: euarchontoglires>, <Taxa: eutheria>, <Taxa: theria>, <Taxa: mammalia>, <Taxa: amniota>, <Taxa: tetrapoda>, <Taxa: sarcopterygii>, <Taxa: euteleostomi>, <Taxa: teleostomi>, <Taxa: gnathostomata <vertebrate>>, <Taxa: vertebrata>, <Taxa: craniata <chordata>>, <Taxa: chordata>, <Taxa: deuterostomia>, <Taxa: coelomata>, <Taxa: bilateria>, <Taxa: eumetazoa>, <Taxa: metazoa>, <Taxa: fungi/metazoa group>, <Taxa: eukaryota>, <Taxa: cellular organisms>, <Taxa: root>]
+[<Taxonomy: mus (scientific name)>, <Taxonomy: murinae (scientific name)>, <Taxonomy: muridae (scientific name)>, <Taxonomy: muroidea (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: theria (scientific name)>, <Taxonomy: mammalia (scientific name)>, <Taxonomy: amniota (scientific name)>, <Taxonomy: tetrapoda (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: euteleostomi (scientific name)>, <Taxonomy: teleostomi (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: vertebrata (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: chordata (scientific name)>, <Taxonomy: deuterostomia (scientific name)>, <Taxonomy: coelomata (scientific name)>, <Taxonomy: bilateria (scientific name)>, <Taxonomy: eumetazoa (scientific name)>, <Taxonomy: metazoa (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: eukaryota (scientific name)>, <Taxonomy: cellular organisms (scientific name)>, <Taxonomy: root (scientific name)>]
+
 >>> list( reversed( taxa.parents ) )
-[<Taxa: root>, <Taxa: cellular organisms>, <Taxa: eukaryota>, <Taxa: fungi/metazoa group>, <Taxa: metazoa>, <Taxa: eumetazoa>, <Taxa: bilateria>, <Taxa: coelomata>, <Taxa: deuterostomia>, <Taxa: chordata>, <Taxa: craniata <chordata>>, <Taxa: vertebrata>, <Taxa: gnathostomata <vertebrate>>, <Taxa: teleostomi>, <Taxa: euteleostomi>, <Taxa: sarcopterygii>, <Taxa: tetrapoda>, <Taxa: amniota>, <Taxa: mammalia>, <Taxa: theria>, <Taxa: eutheria>, <Taxa: euarchontoglires>, <Taxa: glires>, <Taxa: rodentia>, <Taxa: sciurognathi>, <Taxa: muroidea>, <Taxa: muridae>, <Taxa: murinae>, <Taxa: mus>]
+[<Taxonomy: root (scientific name)>, <Taxonomy: cellular organisms (scientific name)>, <Taxonomy: eukaryota (scientific name)>, <Taxonomy: fungi/metazoa group (scientific name)>, <Taxonomy: metazoa (scientific name)>, <Taxonomy: eumetazoa (scientific name)>, <Taxonomy: bilateria (scientific name)>, <Taxonomy: coelomata (scientific name)>, <Taxonomy: deuterostomia (scientific name)>, <Taxonomy: chordata (scientific name)>, <Taxonomy: craniata <chordata> (scientific name)>, <Taxonomy: vertebrata (scientific name)>, <Taxonomy: gnathostomata <vertebrate> (scientific name)>, <Taxonomy: teleostomi (scientific name)>, <Taxonomy: euteleostomi (scientific name)>, <Taxonomy: sarcopterygii (scientific name)>, <Taxonomy: tetrapoda (scientific name)>, <Taxonomy: amniota (scientific name)>, <Taxonomy: mammalia (scientific name)>, <Taxonomy: theria (scientific name)>, <Taxonomy: eutheria (scientific name)>, <Taxonomy: euarchontoglires (scientific name)>, <Taxonomy: glires (scientific name)>, <Taxonomy: rodentia (scientific name)>, <Taxonomy: sciurognathi (scientific name)>, <Taxonomy: muroidea (scientific name)>, <Taxonomy: muridae (scientific name)>, <Taxonomy: murinae (scientific name)>, <Taxonomy: mus (scientific name)>]
+
 
 'root' doesn't have parents
 
->>> root = Taxa.objects.get( name = 'root' )
+>>> root = Taxonomy.objects.get( name = 'root' )
 >>> root.parents
 []
 
@@ -64,11 +73,12 @@ Dealing with rank
 
 >>> species = Rank.objects.get( name = 'species' )
 >>> species.taxas.all()
-[<Taxa: antilocapra americana>, <Taxa: avenella flexuosa>, <Taxa: echinops ritro>, <Taxa: echinops telfairi>, <Taxa: monarcha axillaris>, <Taxa: mus musculus>, <Taxa: rattus rattus>]
+[<Taxonomy: antilocapra americana (scientific name)>, <Taxonomy: avenella flexuosa (scientific name)>, <Taxonomy: echinops ritro (scientific name)>, <Taxonomy: echinops telfairi (scientific name)>, <Taxonomy: monarcha axillaris (scientific name)>, <Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus rattus (scientific name)>]
 
 >>> genus = Rank.objects.get( name = 'genus' )
 >>> genus.taxas.all()
-[<Taxa: antilocapra>, <Taxa: avenella>, <Taxa: echinops <mammal>>, <Taxa: echinops <plant>>, <Taxa: monarcha <aves>>, <Taxa: mus>, <Taxa: rattus>]
+[<Taxonomy: antilocapra (scientific name)>, <Taxonomy: avenella (scientific name)>, <Taxonomy: echinops <mammal> (scientific name)>, <Taxonomy: echinops <plant> (scientific name)>, <Taxonomy: monarcha <aves> (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: rattus (scientific name)>]
+
 
 """
 
