@@ -1,4 +1,4 @@
-#summary Places for developpers
+#summary Place for developpers
 #labels Featured
 
 = Introduction =
@@ -18,13 +18,6 @@ If you want to include your database into phyloexplorer, you must create your du
 Note that you don't have to create the `parentsrelation.dmp` will be automatiquely 
 created while executing `./manage.py loadtaxonomy`
 
-=== taxonomy.dmp ===
-{{{
-id|taxa_name|type_name
-}}}
-
-`type_name` must be 'scientific name', 'synonym', 'common' or 'homonym'
-
 === rank.dmp ===
 {{{
 id|name
@@ -32,50 +25,51 @@ id|name
 
 you must have an 'no rank' rank
 
-=== taxa.dumps ===
+=== taxonomy.dmp ===
 {{{
-taxa_id|taxa_name|rank_id|parents_id
+id|taxa_name|type_name|rank_id|parent_id
 }}}
+
+`type_name` must be 'scientific name', 'synonym', 'common' or 'homonym'
 
 note that if you don't have rank put the 'no rank' rank id
 
-=== synonymname.dmp ===
-
+=== relhomonymtaxa.dmp ===
 {{{
-id|name
+id|taxa_id|parent_id|index
 }}}
 
-=== synonym.dmp ===
+where `taxa_id` and `parent_id` are from taxonomy.dmp and index is the depth of the parent from the taxa.
+
+Exemple:
+{{{
+index of (mus, murinae) -> 1
+index of (mus, rodontia) -> 2...
+}}}
+
+=== relsynonymtaxa.dmp ===
+
 {{{
 id|synonym_id|taxa_id
 }}}
 
-=== homonymname.dmp ===
-{{{
-id|name
-}}}
+where `synonym_id` and `taxa_id` are from taxonomy.dmp
 
-=== homonymname.dmp ===
-{{{
-id|name
-}}}
-
-=== homonym.dmp ===
+=== relhomonymtaxa.dmp ===
 {{{
 id|homonym_id|taxa_id
 }}}
 
-=== commonname.dmp ===
+where `homonym_id` and `taxa_id` are from taxonomy.dmp
+
+=== relcommontaxa.dmp ===
 {{{
-id|name|language
+id|common_id|taxa_id|langage
 }}}
+
+where `common_id` and `taxa_id` are from taxonomy.dmp
 
 exemple:
 {{{
-1|rats noir|french
-}}}
-
-=== common.dmp ===
-{{{
-id|common_id|taxa_id
+1|2|4|french
 }}}
