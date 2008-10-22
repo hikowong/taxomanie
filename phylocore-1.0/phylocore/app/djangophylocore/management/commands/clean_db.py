@@ -33,17 +33,19 @@ Type 'yes' to continue, or 'no' to cancel: """ % (settings.DATABASE_NAME,))
         if confirm != 'yes':
             print "Clean up cancelled."
             return
-        if 1:#TreeCollection.objects.all().count():
+        if TreeCollection.objects.all().count():
             cursor = connection.cursor()
             last_id = TreeCollection.objects.latest( 'id' ).id
-            for i in range( 1, 90 ):#last_id + 1 ):
-                print i
+            for i in range( 1, last_id + 1 ):
                 try:
                     cursor.execute( 
                       'DROP TABLE djangophylocore_reltreecoltaxa%s;' % i )
                 except Exception, e:
-                    print e
+                    pass
             TreeCollection.objects.all().delete()
+            BadTaxa.objects.all().delete()
             print "Clean up successful."
         else:
             print "Nothing to clean."
+        os.system( "python manage.py loadtreebase -v" )
+        print "TreeBase loaded"

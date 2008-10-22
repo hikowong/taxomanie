@@ -4,12 +4,15 @@
 
 def test_tree():
     return """
+>>> TEST_LAUNCHED = True
 >>> from djangophylocore.models import *
+
+>>> TAXONOMY_TOC = get_taxonomy_toc( True )
 
 # In this tree, there is only scientific names
 
 >>> nwk_tree = " ( echinops <plant>, (rattus, ( mus,(mus musculus))))"
->>> tree = Tree.objects.create( tree_string = nwk_tree, name = "bla")
+>>> tree = Tree.objects.create( tree_string = nwk_tree, name = "1")
 
 >>> tree.is_valid
 True
@@ -27,14 +30,14 @@ True
 # In this tree, there's bad taxas, common names, synonyms and homonyms
 
 >>> nwk_tree = "( echinops, (rattus, ( mus, azerty, black rat ), nannomys ))"
->>> tree = Tree.objects.create( tree_string = nwk_tree, name = "bla")
+>>> tree = Tree.objects.create( tree_string = nwk_tree, name = "2")
 
 >>> tree.is_valid
 True
 >>> tree.scientifics.all()
 [<Taxonomy: mus (scientific name)>, <Taxonomy: rattus (scientific name)>]
 >>> tree.bad_taxas.all()
-[<BadTaxa: azerty (1)>]
+[<BadTaxa: azerty (0)>]
 >>> tree.synonyms.all()
 [<Taxonomy: nannomys (synonym)>]
 >>> tree.homonyms.all()
@@ -52,20 +55,20 @@ True
 
 # getting arborescence
 >>> tree.arborescence.edges()
-[(<Taxa: root>, <HomonymName: echinops>), (<Taxa: root>, <Taxa: murinae>), (<Taxa: murinae>, <Taxa: mus>), (<Taxa: murinae>, <BadTaxa: azerty (1)>), (<Taxa: murinae>, <Taxa: rattus>), (<Taxa: murinae>, <SynonymName: nannomys>), (<Taxa: murinae>, <CommonName: black rat (english)>)]
+[(<Taxa: root>, <HomonymName: echinops>), (<Taxa: root>, <Taxa: murinae>), (<Taxa: murinae>, <Taxa: mus>), (<Taxa: murinae>, <BadTaxa: azerty (0)>), (<Taxa: murinae>, <Taxa: rattus>), (<Taxa: murinae>, <SynonymName: nannomys>), (<Taxa: murinae>, <CommonName: black rat (english)>)]
 
 # we can know the number of occurence of each bad taxa
 
 >>> nwk_tree = "(rattus, ( azerty, black rat ), badname)"
->>> tree = Tree.objects.create( tree_string = nwk_tree, name = "bla")
+>>> tree = Tree.objects.create( tree_string = nwk_tree, name = "3")
 
 >>> tree.bad_taxas.all()
-[<BadTaxa: azerty (2)>, <BadTaxa: badname (1)>]
+[<BadTaxa: azerty (0)>, <BadTaxa: badname (0)>]
 
 # and getting arborescence even with bad taxa
 
 >>> tree.arborescence.edges()
-[(<Taxa: root>, <CommonName: black rat (english)>), (<Taxa: root>, <BadTaxa: azerty (2)>), (<Taxa: root>, <Taxa: rattus>), (<Taxa: root>, <BadTaxa: badname (1)>)]
+[(<Taxa: root>, <CommonName: black rat (english)>), (<Taxa: root>, <BadTaxa: azerty (0)>), (<Taxa: root>, <Taxa: rattus>), (<Taxa: root>, <BadTaxa: badname (0)>)]
 
 Going further
 -------------
@@ -90,7 +93,7 @@ Working with delimiter
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 >>> nwk_tree = "(rattus_rattus, (mus, mus_musculus ))"
->>> tree2 = Tree.objects.create( tree_string = nwk_tree, name = "blu", delimiter = '_')
+>>> tree2 = Tree.objects.create( tree_string = nwk_tree, name = "4", delimiter = '_')
 >>> tree2.taxas.all()
 [<Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus rattus (scientific name)>]
 
@@ -98,7 +101,7 @@ Working with delimiter
 
 >>> nwk_tree = "(murinae, (mus, mus(,)musculus ))"
 >>> try:
-...     tree2 = Tree.objects.create( tree_string = nwk_tree, name = "blo", delimiter = '(,)')
+...     tree2 = Tree.objects.create( tree_string = nwk_tree, name = "5", delimiter = '(,)')
 ... except ValueError, e:
 ...     e
 ValueError('"(,)" is a bad delimiter',)
@@ -146,7 +149,7 @@ ValueError(u'bla not found in the database',)
 
 >>> taxa_list = tree._Tree__get_django_objects_from_nwk( '(rattus,(mus,(echinops,badname)))')
 >>> taxa_list
-[[<Taxonomy: rattus (scientific name)>], [<Taxonomy: mus (scientific name)>], [<Taxonomy: echinops (homonym)>], <BadTaxa: badname (1)>]
+[[<Taxonomy: rattus (scientific name)>], [<Taxonomy: mus (scientific name)>], [<Taxonomy: echinops (homonym)>], <BadTaxa: badname (0)>]
 
 
 

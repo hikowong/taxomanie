@@ -26,14 +26,14 @@ class Nexus( object ):
 #              "The following trees are not in newick format: %s" % str(bad_trees_names)
         self.__collection = {}
         # XXX see if nexus can be uppercase
-        if "TRANSLATE" in nexus_string:
+        if "translate" in nexus_string.lower():
             raw_collection = self.translate( nexus_string )
         else:
             raw_collection = nexus_string
         raw_collection = raw_collection.split( 
-          'BEGIN TREES;')[1].split( 'END;')[0]
+          'begin trees;')[1].split( 'end;')[0]
         for raw_tree in raw_collection.split( ';' ):
-            if raw_tree.strip() and raw_tree.strip() != 'END':
+            if raw_tree.strip() and raw_tree.strip() != 'end':
                 raw_tree = raw_tree.strip()
                 tree_name, tree, rooted = self.__split_nexus_line( raw_tree )
                 # tree = phylogelib.tidyNwk( tree )
@@ -50,7 +50,7 @@ class Nexus( object ):
         Check if all trees are *really* newick trees
         """
         bad_trees_names = []
-        for raw_tree in self.__nexus_ori.split('BEGIN TREES;')[1].split('END;')[0].split(';')[1:]:
+        for raw_tree in self.__nexus_ori.split('begin trees;')[1].split('end;')[0].split(';')[1:]:
             if raw_tree.strip():
                 raw_tree = remove_nexus_comments( raw_tree )
                 raw_tree = raw_tree.strip()
@@ -87,8 +87,8 @@ class Nexus( object ):
         # Support of the nexus translate
         trans = []
         d_translation = {}
-        translation = nexus_string.split("TRANSLATE")[1].split(";")[0].split()
-        collection = nexus_string.split("TRANSLATE")[1].split(";")[1:]
+        translation = nexus_string.split("translate")[1].split(";")[0].split()
+        collection = nexus_string.split("translate")[1].split(";")[1:]
         for i in range(0,len(translation),2):
             d_translation[translation[i]] = translation[i+1].replace(",","")
             trans.append( 
@@ -99,15 +99,15 @@ class Nexus( object ):
         for tree in collection:
             tree = tree.strip()
             if tree:
-                if tree == 'END': break
+                if tree == 'end': break
                 for indice, translation in trans:
                     if translation[0] in ["'",'"']:
                         translation = translation[1:-1]
                     tree = tree.split('=')[0]+'= '+tree.split('=')[1].replace(
                       indice, translation ).strip()
                 new_collection.append( '\t'+tree.strip()+';' )
-        nexus_string = "#NEXUS\n\nBEGIN TREES;\n\n"+ \
-          "\n".join(new_collection)+"\n\nEND;"
+        nexus_string = "#nexus\n\nbegin trees;\n\n"+ \
+          "\n".join(new_collection)+"\n\nend;"
         return nexus_string
 
     def get_nexus_comments( self ):
