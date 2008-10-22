@@ -101,7 +101,7 @@ Getting django objects from name
 >>> taxoref.get_object_from_name( 'echinops' )
 [<Taxonomy: echinops (homonym)>]
 >>> taxoref.get_object_from_name( 'badname' )
-<BadTaxa: badname (1)>
+<BadTaxa: badname (0)>
 
 The name must be present into the database
 

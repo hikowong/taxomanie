@@ -7,7 +7,7 @@ from django.db import transaction
 from django.db import connection
 
 from lib.phylogelib import getTaxa, getChildren, removeBootStraps
-from lib.phylogelib import getBrothers, removeNexusComments
+from lib.phylogelib import getBrothers, removeNexusComments, getStruct
 from lib.phylogelib import tidyNwk, checkNwk
 from lib.nexus import Nexus
 import datetime, re, sys, os, codecs
@@ -27,7 +27,8 @@ class TaxonomyReference( object ):
         return True if name is in the taxonomy
         return False otherwise
         """
-        if Taxonomy.objects.filter( name = name ):
+        #if Taxonomy.objects.filter( name = name ):
+        if name in TAXONOMY_TOC:
             return True
         return False
 
@@ -128,11 +129,15 @@ class TaxonomyReference( object ):
         Strip Taxon name in order to keep the root name and to remove
         all user staff.
         """
-        name = " ".join( taxa_name.replace(delimiter," ").split()[:2] )
-        if not self.is_valid_name( name ):
-            return name.split()[0]
-        return name
- 
+        taxa_name = taxa_name.replace( delimiter, ' ' )
+        while not self.is_valid_name( taxa_name ):
+            new_taxa_name = ' '.join( taxa_name.split()[:-1] )
+            if new_taxa_name:
+                taxa_name = new_taxa_name
+            else:
+                break
+        return taxa_name
+
     def correct( self, name, guess = False ):
         # TODO TEST
         """
@@ -219,12 +224,13 @@ class TaxonomyReference( object ):
         return a networkx.DiGraph tree.
         """
         import networkx as NX
-        tree = NX.DiGraph()
+        tree = NX.DiGraph() 
+        already_done = set([])
         for taxa in taxa_list:
-            parents = taxa.parents
-            for parent in parents:
-                tree.add_edge( parent, taxa )
-                taxa = parent
+            while taxa.name != 'root' and taxa not in already_done:
+                tree.add_edge( taxa.parent, taxa )
+                already_done.add( taxa )
+                taxa = taxa.parent
         return tree
 
 ##################################################
@@ -278,7 +284,7 @@ class Taxonomy( models.Model ):
         elif self.type_name == 'synonym':
             return Taxonomy.objects.filter( taxa_from_synonym__synonym = self )
         elif self.type_name == 'common':
-            return Taxonomy.objects.filter( taxa_common_from__common = self )
+            return Taxonomy.objects.filter( taxa_from_common__common = self )
         else:
             return Taxonomy.objects.none()
     scientifics = property( get_scientific_names )
@@ -333,35 +339,6 @@ class ParentsRelation( models.Model ):
 
     def __unicode__( self ):
         return "%s > %s (%s)" % (self.parent, self.taxa, self.index )
-
-##################################################
-#               Source staffs                    #
-##################################################
-
-#class Source( models.Model ):
-#    """
-#    Cet objet décrit la provenance du taxon
-#    """
-#    name = models.CharField( max_length = 200, unique = True )
-#    description = models.TextField( null = True )
-#    web_site_url = models.URLField( verify_exists = True, null=True )
-#    target_url = models.URLField( null = True )
-#
-#    def __unicode__( self ):
-#        return self.name
-#
-#class FromSource( models.Model ):
-#    taxa = models.ForeignKey( Taxa )
-#    source = models.ForeignKey( Source )
-#    taxa_id_in_source = models.CharField( max_length = 200 )
-#    taxa_name_in_source = models.CharField( max_length = 200 )
-#    class Meta:
-#        unique_together = ('source', 'taxa',
-#          'taxa_id_in_source', 'taxa_name_in_source')
-#
-#    def __unicode__( self ):
-#        return "%s (%s:%s)" % ( self.source, self.taxa_id_in_source,
-#          self.taxa_name_in_source )
 
 ##################################################
 #               Common staffs                    #
@@ -475,6 +452,8 @@ class Tree( models.Model, TaxonomyReference ):
 
     @transaction.commit_on_success
     def generate_tree_infos( self ):
+        global get_taxonomy_toc, BADTAXA_TOC
+        TAXONOMY_TOC = get_taxonomy_toc()
         if [i for i in ('(',')',',') if i in self.delimiter]:
             raise ValueError, '"%s" is a bad delimiter' % self.delimiter
         tree = self.tree_string.lower()#.replace( self.delimiter, ' ' )
@@ -483,28 +462,34 @@ class Tree( models.Model, TaxonomyReference ):
             self.save( dont_generate = True )
         taxas_list = getTaxa( tree ) # set( getTaxa( tree ) )
         self.taxa_ids = {}
+        if BADTAXA_TOC is None:
+            BADTAXA_TOC = set([i[0] for i in BadTaxa.objects.all().values_list( 'name')])
+        self.bad_taxa_ids = BADTAXA_TOC
         for taxa_name in taxas_list:
             if taxa_name.strip():
                 user_taxa_name = taxa_name
-                taxa_name = self.strip_taxa_name( taxa_name ).replace( self.delimiter, ' ' )
-                taxo_list = Taxonomy.objects.filter( name = taxa_name )
-                if not taxo_list:
-                    t, created = BadTaxa.objects.get_or_create( name = user_taxa_name )
-                    # Enable login of reccurence
-                    # TODO mettre un signal pour incrementer l'occurence
-                    t.nb_occurence += 1
-                    t.save()
-#                    ###
-                    self.bad_taxas.add( t )
+                taxa_name = self.strip_taxa_name( taxa_name, self.delimiter )
+                taxo = TAXONOMY_TOC.get( taxa_name, '' )
+                if self._from_collection:
+                    if taxo:
+                        self.taxa_ids[user_taxa_name] = taxo
+                    else:
+                        if user_taxa_name not in self.bad_taxa_ids:
+                            BadTaxa.objects.create( name = user_taxa_name )
+                            self.bad_taxa_ids.add( user_taxa_name )
+                        self.taxa_ids[user_taxa_name] = ''
                 else:
-                    for taxo in taxo_list:
-                        if self._from_collection:
-                            self.taxa_ids[taxo.id] = user_taxa_name
-                        else:
-                            tto, created = TaxonomyTreeOccurence.objects.get_or_create( 
-                              taxa = taxo, tree = self, user_taxa_name = user_taxa_name )
-                            tto.nb_occurence += 1
-                            tto.save()
+                    if not taxo:
+                        if user_taxa_name not in self.bad_taxa_ids:
+                            t, created = BadTaxa.objects.get_or_create( name = user_taxa_name )
+                            self.bad_taxas.add( t )
+                            self.bad_taxa_ids.add( t.id )
+                    else:
+                        taxa = Taxonomy.objects.get( id = taxo )
+                        tto, created = TaxonomyTreeOccurence.objects.get_or_create( 
+                          taxa = taxa, tree = self, user_taxa_name = user_taxa_name )
+                        tto.nb_occurence += 1
+                        tto.save()
 
     def __get_relation( self ):
         class Meta: pass
@@ -589,9 +574,15 @@ class Tree( models.Model, TaxonomyReference ):
         return self.__networkx_tree
     arborescence = property( get_arborescence )
 
-    def get_nb_taxa_from_parent( self, parent_name ):
-        parent = Taxonomy.objects.get( name = parent_name )
-        return len( [t for t in self.taxas if parent in t.parents] )
+    def get_nb_taxa_from_parent( self, parent_name ):#, taxa_occurence = None ):
+        global get_taxonomy_toc
+        TAXONOMY_TOC = get_taxonomy_toc()
+        if self._from_collection:
+            cursor = connection.cursor()
+            #parent = Taxonomy.objects.get( name = parent_name )
+            parent_id = TAXONOMY_TOC[parent_name]
+            cur = cursor.execute( "select tree_id, count(taxa_id) from djangophylocore_reltreecoltaxa%s where (taxa_id IN (select taxa_id from djangophylocore_parentsrelation where parent_id = %s) or taxa_id = %s) and tree_id = %s GROUP BY  tree_id ;" % ( self.collection.id, parent_id, parent_id, self.id ) ) 
+            return cur.fetchone()[1]
         return self.taxas.filter( parents_relation_taxas__parent__name = parent_name ).count()
 
     def eval_query( self, query, usertaxa_list=[] ):
@@ -612,7 +603,6 @@ class Tree( models.Model, TaxonomyReference ):
         will return true if tree have at least 4 taxa wich are muridae and
         more than 2 taxa wich are in the usertaxa_list 
         """
-        print "+++++++++++++++++++++++++++++++++"
         res = query.strip()
         for pattern in re.findall("{([^}]+)}", query):
             striped_pattern = pattern.strip().lower()
@@ -629,8 +619,6 @@ class Tree( models.Model, TaxonomyReference ):
             else:
                 nb_occurence = self.get_nb_taxa_from_parent( striped_pattern )
             res = res.replace("{"+pattern+"}", str(nb_occurence) )
-            print res
-        print "-------------------------------------"
         if res:
             try:
                 return eval( res )
@@ -638,11 +626,53 @@ class Tree( models.Model, TaxonomyReference ):
                 raise SyntaxError, "bad query %s" % query
         raise SyntaxError, "bad query %s" % query
 
+#    def eval_query_old( self, query, usertaxa_list=[], taxa_occurence= None ):
+#        """
+#        test if a query match the tree. The query format is a python
+#        boolean expression with taxa name beetween braces :
+#
+#        tree.eval_query( "{muridae} > 2 and {primates}" )
+#
+#        will return true if tree have more than 2 taxas wich have muridae as parents
+#        and at least 1 taxa wich have a primate as parents.
+#
+#        if a taxa_list is not null, the query can have another variable
+#        {usertaxa}. this variable represente all taxa passed in the list.
+#
+#        tree.eval_query( "{muridae} => 4 and {usertaxa} > 2", ['rattus', 'mus', 'pan', 'boss'] )
+#
+#        will return true if tree have at least 4 taxa wich are muridae and
+#        more than 2 taxa wich are in the usertaxa_list 
+#        """
+#        res = query.strip()
+#        for pattern in re.findall("{([^}]+)}", query):
+#            striped_pattern = pattern.strip().lower()
+#            if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
+#                raise NameError, striped_pattern
+#            if striped_pattern == 'usertaxa':
+#                if usertaxa_list:
+#                    query = Q()
+#                    for taxa_name in usertaxa_list:
+#                        query |= Q( name = taxa_name )
+#                    nb_occurence = self.taxas.filter( query ).count()
+#                else:
+#                    nb_occurence = 0
+#            else:
+#                nb_occurence = self.get_nb_taxa_from_parent( striped_pattern, taxa_occurence )
+#            res = res.replace("{"+pattern+"}", str(nb_occurence) )
+#        if res:
+#            try:
+#                return eval( res )
+#            except:
+#                raise SyntaxError, "bad query %s" % query
+#        raise SyntaxError, "bad query %s" % query
+
+
 ##################################################
 #               TreeCollection                   #
 ##################################################
 
-class TreeCollection( models.Model ):
+class TreeCollection( models.Model, TaxonomyReference ):
     name = models.CharField( max_length = 80, null= True )
     original_collection_string = models.TextField( null = True ) # source
     delimiter = models.CharField( max_length = 5, default=' ' )
@@ -657,6 +687,7 @@ class TreeCollection( models.Model ):
     @transaction.commit_on_success
     def save( self, collection_changed = False, dont_regenerate = False,  **kwargs ):
         collection_string_changed = False
+        self.original_collection_string = self.original_collection_string.lower()#.replace( self.delimiter, '' )
         if not collection_changed and not dont_regenerate:
             if self.id: # if instance is in the database
                 if TreeCollection.objects.get( id = self.id).original_collection_string != self.original_collection_string:
@@ -666,6 +697,7 @@ class TreeCollection( models.Model ):
         super( TreeCollection, self ).save( **kwargs )
         if self.original_collection_string and collection_string_changed and not dont_regenerate:
             self.regenerate_from_original_collection_string()
+            self.__get_relation().model.objects.filter( taxa = '' ).update( taxa = None )
 
     def regenerate_collection_string_from_trees( self ):
         """
@@ -704,8 +736,10 @@ class TreeCollection( models.Model ):
         return model_rel.objects.filter( collection = self )
     rel = property( __get_relation )
 
-    @transaction.commit_manually
+    @transaction.commit_on_success
     def regenerate_from_original_collection_string( self ):
+        global BADTAXA_TOC
+        BADTAXA_TOC = set([i[0] for i in BadTaxa.objects.all().values_list( 'name')])
         # TODO mettre un signal sur cette method quand
         # original_collection_string change
         #if self.trees.count():
@@ -737,11 +771,11 @@ class TreeCollection( models.Model ):
                     index += 1
                     dump.append( '%s|%s|%s||\n' % (index, self.id, t.id ) )
                 else:
-                    for taxa_id in t.taxa_ids:
+                    for user_taxa_name in t.taxa_ids:
                         index += 1
                         # index, collection_id, tree_id, taxa_id, user_taxa_name
                         dump.append(  '%s|%s|%s|%s|%s\n' % (index, self.id,
-                          t.id, taxa_id, t.taxa_ids[taxa_id] ) )
+                          t.id, t.taxa_ids[user_taxa_name], user_taxa_name ) )
 #                if settings.DEBUG:
 #                    i += 1
 #                    sys.stdout.write("\r[%s] %s%% " % ( str(i), str( i*100.0/NB_LINE)  ) )
@@ -767,11 +801,11 @@ class TreeCollection( models.Model ):
                         index += 1
                         dump.append( '%s|%s|%s||\n' % (index, self.id, t.id ) )
                     else:
-                        for taxa_id in t.taxa_ids:
+                        for user_taxa_name in t.taxa_ids:
                             index += 1
                             # index, collection_id, tree_id, taxa_id, user_taxa_name
                             dump.append(  '%s|%s|%s|%s|%s\n' % (index,
-                              self.id, t.id, taxa_id, t.taxa_ids[taxa_id] ) )
+                              self.id, t.id, t.taxa_ids[user_taxa_name], user_taxa_name ) )
 #                if settings.DEBUG:
 #                    i += 1
 #                    sys.stdout.write("\r[%s] %s%% " % ( str(i), str( i*100.0/NB_LINE)  ) )
@@ -800,6 +834,9 @@ class TreeCollection( models.Model ):
         return Taxonomy.objects.extra( where = ['id IN (SELECT taxa_id from djangophylocore_reltreecoltaxa%s)' % self.id] )
     taxas = property( get_taxas )
 
+    def get_user_taxa_names( self ):
+        return set([i[0] for i in self.rel.values_list( 'user_taxa_name' ) if i])
+
     def get_ambiguous( self ):
         """
         return a queryset of non scientific name taxonomy objects
@@ -808,8 +845,8 @@ class TreeCollection( models.Model ):
     ambiguous = property( get_ambiguous )
 
     def get_bad_taxas( self ):
-        id_list = [i[0] for i in self.trees.values_list( 'id' ) if i[0]]
-        return BadTaxa.objects.filter( trees__id__in = id_list ).distinct()
+        return BadTaxa.objects.extra(
+          where = ["name in (select user_taxa_name from djangophylocore_reltreecoltaxa%s where taxa_id is null)" % self.id ] )
     bad_taxas = property( get_bad_taxas )
 
     def get_scientific_names( self ):
@@ -832,38 +869,57 @@ class TreeCollection( models.Model ):
         return self.trees.filter( is_valid = False )
     bad_trees = property( get_bad_trees )
 
-    def _get_query_stats( self ):
-        """
-        proceure parcours_prof_suffixe(T : arbre )
 
-            si non EstVide(T) alors
-
-                    parcours_prof_suffixe(FilsGauche(T));
-                    parcours_prof_suffixe(FilsDroit(T));
-                    traiter_racine(T);
-
-            fin si
-        """
-        raise NotImplementedError
-        tree = self.get_reference_arborescence()
-        def traitement( node ):
-            for child in tree.successors_iter( Taxonomy.objects.get( name = 'root') ):
-                nb_occurence += self._get_query_stats( child )
-            stats[child.id] = nb_occurence
-
-
-
-    def query( self, query, usertaxa_list = [] ):
+    def _query( self, query, treebase ):
         """
         return a list of trees matching the query. You can pass usertaxa_list
         in order to use the {usertaxa} variable (see Tree.eval_query for more
         details)
         """
-        trees_list = set([])
-        for tree in self.trees.all():
-            if tree.eval_query( query, usertaxa_list ):
-                trees_list.add( tree )
-        return list( trees_list )
+        global get_taxonomy_toc
+        TAXONOMY_TOC = get_taxonomy_toc()
+        res = query.strip()
+        d_trees = {}
+        cursor = connection.cursor()
+        l_patterns = re.findall("{([^}]+)}", query)
+        for pattern in l_patterns:
+            striped_pattern = pattern.strip().lower()
+            if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
+                raise NameError, striped_pattern
+            if 'usertaxa' == striped_pattern and treebase:
+                cur = cursor.execute( " select tree_id, count(taxa_id) from djangophylocore_reltreecoltaxa1 where taxa_id IN (select taxa_id from djangophylocore_reltreecoltaxa%s ) GROUP BY tree_id;" % (self.id ) )
+            else:
+                parent_id = TAXONOMY_TOC[striped_pattern]
+                if treebase:
+                    cur = cursor.execute( "select tree_id, count(taxa_id) from djangophylocore_reltreecoltaxa1 where taxa_id IN (select taxa_id from djangophylocore_parentsrelation where parent_id = %s) or taxa_id = %s GROUP BY  tree_id ;" % ( parent_id, parent_id ) ) 
+                else:
+                    cur = cursor.execute( "select tree_id, count(taxa_id) from djangophylocore_reltreecoltaxa%s where taxa_id IN (select taxa_id from djangophylocore_parentsrelation where parent_id = %s) or taxa_id = %s GROUP BY  tree_id ;" % ( self.id, parent_id, parent_id ) ) 
+            result = cur.fetchall()
+            for (tree_id, nb_occurence) in result:
+                if tree_id not in d_trees:
+                    d_trees[tree_id] = {}
+                d_trees[tree_id][pattern] =  nb_occurence
+        l_trees_id = set()
+        for tree_id in d_trees:
+            result = res
+            for pattern in l_patterns:
+                if pattern in d_trees[tree_id]:
+                    result = result.replace( '{'+pattern+'}', str(d_trees[tree_id][pattern]) )
+                else:
+                    result = result.replace( '{'+pattern+'}', '0' )
+            if result:
+                try:
+                    if eval( result ):
+                       l_trees_id.add( tree_id ) 
+                except:
+                    raise SyntaxError, "bad query %s" % query
+        return Tree.objects.filter( id__in = l_trees_id )
+
+    def query( self, query ):
+        return self._query( query, False )
+
+    def query_treebase( self, query ):
+        return self._query( query, True )
 
     def get_collection_from_query( self, query ):
         """
@@ -916,12 +972,15 @@ class TreeCollection( models.Model ):
                     result_stat[key] += 1
         return result_stat
 
+    def get_taxa_name_from_parents( self, parent_name ):
+        return [i.name for i in self.get_taxa_from_parents( parent_name )] 
+
     def get_taxa_from_parents( self, parent_name ):
         """
         return taxa in collection wich are for parent 'parent_name'
         """
-        id_list = [i.id for i in Taxonomy.objects.get( name = parent_name ).direct_children.all()]
-        return self.taxas.filter( id__in = id_list )
+        assert parent_name in TAXONOMY_TOC, "%s does not exist in the current taxonomy" % parent_name
+        return Taxonomy.objects.extra( where = ["id IN (select taxa_id from djangophylocore_reltreecoltaxa%s where taxa_id IN (select taxa_id from djangophylocore_parentsrelation where parent_id = %s))" % (self.id, Taxonomy.objects.get( name = parent_name ).id)])
 
     def get_nb_trees( self, taxa ):
         """
@@ -984,6 +1043,18 @@ class TreeCollection( models.Model ):
         return TreeCollection.objects.create( delimiter = self.delimiter, original_collection_string = new_nwk )
 
     def get_corrected_collection_string( self, tuple_list ):
+        correction = dict( tuple_list )
+        collection = tidyNwk( self.original_collection_string )
+        struct_collection = getStruct( collection )
+        for i in xrange(len(struct_collection)):
+            bad_name = struct_collection[i].strip().split()
+            if " ".join( bad_name[:2] ) in correction:
+                struct_collection[i] = self.delimiter.join( correction[" ".join( bad_name[:2] )].split() + bad_name[2:] )
+            elif " ".join( bad_name[:1] ) in correction:
+                struct_collection[i] = self.delimiter.join( correction[" ".join( bad_name[:1] )].split() + bad_name[1:] )
+        return ';\n'.join( ''.join( struct_collection ).split(';') )
+
+    def get_corrected_collection_string_old( self, tuple_list ):
         """
         return a collection with correction from tuple_list:
 
@@ -1036,8 +1107,11 @@ class TreeCollection( models.Model ):
 
     def get_autocorrected_collection( self ):
         list_correction =  [(i.user_taxa_name, i.taxa.scientifics.get().name)\
-          for i in self.rel.filter( taxa__in = self.taxas.exclude( type_name = 'scientific name' ) )\
-            if i.taxa.scientifics.count() == 1] 
+          for i in self.rel.extra( where = ["taxa_id in (select id from djangophylocore_taxonomy where type_name != 'scientific name')"] )\
+            if i.taxa.scientifics.count() == 1]
+        #list_correction =  [(i.user_taxa_name, i.taxa.scientifics.get().name)\
+        #  for i in self.rel.filter( taxa__in = self.taxas.exclude( type_name = 'scientific name' ) )\
+        #    if i.taxa.scientifics.count() == 1] 
         return self.get_corrected_collection( list_correction ), list_correction
 
     def get_reference_arborescence( self ):
@@ -1051,12 +1125,41 @@ class TreeCollection( models.Model ):
         already_done = set([])
         for taxa in taxa_list():
             while taxa.name != 'root' and taxa not in already_done:
-                #if taxa.parent in already_done:
-                #    break
                 tree.add_edge( taxa.parent, taxa )
                 already_done.add( taxa )
                 taxa = taxa.parent
         return tree
+
+    def get_statistics( self ):
+        global TAXONOMY_TOC
+        taxon_occurence = {}
+        # initialisation of user taxa
+        cursor = connection.cursor()
+        cur = cursor.execute( "select rel.tree_id, rel.taxa_id, rel.user_taxa_name, taxonomy.name from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxa_id" % self.id )
+        results = cur.fetchall()
+        for ( tree_id, taxa_id, user_taxa_name, scientific_name ) in results:
+            if taxa_id not in taxon_occurence:
+                taxon_occurence[taxa_id] = {"trees_list": set([]),
+                  'user_taxa_list':set([]), "scientific_taxa_list":set([]), "degree":0}
+            taxon_occurence[taxa_id]['trees_list'].add( tree_id )
+            taxon_occurence[taxa_id]['user_taxa_list'].add( user_taxa_name )
+            taxon_occurence[taxa_id]['scientific_taxa_list'].add( scientific_name )
+        cur.close()
+        tree = self.get_reference_arborescence()
+        self.__compute_stats_arborescence( taxon_occurence, tree, Taxonomy.objects.get( name = 'root' ) )
+        return taxon_occurence
+
+    def __compute_stats_arborescence( self, taxon_occurence, tree, node ):
+        if node.id not in taxon_occurence:
+            taxon_occurence[node.id] = {"trees_list": set([]),
+              'user_taxa_list':set([]), "scientific_taxa_list":set([]), "degree":0}
+        taxon_occurence[node.id]['degree'] = len( tree.successors( node ) ) + len( tree.predecessors( node ) )
+        if tree.successors( node ): # if internal node
+            for child in tree.successors( node ):
+                self.__compute_stats_arborescence( taxon_occurence, tree, child )
+                taxon_occurence[node.id]['trees_list'].update( taxon_occurence[child.id]['trees_list'] )
+                taxon_occurence[node.id]['user_taxa_list'].update( taxon_occurence[child.id]['user_taxa_list'] )
+                taxon_occurence[node.id]['scientific_taxa_list'].update( taxon_occurence[child.id]['scientific_taxa_list'] )
 
 class AbstractTreeColTaxa( models.Model ):
     collection = models.ForeignKey( TreeCollection )#, related_name = 'rel' )
@@ -1067,7 +1170,7 @@ class AbstractTreeColTaxa( models.Model ):
     class Meta:
         abstract = True
     def __unicode__( self ):
-        return u"%s|%s|%s" % (self.collection.id, self.tree.id, self.taxa.name)
+        return u"%s|%s|%s" % (self.collection.id, self.tree.id, self.user_taxa_name)
 
 #############################################
 #                Signals                    #
@@ -1080,12 +1183,23 @@ def fill_created_updated_fields( sender, instance, signal, *args, **kwargs ):
 signals.pre_save.connect(fill_created_updated_fields, sender=Tree)
 signals.pre_save.connect(fill_created_updated_fields, sender=TreeCollection)
 
+TAXONOMY_TOC = None
+BADTAXA_TOC = None
 
-#def build_taxonomy_toc():
-#    TAXONOMY_TOC = {}
-#    for taxa in Taxonomy.objects.all().iterator():
-#        TAXONOMY_TOC[taxa.name] = taxa.id
-#    print "++++++++++++++++++++++++++++++++++ok++++++++++++++++++++++++++++++"
-#    return TAXONOMY_TOC
-#
-#TAXONOMY_TOC = build_taxonomy_toc()
+def get_taxonomy_toc( test = False ):
+    try:
+        import cPickle as pickle
+    except:
+        import pickle
+    global TAXONOMY_TOC
+    localDir = os.path.dirname(__file__)
+    absDir = os.path.join(os.getcwd(), localDir)
+    if not TAXONOMY_TOC:
+        if test:
+            TAXONOMY_TOC = pickle.load( open( os.path.join( absDir, 'taxonomy_toc_test') ) )
+        else:
+            TAXONOMY_TOC = pickle.load( open( os.path.join( absDir, 'taxonomy_toc') ) )
+    else:
+        TAXONOMY_TOC = globals()['TAXONOMY_TOC']
+    return TAXONOMY_TOC
+

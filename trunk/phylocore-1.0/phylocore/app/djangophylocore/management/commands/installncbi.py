@@ -29,4 +29,7 @@ class Command(NoArgsCommand):
         if verbose:
             print "loading taxonomy"
         os.system( 'python manage.py loadtaxonomy %s' % verbose_string )
+        if verbose:
+            print "building taxonomy toc"
+        os.system( 'python manage.py buildtaxonomytoc' )
 

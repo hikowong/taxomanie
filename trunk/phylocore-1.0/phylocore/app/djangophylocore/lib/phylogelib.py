@@ -146,6 +146,36 @@ def removeBootStraps(tree):
 def getTaxa( tree ):
     return [i.strip() for i in removeBootStraps(tree.strip()).replace("(","").replace(")","").split(",")]
 
+def getStruct( tree ):
+    """
+    split the collection or tree into a list
+
+    >>> getStruct( '((a,b),c);(((aee,bcd),(c,d)),e);' )
+    ['((', 'a', ',', 'b', '),', 'c', ');(((', 'aee', ',', 'bcd', '),(', 'c', ',', 'd', ')),', 'e', ');']
+    """
+    struct = []
+    taxa_name = []
+    delim = []
+    delimiter = False
+    taxa = False
+    for c in tree:
+        if c in '(),;':
+            if taxa:
+                delimiter = True
+                taxa = False
+                struct.append( ''.join( taxa_name ) )
+                taxa_name = []
+            delim.append( c )
+        else:
+            if not taxa:
+                delimiter = False
+                taxa = True
+                struct.append( ''.join( delim ) )
+                delim = []
+            taxa_name.append( c )
+    struct.append( ''.join( delim ) )
+    return struct
+
 def getDepth(tree):
   """ Return the depth of the tree """
   if len(getChildren(tree)) == 0:

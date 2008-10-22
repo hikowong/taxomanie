@@ -70,6 +70,7 @@ def statistics( request ):
         d_stat = collection.get_tree_size_distribution()
         d_stat = collection.get_taxon_frequency_distribution()
         request.session['last_query'] = ''
+    print "fin creation collection"
     collection = request.session['collection']
     context = {}
     ## Query
@@ -87,6 +88,7 @@ def statistics( request ):
     if 'clear_query' in request.GET:
         collection = TreeCollection.objects.get( id = request.session['original_collection_id'] )
     context['query'] = query
+    print "fin query"
     ## Dealing collection
     if not collection.trees.count(): #Empty collection
         context['not_empty_collection'] = False
@@ -102,23 +104,26 @@ def statistics( request ):
         context['nb_homonyms'] = collection.homonyms.count()
         context['nb_synonyms'] = collection.synonyms.count()
         context['not_empty_collection'] = True
+        print "fin donnees numeriques"
         # stats
         d_stat = collection.get_tree_size_distribution()
         context['tree_size_distributions'] = get_tree_size_distribution( d_stat )
         d_stat = collection.get_taxon_frequency_distribution()
         context['taxon_frequency_distribution'] = get_taxon_frequency_distribution( d_stat )
-        if context['nb_taxa'] < 200:
+        print "fin stats"
+        if 1:#context['nb_taxa'] < 200:
             context['stats_tree'] = display_tree_stats( collection )
+            print "fin arbre ncbi"
         else:
             context['stats_tree'] = None
         # correct bad taxas
-        dict_bad_taxas = {}
-        for bad in collection.bad_taxas.all():
-            dict_bad_taxas[bad.name] = []
-            for i in TAXOREF.correct( bad.name, guess = True ):
-                if i != bad.name:
-                    dict_bad_taxas[bad.name].append( i )
-        context['dict_bad_taxas'] = dict_bad_taxas
+#        dict_bad_taxas = {}
+#        for bad in collection.bad_taxas.all():
+#            dict_bad_taxas[bad.name] = []
+#            for i in TAXOREF.correct( bad.name, guess = True ):
+#                if i != bad.name:
+#                    dict_bad_taxas[bad.name].append( i )
+#        context['dict_bad_taxas'] = dict_bad_taxas
         # correct homonyms
         dict_homonyms = {}
         for homonym in collection.homonyms.all():
@@ -126,6 +131,7 @@ def statistics( request ):
             for name in homonym.scientifics.values('name'):
                 dict_homonyms[homonym.name].extend( name.values() )
         context['dict_homonyms'] = dict_homonyms
+        print "fin homonym"
         # correct synonym
         dict_synonym = {}
         for synonym in collection.synonyms.all():
@@ -133,6 +139,7 @@ def statistics( request ):
             for name in synonym.scientifics.values('name'):
                 dict_synonym[synonym.name].extend( name.values() )
         context['dict_synonym'] = dict_synonym
+        print "fin synonym"
         nb_bad_trees = collection.bad_trees.count()
         if nb_bad_trees:
             context['error_msg'] = "Warning : your collection have %s bad trees" % nb_bad_trees
@@ -427,24 +434,23 @@ def display_tree_stats( collection, allparents = False ):
     Display NCBI arborescence with stats
     """
     if collection.trees.all().count():
-        #tree = TAXOREF.get_reference_arborescence( collection.taxas.all() )
         tree = collection.get_reference_arborescence()
-        if not allparents:
-            tree = _remove_single_parent( collection, tree )
-        return _display_itis_tree( collection, tree, root = 'root' )
+        list_taxa_collection = collection.taxas.all()
+        d_stats = collection.get_statistics()
+        return _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 'root' )
     return ''
 
-def _remove_single_parent( collection, tree ):
-    for node in tree:
-        if node not in collection.taxas.all():
-            n = tree.predecessors( node ) + tree.successors(node)
-            if len(n) == 2:
-                tree.delete_edge( n[0], node )
-                tree.delete_edge( node, n[1] )
-                tree.add_edge( n[0], n[1] )
-    return tree
+#def _remove_single_parent( list_taxa_collection, tree ):
+#    for node in tree:
+#        if node not in list_taxa_collection:
+#            n = tree.predecessors( node ) + tree.successors(node)
+#            if len(n) == 2:
+#                tree.delete_edge( n[0], node )
+#                tree.delete_edge( node, n[1] )
+#                tree.add_edge( n[0], n[1] )
+#    return tree
 
-def _display_itis_tree( collection, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
+def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
     """
     Pretty print of the tree in HTML.
 
@@ -465,22 +471,25 @@ def _display_itis_tree( collection, tree, root = "",  mydepth = 0, lastnode = 'r
     # Create tree display
     if root in tree.nodes():
         for node in tree.successors( root ):
-            dispnode = node.name
-            dispnode = dispnode.replace( "<", "&lt;" )
-            dispnode = dispnode.replace( ">", "&gt;" )
+            n = tree.predecessors( node ) + tree.successors(node)
             nb_inter_parents = 0
             # Create div for interparents (parents beetween nodes)
-            if lastnode in node.parents:
-                inter_parents = TAXOREF.get_interval_parents( lastnode, node )
-                nb_inter_parents = len( inter_parents )
-                blocknum += 1
-                blockname += str( blocknum )
-                result += "<div id='%s' class='interparents'><tt>" % blockname
-                if len( inter_parents ):
-                    result += """<span class="treeline">|</span> """*mydepth
-                    result +=  ("""<span class="treeline">|</span> """*mydepth).join(
-                      _link_itis_genre(collection, i,i,blockname) for i in inter_parents ) 
-                result += "</tt></div>" 
+            if len(n) == 2:
+                result += _display_itis_tree( collection, list_taxa_collection, d_stats, tree,  node, mydepth, 
+                  lastnode = node, blockname = blockname+"a")
+                continue
+#            if create_interparent:
+#                if lastnode in node.parents:
+#                    inter_parents = TAXOREF.get_interval_parents( lastnode, node )
+#                    nb_inter_parents = len( inter_parents )
+#                    blocknum += 1
+#                    blockname += str( blocknum )
+#                    result += "<div id='%s' class='interparents'><tt>" % blockname
+#                    if len( inter_parents ):
+#                        result += """<span class="treeline">|</span> """*mydepth
+#                        result +=  ("""<span class="treeline">|</span> """*mydepth).join(
+#                          _link_itis_genre(collection, i,i,blockname) for i in inter_parents ) 
+#                    result += "</tt></div>" 
             # Create arborescence display
             depth = 0
             while depth != mydepth :
@@ -489,18 +498,18 @@ def _display_itis_tree( collection, tree, root = "",  mydepth = 0, lastnode = 'r
             subnodes = tree.successors( node )
             if subnodes: # it's a genre
                 result += """<span genre="%s">\n""" % node.name
-                if node in collection.taxas.all():
-                    result += _link_itis_species( collection, node, True, blockname, nb_inter_parents)
+                if node in list_taxa_collection:
+                    result += _link_itis_species( d_stats, collection,  node, True, blockname, nb_inter_parents)
                 else:
-                    result += _link_itis_genre( collection, node, blockname, True, nb_inter_parents, stat=True )
-                result += _display_itis_tree( collection, tree,  node, depth + 1, 
+                    result += _link_itis_genre( d_stats, collection, node, blockname, True, nb_inter_parents, stat=True )
+                result += _display_itis_tree( collection, list_taxa_collection, d_stats, tree,  node, depth + 1, 
                   lastnode = node, blockname = blockname+"a")
                 result += """</span>\n"""
             else: # it's a species (ie taxon)
-                result += _link_itis_species( collection, node, True, blockname, nb_inter_parents)
+                result += _link_itis_species( d_stats, collection, node, True, blockname, nb_inter_parents)
     return result
 
-def _link_itis_species( collection, node, stat=False, blockname="", nb_inter_parents=0 ):
+def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_inter_parents=0 ):
     result = ""
     dispnode = node.name
     dispnode = dispnode.replace( "<", "&lt;" )
@@ -516,23 +525,15 @@ def _link_itis_species( collection, node, stat=False, blockname="", nb_inter_par
     result += """<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s</a>""" % (
       node.id,
       style,                        
-      node.name,#.capitalize().replace(" ", "_"),
+      node.name,
       "",#self.NCBI,
       "",#self.reference.TAXONOMY[bdnode]["id"],
       dispnode.capitalize() )
     if stat:
-        # XXX FIXME
-        #taxa_from_genus = collection.get_taxa_from_genus( node.name )
-#        result += """
-#        (<a class="nolink" title='%s'>%s</a>/
-#        <a title='%s' href="statistics?query=%%7B%s%%7D">%s</a>)\n""" % (
         result += """(<a title='%s' href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
-          #",".join( [i.name for i in taxa_from_genus]) ,
-          #taxa_from_genus.count(),
           "Restrict your collection to these trees",
           node.name,
-          #collection.trees.filter( taxas = node ).count() )#getNbTrees( bdnode ))
-          collection.get_nb_trees( node ) )#getNbTrees( bdnode ))
+          len(d_stats[node.id]['trees_list']) )
     if nb_inter_parents:
         result += """<a id="a-%s" class='showparents'
           onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
@@ -542,7 +543,7 @@ def _link_itis_species( collection, node, stat=False, blockname="", nb_inter_par
         result += "<br />\n"
     return result
 
-def _link_itis_genre( collection, node, blockname, isinterparent=False, nb_inter_parents=0, stat = 0  ):
+def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False, nb_inter_parents=0, stat = 0  ):
     result = ""
     dispnode = node.name
     dispnode = dispnode.replace( "<", "&lt;" )
@@ -563,17 +564,14 @@ def _link_itis_genre( collection, node, blockname, isinterparent=False, nb_inter
       "",#self.NCBI,
       "",#self.reference.TAXONOMY[bdnode]["id"],
       dispnode.capitalize())
-    taxa_from_genus = collection.get_taxa_from_parents( node.name )
     result += """
     (<a class="nolink" title='%s'>%s</a>/
     <a title="%s" href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
-      ",".join( [i.name for i in taxa_from_genus]),
-      taxa_from_genus.count(),
+      ",".join( d_stats[node.id]['scientific_taxa_list']),
+      len( d_stats[node.id]['scientific_taxa_list'] ),
       "Restrict your collection to these trees",
       node.name,
-      #collection.trees.filter( taxas = node ).count() )#getNbTrees( bdnode ))
-      #collection.trees.filter(taxas__parents_relation_taxas__parent=node).distinct().count() )
-      collection.get_nb_trees( node ) )
+      len( d_stats[node.id]['trees_list'] ) )
     if isinterparent and nb_inter_parents:
         result += """<a id="a-%s" class='showparents'
           onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
