@@ -60,7 +60,7 @@ Dealing with collection
 # Tree names are taken from nexus file
 
 >>> tree_col.trees.all()
-[<Tree: Fig._3>]
+[<Tree: fig._3>]
 
 >>> tree_col.bad_taxas.all()
 [<BadTaxa: phytophthora_cajani (0)>, <BadTaxa: phytophthora_cinnamomi (0)>, <BadTaxa: phytophthora_drechsleri-like (0)>, <BadTaxa: phytophthora_melonis (0)>, <BadTaxa: phytophthora_pistaciae_a (0)>, <BadTaxa: phytophthora_pistaciae_b (0)>, <BadTaxa: phytophthora_sinensis (0)>, <BadTaxa: phytophthora_sojae_a (0)>, <BadTaxa: phytophthora_sojae_b (0)>, <BadTaxa: phytophthora_vignae (0)>]
@@ -76,7 +76,7 @@ Export collection to string
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 >>> tree_col.get_collection_string()
-u'#NEXUS\\n\\nBEGIN TREES;\\n\\nTREE Fig._3 = [&R] (((Phytophthora_sojae_a,Phytophthora_sojae_b),(((Phytophthora_vignae,Phytophthora_cajani),(Phytophthora_melonis,(Phytophthora_drechsleri-like,Phytophthora_sinensis))),(Phytophthora_pistaciae_a,Phytophthora_pistaciae_b))),Phytophthora_cinnamomi)\\n\\nEND;\\n'
+u'#NEXUS\\n\\nBEGIN TREES;\\n\\nTREE fig._3 = [&R] (((phytophthora_sojae_a,phytophthora_sojae_b),(((phytophthora_vignae,phytophthora_cajani),(phytophthora_melonis,(phytophthora_drechsleri-like,phytophthora_sinensis))),(phytophthora_pistaciae_a,phytophthora_pistaciae_b))),phytophthora_cinnamomi)\\n\\nEND;\\n'
 
 
 Creation of collection from phylip format
