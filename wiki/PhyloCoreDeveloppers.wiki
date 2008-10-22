@@ -31,7 +31,7 @@ id|taxa_name|type_name|rank_id|parent_id
 
 note that if you don't have rank put the 'no rank' rank id
 
-=== relhomonymtaxa.dmp ===
+=== parentsrelation.dmp ===
 {{{
 id|taxa_id|parent_id|index
 }}}
