@@ -15,9 +15,6 @@ will search for dumps files (actually csv files) in djangophylocore/dumps.
 
 If you want to include your database into phyloexplorer, you must create your dump file and follow certains rules when creating those dump files.
 
-Note that you don't have to create the `parentsrelation.dmp` will be automatiquely 
-created while executing `./manage.py loadtaxonomy`
-
 === rank.dmp ===
 {{{
 id|name
