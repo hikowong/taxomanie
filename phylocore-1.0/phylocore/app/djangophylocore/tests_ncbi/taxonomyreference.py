@@ -95,11 +95,11 @@ True
 Getting django objects from name
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 >>> taxoref.get_object_from_name( 'mus' )
-[<Taxonomy: mus (scientific name)>]
+<Taxonomy: mus (scientific name)>
 >>> taxoref.get_object_from_name( 'nannomys' )
-[<Taxonomy: nannomys (synonym)>]
+<Taxonomy: nannomys (synonym)>
 >>> taxoref.get_object_from_name( 'echinops' )
-[<Taxonomy: echinops (homonym)>]
+<Taxonomy: echinops (homonym)>
 >>> taxoref.get_object_from_name( 'badname' )
 <BadTaxa: badname (0)>
 

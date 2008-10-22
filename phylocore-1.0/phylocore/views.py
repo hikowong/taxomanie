@@ -26,6 +26,7 @@ from django.shortcuts import render_to_response
 #    return HttpResponse(template.render(context))
 
 TAXOREF = TaxonomyReference()
+TAXONOMY_TOC = get_taxonomy_toc()
 
 import os.path
 localDir = os.path.dirname(__file__)
@@ -172,9 +173,9 @@ def browse( request ):
     context = {}
     if not tree.is_valid:
         context['error_msg'] = "Warning : this tree is not well formated"
-    try:
+    if 1:#try:
         context['tree'] = _display_tree( tree.arborescence, source )
-    except:
+    else:#except:
         context['error_msg'] = "This tree contains error(s). Please, check the source"
     context['tree_string'] = tree.tree_string.replace( collection.delimiter, ' ' )
     context['current_tree_id'] = tree.id
@@ -358,11 +359,11 @@ def _display_tree( tree, source=None, root = "",  mydepth = 0, lastnode = 'root'
         else: # it's a species (ie taxon)
             if TAXOREF.is_bad_taxa( node.name ):
                 result += "+-<font color='red'><b>"+node.name.capitalize()+"</b></font><br />\n"
-            elif TAXOREF.is_homonym( node ):
+            elif TAXOREF.is_homonym( node.name ):
                 result += "+-<font color='orange'><b>"+node.name.capitalize()+"</b></font><br />\n"
-            elif TAXOREF.is_common( node ):
+            elif TAXOREF.is_common( node.name ):
                 result += "+-<font color='violet'><b>"+node.name.capitalize()+"</b></font><br />\n"
-            elif TAXOREF.is_synonym( node ):
+            elif TAXOREF.is_synonym( node.name ):
                 result += "+-<font color='gray'><b>"+node.name.capitalize()+"</b></font><br />\n"
             else:
                 result += _link_species_tree( node, source, blockname, nb_inter_parents)

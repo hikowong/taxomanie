@@ -120,7 +120,7 @@ class TaxonomyReference( object ):
                 return BadTaxa.objects.get( name = taxa_name )
             raise ValueError, '%s not found in the database' % taxa_name
         else:
-            return Taxonomy.objects.filter( name = taxa_name )
+            return Taxonomy.objects.filter( name = taxa_name )[0]
         # We never should be here
         raise RuntimeError, 'Something very wrong appened'
 
@@ -181,9 +181,13 @@ class TaxonomyReference( object ):
     #
 
     def __sort( self, x, y ):
-        return len( y.parents ) - len( x.parents )
+        return y.parents.count() - x.parents.count()
 
     def get_common_parents( self, taxa_list ):
+        # XXX a refactoriser
+        """
+        select * from djangophylocore_parentsrelation where parent_id IN (select parent_id from djangophylocore_parentsrelation where taxa_id = 10114 except select parent_id from djangophylocore_parentsrelation where taxa_id = 9989 ) and taxa_id = 10114;
+        """
         """
         return a list of all common parents beetween 2 taxa.
         Note that taxa1 and taxa2 must be Taxa objects
@@ -292,7 +296,12 @@ class Taxonomy( models.Model ):
     def get_parents( self, regenerate = False ):
         if regenerate:
             self.regenerate_parents()    
-        return [i.parent for i in self.parents_relation_taxas.all()]
+        return Taxonomy.objects.extra( 
+          tables = ['djangophylocore_parentsrelation'],
+          where = ["djangophylocore_taxonomy.id = djangophylocore_parentsrelation.parent_id and djangophylocore_parentsrelation.taxa_id = %s"],
+          params = [self.id],
+          order_by = ['djangophylocore_parentsrelation."index"'] )
+        #return [i.parent for i in self.parents_relation_taxas.all()]
     parents = property( get_parents )
 
     def get_children( self, regenerate = False ):
@@ -542,16 +551,17 @@ class Tree( models.Model, TaxonomyReference ):
                 parent_name = Taxonomy.objects.get( name = 'root' )
             else:
                 if not self.__rel_name.has_key( tree ):
-                    taxa_list = self.__get_django_objects_from_nwk( tree )
-                    stn_list = Taxonomy.objects.filter( type_name = 'scientific name' )
-                    parent_name = self.get_first_common_parent(stn_list)
+                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in getTaxa( tree ) if self.is_valid_name( i )]
+                    #taxa_list = self.__get_django_objects_from_nwk( tree )
+                    parent_name = self.get_first_common_parent(taxa_list)
                 else:
                     parent_name = self.__rel_name[tree]
-            for child_name in getChildren( tree ):
+            children = getChildren( tree )
+            for child_name in children:
                 if getChildren( child_name ): # child is a node
-                    taxa_list = self.__get_django_objects_from_nwk( child_name )
-                    stn_list = Taxonomy.objects.filter( type_name = 'scientific name' )
-                    child = self.get_first_common_parent(stn_list)
+                    #taxa_list = self.__get_django_objects_from_nwk( child_name )
+                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in getTaxa( child_name ) if self.is_valid_name( i )]
+                    child = self.get_first_common_parent(taxa_list)
                     if child is None:
                         child = parent_name
                     if child not in self.__children:
@@ -606,16 +616,8 @@ class Tree( models.Model, TaxonomyReference ):
         res = query.strip()
         for pattern in re.findall("{([^}]+)}", query):
             striped_pattern = pattern.strip().lower()
-            if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
+            if not self.is_valid_name( striped_pattern ):
                 raise NameError, striped_pattern
-            if striped_pattern == 'usertaxa':
-                if usertaxa_list:
-                    query = Q()
-                    for taxa_name in usertaxa_list:
-                        query |= Q( name = taxa_name )
-                    nb_occurence = self.taxas.filter( query ).count()
-                else:
-                    nb_occurence = 0
             else:
                 nb_occurence = self.get_nb_taxa_from_parent( striped_pattern )
             res = res.replace("{"+pattern+"}", str(nb_occurence) )
@@ -625,47 +627,6 @@ class Tree( models.Model, TaxonomyReference ):
             except:
                 raise SyntaxError, "bad query %s" % query
         raise SyntaxError, "bad query %s" % query
-
-#    def eval_query_old( self, query, usertaxa_list=[], taxa_occurence= None ):
-#        """
-#        test if a query match the tree. The query format is a python
-#        boolean expression with taxa name beetween braces :
-#
-#        tree.eval_query( "{muridae} > 2 and {primates}" )
-#
-#        will return true if tree have more than 2 taxas wich have muridae as parents
-#        and at least 1 taxa wich have a primate as parents.
-#
-#        if a taxa_list is not null, the query can have another variable
-#        {usertaxa}. this variable represente all taxa passed in the list.
-#
-#        tree.eval_query( "{muridae} => 4 and {usertaxa} > 2", ['rattus', 'mus', 'pan', 'boss'] )
-#
-#        will return true if tree have at least 4 taxa wich are muridae and
-#        more than 2 taxa wich are in the usertaxa_list 
-#        """
-#        res = query.strip()
-#        for pattern in re.findall("{([^}]+)}", query):
-#            striped_pattern = pattern.strip().lower()
-#            if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
-#                raise NameError, striped_pattern
-#            if striped_pattern == 'usertaxa':
-#                if usertaxa_list:
-#                    query = Q()
-#                    for taxa_name in usertaxa_list:
-#                        query |= Q( name = taxa_name )
-#                    nb_occurence = self.taxas.filter( query ).count()
-#                else:
-#                    nb_occurence = 0
-#            else:
-#                nb_occurence = self.get_nb_taxa_from_parent( striped_pattern, taxa_occurence )
-#            res = res.replace("{"+pattern+"}", str(nb_occurence) )
-#        if res:
-#            try:
-#                return eval( res )
-#            except:
-#                raise SyntaxError, "bad query %s" % query
-#        raise SyntaxError, "bad query %s" % query
 
 
 ##################################################
@@ -872,9 +833,6 @@ class TreeCollection( models.Model, TaxonomyReference ):
 
     def _query( self, query, treebase ):
         """
-        return a list of trees matching the query. You can pass usertaxa_list
-        in order to use the {usertaxa} variable (see Tree.eval_query for more
-        details)
         """
         global get_taxonomy_toc
         TAXONOMY_TOC = get_taxonomy_toc()
