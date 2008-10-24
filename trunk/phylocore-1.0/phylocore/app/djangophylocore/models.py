@@ -258,14 +258,14 @@ class Rank( models.Model ):
 ##################################################
 
 class Taxonomy( models.Model ):
-    name = models.CharField( max_length = 200 )
+    name = models.CharField( max_length = 200, unique = True )
     type_name = models.CharField( max_length = 50 )
     rank = models.ForeignKey( Rank, related_name = 'taxas', null = True )
     parent = models.ForeignKey( 'self', related_name = 'direct_children', null = True )
     _parents = models.ManyToManyField( 'self', through = 'ParentsRelation', related_name = 'children', symmetrical=False )
     class Meta:
         ordering = ['name']
-        unique_together = ['name', 'type_name']
+        #unique_together = ['name', 'type_name']
 
     def __unicode__( self ):
         return "%s (%s)" % ( self.name, self.type_name )
