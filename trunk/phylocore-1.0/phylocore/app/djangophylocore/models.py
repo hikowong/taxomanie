@@ -592,7 +592,11 @@ class Tree( models.Model, TaxonomyReference ):
             #parent = Taxonomy.objects.get( name = parent_name )
             parent_id = TAXONOMY_TOC[parent_name]
             cur = cursor.execute( "select tree_id, count(taxa_id) from djangophylocore_reltreecoltaxa%s where (taxa_id IN (select taxa_id from djangophylocore_parentsrelation where parent_id = %s) or taxa_id = %s) and tree_id = %s GROUP BY  tree_id ;" % ( self.collection.id, parent_id, parent_id, self.id ) ) 
-            return cur.fetchone()[1]
+            if settings.DATABASE_ENGINE == 'sqlite3':
+                results = cur.fetchone()[1]
+            else:
+                results = cursor.fetchone()[1]
+            return results
         return self.taxas.filter( parents_relation_taxas__parent__name = parent_name ).count()
 
     def eval_query( self, query, usertaxa_list=[] ):
@@ -669,13 +673,22 @@ class TreeCollection( models.Model, TaxonomyReference ):
 
     def __create_relation( self, name, dump ):
         cursor = connection.cursor()
-        cursor.execute( """ CREATE TABLE "djangophylocore_reltreecoltaxa%s" (
-            "id" integer NOT NULL PRIMARY KEY,
-            "collection_id" integer NOT NULL REFERENCES "djangophylocore_treecollection" ("id"),
-            "tree_id" integer NOT NULL REFERENCES "djangophylocore_tree" ("id"),
-            "taxa_id" integer NULL REFERENCES "djangophylocore_taxonomy" ("id"),
-            "user_taxa_name" varchar(200) NULL
-        );""" % name )
+        if settings.DATABASE_ENGINE == 'sqlite3':
+            cursor.execute( """ CREATE TABLE "djangophylocore_reltreecoltaxa%s" (
+                "id" integer NOT NULL PRIMARY KEY,
+                "collection_id" integer NOT NULL REFERENCES "djangophylocore_treecollection" ("id"),
+                "tree_id" integer NOT NULL REFERENCES "djangophylocore_tree" ("id"),
+                "taxa_id" integer NULL REFERENCES "djangophylocore_taxonomy" ("id"),
+                "user_taxa_name" varchar(200) NULL
+            );""" % name )
+        elif settings.DATABASE_ENGINE == 'mysql':
+            cursor.execute( """ CREATE TABLE `djangophylocore_reltreecoltaxa%s` (
+                `id` integer NOT NULL PRIMARY KEY,
+                `collection_id` integer NOT NULL REFERENCES `djangophylocore_treecollection` (`id`),
+                `tree_id` integer NOT NULL REFERENCES `djangophylocore_tree` (`id`),
+                `taxa_id` integer NULL REFERENCES `djangophylocore_taxonomy` (`id`),
+                `user_taxa_name` varchar(200) NULL
+            );""" % name )
         codecs.open( '/tmp/rel_%s.dmp' % name, encoding='utf-8', mode='w').write( ''.join( dump ) )
         if settings.DATABASE_NAME == ':memory:':
             db_name = settings.TEST_DATABASE_NAME
@@ -685,7 +698,8 @@ class TreeCollection( models.Model, TaxonomyReference ):
             os.system( "sqlite3 -separator '|' %s '.import /tmp/rel_%s.dmp djangophylocore_reltreecoltaxa%s'" % (
               db_name, name, name ) )
         elif settings.DATABASE_ENGINE == 'mysql':
-            cmd = """mysql -u %s -p%s %s -e "LOAD DATA LOCAL INFILE '/tmp/rel_%s.dmp' INTO TABLE djangophylocore_reltreecoltaxa%s FIELDS TERMINATED BY '|';" """ % ( settings.DATABASE_USER, settings.DATABASE_PASSWORD, nb_name, name, name )
+            cmd = """mysql -u %s -p%s %s -e "LOAD DATA LOCAL INFILE '/tmp/rel_%s.dmp' INTO TABLE djangophylocore_reltreecoltaxa%s FIELDS TERMINATED BY '|';" """ % ( settings.DATABASE_USER, settings.DATABASE_PASSWORD, db_name, name, name )
+            os.system( cmd )
         else:
             raise RuntimeError, "%s engine not supported" % settings.DATABASE_ENGINE
         os.system( 'rm /tmp/rel_%s.dmp' % name )
@@ -852,7 +866,10 @@ class TreeCollection( models.Model, TaxonomyReference ):
                     cur = cursor.execute( "select tree_id, count(taxa_id) from djangophylocore_reltreecoltaxa1 where taxa_id IN (select taxa_id from djangophylocore_parentsrelation where parent_id = %s) or taxa_id = %s GROUP BY  tree_id ;" % ( parent_id, parent_id ) ) 
                 else:
                     cur = cursor.execute( "select tree_id, count(taxa_id) from djangophylocore_reltreecoltaxa%s where taxa_id IN (select taxa_id from djangophylocore_parentsrelation where parent_id = %s) or taxa_id = %s GROUP BY  tree_id ;" % ( self.id, parent_id, parent_id ) ) 
-            result = cur.fetchall()
+            if settings.DATABASE_ENGINE == 'sqlite3':
+                result = cur.fetchall()
+            else:
+                result = cursor.fetchall()
             for (tree_id, nb_occurence) in result:
                 if tree_id not in d_trees:
                     d_trees[tree_id] = {}
@@ -1094,7 +1111,12 @@ class TreeCollection( models.Model, TaxonomyReference ):
         # initialisation of user taxa
         cursor = connection.cursor()
         cur = cursor.execute( "select rel.tree_id, rel.taxa_id, rel.user_taxa_name, taxonomy.name from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxa_id" % self.id )
-        results = cur.fetchall()
+        if settings.DATABASE_ENGINE == 'sqlite3':
+            results = cur.fetchall()
+            cur.close()
+        else:
+            results = cursor.fetchall()
+            cursor.close()
         for ( tree_id, taxa_id, user_taxa_name, scientific_name ) in results:
             if taxa_id not in taxon_occurence:
                 taxon_occurence[taxa_id] = {"trees_list": set([]),
@@ -1102,7 +1124,6 @@ class TreeCollection( models.Model, TaxonomyReference ):
             taxon_occurence[taxa_id]['trees_list'].add( tree_id )
             taxon_occurence[taxa_id]['user_taxa_list'].add( user_taxa_name )
             taxon_occurence[taxa_id]['scientific_taxa_list'].add( scientific_name )
-        cur.close()
         tree = self.get_reference_arborescence()
         self.__compute_stats_arborescence( taxon_occurence, tree, Taxonomy.objects.get( name = 'root' ) )
         return taxon_occurence
