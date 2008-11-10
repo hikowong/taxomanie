@@ -24,14 +24,22 @@ DjangoPhylocore and PhyloCore are providing the same librairy. The difference re
 
 In short, if you developpe a web app apon django, use DjangoPhylocore. If not, use PhyloCore.
 
-= Dependancies =
+= Dependencies =
 PhyloCore relies on Django wich is written in Python. So, you need Python and Django.
 
 PhyloCore is using a database for dealing with taxonomy. Please install SQLite3 or MySQL
 and their python wrapper : [http://sourceforge.net/projects/mysql-python mysql-python] for MySQL or [http://initd.org/pub/software/pysqlite/ pysqlite] for sqlite...
 
+NetworkX for the graph manipulations.
 
-You can install NetworkX for the graph manipulations (recommended).
+You can check whether those dependencies have been successfully installed by typing those 
+lines into the python interpreter:
+
+{{{
+>>> import sqlite3
+>>> import django
+>>> import networkx
+}}}
 
 = Installation =
 First of all, download an install [http://www.djangoproject.com/download/ Django 1.0].
@@ -43,7 +51,7 @@ svn checkout http://taxomanie.googlecode.com/svn/trunk/ taxomanie
 
 Go to the PhyloCore folder and launch the `install` script:
 {{{
-cd taxomanie/phylocore
+cd taxomanie/phylocore-1.0
 sudo ./install
 }}}
 
