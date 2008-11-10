@@ -3,6 +3,22 @@
 
 Phylocore needs a database. In this section, you'll see how-to configure phylocore and how-to prepopulate the database.
 
+= Installing NCBI database =
+
+Edit the `settings.py` file (in phylocore-1.0/phylocore). You should see something like that :
+
+{{{
+DATABASE_ENGINE = 'sqlite3' # 'mysql' or 'sqlite3'
+TAXONOMY_ENGINE = 'ncbi' # ncbi or itis
+DEBUG = True
+}}}
+
+Now you must choose the database backend wich PhyloCore will use (choose between and the taxonomy you want to use.
+
+`DEBUG` 
+
+
+
 = Prepare settings =
 
 Go to the folder phylocore. You should see a file named 'settings.py'. This is the "control center" of PhyloCore. Open this file. And you should see something like that:
