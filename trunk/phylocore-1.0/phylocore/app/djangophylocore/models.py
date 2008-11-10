@@ -258,7 +258,7 @@ class Rank( models.Model ):
 ##################################################
 
 class Taxonomy( models.Model ):
-    name = models.CharField( max_length = 200, unique = True )
+    name = models.CharField( max_length = 200 )#, unique = True )
     type_name = models.CharField( max_length = 50 )
     rank = models.ForeignKey( Rank, related_name = 'taxas', null = True )
     parent = models.ForeignKey( 'self', related_name = 'direct_children', null = True )
