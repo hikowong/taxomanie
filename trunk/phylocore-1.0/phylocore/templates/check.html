@@ -24,13 +24,13 @@ $(document).ready(function(){
 {% block menu %}
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to import collection page"> Upload Collection </a>
-<a href="help" class="path" title="(?) Help contents"> Help Contents </a>
-<a href="about" class="path" title="About PhyloExplorer project..."> About </a>
+<a href="/phyloexplorer/help" class="path" title="(?) Help contents"> Help Contents </a>
+<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project..."> About </a>
 <br />
 <center> <b>Current collection</b> </center>
-<a href="statistics" blockui="wait" class="path"
+<a href="/phyloexplorer/statistics" blockui="wait" class="path"
 title="Go back to statistics for this subset of trees"> Back to statistics </a>
-<a href="/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
+<a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
 {% endblock %}
 
@@ -65,7 +65,8 @@ name="query" />
 if _query_:
     #
 %>
-    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=check?clear_query=1>Back to full collection</a>
+    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a blockui="wait"
+    href=/phyloexplorer/check?clear_query=1>Back to full collection</a>
 <%
 else:
     _query_ = ""
@@ -92,11 +93,11 @@ else:
 <center>
 <form>
 {% if page.has_previous %}
-    <a href="/browse?page={{page.previous_page_number}}"> Previous </a>&nbsp;
+    <a href="/phyloexplorer/browse?page={{page.previous_page_number}}"> Previous </a>&nbsp;
 {% endif %}
 <input size="5" type="text" value="{{page.start_index}}" name="page"/>/{{ page.paginator.count }}
 {% if page.has_next %}
-    &nbsp;<a href="/browse?page={{page.next_page_number}}"> Next </a>
+    &nbsp;<a href="/phyloexplorer/browse?page={{page.next_page_number}}"> Next </a>
 {% endif %}
 </form>
 </center>
@@ -135,11 +136,11 @@ else:
 <center>
 <form>
 {% if page.has_previous %}
-    <a href="/browse?page={{page.previous_page_number}}"> Previous </a>&nbsp;
+    <a href="/phyloexplorer/browse?page={{page.previous_page_number}}"> Previous </a>&nbsp;
 {% endif %}
 <input size="5" type="text" value="{{page.start_index}}" name="page"/>/{{ page.paginator.count }}
 {% if page.has_next %}
-    &nbsp;<a href="/browse?page={{page.next_page_number}}"> Next </a>
+    &nbsp;<a href="/phyloexplorer/browse?page={{page.next_page_number}}"> Next </a>
 {% endif %}
 </form>
 </center>

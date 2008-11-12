@@ -6,8 +6,8 @@
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to import collection page">Upload Collection</a>
-<a href="help" class="path" title="(?) Help contents">Help Contents</a>
-<a href="about" class="path" title="About PhyloExplorer project...">About</a>
+<a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help Contents</a>
+<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About</a>
 {% endblock %}
 
 
@@ -17,7 +17,7 @@
 {% endif %}
     <fieldset>
         <legend>Choose the file containing your tree collection in newick or nexus...</legend>
-        <form action="statistics" method="post" enctype="multipart/form-data">
+        <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
             Filename: <input type="file" name="myFile" class="button" /><br /><br />
             <input type="reset" class="button" value="clear" />
             Enter your delimiter (ex: "_" or "$" )
@@ -30,7 +30,7 @@
     or
     <fieldset>
         <legend>... or paste your collection</legend>
-        <form action="statistics" method="post" enctype="multipart/form-data">
+        <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
             <textarea rows="10" cols="80" name="myFile"></textarea><br />
             <input type="reset" class="button" value="clear" />
             Enter your delimiter (ex: "_" or "$" )
