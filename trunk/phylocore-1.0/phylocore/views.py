@@ -118,7 +118,6 @@ def statistics( request ):
         else:
             context['stats_tree'] = None
         # correct bad taxas
-#XXX Put ajax here
 #        dict_bad_taxas = {}
 #        for bad in collection.bad_taxas.all():
 #            dict_bad_taxas[bad.name] = []
