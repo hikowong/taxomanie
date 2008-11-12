@@ -43,15 +43,15 @@ function selectGenre( genre ){
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
 <center> <b> Home </b> </center>
 <a href="." class="path" title="Go to upload collection page">Upload Collection</a>
-<a href="help" class="path" title="(?) Help contents">Help Contents</a>
-<a href="about" class="path" title="About PhyloExplorer project...">About</a>
+<a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help Contents</a>
+<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About</a>
 <br />
 {% if not_empty_collection %}
 <center> <b>Current collection</b> </center>
-<a href="/browse" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
-<a href="/downloadNCBITree" class="path" title="Download the NCBI arborescence">
+<a href="/phyloexplorer/browse" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
+<a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence">
 Download NCBI tree </a>
-<a href="/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
+<a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
 {% endif %}
 {% endblock %}

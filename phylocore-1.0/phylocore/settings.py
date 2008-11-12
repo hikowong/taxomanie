@@ -1,5 +1,27 @@
 # Django settings for taxomanie project.
 
+########################   User Section ##########################
+
+DATABASE_ENGINE = 'mysql' # 'mysql' or 'sqlite3'
+TAXONOMY_ENGINE = 'ncbi' # ncbi or itis
+
+DATABASE_NAME = 'phylocore_%s' % TAXONOMY_ENGINE
+
+DATABASE_USER = 'root'         # Not used with sqlite3.
+DATABASE_PASSWORD = 'mysql'    # Not used with sqlite3.
+DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+
+DEBUG = True
+
+ADMINS = (
+    ('John Foo', 'john.foo@example.com'),
+)
+
+################### END USER SECTION  #############################
+###################################################################
+# YOU DO NOT HAVE TO TOUCH ANYTHING BELOW !!
+
 import os
 ROOT_PATH = os.path.join(os.getcwd(), os.path.dirname(__file__) )
 
@@ -10,27 +32,20 @@ try:
 except:
     pass
 
-DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    ('Nicolas Clairon', 'clairon@gmail.com'),
-)
 
 MANAGERS = ADMINS
 
-# For sqlite3
-DATABASE_ENGINE = 'sqlite3'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = os.path.join( ROOT_PATH, 'phylocore.db' )    # Or path to database file if using sqlite3.
 
-# For mysql
-#DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-#DATABASE_NAME = 'phylocore_ncbi'    # Or path to database file if using sqlite3.
-DATABASE_USER = 'root'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'mysql'         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
-
+if DATABASE_ENGINE == 'sqlite3':
+    # For sqlite3
+    DATABASE_NAME = os.path.join( ROOT_PATH, '%s.db' % DATABASE_NAME ) 
+elif DATABASE_ENGINE == 'mysql':
+    # For mysql
+    pass
+else:
+    raise ValueError, "DATABASE_ENGINE must be 'sqlite3' or 'mysql'. Found %s" % DATABASE_ENGINE
 TEST_DATABASE_NAME = 'test_phylocore'
 BOOST_SQLITE = True
 

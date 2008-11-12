@@ -20,12 +20,12 @@ urlpatterns += patterns('phylocore.views',
     # Example:
     #(r'^taxomanie/', include('taxomanie.phylocore.urls')),
 
-    (r'^get_img_url/(?P<taxon>.*)$', 'get_img_url'),
-    (r'^recreate_collection$', 'recreate_collection'),
-    (r'^statistics$', 'statistics'),
-    (r'^browse$', 'browse'),
-    (r'^help$', 'help'),
-    (r'^about$', 'about'),
+    (r'^phyloexplorer/get_img_url/(?P<taxon>.*)$', 'get_img_url'),
+    (r'^phyloexplorer/recreate_collection$', 'recreate_collection'),
+    (r'^phyloexplorer/statistics$', 'statistics'),
+    (r'^phyloexplorer/browse$', 'browse'),
+    (r'^phyloexplorer/help$', 'help'),
+    (r'^phyloexplorer/about$', 'about'),
     (r'^', 'index'),
 
     #(r'^articles/(\d{4})/$', 'news.views.year_archive'),
