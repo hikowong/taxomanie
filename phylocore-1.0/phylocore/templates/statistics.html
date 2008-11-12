@@ -5,8 +5,8 @@
 {% block script %}
 <script type="text/javascript"> 
 $(document).ready(function() { 
-    $('#sugestions').text('Processing...');
-    $('#sugestions').load( "getAllSugestions" ); 
+    $('#suggestions').text('Processing...');
+    $('#suggestions').load( "suggestions" ); 
 }); 
 $(document).ready(function(){
 //    $("#exemplequery").hide();
@@ -76,7 +76,7 @@ name="query" />
 <i>You can download your result after your query</i></tt>
 </form>
 {% if query %}
-    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=statistics?clear_query=1>Back to full collection</a>
+    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_query=1>Back to full collection</a>
 {% endif %}
 </div>
 <!-- end query panel -->
@@ -143,23 +143,7 @@ name="query" />
     <!-- end synonym fieldset -->
     <!-- badtaxa fieldset -->
     {% if nb_badtaxa %}
-        <span class="homonymlist">
-        <fieldset>
-        <legend> {{ nb_badtaxa }} taxa(s) </legend>
-        {% for bad_name, suggestions in dict_bad_taxas.iteritems %}
-            <font color="red">{{ bad_name }}</font> :
-            {% if suggestions %}
-                {% for sugg in suggestions %}
-                    {{ sugg }}
-                    <input type="radio" name="{{bad_name}}" value="{{ sugg }}" />
-                {% endfor %}
-            {% else %}
-                <input type='text' name="{{bad_name}}" />
-            {% endif %}
-            <br />
-        {% endfor %}
-        </fieldset>
-        </span>
+        <span id="suggestions" class="homonymlist"> </span>
     {% endif %}
     <!-- end badtaxa fieldset -->
 

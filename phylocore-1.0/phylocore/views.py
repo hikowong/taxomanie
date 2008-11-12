@@ -203,6 +203,20 @@ def recreate_collection( request ):
 def get_img_url( request, taxon ):
    return HttpResponse( _get_image_url( taxon )  )
 
+def suggestions( request ):
+    # correct bad taxas
+    dict_bad_taxas = {}
+    context = {}
+    collection = request.session['collection']
+    for bad in collection.bad_taxas.all():
+        dict_bad_taxas[bad.name] = []
+        for i in TAXOREF.correct( bad.name, guess = True ):
+            if i != bad.name:
+                dict_bad_taxas[bad.name].append( i )
+    context['dict_bad_taxas'] = dict_bad_taxas
+    return render_to_response( 'suggestions.html', context )
+
+
 ########################################
 #   Needed fonctions (not views)       #
 ########################################
