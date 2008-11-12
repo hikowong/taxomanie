@@ -25,6 +25,7 @@ class Command(NoArgsCommand):
         db_engine = settings.DATABASE_ENGINE
         map_dumps = {}
         for dump in os.listdir( path_dumps ):
+            if dump == '.svn': continue # XXX
             name = os.path.splitext( dump )[0]
             map_dumps[name] = os.path.join( path_dumps, dump )
             if db_engine == 'sqlite3':

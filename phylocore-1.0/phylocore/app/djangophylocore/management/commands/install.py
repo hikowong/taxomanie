@@ -8,20 +8,24 @@ from django.conf import settings
 class Command(NoArgsCommand):
     option_list = NoArgsCommand.option_list + (
         make_option('--verbose', '-v', action='store_true', dest='verbose', 
-            help='Verbose operation'),
+            help='Verbose behavior'),
+        make_option('--taxonomy', '-t', dest='taxonomy', default = 'ncbi',
+            help='Taxonomy to use: itis or ncbi (default ncbi)'),
     )
-    help = "Load all taxonomy data into database"
+    help = "Install base information into the database"
     
     requires_model_validation = True
     
     def handle_noargs(self, **options):
         verbose = options.get("verbose", False)
+        taxonomy = options.get("taxonomy", 'ncbi')
+        assert taxonomy in ['ncbi', 'itis'], "taxonomy supported : itis or ncbi"
         verbose_string = ''
         if verbose:
             verbose_string = '-v'
         if verbose:
-            print "building ncbi dumps"
-        os.system( 'python manage.py buildncbi %s' % verbose_string )
+            print "building %s dumps" % taxonomy
+        os.system( 'python manage.py build%s %s' % (taxonomy, verbose_string) )
         if verbose:
             print "creating database"
         os.system( 'python manage.py reset_db --noinput' )
