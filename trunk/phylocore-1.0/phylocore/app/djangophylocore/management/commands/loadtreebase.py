@@ -26,14 +26,24 @@ class Command(NoArgsCommand):
         db_engine = settings.DATABASE_ENGINE
         map_dumps = {}
         cursor = connection.cursor()
-        cursor.execute( """ CREATE TABLE "djangophylocore_reltreecoltaxa1" (
-            "id" integer NOT NULL PRIMARY KEY,
-            "collection_id" integer NOT NULL REFERENCES "djangophylocore_treecollection" ("id"),
-            "tree_id" integer NOT NULL REFERENCES "djangophylocore_tree" ("id"),
-            "taxa_id" integer NULL REFERENCES "djangophylocore_taxonomy" ("id"),
-            "user_taxa_name" varchar(200) NULL);
-        """ )
+        if settings.DATABASE_ENGINE == 'sqlite3':
+            cursor.execute( """ CREATE TABLE "djangophylocore_reltreecoltaxa1" (
+                "id" integer NOT NULL PRIMARY KEY,
+                "collection_id" integer NOT NULL REFERENCES "djangophylocore_treecollection" ("id"),
+                "tree_id" integer NOT NULL REFERENCES "djangophylocore_tree" ("id"),
+                "taxa_id" integer NULL REFERENCES "djangophylocore_taxonomy" ("id"),
+                "user_taxa_name" varchar(200) NULL
+            );""" )
+        elif settings.DATABASE_ENGINE == 'mysql':
+            cursor.execute( """ CREATE TABLE `djangophylocore_reltreecoltaxa1` (
+                `id` integer NOT NULL PRIMARY KEY,
+                `collection_id` integer NOT NULL REFERENCES `djangophylocore_treecollection` (`id`),
+                `tree_id` integer NOT NULL REFERENCES `djangophylocore_tree` (`id`),
+                `taxa_id` integer NULL REFERENCES `djangophylocore_taxonomy` (`id`),
+                `user_taxa_name` varchar(200) NULL
+            );""" )
         for dump in os.listdir( path_dumps ):
+            if dump == ".svn": continue #XXX
             name = os.path.splitext( dump )[0]
             map_dumps[name] = os.path.join( path_dumps, dump )
             if name in ['tree', 'treecollection']:
