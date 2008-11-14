@@ -64,8 +64,16 @@ def statistics( request ):
             request.session['delimiter'] = request.POST['delimiter']
         delimiter = request.session['delimiter']
         collection = TreeCollection.objects.create( original_collection_string = input, delimiter = delimiter )
-        if 'autocorrection' in request.POST:
-            collection, list_correction = collection.get_autocorrected_collection()
+        #if 'autocorrection' in request.POST:
+        #    collection, list_correction = collection.get_autocorrected_collection()
+        request.session['original_collection_id'] = collection.id
+        request.session['collection'] = collection
+        d_stat = collection.get_tree_size_distribution()
+        d_stat = collection.get_taxon_frequency_distribution()
+        request.session['last_query'] = ''
+    elif 'query_treebase' in request.POST:
+        treebase = TreeCollection.objects.get( id = 1 )
+        collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
         d_stat = collection.get_tree_size_distribution()
@@ -85,7 +93,9 @@ def statistics( request ):
         query = request.GET['query']
     if query:
         request.session['last_query'] = query
-        collection = collection.get_collection_from_query( query )
+        query_against_treebase = 'treebase' in request.GET
+        if query_against_treebase:
+            collection = collection.get_collection_from_query( query, query_against_treebase )
     if 'clear_query' in request.GET:
         collection = TreeCollection.objects.get( id = request.session['original_collection_id'] )
     context['query'] = query
@@ -104,6 +114,7 @@ def statistics( request ):
         context['nb_badtaxa'] = collection.bad_taxas.count()
         context['nb_homonyms'] = collection.homonyms.count()
         context['nb_synonyms'] = collection.synonyms.count()
+        context['nb_commons'] = collection.commons.count()
         context['not_empty_collection'] = True
         print "fin donnees numeriques"
         # stats
@@ -141,6 +152,14 @@ def statistics( request ):
                 dict_synonym[synonym.name].extend( name.values() )
         context['dict_synonym'] = dict_synonym
         print "fin synonym"
+        # correct common
+        dict_common = {}
+        for common in collection.commons.all():
+            dict_common[common.name] = []
+            for name in common.scientifics.values('name'):
+                dict_common[common.name].extend( name.values() )
+        context['dict_common'] = dict_common
+        print "fin common"
         nb_bad_trees = collection.bad_trees.count()
         if nb_bad_trees:
             context['error_msg'] = "Warning : your collection have %s bad trees" % nb_bad_trees
@@ -148,7 +167,7 @@ def statistics( request ):
             request.session['initial_context'] = context
     return render_to_response( 'statistics.html', context )
 
-def browse( request ):
+def check( request ):
     #source = Source.objects.get( id = request.session['current_source_id'] )
     source = None
     col_id = request.session['current_col_id']
@@ -184,6 +203,17 @@ def browse( request ):
     context['enable_select_tree_names'] = nb_trees < 100 and nb_trees > 1
     context['tree_names_list'] = [(tree.name, tree.id) for tree in collection.trees.iterator()]
     return render_to_response( 'check.html', context )#TODO Rename to browse
+
+def browse( request ):
+    #source = Source.objects.get( id = request.session['current_source_id'] )
+    source = None
+    col_id = request.session['current_col_id']
+    collection = TreeCollection.objects.get( id = col_id )
+    trees_list = [(i.name.replace('.','').replace('|', ' '), i.tree_string) for i in collection.trees.all()]
+    paginator = Paginator( trees_list, 100 )
+    context = {'trees_list':trees_list}
+    return render_to_response( 'browse.html', context )#TODO Rename to browse
+
 
 def recreate_collection( request ):
     # FIXME TODO Prendre en charge la correction sur les bad_taxa

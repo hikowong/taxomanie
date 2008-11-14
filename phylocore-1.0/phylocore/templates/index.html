@@ -20,24 +20,33 @@
         <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
             Filename: <input type="file" name="myFile" class="button" /><br /><br />
             <input type="reset" class="button" value="clear" />
-            Enter your delimiter (ex: "_" or "$" )
+            Enter your space delimiter for taxa name (e.g., "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
             <input type="submit" class="button" blockui="wait" value="Upload" />
-            <input type="checkbox" name="autocorrection"/> Autocorrection<br />
+            <!-- <input type="checkbox" name="autocorrection"/> Autocorrection<br /> -->
             <input type="hidden" name="new_collection" value="true" />
         </form>
     </fieldset>
-    or
+    <br />
     <fieldset>
-        <legend>... or paste your collection</legend>
+        <legend>... or paste your collection...</legend>
         <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
             <textarea rows="10" cols="80" name="myFile"></textarea><br />
             <input type="reset" class="button" value="clear" />
             Enter your delimiter (ex: "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
             <input type="submit" class="button" blockui="wait" value="Upload" />
-            <input type="checkbox" name="autocorrection"/> Autocorrection<br />
+            <!-- <input type="checkbox" name="autocorrection"/> Autocorrection<br /> -->
             <input type="hidden" name="new_collection" value="true" />
+        </form>
+    </fieldset>
+    <br />
+    <fieldset>
+        <legend>... or enter a query for TreeBase</legend>
+        <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
+            <input type="text" size="80px" name="query_treebase" />
+            <input type="submit" class="button" blockui="wait" value="Go" />
+            <input type="reset" class="button" value="clear" />
         </form>
     </fieldset>
 {% endblock %}
