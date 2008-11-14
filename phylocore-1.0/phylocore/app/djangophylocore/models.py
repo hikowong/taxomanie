@@ -265,7 +265,7 @@ class Taxonomy( models.Model ):
     _parents = models.ManyToManyField( 'self', through = 'ParentsRelation', related_name = 'children', symmetrical=False )
     class Meta:
         ordering = ['name']
-        #unique_together = ['name', 'type_name']
+        unique_together = ['name', 'type_name']
 
     def __unicode__( self ):
         return "%s (%s)" % ( self.name, self.type_name )
@@ -725,7 +725,6 @@ class TreeCollection( models.Model, TaxonomyReference ):
                     cursor = connection.cursor()
                     cursor.execute('PRAGMA temp_store = MEMORY;')
                     cursor.execute('PRAGMA synchronous=OFF')
-        #
         index = 0
         dump = []
         nwk_collection = self.original_collection_string
@@ -896,12 +895,22 @@ class TreeCollection( models.Model, TaxonomyReference ):
     def query_treebase( self, query ):
         return self._query( query, True )
 
-    def get_collection_from_query( self, query ):
+    def get_collection_from_query( self, query, treebase = False ):
         """
         return a new collection with all trees that match the query
         """
-        return TreeCollection.objects.create( delimiter = self.delimiter, 
-          original_collection_string = ';'.join( [i.tree_string for i in self.query( query )] ) )
+        if self.format == 'phylip':
+            return TreeCollection.objects.create( delimiter = self.delimiter, 
+              original_collection_string = '\n;'.join( [i.tree_string for i in self._query( query, treebase )] ) )
+        else:
+            source = "#NEXUS\n\nBEGIN TREES;\n\n"
+            trees_list = self._query( query, treebase )
+            for tree in trees_list:
+                source += "TREE %s = [&R] %s;\n" % ( tree.name, tree.tree_string )
+            source += "\nEND;\n"
+            return TreeCollection.objects.create( delimiter = self.delimiter,
+              original_collection_string = source )
+
         
     def get_tree_size_distribution( self ):
         """ return stat of Tree Size Distribution """
