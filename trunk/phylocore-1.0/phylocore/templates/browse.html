@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block pagedef %} Home > Statistics {% endblock %}
+
+{% block script %}
+<script type="text/javascript"> 
+$(document).ready(function() { 
+    $('#suggestions').text('Processing...');
+    $('#suggestions').load( "suggestions" ); 
+}); 
+$(document).ready(function(){
+//    $("#exemplequery").hide();
+    $("#exemplelink").click(function () {
+        $("#exemplequery").slideToggle("slow");
+    });
+});
+function unselectAll(){
+    $(document).ready( function(){
+       $("input.restrict").removeAttr( "checked" );
+    });
+}
+function selectAll(){
+    $(document).ready( function(){
+       $("input.restrict").attr( "checked", "checked" );
+    });
+}
+function selectGenre( genre ){
+    $(document).ready( function(){
+        if( $("span[genre="+genre+"] input").attr("check")){
+           $("span[genre="+genre+"] input").removeAttr( "check" );
+           $("span[genre="+genre+"] input").removeAttr( "checked" );
+        }
+        else{
+            $("span[genre="+genre+"]  input").attr("check", "check");
+            $("span[genre="+genre+"]  input").attr("checked", "checked");
+        }
+    });
+}
+
+$(document).ready(function(){
+    $("div.source").hide();
+});
+
+function togglesource(idNode){
+    $(document).ready(function(){
+        $("#source-"+idNode).slideToggle("slow");
+    });
+}
+
+</script>
+{% endblock %}
+
+{% block menu %}
+<!-- <a href="home" class="path" title="Go home">Home</a> -->
+<center> <b> Home </b> </center>
+<a href="." class="path" title="Go to upload collection page">Upload Collection</a>
+<a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help Contents</a>
+<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About</a>
+<br />
+{% if not_empty_collection %}
+<center> <b>Current collection</b> </center>
+<a href="/phyloexplorer/browse" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
+<a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence">
+Download NCBI tree </a>
+<a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
+<br />
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+<br />
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
+<!-- query panel -->
+<div class="query">
+<form action="statistics" class="nopadding">
+<!-- <a onclick="javascript:toggleExemple();" id="exemplelink"> View exemple </a>&nbsp; -->
+<input size=60  type=text 
+onfocus="if(this.value=='Your query...'){this.value='';}" 
+onblur="if(this.value==''){this.value='Your query...';}"
+{% if query %} value="{{query}}" {% else %} value="Your query..." {% endif %}
+name="query" /> 
+<input type="submit" value="Search" class="button" blockui="wait"> <br>
+<tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
+<br /> 
+<i>You can download your result after your query</i></tt>
+</form>
+{% if query %}
+    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_query=1>Back to full collection</a>
+{% endif %}
+</div>
+<!-- end query panel -->
+
+{% for name, tree_string in trees_list %}
+<b> {{name}} </b> 
+<a id='showsource-{{name}}' class="showparents" onclick="javascript:togglesource('{{name}}');"> Show source </a> 
+<a target="_blank" style="color:green"
+   href="http://www.phylowidget.org/full/index.html?tree='{{ tree_string }} %>'"
+   title="Display the ncbi tree as graph"> Visualize with PhyloWidget </a>
+<!-- TODO mettre de l'ajax ici pour eviter un chargement trop lent -->
+<div class="source" id='source-{{name}}'> {{tree_string}} </div>
+<br />
+{% endfor %}
+
+{% if error_msg %} <div  class="error">{{ error_msg }}</div>{% endif %}
+    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+<!-- CONTENT : END -->
+{% endblock %}
