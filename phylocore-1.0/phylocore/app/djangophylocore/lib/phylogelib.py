@@ -11,6 +11,171 @@
 #################################################
 """ Pylogenic trees manipulating fonctions """
 
+from pyparsing import *
+
+class NewickParser( object ):
+    """
+    Class wrapping a parser for building Trees from newick format strings
+    """
+    def __init__( self ):
+        self.parser = self.create_parser()
+        self.tree = []
+        self.taxa_list = []
+        self.source = ""
+
+    def create_parser( self ):
+        """
+        Create a 'pyparsing' parser for newick format trees roughly based on the
+        grammer here:
+            http://evolution.genetics.washington.edu/phylip/newick_doc.html
+            
+        Problems:
+            - Is a single leaf a valid tree?
+            - Branch length on root? Doesn't make sense to me, and forces the root
+              to be an edge.
+        """
+        # Basic tokens
+        real = Combine( Word( "+-" + nums, nums ) + 
+                        Optional( "." + Optional( Word( nums ) ) ) +
+                        Optional( CaselessLiteral( "E" ) + Word( "+-" + nums, nums ) ) )
+        lpar = Suppress( "(" ) 
+        rpar = Suppress( ")" )
+        colon = Suppress( ":" )
+        semi = Suppress( ";" )
+        quot = Suppress( "'" )
+        # Labels are either unquoted or single quoted, if unquoted underscores will be replaced with spaces
+        quoted_label = QuotedString( "'", None, "''" ).setParseAction( lambda s, l, t: t[0] )
+        simple_label = Word( ' 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'*+-./:<=>?@[\\]^_`{|}~' ).setParseAction( lambda s, l, t: t[0].replace( "_", " " ) )
+        label = quoted_label | simple_label
+        # Branch length is a real number (note though exponents are not in the spec!)
+        branch_length = real.setParseAction( lambda s, l, t: float( t[0] ) )
+        # Need to forward declare this due to circularity
+        node_list = Forward()
+        # A leaf node must have a label
+        leaf = ( label + Optional( colon + branch_length, "" ) ) \
+            .setParseAction( lambda s, l, t: t[0])
+            #.setParseAction( lambda s, l, t: ( t[1] or None,  t[0]  ) )
+            #.setParseAction( lambda s, l, t: Edge( t[1] or None, Tree( t[0] ) ) )
+        # But a subtree doesn't but must have edges
+        subtree = ( node_list + Optional( label, "" ) + Optional( colon + branch_length, "" ) )\
+            .setParseAction( lambda s, l, t: [t[0]] )
+            #.setParseAction( lambda s, l, t: ( t[2] or None, ( t[1] or None, t[0] ) ) )
+            #.setParseAction( lambda s, l, t: Edge( t[2] or None, Tree( t[1] or None, t[0] ) ) )
+        # A tree is then a nested set of leaves and subtrees
+        node = leaf | subtree
+        node_list << ( lpar + delimitedList( node ) + rpar ) \
+            .setParseAction( lambda s, l, t: [ t.asList() ] )
+        # The root cannot have a branch length
+        tree = ( node_list + Optional( label, "" ) + Optional( semi ) )\
+            .setParseAction( lambda s, l, t: ( t[1] or None, t[0] ) )
+            #.setParseAction( lambda s, l, t: Tree( t[1] or None, t[0] ) )
+        # Return the outermost element
+        return tree
+
+    def parse_string( self, s ):
+        self.source = s
+        self.tree = self.parser.parseString( str(s) )[0][1]
+        self.taxa_list = []
+        return self.tree
+
+    def __remove_taxa( self, tree, node, remove_list ):
+        if node in remove_list:
+            tree.remove( node )
+        else:
+            if type(node) is list:
+                for i in node:
+                    self.__remove_taxa( node, i, remove_list )
+
+#    def __remove_singleton( self, node ):
+#        if type( node ) is list:
+#            for son in node:
+#                if type( son ) is list and len( son ) == 1:
+#                    node[node.index( son )] = son[0]
+#                    self.__remove_singleton( node )
+#                self.__remove_singleton( son )
+#
+    def __remove_singleton( self, node ):
+        if type( node ) is list:
+            for son in node:
+                if type( son ) is list and len( son ) == 1:
+                    self.__remove_one_singleton( node )
+            for son in node:
+                if type( son ) is list:
+                    self.__remove_singleton( son )
+
+    def __remove_one_singleton( self, node ):
+        if type( node ) is list:
+            for son in node:
+                if type( son ) is list and len( son ) == 1:
+                    node[node.index( son )] = son[0]
+                    self.__remove_one_singleton( node )
+
+    def filter( self, remove_taxa_list ):
+        tree = self.tree
+        self.__remove_taxa( tree, tree, remove_taxa_list )
+        self.__remove_singleton( tree )
+        return tree
+
+    def __correct_tree( self, tree, node, correct_dict ):
+        if type(node) is not list:
+            if node in correct_dict:
+                tree[tree.index( node )] = correct_dict[node]
+        else:
+            if type(node) is list:
+                for i in node:
+                    self.__correct_tree( node, i, correct_dict )
+
+    def correct_tree( self, correct_dict ):
+        """
+        correct taxa name with the corresponding name in correct_dict
+        {'ratus':'rattus', 'echinops':'echinops <plant>'}
+        """
+        tree = self.tree
+        self.__correct_tree( tree, tree, correct_dict )
+        return tree
+
+     
+    def get_taxa( self, tree = None ):
+        if not tree:
+            tree = self.tree
+        self.taxa_list = str( tree ).replace( "[u'", "['").replace(", u'", ", '" )
+        self.taxa_list = self.taxa_list.replace( "['", "[" ).replace( "']", "]" )
+        self.taxa_list = self.taxa_list.replace( "',", "," ).replace( ", '", ", " )
+        self.taxa_list = self.taxa_list.replace( '[', '' ).replace( ']', '' ).split(', ')
+        return self.taxa_list
+
+    def get_struct( self ):
+        """
+        split the collection or tree into a list
+
+        >>> getStruct( '((a,b),c);(((aee,bcd),(c,d)),e);' )
+        ['((', 'a', ',', 'b', '),', 'c', ');(((', 'aee', ',', 'bcd', '),(', 'c', ',', 'd', ')),', 'e', ');']
+        """
+        struct = []
+        taxa_name = []
+        delim = []
+        delimiter = False
+        taxa = False
+        for c in self.source:
+            if c in '(),;':
+
+                if taxa:
+                    delimiter = True
+                    taxa = False
+                    struct.append( ''.join( taxa_name ) )
+                    taxa_name = []
+                delim.append( c )
+            else:
+                if not taxa:
+                    delimiter = False
+                    taxa = True
+                    struct.append( ''.join( delim ) )
+                    delim = []
+                taxa_name.append( c )
+        struct.append( ''.join( delim ) )
+        return struct
+
+
 def tidyNwk( nwk ):
     """ Strip all space and backline from newick string """
     nwk = nwk.replace( "\n", " " )
@@ -268,12 +433,28 @@ def generateTree(nbTaxas, maxChildren = 2, name = 1):
   results += ")"
   return results
 
-####################################################################################################
-""" Exemple of pylogenic trees """
-a = "((a,b),c,(d,(e,f)))"
-b = "((((a,b),c,d),(e,f)),g)"
-c = "(((a,b),c,d),e,f,((g,h),i))"
-d = "(t5:0.004647,t4:0.142159,((t6:0.142159,t1:0.047671)10:0.115,DinosauriaxDinosorus:0.545582)60:0.995353)"
-####################################################################################################
 
+if __name__ == "__main__":
+    ####################################################################################################
+    """ Exemple of pylogenic trees """
+    a = "((a,e),c,(d,(e,f)))"
+    b = "((((a,b),c,d),(e,f)),g)"
+    c = "(((a,b),c,d),e,f,((g,h),i))"
+    d = "(t5:0.004647,t4:0.142159,((t6:0.142159,t1:0.047671)10:0.115,DinosauriaxDinosorus:0.545582)60:0.995353)"
+    ####################################################################################################
+    parser = NewickParser()
+    tree = [['mus', 'rattus'], [['homo', 'pan'], 'echinops']]
+    print parser.parse_string( '(((echinops <mammal> sp./ 2344)),petunia_x_hybrida);' )
+    print parser.get_taxa()
+    print parser.parse_string( """((batomys granti ear1822,batomys granti 458948),(archboldomys luzonensis,(chrotomys gonzalesi,(rhynchomys isarogensis,(((apomys datae 167243,apomys datae 167358),(apomys gracilostris m646,apomys gracilostris m648)),(((apomys sp. d 154816,apomys sp. d 154854),(((apomys hylocoetes 147871,apomys hylocoetes 147914,apomys hylocoetes 148149,apomys insignis 147915,apomys insignis 147924),(apomys insignis 147911,apomys insignis 148160)),(apomys sp. f 458762,apomys sp. f ear1491))),(((apomys microdon 167241,apomys microdon 167242),(apomys microdon 458907,apomys microdon 458919)),((apomys musculus 458925,apomys musculus 458913),(((apomys sp. a/c 135715,apomys sp. a/c 137024,apomys sp.  a/c 458747),apomys sp. a/c 458751),(apomys sp. b 145698,apomys sp. b 145699))))))))))""" )
+    print parser.get_taxa()
+    print parser.parse_string( '(echinops_<mammal>,petunia_x_hybrida);' )
+    print parser.get_taxa()
+    print parser.parse_string( u"(pan,petunia hybrida)" )
+    print parser.get_taxa()
+    print parser.parse_string( "(('mus', 'rattus'), ((('homo', 'pan')), 'echinops'));" )
+    print parser.correct_tree( {"mus": "mus musculus", "echinops":"echinops <plant>" } )
+    print parser.get_taxa()
+    print parser.filter( ['rattus', 'pan'] )
+    
 
