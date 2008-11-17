@@ -9,6 +9,7 @@ from django.db import connection
 from lib.phylogelib import getTaxa, getChildren, removeBootStraps
 from lib.phylogelib import getBrothers, removeNexusComments, getStruct
 from lib.phylogelib import tidyNwk, checkNwk
+from lib.phylogelib import NewickParser
 from lib.nexus import Nexus
 import datetime, re, sys, os, codecs
 
@@ -438,18 +439,6 @@ class Tree( models.Model, TaxonomyReference ):
     def __unicode__( self ):
         return "%s" % ( self.name )
 
-    def __get_django_objects_from_nwk( self, nwk_tree ):
-        """
-        return django objects list related to the name of taxa
-        assuming that all taxa names are in database (including bad one)
-        """
-        nwk_tree = nwk_tree.replace( self.delimiter, ' ' )
-        taxa_name_list = getTaxa( nwk_tree )
-        objects_list = []
-        for taxa_name in taxa_name_list:
-            objects_list.append( self.get_object_from_name( taxa_name ) )
-        return objects_list
-
     @transaction.commit_on_success
     def save( self, dont_generate = False, **kwargs ):
         regenerate = False
@@ -466,10 +455,15 @@ class Tree( models.Model, TaxonomyReference ):
         if [i for i in ('(',')',',') if i in self.delimiter]:
             raise ValueError, '"%s" is a bad delimiter' % self.delimiter
         tree = self.tree_string.lower()#.replace( self.delimiter, ' ' )
-        if checkNwk( tidyNwk( tree ) ):
+        self.newick_parser = NewickParser()
+        if 1:#try:
+            self.newick_parser.parse_string( tree ) # XXX Verifier plantage
+            p =  NewickParser()
             self.is_valid = True
             self.save( dont_generate = True )
-        taxas_list = getTaxa( tree ) # set( getTaxa( tree ) )
+        else:#except:
+            pass
+        taxas_list = self.newick_parser.get_taxa() # set( getTaxa( tree ) )
         self.taxa_ids = {}
         if BADTAXA_TOC is None:
             BADTAXA_TOC = set([i[0] for i in BadTaxa.objects.all().values_list( 'name')])
@@ -546,21 +540,20 @@ class Tree( models.Model, TaxonomyReference ):
             self.__last_child = ""
             self.__rel_name = {}
             self.__miss_spelled = {}
-        if getChildren( tree ):
+            tree = self.newick_parser.tree
+        if tree:
             if tree == self.tree_string:
                 parent_name = Taxonomy.objects.get( name = 'root' )
             else:
                 if not self.__rel_name.has_key( tree ):
-                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in getTaxa( tree ) if self.is_valid_name( i )]
-                    #taxa_list = self.__get_django_objects_from_nwk( tree )
+                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in self.newick_parser.get_taxa( tree ) if self.is_valid_name( i )]
                     parent_name = self.get_first_common_parent(taxa_list)
                 else:
                     parent_name = self.__rel_name[tree]
-            children = getChildren( tree )
+            children = tree
             for child_name in children:
-                if getChildren( child_name ): # child is a node
-                    #taxa_list = self.__get_django_objects_from_nwk( child_name )
-                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in getTaxa( child_name ) if self.is_valid_name( i )]
+                if type(child_name) is list: # child is a node
+                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in self.newick_parser.get_taxa( child_name ) if self.is_valid_name( i )]
                     child = self.get_first_common_parent(taxa_list)
                     if child is None:
                         child = parent_name
@@ -764,7 +757,8 @@ class TreeCollection( models.Model, TaxonomyReference ):
 #                i = 0
 #                NB_LINE = len( l_trees )
             for nwktree in l_trees:
-                tree = removeBootStraps( tidyNwk( nwktree.strip().lower())).strip()
+                #tree = removeBootStraps( tidyNwk( nwktree.strip().lower())).strip()
+                tree = nwktree.lower()
                 if tree:
                     name += 1
                     t = Tree( name = name, tree_string = tree, rooted = False, 
@@ -973,6 +967,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return len(set([i[0] for i in self.rel.filter( taxa = taxa ).values_list( 'tree' )]))
 
     def get_filtered_collection_string( self, taxa_name_list ):
+        # FIXME a refactoriser
         """
         return a collections string wich have been striped of all taxa present
         in the taxa_name_list
@@ -990,7 +985,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
                 for taxon in user_taxa_list:  # For taxa in user_name taxon
                     # while taxa user name exists, remove it
                     #taxon = self.delimiter.join( taxon.split() )
-                    while taxon in getTaxa( new_tree ):
+                    while taxon in tree.newick_parser.get_taxa( new_tree ):
                         list_taxa = getBrothers(new_tree, taxon )
                         list_brother = getBrothers(new_tree, taxon )
                         if taxon in list_brother:
@@ -1018,6 +1013,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return new_col
 
     def get_restricted_collection( self, taxa_name_list ):
+        # FIXME a refactoriser
         """
         return a collection string wich contains only the taxa present in
         taxa_list
@@ -1027,6 +1023,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return TreeCollection.objects.create( delimiter = self.delimiter, original_collection_string = new_nwk )
 
     def get_corrected_collection_string( self, tuple_list ):
+        # FIXME a refactoriser
         correction = dict( tuple_list )
         collection = tidyNwk( self.original_collection_string )
         struct_collection = getStruct( collection )
@@ -1080,6 +1077,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return new_col
 
     def get_corrected_collection( self, tuple_list ):
+        # FIXME a refactoriser
         """
         return a collection with correction from tuple_list. tuple_list take
         the following format : [(bad_name1, good_name1), (bad_name2, good_name2)...]
@@ -1090,6 +1088,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return TreeCollection.objects.create( delimiter = self.delimiter, original_collection_string = new_nwk )
 
     def get_autocorrected_collection( self ):
+        # FIXME a refactoriser
         list_correction =  [(i.user_taxa_name, i.taxa.scientifics.get().name)\
           for i in self.rel.extra( where = ["taxa_id in (select id from djangophylocore_taxonomy where type_name != 'scientific name')"] )\
             if i.taxa.scientifics.count() == 1]
@@ -1134,7 +1133,8 @@ class TreeCollection( models.Model, TaxonomyReference ):
             taxon_occurence[taxa_id]['user_taxa_list'].add( user_taxa_name )
             taxon_occurence[taxa_id]['scientific_taxa_list'].add( scientific_name )
         tree = self.get_reference_arborescence()
-        self.__compute_stats_arborescence( taxon_occurence, tree, Taxonomy.objects.get( name = 'root' ) )
+        if len( tree ):
+            self.__compute_stats_arborescence( taxon_occurence, tree, Taxonomy.objects.get( name = 'root' ) )
         return taxon_occurence
 
     def __compute_stats_arborescence( self, taxon_occurence, tree, node ):

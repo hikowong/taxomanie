@@ -68,16 +68,18 @@ def statistics( request ):
         #    collection, list_correction = collection.get_autocorrected_collection()
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
-        d_stat = collection.get_tree_size_distribution()
-        d_stat = collection.get_taxon_frequency_distribution()
+        if collection.taxas:
+            d_stat = collection.get_tree_size_distribution()
+            d_stat = collection.get_taxon_frequency_distribution()
         request.session['last_query'] = ''
     elif 'query_treebase' in request.POST:
         treebase = TreeCollection.objects.get( id = 1 )
         collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
-        d_stat = collection.get_tree_size_distribution()
-        d_stat = collection.get_taxon_frequency_distribution()
+        if collection.taxas:
+            d_stat = collection.get_tree_size_distribution()
+            d_stat = collection.get_taxon_frequency_distribution()
         request.session['last_query'] = ''
     print "fin creation collection"
     collection = request.session['collection']
@@ -118,10 +120,11 @@ def statistics( request ):
         context['not_empty_collection'] = True
         print "fin donnees numeriques"
         # stats
-        d_stat = collection.get_tree_size_distribution()
-        context['tree_size_distributions'] = get_tree_size_distribution( d_stat )
-        d_stat = collection.get_taxon_frequency_distribution()
-        context['taxon_frequency_distribution'] = get_taxon_frequency_distribution( d_stat )
+        if collection.taxas:
+            d_stat = collection.get_tree_size_distribution()
+            context['tree_size_distributions'] = get_tree_size_distribution( d_stat )
+            d_stat = collection.get_taxon_frequency_distribution()
+            context['taxon_frequency_distribution'] = get_taxon_frequency_distribution( d_stat )
         print "fin stats"
         if 1:#context['nb_taxa'] < 200:
             context['stats_tree'] = display_tree_stats( collection )
