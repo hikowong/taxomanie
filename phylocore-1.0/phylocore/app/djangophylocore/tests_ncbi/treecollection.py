@@ -9,6 +9,7 @@ def test_tree_collection():
 Creation of a simple collection
 -------------------------------
 
+>>> TAXONOMY_TOC = get_taxonomy_toc( True )
 >>> simple_col = "(mus,nannomys,black rat,echinops,blabla);(mus, black rat);"
 >>> col = TreeCollection.objects.create( name = 'simple', original_collection_string = simple_col )
 >>> col.taxas.all()
@@ -82,7 +83,7 @@ u'#NEXUS\\n\\nBEGIN TREES;\\n\\nTREE fig._3 = [&R] (((phytophthora_sojae_a,phyto
 Creation of collection from phylip format
 -----------------------------------------
 
->>> nwk_col = "(echinops <plant>,(rattus,( mus,(mus musculus)));\\n(rattus,(azerty,ratis));\\n(echinops, (rattus, ( mus, azerty, black rat ), nannomys ));\\n(rattus, echinops, mus);"
+>>> nwk_col = "(echinops <plant>,(rattus,( mus,(mus musculus))));\\n(rattus,(azerty,ratis));\\n(echinops, (rattus, ( mus, azerty, black rat ), nannomys ));\\n(rattus, echinops, mus);"
 >>> tree_col = TreeCollection.objects.create( name="test_phylip", original_collection_string=nwk_col )
 >>> tree_col.format
 'phylip'

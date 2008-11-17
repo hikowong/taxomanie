@@ -131,23 +131,6 @@ True
 >>> tree.eval_query('{cardueae}==1 and not {murinae}<2')
 True
 
-###########################
-# TESTING PRIVATE METHODS #
-###########################
-
->>> try:
-...     tree._Tree__get_django_objects_from_nwk( '(rattus,bla)')
-... except ValueError, e:
-...     e
-ValueError(u'bla not found in the database',)
-
->>> taxa_list = tree._Tree__get_django_objects_from_nwk( '(rattus,(mus,(echinops,badname)))')
->>> taxa_list
-[<Taxonomy: rattus (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: echinops (homonym)>, <BadTaxa: badname (0)>]
-
-
-
-
 """
 
 
