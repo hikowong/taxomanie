@@ -9,6 +9,7 @@ All objects that inerits from TaxonomyReference will have some more methods.
 Those methods provide informations from the taxonomy.
 
 >>> from djangophylocore.models import *
+>>> TAXONOMY_TOC = get_taxonomy_toc( True )
 >>> taxoref = TaxonomyReference()
 
 
