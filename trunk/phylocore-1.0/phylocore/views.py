@@ -220,13 +220,19 @@ def recreate_collection( request ):
     collection = request.session['collection']
     list_correction = []
     for bad, good in request.GET.iteritems():
+        if not good.strip():
+            good = bad
+        print bad,">>",  good
         if Taxonomy.objects.filter( name = bad ).count():
             list_user_taxa_name = set([i.user_taxa_name for i in collection.rel.filter( taxa = Taxonomy.objects.get( name = bad ) )])
+            print bad, "++", list_user_taxa_name
         else:
             list_user_taxa_name = [BadTaxa.objects.get( name = bad ).name]
         for user_taxa_name in list_user_taxa_name:
-            list_correction.append( (user_taxa_name, collection.delimiter.join(good.split()) ))
+            list_correction.append( (user_taxa_name, " ".join(good.split()) ))
+        print "----", list_correction
     request.session['collection'] = collection.get_corrected_collection( list_correction ) 
+    print request.session['collection'].ambiguous
     return statistics( request )
 
 def get_img_url( request, taxon ):
