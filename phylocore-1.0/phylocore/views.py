@@ -212,7 +212,13 @@ def browse( request ):
     source = None
     col_id = request.session['current_col_id']
     collection = TreeCollection.objects.get( id = col_id )
-    trees_list = [(i.name.replace('.','').replace('|', ' '), i.tree_string) for i in collection.trees.all()]
+    trees_list = []
+    for i in collection.trees.all():
+        if i.column_error:
+            error_line = " "*(i.column_error-1)+"^"
+        else:
+            error_line = ""
+        trees_list.append( (i.name.replace('.','').replace('|', '_'), i.tree_string, error_line ) )
     paginator = Paginator( trees_list, 100 )
     context = {'trees_list':trees_list}
     return render_to_response( 'browse.html', context )#TODO Rename to browse
@@ -225,17 +231,14 @@ def recreate_collection( request ):
     for bad, good in request.GET.iteritems():
         if not good.strip():
             good = bad
-        print bad,">>",  good
         if Taxonomy.objects.filter( name = bad ).count():
             list_user_taxa_name = set([i.user_taxa_name for i in collection.rel.filter( taxa = Taxonomy.objects.get( name = bad ) )])
-            print bad, "++", list_user_taxa_name
         else:
             list_user_taxa_name = [BadTaxa.objects.get( name = bad ).name]
         for user_taxa_name in list_user_taxa_name:
             list_correction.append( (user_taxa_name, " ".join(good.split()) ))
-        print "----", list_correction
-    request.session['collection'] = collection.get_corrected_collection( list_correction ) 
-    print request.session['collection'].ambiguous
+    corrected_collection = collection.get_corrected_collection( dict(list_correction) ) 
+    request.session['collection'] = corrected_collection
     return statistics( request )
 
 def get_img_url( request, taxon ):
