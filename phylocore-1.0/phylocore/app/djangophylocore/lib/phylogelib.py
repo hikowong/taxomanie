@@ -83,7 +83,7 @@ class NewickParser( object ):
             tree.remove( node )
         else:
             if type(node) is list:
-                for i in node:
+                for i in node[:]:
                     self.__remove_taxa( node, i, remove_list )
 
 #    def __remove_singleton( self, node ):
@@ -120,6 +120,16 @@ class NewickParser( object ):
         if type(node) is not list:
             if node in correct_dict:
                 tree[tree.index( node )] = correct_dict[node]
+            elif " ".join( node.split()[:2]) in correct_dict:
+                old_node = node
+                base_node = correct[" ".join( node.split()[:2] )]
+                node = base_node+" "+" ".join( node.split()[2:] )
+                tree[tree.index( old_node )] = node
+            elif node.split()[0] in correct_dict:
+                old_node = node
+                base_node = correct_dict[node.split()[0]]
+                node = base_node+" "+" ".join( node.split()[1:] )
+                tree[tree.index( old_node )] = node
         else:
             if type(node) is list:
                 for i in node:
@@ -451,9 +461,10 @@ if __name__ == "__main__":
     print parser.get_taxa()
     print parser.parse_string( u"(pan,petunia hybrida)" )
     print parser.get_taxa()
-    print parser.parse_string( "(('mus', 'rattus'), ((('homo', 'pan')), 'echinops'));" )
-    print parser.correct_tree( {"mus": "mus musculus", "echinops":"echinops <plant>" } )
+    print parser.parse_string( "(('mis france', 'rattus'), ((('homo', 'pan')), 'echinops'));" )
+    print parser.correct_tree( {"mis": "mus", "echinops":"echinops <plant>" } )
     print parser.get_taxa()
-    print parser.filter( ['rattus', 'pan'] )
+    print parser.parse_string( "(glis,mus,rattus rattus);")
+    print parser.filter( ['mus', 'glis', 'rattus rattus'] )
     
 
