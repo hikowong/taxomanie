@@ -131,6 +131,7 @@ def statistics( request ):
             print "fin arbre ncbi"
         else:
             context['stats_tree'] = None
+        context['reference_tree'] = collection.get_reference_tree_as_nwk()
         # correct bad taxas
 #        dict_bad_taxas = {}
 #        for bad in collection.bad_taxas.all():
