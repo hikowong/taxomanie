@@ -158,7 +158,6 @@ class NewickParser( object ):
         taxa = False
         for c in self.source:
             if c in '(),;':
-
                 if taxa:
                     delimiter = True
                     taxa = False

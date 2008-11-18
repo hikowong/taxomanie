@@ -11,6 +11,7 @@ from lib.phylogelib import getBrothers, removeNexusComments, getStruct
 from lib.phylogelib import tidyNwk, checkNwk
 from lib.phylogelib import NewickParser
 from lib.nexus import Nexus
+from pyparsing import ParseException
 import datetime, re, sys, os, codecs
 
 ##################################################
@@ -431,6 +432,7 @@ class Tree( models.Model, TaxonomyReference ):
     updated = models.DateTimeField()
     is_valid = models.BooleanField( default = False )
     _from_collection = models.BooleanField( default = False )
+    column_error = models.IntegerField( null = True )
     #
     collection = models.ForeignKey( 'TreeCollection', related_name = 'trees', null = True)
     bad_taxas = models.ManyToManyField( BadTaxa, related_name = 'trees'  )
@@ -456,13 +458,12 @@ class Tree( models.Model, TaxonomyReference ):
             raise ValueError, '"%s" is a bad delimiter' % self.delimiter
         tree = self.tree_string.lower()#.replace( self.delimiter, ' ' )
         self.newick_parser = NewickParser()
-        if 1:#try:
+        try:
             self.newick_parser.parse_string( tree ) # XXX Verifier plantage
-            p =  NewickParser()
             self.is_valid = True
-            self.save( dont_generate = True )
-        else:#except:
-            pass
+        except ParseException, err:
+            self.column_error = err.column
+        self.save( dont_generate = True )
         taxas_list = self.newick_parser.get_taxa() # set( getTaxa( tree ) )
         self.taxa_ids = {}
         if BADTAXA_TOC is None:
@@ -470,8 +471,8 @@ class Tree( models.Model, TaxonomyReference ):
         self.bad_taxa_ids = BADTAXA_TOC
         for taxa_name in taxas_list:
             if taxa_name.strip():
-                user_taxa_name = taxa_name
-                taxa_name = self.strip_taxa_name( taxa_name, self.delimiter )
+                user_taxa_name = taxa_name.strip()
+                taxa_name = self.strip_taxa_name( taxa_name.strip(), self.delimiter )
                 taxo = TAXONOMY_TOC.get( taxa_name, '' )
                 if self._from_collection:
                     if taxo:
@@ -500,6 +501,10 @@ class Tree( models.Model, TaxonomyReference ):
           (AbstractTreeColTaxa,), {'__module__': Taxonomy.__module__, 'Meta':Meta})
         return model_rel.objects.filter( tree = self )
     rel = property( __get_relation )
+
+    def print_error( self ):
+        print self.tree_string
+        print " "*(err.column-1) + "^"
 
     def get_taxas( self ):
         if not self._from_collection:
@@ -722,7 +727,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         dump = []
         nwk_collection = self.original_collection_string
         # Nexus collection
-        if nwk_collection[:6].lower().strip() == "#nexus":
+        if nwk_collection.lower().strip()[:6] == "#nexus":
             nex = Nexus( nwk_collection )
             self.format = 'nexus'
             self.save( dont_regenerate = True )
@@ -977,32 +982,36 @@ class TreeCollection( models.Model, TaxonomyReference ):
         else:
             new_col = ''
         for tree in self.trees.all():
-            new_tree = tidyNwk( tree.tree_string ).lower()
-            for taxa_name in taxa_name_list:
-                user_taxa_list = [i.user_taxa_name for i in tree.rel.filter( taxa__name = taxa_name )]
-                if not user_taxa_list: # if taxa_name not in taxonomy (bad taxa)
-                    user_taxa_list = [taxa_name] # buid user_taxa_list from scratch
-                for taxon in user_taxa_list:  # For taxa in user_name taxon
-                    # while taxa user name exists, remove it
-                    #taxon = self.delimiter.join( taxon.split() )
-                    while taxon in tree.newick_parser.get_taxa( new_tree ):
-                        list_taxa = getBrothers(new_tree, taxon )
-                        list_brother = getBrothers(new_tree, taxon )
-                        if taxon in list_brother:
-                            list_brother.remove( taxon )
-                            if len( list_brother ) > 1:
-                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
-                            else:
-                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
-                        else:
-                            new_tree = ""
+#            new_tree = tidyNwk( tree.tree_string ).lower()
+#            for taxa_name in taxa_name_list:
+#                user_taxa_list = [i.user_taxa_name for i in tree.rel.filter( taxa__name = taxa_name )]
+#                if not user_taxa_list: # if taxa_name not in taxonomy (bad taxa)
+#                    user_taxa_list = [taxa_name] # buid user_taxa_list from scratch
+#                for taxon in user_taxa_list:  # For taxa in user_name taxon
+#                    # while taxa user name exists, remove it
+#                    #taxon = self.delimiter.join( taxon.split() )
+#                    while taxon in tree.newick_parser.get_taxa( new_tree ):
+#                        list_taxa = getBrothers(new_tree, taxon )
+#                        list_brother = getBrothers(new_tree, taxon )
+#                        if taxon in list_brother:
+#                            list_brother.remove( taxon )
+#                            if len( list_brother ) > 1:
+#                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
+#                            else:
+#                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
+#                        else:
+#                            new_tree = ""
+            filtered_tree = tree.newick_parser.filter( taxa_name_list )
+            filtered_tree = filtered_tree.replace("[", "(" ).replace("]", ")")
+            filtered_tree = filtered_tree.replace("('","(").replace("')",")")
+            filtered_tree = filtered_tree.replace("',", ",").replace(", '", ",").replace( ", ", ",")
             # Recreate nexus collection
-            if new_tree:
-                if len( getTaxa( new_tree ) ) == 1:
+            if filtered_tree:
+                if len( tree.taxas_list ) == 1:
                     if self.format == 'nexus':
-                        new_col += "Tree "+str(tree.name)+" = ("+new_tree+");\n"
+                        new_col += "Tree "+str(tree.name)+" = "+filtered_tree+";\n"
                     else:
-                        new_col += "("+new_tree+");\n"
+                        new_col += filtered_tree+";\n"
                 else:
                     if self.format == 'nexus':
                         new_col += "Tree "+str(tree.name)+" = "+new_tree+";\n"
@@ -1013,7 +1022,6 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return new_col
 
     def get_restricted_collection( self, taxa_name_list ):
-        # FIXME a refactoriser
         """
         return a collection string wich contains only the taxa present in
         taxa_list
@@ -1022,9 +1030,8 @@ class TreeCollection( models.Model, TaxonomyReference ):
         new_nwk = self.get_filtered_collection_string( remove_taxa_list )
         return TreeCollection.objects.create( delimiter = self.delimiter, original_collection_string = new_nwk )
 
-    def get_corrected_collection_string( self, tuple_list ):
+    def get_corrected_collection_string_old( self, correction ):
         # FIXME a refactoriser
-        correction = dict( tuple_list )
         collection = tidyNwk( self.original_collection_string )
         struct_collection = getStruct( collection )
         for i in xrange(len(struct_collection)):
@@ -1035,46 +1042,27 @@ class TreeCollection( models.Model, TaxonomyReference ):
                 struct_collection[i] = self.delimiter.join( correction[" ".join( bad_name[:1] )].split() + bad_name[1:] )
         return ';\n'.join( ''.join( struct_collection ).split(';') )
 
-    def get_corrected_collection_string_old( self, tuple_list ):
-        """
-        return a collection with correction from tuple_list:
-
-        col_string = col.get_corrected_collection_string( [('echinops', 'echinops <plant>'), ('ratis', 'rattus' )] )
-        """
-        if self.format == 'nexus':
-            new_col = "#NEXUS\nBEGIN TREES;\n"
-        else:
-            new_col = ''
-        for tree in self.trees.all():
-            new_tree = removeBootStraps( tidyNwk( tree.tree_string ).lower() )
-            for bad_taxon, taxon in tuple_list:
-                while bad_taxon in getTaxa( new_tree ):
-                    list_taxa = getBrothers(new_tree, bad_taxon )
-                    list_brother = getBrothers(new_tree, bad_taxon )
-                    if bad_taxon in list_brother:
-                        list_brother.remove( bad_taxon )
-                        list_brother.append( taxon )
-                        if len( list_brother ) > 1:
-                            new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
-                        else:
-                            new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
-                    else:
-                        new_tree = ""
-            # Recreate nexus collection
-            if new_tree:
-                if len( getTaxa( new_tree ) ) == 1:
-                    if self.format == 'nexus':
-                        new_col += "Tree "+str(tree.name)+" = ("+new_tree+");\n"
-                    else:
-                        new_col += "("+new_tree+");\n"
-                else:
-                    if self.format == 'nexus':
-                        new_col += "Tree "+str(tree.name)+" = "+new_tree+";\n"
-                    else:
-                        new_col += new_tree+";\n"
-        if self.format == 'nexus':
-            new_col += "END;\n"
-        return new_col
+    def get_corrected_collection_string( self, correction ):
+        parser = NewickParser()
+        trees_list = []
+        for i in self.trees.all():
+            if i.is_valid:
+                parser.parse_string( i.tree_string )
+                corrected_tree = str( parser.correct_tree( correction ) )
+                corrected_tree = corrected_tree.replace( "[u'", "['").replace(", u'", ", '" )
+                corrected_tree = corrected_tree.replace( "['", "[" ).replace( "']", "]" )
+                corrected_tree = corrected_tree.replace( "',", "," ).replace( ", '", ", " )
+                corrected_tree = corrected_tree.replace("[", "(" ).replace("]", ")")
+                corrected_tree = corrected_tree.replace("('","(").replace("')",")")
+                corrected_tree = corrected_tree.replace("',", ",").replace(", '", ",").replace( ", ", ",")
+            else:
+                corrected_tree = i.tree_string
+            trees_list.append( (i.name, corrected_tree ) )
+        source = "#NEXUS\n\nBEGIN TREES;\n\n"
+        for tree in trees_list:
+            source += "TREE %s = %s;\n" % ( tree[0], tree[1] )
+        source += "\nEND;\n"
+        return source
 
     def get_corrected_collection( self, tuple_list ):
         # FIXME a refactoriser

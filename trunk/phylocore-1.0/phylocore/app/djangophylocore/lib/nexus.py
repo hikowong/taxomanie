@@ -17,7 +17,7 @@ class Nexus( object ):
 
     def __init__( self, nexus_string ):
         # Nexus collection
-        if not nexus_string[:6].lower().strip() == "#nexus":
+        if not nexus_string.lower().strip()[:6] == "#nexus":
             raise ValueError, "Wrong nexus string"
         self.__nexus_ori = nexus_string
 #        self.bad_trees_names = self.get_bad_trees_names()
