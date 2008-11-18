@@ -221,6 +221,8 @@ def browse( request ):
         trees_list.append( (i.name.replace('.','').replace('|', '_'), i.tree_string, error_line ) )
     paginator = Paginator( trees_list, 100 )
     context = {'trees_list':trees_list}
+    if len( trees_list ):
+        context['not_empty_collection'] = True
     return render_to_response( 'browse.html', context )#TODO Rename to browse
 
 
@@ -256,6 +258,27 @@ def suggestions( request ):
                 dict_bad_taxas[bad.name].append( i )
     context['dict_bad_taxas'] = dict_bad_taxas
     return render_to_response( 'suggestions.html', context )
+
+def downloadCollection( request ):
+    col_id = request.session['current_col_id']
+    collection = TreeCollection.objects.get( id = col_id )
+    response = HttpResponse(mimetype='text/plain')
+    if collection.format == "phylip":
+        ext = 'nwk'
+    else:
+        ext = 'nex'
+    response['Content-Disposition'] = 'attachment; filename=phyloexplorer_collection-%s.%s' % (col_id, ext)
+    response.write( collection.get_collection_string() )
+    return response
+
+def downloadNCBITree( request ):
+    col_id = request.session['current_col_id']
+    collection = TreeCollection.objects.get( id = col_id )
+    response = HttpResponse(mimetype='text/plain')
+    response['Content-Disposition'] = 'attachment; filename=ncbi_collection-%s.nwk' % col_id
+    response.write( collection.get_reference_tree_as_nwk() )
+    return response
+
 
 
 ########################################
