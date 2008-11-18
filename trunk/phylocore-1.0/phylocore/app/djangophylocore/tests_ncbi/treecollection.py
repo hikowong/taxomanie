@@ -77,7 +77,7 @@ Export collection to string
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 >>> tree_col.get_collection_string()
-u'#NEXUS\\n\\nBEGIN TREES;\\n\\nTREE fig._3 = [&R] (((phytophthora_sojae_a,phytophthora_sojae_b),(((phytophthora_vignae,phytophthora_cajani),(phytophthora_melonis,(phytophthora_drechsleri-like,phytophthora_sinensis))),(phytophthora_pistaciae_a,phytophthora_pistaciae_b))),phytophthora_cinnamomi)\\n\\nEND;\\n'
+u'#NEXUS\\n\\nBEGIN TREES;\\n\\nTREE fig._3 =  (((phytophthora_sojae_a,phytophthora_sojae_b),(((phytophthora_vignae,phytophthora_cajani),(phytophthora_melonis,(phytophthora_drechsleri-like,phytophthora_sinensis))),(phytophthora_pistaciae_a,phytophthora_pistaciae_b))),phytophthora_cinnamomi)\\n\\nEND;\\n'
 
 
 Creation of collection from phylip format
@@ -111,7 +111,7 @@ Dealing with collections
 >>> tree_col.bad_taxas.count()
 2L
 >>> tree_col.get_collection_string()
-u'(echinops <plant>,(rattus,(mus,(mus musculus)));\\n(rattus,(azerty,ratis));\\n(echinops,(rattus,(mus,azerty,black rat),nannomys));\\n(rattus,echinops,mus);'
+u'(echinops <plant>,(rattus,( mus,(mus musculus))));\\n(rattus,(azerty,ratis));\\n(echinops, (rattus, ( mus, azerty, black rat ), nannomys ));\\n(rattus, echinops, mus);'
 
 Specify the delimiter
 ---------------------
@@ -174,9 +174,9 @@ Filter and restrict collection
 >>> simple_col = "(mus musculus, rattus, glis);( glis, mus, rattus rattus);(mus, rattus);"
 >>> col = TreeCollection.objects.create( original_collection_string = simple_col )
 >>> col.get_filtered_collection_string( ['mus', 'glis'] )
-u'(mus musculus,rattus);\\n(rattus rattus);\\n(rattus);\\n'
+'(mus musculus,rattus);\\n(rattus rattus);\\n(rattus);\\n'
 >>> col.get_filtered_collection_string( ['mus', 'rattus'] )
-u'(mus musculus,glis);\\n(glis,rattus rattus);\\n'
+'(mus musculus,glis);\\n(glis,rattus rattus);\\n'
 >>> '' is col.get_filtered_collection_string( ['mus musculus', 'rattus rattus', 'glis', 'mus', 'rattus'] )
 True
 
@@ -201,10 +201,10 @@ Correct the collection
 [<BadTaxa: mis (0)>, <BadTaxa: rattis (0)>]
 >>> col.homonyms.all()
 [<Taxonomy: echinops (homonym)>]
->>> col.get_corrected_collection_string( [('mis', 'mus'), ('rattis rattus','rattus rattus'), ('echinops', 'echinops <plant>')] )
-u'(mus musculus,(rattus,echinops <plant>));\\n((mus france,echinops <plant>),rattus rattus);\\n(mus,(rattus));\\n'
+>>> col.get_corrected_collection_string( {'mis': 'mus', 'rattis rattus':'rattus rattus', 'echinops': 'echinops <plant>'} )
+'(mus musculus,(rattus,echinops <plant>));\\n((echinops <plant>,mus france),rattus rattus);\\n(mus,rattus);\\n'
 
->>> corrected_col = col.get_corrected_collection([('mis', 'mus'), ('rattis rattus','rattus rattus'), ('echinops', 'echinops <plant>')] )
+>>> corrected_col = col.get_corrected_collection({'mis': 'mus', 'rattis rattus':'rattus rattus', 'echinops': 'echinops <plant>'})
 >>> corrected_col.bad_taxas.all()
 []
 >>> corrected_col.homonyms.all()

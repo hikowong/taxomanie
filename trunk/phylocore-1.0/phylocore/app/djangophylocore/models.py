@@ -972,7 +972,6 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return len(set([i[0] for i in self.rel.filter( taxa = taxa ).values_list( 'tree' )]))
 
     def get_filtered_collection_string( self, taxa_name_list ):
-        # FIXME a refactoriser
         """
         return a collections string wich have been striped of all taxa present
         in the taxa_name_list
@@ -981,42 +980,26 @@ class TreeCollection( models.Model, TaxonomyReference ):
             new_col = "#NEXUS\nBEGIN TREES;\n"
         else:
             new_col = ''
+        parser = NewickParser()
         for tree in self.trees.all():
-#            new_tree = tidyNwk( tree.tree_string ).lower()
-#            for taxa_name in taxa_name_list:
-#                user_taxa_list = [i.user_taxa_name for i in tree.rel.filter( taxa__name = taxa_name )]
-#                if not user_taxa_list: # if taxa_name not in taxonomy (bad taxa)
-#                    user_taxa_list = [taxa_name] # buid user_taxa_list from scratch
-#                for taxon in user_taxa_list:  # For taxa in user_name taxon
-#                    # while taxa user name exists, remove it
-#                    #taxon = self.delimiter.join( taxon.split() )
-#                    while taxon in tree.newick_parser.get_taxa( new_tree ):
-#                        list_taxa = getBrothers(new_tree, taxon )
-#                        list_brother = getBrothers(new_tree, taxon )
-#                        if taxon in list_brother:
-#                            list_brother.remove( taxon )
-#                            if len( list_brother ) > 1:
-#                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", "("+",".join( list_brother)+")")
-#                            else:
-#                                new_tree = new_tree.replace( "("+",".join(list_taxa)+")", ",".join( list_brother ))
-#                        else:
-#                            new_tree = ""
-            filtered_tree = tree.newick_parser.filter( taxa_name_list )
-            filtered_tree = filtered_tree.replace("[", "(" ).replace("]", ")")
-            filtered_tree = filtered_tree.replace("('","(").replace("')",")")
-            filtered_tree = filtered_tree.replace("',", ",").replace(", '", ",").replace( ", ", ",")
-            # Recreate nexus collection
+            parser.parse_string( tree.tree_string )
+            filtered_tree = parser.filter( taxa_name_list )
             if filtered_tree:
-                if len( tree.taxas_list ) == 1:
+                filtered_tree = str(filtered_tree)
+                filtered_tree = filtered_tree.replace("[", "(" ).replace("]", ")")
+                filtered_tree = filtered_tree.replace("('","(").replace("')",")")
+                filtered_tree = filtered_tree.replace("',", ",").replace(", '", ",").replace( ", ", ",")
+                # Recreate nexus collection
+                if len( parser.get_taxa() ) == 1:
                     if self.format == 'nexus':
                         new_col += "Tree "+str(tree.name)+" = "+filtered_tree+";\n"
                     else:
                         new_col += filtered_tree+";\n"
                 else:
                     if self.format == 'nexus':
-                        new_col += "Tree "+str(tree.name)+" = "+new_tree+";\n"
+                        new_col += "Tree "+str(tree.name)+" = "+filtered_tree+";\n"
                     else:
-                        new_col += new_tree+";\n"
+                        new_col += filtered_tree+";\n"
         if self.format == 'nexus':
             new_col += "END;\n"
         return new_col
@@ -1059,21 +1042,28 @@ class TreeCollection( models.Model, TaxonomyReference ):
             else:
                 corrected_tree = i.tree_string
             trees_list.append( (i.name, corrected_tree ) )
-        source = "#NEXUS\n\nBEGIN TREES;\n\n"
+        if self.format == 'nexus':
+            source = "#NEXUS\n\nBEGIN TREES;\n\n"
+        else:
+            source = ""
         for tree in trees_list:
-            source += "TREE %s = %s;\n" % ( tree[0], tree[1] )
-        source += "\nEND;\n"
+            if self.format == 'nexus' :
+                source += "TREE %s = %s;\n" % ( tree[0], tree[1] )
+            else:
+                source += "%s;\n" % tree[1]
+        if self.format == 'nexus':
+            source += "\nEND;\n"
         return source
 
-    def get_corrected_collection( self, tuple_list ):
+    def get_corrected_collection( self, correction ):
         # FIXME a refactoriser
         """
         return a collection with correction from tuple_list. tuple_list take
         the following format : [(bad_name1, good_name1), (bad_name2, good_name2)...]
 
-        newcol = col.get_corrected_collection( [('echinops', 'echinops <plant>'), ('ratis', 'rattus' )] )
+        newcol = col.get_corrected_collection( {'echinops': 'echinops <plant>', 'ratis': 'rattus' } )
         """
-        new_nwk = self.get_corrected_collection_string( tuple_list )
+        new_nwk = self.get_corrected_collection_string( correction )
         return TreeCollection.objects.create( delimiter = self.delimiter, original_collection_string = new_nwk )
 
     def get_autocorrected_collection( self ):
