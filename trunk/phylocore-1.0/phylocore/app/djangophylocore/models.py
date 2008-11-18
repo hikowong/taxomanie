@@ -1048,13 +1048,14 @@ class TreeCollection( models.Model, TaxonomyReference ):
         for i in self.trees.all():
             if i.is_valid:
                 parser.parse_string( i.tree_string )
-                corrected_tree = str( parser.correct_tree( correction ) )
-                corrected_tree = corrected_tree.replace( "[u'", "['").replace(", u'", ", '" )
-                corrected_tree = corrected_tree.replace( "['", "[" ).replace( "']", "]" )
-                corrected_tree = corrected_tree.replace( "',", "," ).replace( ", '", ", " )
-                corrected_tree = corrected_tree.replace("[", "(" ).replace("]", ")")
-                corrected_tree = corrected_tree.replace("('","(").replace("')",")")
-                corrected_tree = corrected_tree.replace("',", ",").replace(", '", ",").replace( ", ", ",")
+                corrected_tree = self._list2nwk( parser.correct_tree( correction ) )
+#                corrected_tree = str( parser.correct_tree( correction ) )
+#                corrected_tree = corrected_tree.replace( "[u'", "['").replace(", u'", ", '" )
+#                corrected_tree = corrected_tree.replace( "['", "[" ).replace( "']", "]" )
+#                corrected_tree = corrected_tree.replace( "',", "," ).replace( ", '", ", " )
+#                corrected_tree = corrected_tree.replace("[", "(" ).replace("]", ")")
+#                corrected_tree = corrected_tree.replace("('","(").replace("')",")")
+#                corrected_tree = corrected_tree.replace("',", ",").replace(", '", ",").replace( ", ", ",")
             else:
                 corrected_tree = i.tree_string
             trees_list.append( (i.name, corrected_tree ) )
@@ -1136,6 +1137,46 @@ class TreeCollection( models.Model, TaxonomyReference ):
                 taxon_occurence[node.id]['trees_list'].update( taxon_occurence[child.id]['trees_list'] )
                 taxon_occurence[node.id]['user_taxa_list'].update( taxon_occurence[child.id]['user_taxa_list'] )
                 taxon_occurence[node.id]['scientific_taxa_list'].update( taxon_occurence[child.id]['scientific_taxa_list'] )
+
+    def _nxgraph2list( self, tree, node, d="" ):
+        if not d:
+            d = {}
+            for i in tree.edges():
+                if not d.has_key( i[0] ):
+                    d[i[0]] = []
+                d[i[0]].append( i[1] )
+            for i in tree.edges():
+                if not d.has_key( i[1] ):
+                    d[i[1]] = i[1]        
+        m = []
+        for node in tree.successors( node ):
+            if isinstance( d[node], list ):
+                m.append( self._nxgraph2list( tree, node, d ) )
+            else:
+                m.append( d[node].name )
+        return m
+
+    def _list2nwk( self, l ):
+        NewickParser().remove_singleton( l )
+        result = str( l )
+        result = result.replace( "[u'", "['").replace(", u'", ", '" )
+        result = result.replace( "['", "[" ).replace( "']", "]" )
+        result = result.replace( "',", "," ).replace( ", '", ", " )
+        result = result.replace("[", "(" ).replace("]", ")")
+        result = result.replace("('","(").replace("')",")")
+        result = result.replace("',", ",").replace(", '", ",").replace( ", ", ",")
+        return result
+
+    def _nxgraph2nwk( self, tree, root ):
+        l = self._nxgraph2list( tree, root )
+        return self._list2nwk( l )[1:-1]+";" # removing extras parenthesis
+        
+    def get_reference_tree_as_nwk( self ):
+        """
+        return the NCBI arborescence in a newick string
+        """
+        tree = self.get_reference_arborescence()
+        return  self._nxgraph2nwk( tree, Taxonomy.objects.get( name = "root" ))
 
 class AbstractTreeColTaxa( models.Model ):
     collection = models.ForeignKey( TreeCollection )#, related_name = 'rel' )

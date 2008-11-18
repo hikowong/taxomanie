@@ -94,14 +94,14 @@ class NewickParser( object ):
 #                    self.__remove_singleton( node )
 #                self.__remove_singleton( son )
 #
-    def __remove_singleton( self, node ):
+    def remove_singleton( self, node ):
         if type( node ) is list:
             for son in node:
                 if type( son ) is list and len( son ) == 1:
                     self.__remove_one_singleton( node )
             for son in node:
                 if type( son ) is list:
-                    self.__remove_singleton( son )
+                    self.remove_singleton( son )
 
     def __remove_one_singleton( self, node ):
         if type( node ) is list:
@@ -113,7 +113,7 @@ class NewickParser( object ):
     def filter( self, remove_taxa_list ):
         tree = self.tree
         self.__remove_taxa( tree, tree, remove_taxa_list )
-        self.__remove_singleton( tree )
+        self.remove_singleton( tree )
         return tree
 
     def __correct_tree( self, tree, node, correct_dict ):
