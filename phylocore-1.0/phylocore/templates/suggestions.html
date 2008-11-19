@@ -1,8 +1,14 @@
 
 <fieldset>
 <legend> {{ nb_badtaxa }} taxa(s) </legend>
+<table>
+<!-- <tr><th>user taxa name</th><th>correction</th></tr> -->
 {% for bad_name, suggestions in dict_bad_taxa.iteritems %}
+    <tr>
+    <td>
     <font color="red">{{ bad_name }}</font> :
+    </td>
+    <td>
     {% if suggestions %}
         {% for sugg in suggestions %}
             {{ sugg }}
@@ -11,7 +17,9 @@
     {% else %}
         <input type='text' name="{{bad_name}}" />
     {% endif %}
-    <br />
+    </td>
+    </tr>
 {% endfor %}
+</table>
 </fieldset>
 

@@ -112,15 +112,23 @@ name="query" />
     {% if nb_homonyms %}
         <span class="homonymlist">
         <fieldset>
-        <legend> {{ nb_homonyms }} homonym(s) </legend>
+        <legend> homonym names to scientific names </legend>
+        <table>
+        <!-- <tr><th>user taxa name</th><th>related scientific names</th></tr> -->
         {% for homonym_name, suggestions in dict_homonyms.iteritems %}
+            <tr>
+            <td>
             <font color="orange">{{ homonym_name }}</font> :
+            </td>
+            <td>
             {% for sugg in suggestions %}
                 {{ sugg }}
                 <input type="radio" name="{{homonym_name}}" value="{{ sugg }}" />
             {% endfor %}
-            <br />
+            </td>
+            </tr>
         {% endfor %}
+        </table>
         </fieldset>
         </span>
     {% endif %}
@@ -129,15 +137,23 @@ name="query" />
     {% if nb_synonyms %}
         <span class="homonymlist">
         <fieldset>
-        <legend> {{ nb_synonym }} synonym(s) </legend>
+        <legend> synonym names to scientific names </legend>
+        <table>
+        <!-- <tr><th>user taxa name</th><th>related scientific names</th></tr> -->
         {% for synonym_name, suggestions in dict_synonym.iteritems %}
+            <tr>
+            <td>
             <font color="orange">{{ synonym_name }}</font> :
+            </td>
+            <td>
             {% for sugg in suggestions %}
                 {{ sugg }}
                 <input type="radio" name="{{synonym_name}}" value="{{ sugg }}" />
             {% endfor %}
-            <br />
+            </td>
+            </tr>
         {% endfor %}
+        </table>
         </fieldset>
         </span>
     {% endif %}
@@ -146,15 +162,23 @@ name="query" />
     {% if nb_commons %}
         <span class="homonymlist">
         <fieldset>
-        <legend> {{ nb_common }} common(s) </legend>
+        <legend> common names to scientific names </legend>
+        <table>
+        <!-- <tr><th>user taxa name</th><th>related scientific names</th></tr> -->
         {% for common_name, suggestions in dict_common.iteritems %}
+            <tr>
+            <td>
             <font color="orange">{{ common_name }}</font> :
+            </td>
+            <td>
             {% for sugg in suggestions %}
                 {{ sugg }}
                 <input type="radio" name="{{common_name}}" value="{{ sugg }}" />
             {% endfor %}
-            <br />
+            </td>
+            </tr>
         {% endfor %}
+        </table>
         </fieldset>
         </span>
     {% endif %}
@@ -171,63 +195,7 @@ name="query" />
     <!-- end collection correction -->
 {% endif %}
 
-
-{% comment %}
-<%
-    if len(_badtaxalist_) or len(_homonymlist_):
-        #
-%>
-        <fieldset>
-        <legend> Correct your collection </legend>
-        <form action="recreateCollection">
-        <!-- badtaxa fieldset -->
-<%
-        if len(_badtaxalist_):
-            #
-%>
-        <fieldset class="sugestions">
-            <legend> <%$ len( _badtaxalist_)%> bad taxa </legend>
-            <span id="sugestions"> </span>
-            <span id="graph"> </span>
-        </fieldset>
-        <!-- end badtaxa fieldset -->
-        <%|%>
-        <!-- homonym fieldset -->
-<%
-        if len(_homonymlist_):
-            #
-%>
-            <span class="homonymlist">
-            <fieldset>
-            <legend> <%$ len(_treecollection_.homonyms.keys()) %> homonym(s) </legend>
-<%
-            for homonym, taxa in _treecollection_.homonyms.iteritems():
-                #
-%>
-                <font color="orange"><%$ homonym %></font> :
-<%
-                for taxon in taxa:
-                    dispnode = taxon.split("|")[0].replace(_treecollection_.reference.delimiter, " ")
-                    dispnode = dispnode.replace( "<", "&lt;" )
-                    dispnode = dispnode.replace( ">", "&gt;" )
-                    #
-%>
-                    <%$ _treecollection_._TreeCollection__linkSpecies( dispnode, taxon) %>
-                    <input type="radio" name="<%$ homonym %>" value="<%$ dispnode %>" />
-                <%|%>
-                <br />
-            <%|%>
-            </fieldset>
-            </span>
-        <!-- end homonym fieldset -->
-        <%|%>
-        <input type="submit" value="Correct collection"/>
-        </form>
-        </fieldset><br />
-    <%|%>
-<!-- end collection fieldset -->
-{% endcomment %}
-
+{% if reference_tree %}
 <!-- stat1 -->
     <fieldset>
         <legend> Tree size distribution </legend>
@@ -268,6 +236,7 @@ name="query" />
             <a href="#top" class="posPage">&nbsp;Go to the top of the page&nbsp;</a>
     <!-- div preview -->
     <div id="preview"></div>
+{% endif %}
 <!-- CONTENT : END -->
 {% endif %}
 {% endblock %}

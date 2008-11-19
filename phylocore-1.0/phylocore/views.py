@@ -517,9 +517,12 @@ def display_tree_stats( collection, allparents = False ):
     """
     if collection.trees.all().count():
         tree = collection.get_reference_arborescence()
-        list_taxa_collection = collection.taxa.all()
-        d_stats = collection.get_statistics()
-        return _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 'root' )
+        if len(tree):
+            list_taxa_collection = collection.taxa.all()
+            d_stats = collection.get_statistics()
+            return _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 'root' )
+        else:
+            return ""
     return ''
 
 #def _remove_single_parent( list_taxa_collection, tree ):
