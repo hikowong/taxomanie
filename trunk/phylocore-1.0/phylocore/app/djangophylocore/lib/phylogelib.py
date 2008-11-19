@@ -45,7 +45,7 @@ class NewickParser( object ):
         quot = Suppress( "'" )
         # Labels are either unquoted or single quoted, if unquoted underscores will be replaced with spaces
         quoted_label = QuotedString( "'", None, "''" ).setParseAction( lambda s, l, t: t[0] )
-        simple_label = Word( ' 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'*+-./:<=>?@[\\]^_`{|}~' ).setParseAction( lambda s, l, t: t[0].replace( "_", " " ) )
+        simple_label = Word( ' 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'*+-./<=>?@[\\]^_`{|}~' ).setParseAction( lambda s, l, t: t[0].replace( "_", " " ) )
         label = quoted_label | simple_label
         # Branch length is a real number (note though exponents are not in the spec!)
         branch_length = real.setParseAction( lambda s, l, t: float( t[0] ) )
@@ -466,5 +466,7 @@ if __name__ == "__main__":
     print parser.get_taxa()
     print parser.parse_string( "(glis,mus,rattus rattus);")
     print parser.filter( ['mus', 'glis', 'rattus rattus'] )
+    print parser.parse_string( "(mus:0.987,rattus:0.93784);")
+    print parser.get_taxa()
     
 
