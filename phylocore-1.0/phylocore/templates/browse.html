@@ -96,7 +96,7 @@ name="query" />
 <a id='showsource-{{name}}' class="showparents" onclick="javascript:togglesource('{{name}}');"
 {%if error_line %} style="color:red" {% endif %} > Show source </a> 
 {% if not error_line %}
-<a target="_blank" style="color:green"
+<a class="phylowidget" target="_blank" 
    href="http://www.phylowidget.org/full/index.html?tree='{{ source }} %>'"
    title="Display the ncbi tree as graph"> Visualize with PhyloWidget </a>
 {% endif %}
