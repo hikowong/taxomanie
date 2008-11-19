@@ -87,15 +87,14 @@ class Command(NoArgsCommand):
         os.system( 'rm taxdump.tar.gz' )
  
     def download_ncbi( self, verbose ):
-        if not os.path.exists( './names.dmp' ) and not os.path.exists( './nodes.dmp' ):
-            if not os.path.exists( './taxdump.tar.gz' ):
-                if verbose:
-                    print "Downloading NCBI database on the web"
-                os.system( "curl -# ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz > taxdump.tar.gz ")
-                #os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
+        if not os.path.exists( './taxdump.tar.gz' ):
             if verbose:
-                print "Extracting database... please wait"
-            os.system( "tar xf taxdump.tar.gz names.dmp nodes.dmp" )
+                print "Downloading NCBI database on the web"
+            os.system( "curl -# ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz > taxdump.tar.gz ")
+            #os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
+        if verbose:
+            print "Extracting database... please wait"
+        os.system( "tar xf taxdump.tar.gz names.dmp nodes.dmp" )
  
     def generate_structure( self, verbose ):
         global DUMP_PATH

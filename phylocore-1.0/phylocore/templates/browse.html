@@ -91,13 +91,13 @@ name="query" />
 </div>
 <!-- end query panel -->
 
-{% for name, tree_string, error_line in trees_list %}
+{% for name, source, error_line in trees_list %}
 <b> {{name}} </b> 
 <a id='showsource-{{name}}' class="showparents" onclick="javascript:togglesource('{{name}}');"
 {%if error_line %} style="color:red" {% endif %} > Show source </a> 
 {% if not error_line %}
 <a target="_blank" style="color:green"
-   href="http://www.phylowidget.org/full/index.html?tree='{{ tree_string }} %>'"
+   href="http://www.phylowidget.org/full/index.html?tree='{{ source }} %>'"
    title="Display the ncbi tree as graph"> Visualize with PhyloWidget </a>
 {% endif %}
 <!-- TODO mettre de l'ajax ici pour eviter un chargement trop lent -->
@@ -106,7 +106,7 @@ name="query" />
 <font color="red">
 {% endif %}
 <pre>
-{{tree_string}}
+{{source}}
 {% if error_line %}{{error_line}}{% endif %}
 </pre>
 {% if error_line %}

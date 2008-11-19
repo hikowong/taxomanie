@@ -63,12 +63,12 @@ def statistics( request ):
         if "delimiter" in request.POST:
             request.session['delimiter'] = request.POST['delimiter']
         delimiter = request.session['delimiter']
-        collection = TreeCollection.objects.create( original_collection_string = input, delimiter = delimiter )
+        collection = TreeCollection.objects.create( source = input, delimiter = delimiter )
         #if 'autocorrection' in request.POST:
         #    collection, list_correction = collection.get_autocorrected_collection()
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
-        if collection.taxas:
+        if collection.taxa:
             d_stat = collection.get_tree_size_distribution()
             d_stat = collection.get_taxon_frequency_distribution()
         request.session['last_query'] = ''
@@ -77,7 +77,7 @@ def statistics( request ):
         collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
-        if collection.taxas:
+        if collection.taxa:
             d_stat = collection.get_tree_size_distribution()
             d_stat = collection.get_taxon_frequency_distribution()
         request.session['last_query'] = ''
@@ -108,19 +108,19 @@ def statistics( request ):
         context['error_msg'] = "Empty collection"
     else:
         request.session['current_col_id'] = collection.id
-        context['bad_taxas'] = collection.bad_taxas.all() # FIXME a supprimer
+        context['bad_taxa'] = collection.bad_taxa.all() # FIXME a supprimer
         if 'clear_query' in request.GET:
             return render_to_response( 'statistics.html', request.session['initial_context'] )
-        context['nb_taxa'] = collection.taxas.count()
+        context['nb_taxa'] = collection.taxa.count()
         context['nb_trees'] = collection.trees.count()
-        context['nb_badtaxa'] = collection.bad_taxas.count()
+        context['nb_badtaxa'] = collection.bad_taxa.count()
         context['nb_homonyms'] = collection.homonyms.count()
         context['nb_synonyms'] = collection.synonyms.count()
         context['nb_commons'] = collection.commons.count()
         context['not_empty_collection'] = True
         print "fin donnees numeriques"
         # stats
-        if collection.taxas:
+        if collection.taxa:
             d_stat = collection.get_tree_size_distribution()
             context['tree_size_distributions'] = get_tree_size_distribution( d_stat )
             d_stat = collection.get_taxon_frequency_distribution()
@@ -200,7 +200,7 @@ def check( request ):
         context['tree'] = _display_tree( tree.arborescence, source )
     else:#except:
         context['error_msg'] = "This tree contains error(s). Please, check the source"
-    context['tree_string'] = tree.tree_string.replace( collection.delimiter, ' ' )
+    context['source'] = tree.source.replace( collection.delimiter, ' ' )
     context['current_tree_id'] = tree.id
     context['page'] = paginator.page( tree_index+1 )
     nb_trees = collection.trees.count()
@@ -219,7 +219,7 @@ def browse( request ):
             error_line = " "*(i.column_error-1)+"^"
         else:
             error_line = ""
-        trees_list.append( (i.name.replace('.','').replace('|', '_'), i.tree_string, error_line ) )
+        trees_list.append( (i.name.replace('.','').replace('|', '_'), i.source, error_line ) )
     paginator = Paginator( trees_list, 100 )
     context = {'trees_list':trees_list}
     if len( trees_list ):
@@ -235,11 +235,11 @@ def recreate_collection( request ):
         if not good.strip():
             good = bad
         if Taxonomy.objects.filter( name = bad ).count():
-            list_user_taxa_name = set([i.user_taxa_name for i in collection.rel.filter( taxa = Taxonomy.objects.get( name = bad ) )])
+            list_user_taxon_name = set([i.user_taxon_name for i in collection.rel.filter( taxon = Taxonomy.objects.get( name = bad ) )])
         else:
-            list_user_taxa_name = [BadTaxa.objects.get( name = bad ).name]
-        for user_taxa_name in list_user_taxa_name:
-            list_correction.append( (user_taxa_name, " ".join(good.split()) ))
+            list_user_taxon_name = [BadTaxa.objects.get( name = bad ).name]
+        for user_taxon_name in list_user_taxon_name:
+            list_correction.append( (user_taxon_name, " ".join(good.split()) ))
     corrected_collection = collection.get_corrected_collection( dict(list_correction) ) 
     request.session['collection'] = corrected_collection
     return statistics( request )
@@ -249,15 +249,16 @@ def get_img_url( request, taxon ):
 
 def suggestions( request ):
     # correct bad taxas
-    dict_bad_taxas = {}
+    dict_bad_taxa = {}
     context = {}
     collection = request.session['collection']
-    for bad in collection.bad_taxas.all():
-        dict_bad_taxas[bad.name] = []
+    bad_taxa_list = collection.bad_taxa.all()
+    for bad in bad_taxa_list:
+        dict_bad_taxa[bad.name] = []
         for i in TAXOREF.correct( bad.name, guess = True ):
             if i != bad.name:
-                dict_bad_taxas[bad.name].append( i )
-    context['dict_bad_taxas'] = dict_bad_taxas
+                dict_bad_taxa[bad.name].append( i )
+    context['dict_bad_taxa'] = dict_bad_taxa
     return render_to_response( 'suggestions.html', context )
 
 def downloadCollection( request ):
@@ -286,11 +287,11 @@ def downloadNCBITree( request ):
 #   Needed fonctions (not views)       #
 ########################################
 def get_autocorrected_collection( self ):
-    return self.get_corrected_collection( [(i.user_taxa_name,
-      i.taxa.scientifics.get().name)\
-        for i in self.rel.filter( taxa__in = self.taxas.exclude(
+    return self.get_corrected_collection( [(i.user_taxon_name,
+      i.taxon.scientifics.get().name)\
+        for i in self.rel.filter( taxon__in = self.taxa.exclude(
           type_name = 'scientific name' ) )\
-            if i.taxa.scientifics.count() == 1] )
+            if i.taxon.scientifics.count() == 1] )
 
 
 def correct_collection( collection ):
@@ -400,7 +401,7 @@ def _display_tree( tree, source=None, root = "",  mydepth = 0, lastnode = 'root'
         root = Taxonomy.objects.get( name = 'root' )
         if source:
             result += "<a class='genre' name='genre' href='"+source.target_url+ \
-              root.fromsource_set.get( source = source ).taxa_id_in_source+\
+              root.fromsource_set.get( source = source ).taxon_id_in_source+\
               "'>"+root.name.capitalize()+"</a><br />\n"
         else:
             result += "<a class='genre' name='genre' href=''>"+root.name.capitalize()+"</a><br />\n"
@@ -437,7 +438,7 @@ def _display_tree( tree, source=None, root = "",  mydepth = 0, lastnode = 'root'
             result += _display_tree( tree, source, node, depth + 1, 
               lastnode = node, blockname = blockname+"a")
         else: # it's a species (ie taxon)
-            if TAXOREF.is_bad_taxa( node.name ):
+            if TAXOREF.is_bad_taxon( node.name ):
                 result += "+-<font color='red'><b>"+node.name.capitalize()+"</b></font><br />\n"
             elif TAXOREF.is_homonym( node.name ):
                 result += "+-<font color='orange'><b>"+node.name.capitalize()+"</b></font><br />\n"
@@ -460,11 +461,11 @@ def _link_species_tree( node, source, blockname, nb_inter_parents ):
         style = 'class="species"'
     if source:
         result += """+-<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s </a>""" % (
-          node.fromsource_set.get( source = source ).taxa_id_in_source,
+          node.fromsource_set.get( source = source ).taxon_id_in_source,
           style,                        
           node.name,
           source.target_url,
-          node.fromsource_set.get( source = source ).taxa_id_in_source,
+          node.fromsource_set.get( source = source ).taxon_id_in_source,
           dispnode.capitalize() )
     else:
         result += """+-<a %s onmouseover="go('%s');" href=""> %s </a>""" % (
@@ -488,10 +489,10 @@ def _link_genre_tree( node, source, blockname, isinterparent=False, nb_inter_par
     if source:
         result += """+-<a id="%s" class="genre" name="genre" onmouseover="go('%s')" 
           href="%s%s" target='_blank'> %s </a>""" % (
-          node.fromsource_set.get( source = source ).taxa_id_in_source,
+          node.fromsource_set.get( source = source ).taxon_id_in_source,
           dispnode,
           source.target_url,
-          node.fromsource_set.get( source = source ).taxa_id_in_source,
+          node.fromsource_set.get( source = source ).taxon_id_in_source,
           dispnode.capitalize())
     else:
         result += """+-<a class="genre" name="genre" onmouseover="go('%s')" href=""> %s </a>""" % (
@@ -516,7 +517,7 @@ def display_tree_stats( collection, allparents = False ):
     """
     if collection.trees.all().count():
         tree = collection.get_reference_arborescence()
-        list_taxa_collection = collection.taxas.all()
+        list_taxa_collection = collection.taxa.all()
         d_stats = collection.get_statistics()
         return _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 'root' )
     return ''
@@ -543,10 +544,10 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
     blocknum = 0
     # Create root node display
     if root == "root":
-        nb_taxas = collection.taxas.all().count()
+        nb_taxa = collection.taxa.all().count()
         nb_trees =  collection.trees.all().count()
         result += "<a class='genre' href=''>Root</a> (%s/%s) = (%s species in %s trees)<br />\n" % (
-          nb_taxas, nb_trees, nb_taxas, nb_trees )
+          nb_taxa, nb_trees, nb_taxa, nb_trees )
         result += """<span class="treeline">|</span><br />\n"""
         root = Taxonomy.objects.get( name = 'root' )
     # Create tree display
@@ -648,8 +649,8 @@ def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False,
     result += """
     (<a class="nolink" title='%s'>%s</a>/
     <a title="%s" href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
-      ",".join( d_stats[node.id]['scientific_taxa_list']),
-      len( d_stats[node.id]['scientific_taxa_list'] ),
+      ",".join( d_stats[node.id]['scientific_taxon_list']),
+      len( d_stats[node.id]['scientific_taxon_list'] ),
       "Restrict your collection to these trees",
       node.name,
       len( d_stats[node.id]['trees_list'] ) )

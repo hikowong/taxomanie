@@ -41,12 +41,12 @@ True
 >>> taxoref.is_homonym( 'echinops <plant>' )
 False
 
->>> taxoref.is_bad_taxa( 'rattus' )
+>>> taxoref.is_bad_taxon( 'rattus' )
 False
->>> taxoref.is_bad_taxa( 'abadname' )
+>>> taxoref.is_bad_taxon( 'abadname' )
 True
 >>> abadname = BadTaxa.objects.create( name = 'abadname' )
->>> taxoref.is_bad_taxa( 'abadname' )
+>>> taxoref.is_bad_taxon( 'abadname' )
 True
 
 >>> taxoref.get_name_from_common( 'mouse' )
@@ -64,22 +64,22 @@ True
 >>> taxoref.get_name_from_homonym( 'homo' )
 []
 
->>> taxoref.strip_taxa_name( "rattus" )
+>>> taxoref.strip_taxon_name( "rattus" )
 'rattus'
->>> taxoref.strip_taxa_name( "rattus_france" )
+>>> taxoref.strip_taxon_name( "rattus_france" )
 'rattus'
->>> taxoref.strip_taxa_name( "rattus france, delimiter=' '" )
+>>> taxoref.strip_taxon_name( "rattus france, delimiter=' '" )
 'rattus'
->>> taxoref.strip_taxa_name( "mus_musculus" )
+>>> taxoref.strip_taxon_name( "mus_musculus" )
 'mus musculus'
->>> taxoref.strip_taxa_name( "mus_musculus_france" )
+>>> taxoref.strip_taxon_name( "mus_musculus_france" )
 'mus musculus'
 
->>> taxoref.strip_taxa_name( "rattus rattus france", delimiter=' ')
+>>> taxoref.strip_taxon_name( "rattus rattus france", delimiter=' ')
 'rattus rattus'
 
 'mus something foo' is not in our test database so we're falling down to 'mus'
->>> taxoref.strip_taxa_name( "mus something foo", delimiter=' ')
+>>> taxoref.strip_taxon_name( "mus something foo", delimiter=' ')
 'mus'
 
 >>> taxoref.correct( 'rattus' ) is None
@@ -90,7 +90,7 @@ True
 [<Taxonomy: echinops <mammal> (scientific name)>, <Taxonomy: echinops <plant> (scientific name)>]
 >>> taxoref.correct( 'nannomys' )
 [<Taxonomy: mus (scientific name)>]
->>> taxoref.correct( 'taxa not in database' )
+>>> taxoref.correct( 'taxon not in database' )
 [0]
 
 Getting django objects from name
