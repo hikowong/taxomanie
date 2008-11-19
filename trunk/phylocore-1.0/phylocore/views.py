@@ -346,20 +346,21 @@ def get_tree_size_distribution( d_stat ):
     result = ""
     nbtaxa_max = max( d_stat.values() ) 
     for nbtaxon, nbtree in sorted(d_stat.items()):
-        nbtreepourcent = nbtree*100/nbtaxa_max
-        bar = " "*( nbtree*70/nbtaxa_max ) # 70 is an abitrary taken number
-        bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
-        bar = """<span class="statMetric">"""+bar+"</span>"
-        if nbtaxon == nbtaxon + ratio-1:
-            if nbtaxon:
-                base = "["+string.center( str(nbtaxon), 7)+"]"
+        if nbtree:
+            nbtreepourcent = nbtree*100/nbtaxa_max
+            bar = " "*( nbtree*70/nbtaxa_max ) # 70 is an abitrary taken number
+            bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
+            bar = """<span class="statMetric">"""+bar+"</span>"
+            if nbtaxon == nbtaxon + ratio-1:
+                if nbtaxon:
+                    base = "["+string.center( str(nbtaxon), 7)+"]"
+                else:
+                    base = ""
             else:
-                base = ""
-        else:
-            base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
-        base = base.replace( " ", "&nbsp;" )
-        if base:
-            result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" trees)</tt><br />\n"
+                base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
+            base = base.replace( " ", "&nbsp;" )
+            if base:
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" trees)</tt><br />\n"
     return result
 
 def get_taxon_frequency_distribution( d_stat ):
@@ -367,20 +368,21 @@ def get_taxon_frequency_distribution( d_stat ):
     result = ""
     nbtaxa_max = max( d_stat.values() ) 
     for nbtaxon, nbtree in sorted(d_stat.items()):
-        nbtreepourcent = nbtree*100/nbtaxa_max
-        bar = " "*( nbtree*70/nbtaxa_max )# 70 is an abitrary taken number
-        bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
-        bar = """<span class="statMetric">"""+bar+"</span>"
-        if nbtaxon == nbtaxon + ratio-1:
-            if nbtaxon:
-                base = "["+string.center( str(nbtaxon), 7)+"]"
+        if nbtree:
+            nbtreepourcent = nbtree*100/nbtaxa_max
+            bar = " "*( nbtree*70/nbtaxa_max )# 70 is an abitrary taken number
+            bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
+            bar = """<span class="statMetric">"""+bar+"</span>"
+            if nbtaxon == nbtaxon + ratio-1:
+                if nbtaxon:
+                    base = "["+string.center( str(nbtaxon), 7)+"]"
+                else:
+                    base = ""
             else:
-                base = ""
-        else:
-            base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
-        base = base.replace( " ", "&nbsp;" )
-        if base:
-            result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("+str(nbtree)+" taxa)</tt><br />\n"
+                base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
+            base = base.replace( " ", "&nbsp;" )
+            if base:
+                result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("+str(nbtree)+" taxa)</tt><br />\n"
     return result
 
 #
