@@ -6,11 +6,8 @@ from django.conf import settings
 from django.db import transaction
 from django.db import connection
 
-from lib.phylogelib import getTaxa, getChildren, removeBootStraps
-from lib.phylogelib import getBrothers, removeNexusComments, getStruct
-from lib.phylogelib import tidyNwk, checkNwk
 from lib.phylogelib import NewickParser
-from lib.nexus import Nexus
+from lib.nexus import Nexus, remove_nexus_comments
 from pyparsing import ParseException
 import datetime, re, sys, os, codecs
 
@@ -464,7 +461,7 @@ class Tree( models.Model, TaxonomyReference ):
         except ParseException, err:
             self.column_error = err.column
         self.save( dont_generate = True )
-        taxa_list = self.newick_parser.get_taxa() # set( getTaxa( tree ) )
+        taxa_list = self.newick_parser.get_taxa()
         self.taxon_ids = {}
         if BADTAXA_TOC is None:
             BADTAXA_TOC = set([i[0] for i in BadTaxa.objects.all().values_list( 'name')])
@@ -725,15 +722,12 @@ class TreeCollection( models.Model, TaxonomyReference ):
                     cursor.execute('PRAGMA synchronous=OFF')
         index = 0
         dump = []
-        nwk_collection = self.source
+        nwk_collection = remove_nexus_comments( self.source )
         # Nexus collection
         if nwk_collection.lower().strip()[:6] == "#nexus":
             nex = Nexus( nwk_collection )
             self.format = 'nexus'
             self.save( dont_regenerate = True )
-#            if settings.DEBUG:
-#                i = 0
-#                NB_LINE = len( nex.collection )
             for name, (tree, rooted) in nex.collection.iteritems():
                 t = Tree( name = name, source = tree, rooted = rooted,
                   delimiter = self.delimiter, _from_collection = True,
@@ -748,21 +742,13 @@ class TreeCollection( models.Model, TaxonomyReference ):
                         # index, collection_id, tree_id, taxon_id, user_taxon_name
                         dump.append(  '%s|%s|%s|%s|%s\n' % (index, self.id,
                           t.id, t.taxon_ids[user_taxon_name], user_taxon_name ) )
-#                if settings.DEBUG:
-#                    i += 1
-#                    sys.stdout.write("\r[%s] %s%% " % ( str(i), str( i*100.0/NB_LINE)  ) )
-#                    sys.stdout.flush()
         # Phylip collection
         else:
             self.format = 'phylip'
             self.save( dont_regenerate = True )
             name = 0
             l_trees = nwk_collection.strip().split(";")
-#            if settings.DEBUG:
-#                i = 0
-#                NB_LINE = len( l_trees )
             for nwktree in l_trees:
-                #tree = removeBootStraps( tidyNwk( nwktree.strip().lower())).strip()
                 tree = nwktree.lower()
                 if tree:
                     name += 1
@@ -779,10 +765,6 @@ class TreeCollection( models.Model, TaxonomyReference ):
                             # index, collection_id, tree_id, taxon_id, user_taxon_name
                             dump.append(  '%s|%s|%s|%s|%s\n' % (index,
                               self.id, t.id, t.taxon_ids[user_taxon_name], user_taxon_name ) )
-#                if settings.DEBUG:
-#                    i += 1
-#                    sys.stdout.write("\r[%s] %s%% " % ( str(i), str( i*100.0/NB_LINE)  ) )
-#                    sys.stdout.flush()
         self.__create_relation( str(self.id), dump )
 
     def get_collection_string( self ):
@@ -1012,18 +994,6 @@ class TreeCollection( models.Model, TaxonomyReference ):
         remove_taxon_list = [i.name for i in self.taxa.exclude( name__in = taxon_name_list )] 
         new_nwk = self.get_filtered_collection_string( remove_taxon_list )
         return TreeCollection.objects.create( delimiter = self.delimiter, source = new_nwk )
-
-    def get_corrected_collection_string_old( self, correction ):
-        # FIXME a refactoriser
-        collection = tidyNwk( self.source )
-        struct_collection = getStruct( collection )
-        for i in xrange(len(struct_collection)):
-            bad_name = struct_collection[i].strip().split()
-            if " ".join( bad_name[:2] ) in correction:
-                struct_collection[i] = self.delimiter.join( correction[" ".join( bad_name[:2] )].split() + bad_name[2:] )
-            elif " ".join( bad_name[:1] ) in correction:
-                struct_collection[i] = self.delimiter.join( correction[" ".join( bad_name[:1] )].split() + bad_name[1:] )
-        return ';\n'.join( ''.join( struct_collection ).split(';') )
 
     def get_corrected_collection_string( self, correction ):
         parser = NewickParser()
