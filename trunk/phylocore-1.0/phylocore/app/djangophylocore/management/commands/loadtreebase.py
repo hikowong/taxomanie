@@ -31,16 +31,16 @@ class Command(NoArgsCommand):
                 "id" integer NOT NULL PRIMARY KEY,
                 "collection_id" integer NOT NULL REFERENCES "djangophylocore_treecollection" ("id"),
                 "tree_id" integer NOT NULL REFERENCES "djangophylocore_tree" ("id"),
-                "taxa_id" integer NULL REFERENCES "djangophylocore_taxonomy" ("id"),
-                "user_taxa_name" varchar(200) NULL
+                "taxon_id" integer NULL REFERENCES "djangophylocore_taxonomy" ("id"),
+                "user_taxon_name" varchar(200) NULL
             );""" )
         elif settings.DATABASE_ENGINE == 'mysql':
             cursor.execute( """ CREATE TABLE `djangophylocore_reltreecoltaxa1` (
                 `id` integer NOT NULL PRIMARY KEY,
                 `collection_id` integer NOT NULL REFERENCES `djangophylocore_treecollection` (`id`),
                 `tree_id` integer NOT NULL REFERENCES `djangophylocore_tree` (`id`),
-                `taxa_id` integer NULL REFERENCES `djangophylocore_taxonomy` (`id`),
-                `user_taxa_name` varchar(200) NULL
+                `taxon_id` integer NULL REFERENCES `djangophylocore_taxonomy` (`id`),
+                `user_taxon_name` varchar(200) NULL
             );""" )
         for dump in os.listdir( path_dumps ):
             if dump == ".svn": continue #XXX

@@ -1136,7 +1136,9 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return the NCBI arborescence in a newick string
         """
         tree = self.get_reference_arborescence()
-        return  self._nxgraph2nwk( tree, Taxonomy.objects.get( name = "root" ))
+        if len(tree):
+            return  self._nxgraph2nwk( tree, Taxonomy.objects.get( name = "root" ))
+        return ""
 
 class AbstractTreeColTaxa( models.Model ):
     collection = models.ForeignKey( TreeCollection )#, related_name = 'rel' )
