@@ -11,8 +11,8 @@ Creation of a simple collection
 
 >>> TAXONOMY_TOC = get_taxonomy_toc( True )
 >>> simple_col = "(mus,nannomys,black rat,echinops,blabla);(mus, black rat);"
->>> col = TreeCollection.objects.create( name = 'simple', original_collection_string = simple_col )
->>> col.taxas.all()
+>>> col = TreeCollection.objects.create( name = 'simple', source = simple_col )
+>>> col.taxa.all()
 [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: nannomys (synonym)>]
 >>> col.ambiguous.all()
 [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: nannomys (synonym)>]
@@ -24,7 +24,7 @@ Creation of a simple collection
 [<Taxonomy: nannomys (synonym)>]
 >>> col.commons.all()
 [<Taxonomy: black rat (common)>]
->>> col.bad_taxas.all()
+>>> col.bad_taxa.all()
 [<BadTaxa: blabla (0)>]
 
 >>> col.trees.all()
@@ -45,10 +45,10 @@ Creation of collection from nexus (translated) format
 >>> nwk_col = open( os.path.join( djangophylocore.__path__[0],"tests","data","nexus_example_utf-8" )).read()
 
 After creating collection, you have to call
-`generate_from_original_collection_string` juste after. This method will build
+`generate_from_source` juste after. This method will build
 all trees from the collection string
 
->>> tree_col = TreeCollection.objects.create( name="test_nexus", original_collection_string=nwk_col, delimiter = '_' )
+>>> tree_col = TreeCollection.objects.create( name="test_nexus", source=nwk_col, delimiter = '_' )
 
 The string format is detected
 
@@ -63,13 +63,13 @@ Dealing with collection
 >>> tree_col.trees.all()
 [<Tree: fig._3>]
 
->>> tree_col.bad_taxas.all()
+>>> tree_col.bad_taxa.all()
 [<BadTaxa: phytophthora_cajani (0)>, <BadTaxa: phytophthora_cinnamomi (0)>, <BadTaxa: phytophthora_drechsleri-like (0)>, <BadTaxa: phytophthora_melonis (0)>, <BadTaxa: phytophthora_pistaciae_a (0)>, <BadTaxa: phytophthora_pistaciae_b (0)>, <BadTaxa: phytophthora_sinensis (0)>, <BadTaxa: phytophthora_sojae_a (0)>, <BadTaxa: phytophthora_sojae_b (0)>, <BadTaxa: phytophthora_vignae (0)>]
 
->>> tree_col.bad_taxas.count()
+>>> tree_col.bad_taxa.count()
 10L
 
->>> tree_col.taxas.all()
+>>> tree_col.taxa.all()
 []
 
 
@@ -84,7 +84,7 @@ Creation of collection from phylip format
 -----------------------------------------
 
 >>> nwk_col = "(echinops <plant>,(rattus,( mus,(mus musculus))));\\n(rattus,(azerty,ratis));\\n(echinops, (rattus, ( mus, azerty, black rat ), nannomys ));\\n(rattus, echinops, mus);"
->>> tree_col = TreeCollection.objects.create( name="test_phylip", original_collection_string=nwk_col )
+>>> tree_col = TreeCollection.objects.create( name="test_phylip", source=nwk_col )
 >>> tree_col.format
 'phylip'
 
@@ -100,7 +100,7 @@ Dealing with collections
 [<Taxonomy: echinops <plant> (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus (scientific name)>]
 >>> tree_col.scientifics.count()
 4L
->>> tree_col.bad_taxas
+>>> tree_col.bad_taxa
 [<BadTaxa: azerty (0)>, <BadTaxa: ratis (0)>]
 >>> tree_col.homonyms
 [<Taxonomy: echinops (homonym)>]
@@ -108,7 +108,7 @@ Dealing with collections
 [<Taxonomy: black rat (common)>]
 >>> tree_col.synonyms
 [<Taxonomy: nannomys (synonym)>]
->>> tree_col.bad_taxas.count()
+>>> tree_col.bad_taxa.count()
 2L
 >>> tree_col.get_collection_string()
 u'(echinops <plant>,(rattus,( mus,(mus musculus))));\\n(rattus,(azerty,ratis));\\n(echinops, (rattus, ( mus, azerty, black rat ), nannomys ));\\n(rattus, echinops, mus);'
@@ -116,10 +116,10 @@ u'(echinops <plant>,(rattus,( mus,(mus musculus))));\\n(rattus,(azerty,ratis));\
 Specify the delimiter
 ---------------------
 >>> tree_col = TreeCollection.objects.create( name="test_delimiter",
-...   original_collection_string="(rattus_rattus,(mus, mus_musculus))", delimiter = '_' )
->>> tree_col.bad_taxas.all()
+...   source="(rattus_rattus,(mus, mus_musculus))", delimiter = '_' )
+>>> tree_col.bad_taxa.all()
 []
->>> tree_col.taxas.all()
+>>> tree_col.taxa.all()
 [<Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus rattus (scientific name)>]
 
 
@@ -131,7 +131,7 @@ Getting bad trees from a collection
 >>> good_tree_nwk_2 = '(mus,( murinae,rattus)0)'
 >>> bad_tree_nwk_2 = '(mus,( '
 >>> nwk_col = ';'.join( [good_tree_nwk_1, bad_tree_nwk_1, good_tree_nwk_2, bad_tree_nwk_2] )
->>> col = TreeCollection( name = 'with_bad_trees', original_collection_string = nwk_col)
+>>> col = TreeCollection( name = 'with_bad_trees', source = nwk_col)
 >>> col.save()
 
 >>> col.bad_trees.count()
@@ -143,7 +143,7 @@ Making queries
 --------------
 
 >>> simple_col = "(mus,echinops <plant>,rattus);(mus, rattus);"
->>> col = TreeCollection.objects.create( name = 'query_col', original_collection_string = simple_col )
+>>> col = TreeCollection.objects.create( name = 'query_col', source = simple_col )
 >>> col.query( '{murinae} > 1' )
 [<Tree: 1>, <Tree: 2>]
 >>> col.query( '{murinae}< 1 or {cardueae}>0' )
@@ -172,7 +172,7 @@ Filter and restrict collection
 ------------------------------
 
 >>> simple_col = "(mus musculus, rattus, glis);( glis, mus, rattus rattus);(mus, rattus);"
->>> col = TreeCollection.objects.create( original_collection_string = simple_col )
+>>> col = TreeCollection.objects.create( source = simple_col )
 >>> col.get_filtered_collection_string( ['mus', 'glis'] )
 '(mus musculus,rattus);\\n(rattus rattus);\\n(rattus);\\n'
 >>> col.get_filtered_collection_string( ['mus', 'rattus'] )
@@ -181,12 +181,12 @@ Filter and restrict collection
 True
 
 >>> restricted_col = col.get_restricted_collection( ['mus', 'glis'] )
->>> restricted_col.taxas.all()
+>>> restricted_col.taxa.all()
 [<Taxonomy: mus (scientific name)>]
->>> restricted_col.bad_taxas.all()
+>>> restricted_col.bad_taxa.all()
 [<BadTaxa: glis (0)>]
 >>> restricted_col = col.get_restricted_collection( ['mus musculus', 'rattus'] )
->>> restricted_col.taxas.all()
+>>> restricted_col.taxa.all()
 [<Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus (scientific name)>]
 
 
@@ -194,10 +194,10 @@ Correct the collection
 ----------------------
 
 >>> simple_col = "(mus musculus, (rattus, echinops));((echinops, mis france), rattis rattus);(mus, (rattus));"
->>> col = TreeCollection.objects.create( original_collection_string = simple_col )
->>> col.taxas.all()
+>>> col = TreeCollection.objects.create( source = simple_col )
+>>> col.taxa.all()
 [<Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus (scientific name)>]
->>> col.bad_taxas.all()
+>>> col.bad_taxa.all()
 [<BadTaxa: mis (0)>, <BadTaxa: rattis (0)>]
 >>> col.homonyms.all()
 [<Taxonomy: echinops (homonym)>]
@@ -205,11 +205,11 @@ Correct the collection
 '(mus musculus,(rattus,echinops <plant>));\\n((echinops <plant>,mus france),rattus rattus);\\n(mus,rattus);\\n'
 
 >>> corrected_col = col.get_corrected_collection({'mis': 'mus', 'rattis rattus':'rattus rattus', 'echinops': 'echinops <plant>'})
->>> corrected_col.bad_taxas.all()
+>>> corrected_col.bad_taxa.all()
 []
 >>> corrected_col.homonyms.all()
 []
->>> corrected_col.taxas.all()
+>>> corrected_col.taxa.all()
 [<Taxonomy: echinops <plant> (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>, <Taxonomy: rattus (scientific name)>, <Taxonomy: rattus rattus (scientific name)>]
 
 """

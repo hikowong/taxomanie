@@ -1,7 +1,7 @@
 
 <fieldset>
 <legend> {{ nb_badtaxa }} taxa(s) </legend>
-{% for bad_name, suggestions in dict_bad_taxas.iteritems %}
+{% for bad_name, suggestions in dict_bad_taxa.iteritems %}
     <font color="red">{{ bad_name }}</font> :
     {% if suggestions %}
         {% for sugg in suggestions %}
