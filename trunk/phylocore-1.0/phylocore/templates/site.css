@@ -27,6 +27,17 @@ a:hover
 
 a:visited {}
 
+a.phylowidget:link
+    {
+    color: green;
+    }
+
+a.phylowidget:visited
+{
+    color: blue;
+}
+
+
 div.interparents
 {
     background: #E8E8E8;
@@ -605,3 +616,5 @@ a#iNode:hover  {
     {
     padding: 0px 0px;
     }
+
+
