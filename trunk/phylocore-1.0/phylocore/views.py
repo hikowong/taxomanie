@@ -252,6 +252,10 @@ def suggestions( request ):
     dict_bad_taxa = {}
     context = {}
     collection = request.session['collection']
+    if not collection.homonyms.count() and not collection.synonyms.count() and not collection.commons.count():
+        context['display_button'] = True
+    else:
+        context['display_button'] = False
     bad_taxa_list = collection.bad_taxa.all()
     for bad in bad_taxa_list:
         dict_bad_taxa[bad.name] = []
