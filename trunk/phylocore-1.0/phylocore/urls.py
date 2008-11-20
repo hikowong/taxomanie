@@ -22,6 +22,8 @@ urlpatterns += patterns('phylocore.views',
 
     (r'^phyloexplorer/get_img_url/(?P<taxon>.*)$', 'get_img_url'),
     (r'^phyloexplorer/suggestions$', 'suggestions'),
+    (r'^phyloexplorer/reference_tree$', 'reference_tree'),
+    (r'^phyloexplorer/filter_collection$', 'filter_collection'),
     (r'^phyloexplorer/recreate_collection$', 'recreate_collection'),
     (r'^phyloexplorer/statistics$', 'statistics'),
     (r'^phyloexplorer/browse$', 'browse'),

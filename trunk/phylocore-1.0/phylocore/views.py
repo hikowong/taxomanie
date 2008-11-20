@@ -64,24 +64,25 @@ def statistics( request ):
             request.session['delimiter'] = request.POST['delimiter']
         delimiter = request.session['delimiter']
         collection = TreeCollection.objects.create( source = input, delimiter = delimiter )
+        print "fin creation collection"
         #if 'autocorrection' in request.POST:
         #    collection, list_correction = collection.get_autocorrected_collection()
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
-        if collection.taxa:
-            d_stat = collection.get_tree_size_distribution()
-            d_stat = collection.get_taxon_frequency_distribution()
+        #if collection.taxa.count():
+        #    d_stat = collection.get_tree_size_distribution()
+        #    d_stat = collection.get_taxon_frequency_distribution()
+        #print "fin stats"
         request.session['last_query'] = ''
     elif 'query_treebase' in request.POST:
         treebase = TreeCollection.objects.get( id = 1 )
         collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
-        if collection.taxa:
-            d_stat = collection.get_tree_size_distribution()
-            d_stat = collection.get_taxon_frequency_distribution()
+        #if collection.taxa:
+        #    d_stat = collection.get_tree_size_distribution()
+        #    d_stat = collection.get_taxon_frequency_distribution()
         request.session['last_query'] = ''
-    print "fin creation collection"
     collection = request.session['collection']
     context = {}
     ## Query
@@ -96,10 +97,16 @@ def statistics( request ):
     if query:
         request.session['last_query'] = query
         query_against_treebase = 'treebase' in request.GET
-        if query_against_treebase:
+        print query_against_treebase
+        print query, collection.id
+        try:
             collection = collection.get_collection_from_query( query, query_against_treebase )
+        except Exception, err:
+            context['error_msg'] = 'bad query: %s not found in taxaonomy' % err.message
+            if err.message == "usertaxa":
+                context['error_msg'] += '. Try to query against TreeBase'
     if 'clear_query' in request.GET:
-        collection = TreeCollection.objects.get( id = request.session['original_collection_id'] )
+        return render_to_response( 'statistics.html', request.session['initial_context'] )
     context['query'] = query
     print "fin query"
     ## Dealing collection
@@ -108,41 +115,32 @@ def statistics( request ):
         context['error_msg'] = "Empty collection"
     else:
         request.session['current_col_id'] = collection.id
-        context['bad_taxa'] = collection.bad_taxa.all() # FIXME a supprimer
-        if 'clear_query' in request.GET:
-            return render_to_response( 'statistics.html', request.session['initial_context'] )
         context['nb_taxa'] = collection.taxa.count()
         context['nb_trees'] = collection.trees.count()
         context['nb_badtaxa'] = collection.bad_taxa.count()
-        context['nb_homonyms'] = collection.homonyms.count()
-        context['nb_synonyms'] = collection.synonyms.count()
-        context['nb_commons'] = collection.commons.count()
+        homonyms_list = collection.homonyms.all()
+        context['nb_homonyms'] = homonyms_list.count()
+        synonyms_list = collection.synonyms.all()
+        context['nb_synonyms'] = synonyms_list.count()
+        commons_list = collection.commons.all()
+        context['nb_commons'] = commons_list.count()
         context['not_empty_collection'] = True
         print "fin donnees numeriques"
         # stats
-        if collection.taxa:
+        if context['nb_taxa']:
             d_stat = collection.get_tree_size_distribution()
             context['tree_size_distributions'] = get_tree_size_distribution( d_stat )
             d_stat = collection.get_taxon_frequency_distribution()
             context['taxon_frequency_distribution'] = get_taxon_frequency_distribution( d_stat )
-        print "fin stats"
-        if 1:#context['nb_taxa'] < 200:
-            context['stats_tree'] = display_tree_stats( collection )
+            print "fin stats"
             print "fin arbre ncbi"
         else:
+            context['tree_size_distributions'] = ""
+            context['taxon_frequency_distribution'] = ""
             context['stats_tree'] = None
-        context['reference_tree'] = collection.get_reference_tree_as_nwk()
-        # correct bad taxas
-#        dict_bad_taxas = {}
-#        for bad in collection.bad_taxas.all():
-#            dict_bad_taxas[bad.name] = []
-#            for i in TAXOREF.correct( bad.name, guess = True ):
-#                if i != bad.name:
-#                    dict_bad_taxas[bad.name].append( i )
-#        context['dict_bad_taxas'] = dict_bad_taxas
         # correct homonyms
         dict_homonyms = {}
-        for homonym in collection.homonyms.all():
+        for homonym in homonyms_list:
             dict_homonyms[homonym.name] = []
             for name in homonym.scientifics.values('name'):
                 dict_homonyms[homonym.name].extend( name.values() )
@@ -150,7 +148,7 @@ def statistics( request ):
         print "fin homonym"
         # correct synonym
         dict_synonym = {}
-        for synonym in collection.synonyms.all():
+        for synonym in synonyms_list:
             dict_synonym[synonym.name] = []
             for name in synonym.scientifics.values('name'):
                 dict_synonym[synonym.name].extend( name.values() )
@@ -158,7 +156,7 @@ def statistics( request ):
         print "fin synonym"
         # correct common
         dict_common = {}
-        for common in collection.commons.all():
+        for common in commons_list:
             dict_common[common.name] = []
             for name in common.scientifics.values('name'):
                 dict_common[common.name].extend( name.values() )
@@ -226,7 +224,6 @@ def browse( request ):
         context['not_empty_collection'] = True
     return render_to_response( 'browse.html', context )#TODO Rename to browse
 
-
 def recreate_collection( request ):
     # FIXME TODO Prendre en charge la correction sur les bad_taxa
     collection = request.session['collection']
@@ -242,6 +239,15 @@ def recreate_collection( request ):
             list_correction.append( (user_taxon_name, " ".join(good.split()) ))
     corrected_collection = collection.get_corrected_collection( dict(list_correction) ) 
     request.session['collection'] = corrected_collection
+    return statistics( request )
+
+def filter_collection( request ):
+    collection = request.session['collection']
+    list_correction = []
+    filter_list = list( request.GET )
+    print filter_list
+    filtered_collection = collection.get_restricted_collection( filter_list )
+    request.session['collection'] = filtered_collection
     return statistics( request )
 
 def get_img_url( request, taxon ):
@@ -264,6 +270,14 @@ def suggestions( request ):
                 dict_bad_taxa[bad.name].append( i )
     context['dict_bad_taxa'] = dict_bad_taxa
     return render_to_response( 'suggestions.html', context )
+
+def reference_tree( request ):
+    collection = request.session['collection']
+    context = {}
+    context['stats_tree'] = display_tree_stats( collection )
+    context['reference_tree'] = collection.get_reference_tree_as_nwk()
+    return render_to_response( 'reference_tree.html', context )
+
 
 def downloadCollection( request ):
     col_id = request.session['current_col_id']
