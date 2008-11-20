@@ -97,7 +97,7 @@ class NewickParser( object ):
     def remove_singleton( self, node ):
         if type( node ) is list:
             for son in node:
-                if type( son ) is list and len( son ) == 1:
+                if type( son ) is list and len( son ) <= 1:
                     self.__remove_one_singleton( node )
             for son in node:
                 if type( son ) is list:
@@ -109,6 +109,9 @@ class NewickParser( object ):
                 if type( son ) is list and len( son ) == 1:
                     node[node.index( son )] = son[0]
                     self.__remove_one_singleton( node )
+                else:
+                    if type( son )is list and len(son) == 0:
+                        node.remove( son )
 
     def filter( self, remove_taxa_list ):
         tree = self.tree
@@ -151,8 +154,11 @@ class NewickParser( object ):
         self.taxa_list = str( tree ).replace( "[u'", "['").replace(", u'", ", '" )
         self.taxa_list = self.taxa_list.replace( "['", "[" ).replace( "']", "]" )
         self.taxa_list = self.taxa_list.replace( "',", "," ).replace( ", '", ", " )
-        self.taxa_list = self.taxa_list.replace( '[', '' ).replace( ']', '' ).split(', ')
-        return self.taxa_list
+        self.taxa_list = self.taxa_list.replace( '[', '' ).replace( ']', '' )
+        if self.taxa_list:
+            return self.taxa_list.split(', ')
+        else:
+            return []
 
     def get_struct( self ):
         """
@@ -464,8 +470,9 @@ if __name__ == "__main__":
     print parser.parse_string( "(('mis france', 'rattus'), ((('homo', 'pan')), 'echinops'));" )
     print parser.correct_tree( {"mis": "mus", "echinops":"echinops <plant>" } )
     print parser.get_taxa()
-    print parser.parse_string( "(glis,mus,rattus rattus);")
+    print parser.parse_string( "(glis,(mus,rattus rattus));")
     print parser.filter( ['mus', 'glis', 'rattus rattus'] )
+    print parser.get_taxa()
     print parser.parse_string( "(mus:0.987,rattus:0.93784);")
     print parser.get_taxa()
     

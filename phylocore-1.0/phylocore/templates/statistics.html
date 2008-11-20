@@ -8,6 +8,12 @@ $(document).ready(function() {
     $('#suggestions').html('<b><font color="red">Processing bad taxa...</font></b><br />');
     $('#suggestions').load( "suggestions" ); 
 }); 
+
+$(document).ready(function() { 
+    $('#reference_tree').html('<b><font color="red">Processing reference tree...</font></b><br />');
+    $('#reference_tree').load( "reference_tree" ); 
+});
+
 $(document).ready(function(){
 //    $("#exemplequery").hide();
     $("#exemplelink").click(function () {
@@ -197,7 +203,7 @@ name="query" />
     <!-- end collection correction -->
 {% endif %}
 
-{% if reference_tree %}
+{% if nb_taxa %}
 <!-- stat1 -->
     <fieldset>
         <legend> Tree size distribution </legend>
@@ -213,27 +219,7 @@ name="query" />
         </tt>
     </fieldset><br />
 <!-- end stat2 -->
-
-<!-- NCBI tree -->
-    <fieldset>
-        <legend> NCBI taxonomy excerpt from user taxa</legend>
-        <a class="phylowidget" target="_blank" 
-        href="http://www.phylowidget.org/full/index.html?tree='{{ reference_tree }}'"
-        title="Display the ncbi tree as graph"> Click to visualize this tree using PhyloWidget </a>
-        <br />
-        <br />
-        <form action="createFilteredCollection">
-            <a class="selectall" onclick="javascript:selectAll();"> Select all</a> &nbsp; &nbsp;
-            <a class="selectall" onclick="javascript:unselectAll();"> Unselect all </a>
-            <br />
-            <tt>
-             {{ stats_tree|safe }}
-            </tt>
-        <b> Select the taxa you want to exclude and </b> <br />
-        <input type="submit" value="Restrict your trees" />
-        </form>
-    </fieldset><br />
-<!-- end NCBI tree -->
+<div id="reference_tree"> </div>
 </div>
             <a href="#top" class="posPage">&nbsp;Go to the top of the page&nbsp;</a>
     <!-- div preview -->

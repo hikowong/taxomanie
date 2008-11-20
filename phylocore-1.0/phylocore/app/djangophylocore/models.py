@@ -506,7 +506,10 @@ class Tree( models.Model, TaxonomyReference ):
     def get_taxa( self ):
         if not self._from_collection:
             return Taxonomy.objects.filter( taxonomy_occurences__tree = self )
-        return Taxonomy.objects.extra( where = ['djangophylocore_taxonomy.id IN (SELECT taxon_id from djangophylocore_reltreecoltaxa%s WHERE tree_id = %s)' % (self.collection.id, self.id)] )
+        try:
+            return Taxonomy.objects.extra( where = ['djangophylocore_taxonomy.id IN (SELECT taxon_id from djangophylocore_reltreecoltaxa%s WHERE tree_id = %s)' % (self.collection.id, self.id)] )
+        except:
+            print (self.source, self.id)
     taxa = property( get_taxa )
 
     def get_ambiguous( self ):
@@ -749,7 +752,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
             name = 0
             l_trees = nwk_collection.strip().split(";")
             for nwktree in l_trees:
-                tree = nwktree.lower()
+                tree = nwktree.lower().strip()
                 if tree:
                     name += 1
                     t = Tree( name = name, source = tree, rooted = False, 
@@ -836,6 +839,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         l_patterns = re.findall("{([^}]+)}", query)
         for pattern in l_patterns:
             striped_pattern = pattern.strip().lower()
+            print type( striped_pattern )
             if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
                 raise NameError, striped_pattern
             if 'usertaxa' == striped_pattern and treebase:
@@ -891,13 +895,19 @@ class TreeCollection( models.Model, TaxonomyReference ):
             source += "\nEND;\n"
             return TreeCollection.objects.create( delimiter = self.delimiter,
               source = source )
-
         
     def get_tree_size_distribution( self ):
         """ return stat of Tree Size Distribution """
         stat = {}
-        for tree in self.trees.all():
-            nbtaxa = tree.taxa.all().count()
+        cursor = connection.cursor()
+        cur = cursor.execute( " select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s GROUP BY tree_id;" % (self.id))
+        if settings.DATABASE_ENGINE == 'sqlite3':
+            result = cur.fetchall()
+            cur.close()
+        else:
+            result = cursor.fetchall()
+        cursor.close()
+        for (tree_id, nbtaxa) in result:
             if not stat.has_key( nbtaxa ):
                 stat[nbtaxa] = 0
             stat[nbtaxa] += 1
@@ -916,9 +926,22 @@ class TreeCollection( models.Model, TaxonomyReference ):
 
     def get_taxon_frequency_distribution( self ):
         stat = {}
-        for tree in self.trees.all():
+        cursor = connection.cursor()
+        cur = cursor.execute( "select rel.tree_id, taxonomy.name from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxon_id" % self.id )
+        if settings.DATABASE_ENGINE == 'sqlite3':
+            results = cur.fetchall()
+            cur.close()
+        else:
+            results = cursor.fetchall()
+        cursor.close()
+        d_results = {}
+        for (tree, taxa_name) in results:
+            if tree not in d_results:
+                d_results[tree] = []
+            d_results[tree].append( taxa_name )
+        for tree in d_results:
             already_done = set()
-            for taxon in tree.taxa.all():
+            for taxon in d_results[tree]:
                 if taxon not in already_done:
                     if not stat.has_key( taxon ):
                         stat[taxon] = 0
@@ -967,17 +990,9 @@ class TreeCollection( models.Model, TaxonomyReference ):
             parser.parse_string( tree.source )
             filtered_tree = parser.filter( taxon_name_list )
             if filtered_tree:
-                filtered_tree = str(filtered_tree)
-                filtered_tree = filtered_tree.replace("[", "(" ).replace("]", ")")
-                filtered_tree = filtered_tree.replace("('","(").replace("')",")")
-                filtered_tree = filtered_tree.replace("',", ",").replace(", '", ",").replace( ", ", ",")
+                filtered_tree = self._list2nwk( filtered_tree )
                 # Recreate nexus collection
-                if len( parser.get_taxa() ) == 1:
-                    if self.format == 'nexus':
-                        new_col += "Tree "+str(tree.name)+" = "+filtered_tree+";\n"
-                    else:
-                        new_col += filtered_tree+";\n"
-                else:
+                if parser.get_taxa():
                     if self.format == 'nexus':
                         new_col += "Tree "+str(tree.name)+" = "+filtered_tree+";\n"
                     else:
@@ -1073,7 +1088,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
             cur.close()
         else:
             results = cursor.fetchall()
-            cursor.close()
+        cursor.close()
         for ( tree_id, taxon_id, user_taxon_name, scientific_name ) in results:
             if taxon_id not in taxon_occurence:
                 taxon_occurence[taxon_id] = {"trees_list": set([]),
