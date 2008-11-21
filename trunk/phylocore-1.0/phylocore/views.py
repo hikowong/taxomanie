@@ -169,7 +169,7 @@ def statistics( request ):
         print "fin common"
         nb_bad_trees = collection.bad_trees.count()
         if nb_bad_trees:
-            context['bad_tree_msg'] = "Warning : your collection have %s bad trees. <a href='/phyloexplorer/browse?bad_trees=1'> Show them</a>" % nb_bad_trees
+            context['bad_tree_msg'] = "Warning : your collection have %s bad trees. <a href='/phyloexplorer/browse?only_bad_trees=1'> Show them</a>" % nb_bad_trees
         if 'new_collection' in request.POST:
             request.session['initial_context'] = context
     return render_to_response( 'statistics.html', context )

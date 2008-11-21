@@ -12,7 +12,13 @@
     {% if suggestions %}
         {% for sugg in suggestions %}
             {{ sugg }}
-            <input type="radio" name="{{bad_name}}" value="{{ sugg }}" />
+            <input 
+            {% if suggestions|length_is:"1" %}
+            type="checkbox" class="alone"
+            {% else %}
+            type="radio"
+            {% endif %}
+            name="{{bad_name}}" value="{{ sugg }}" />
         {% endfor %}
     {% else %}
         <input type='text' name="{{bad_name}}" />
