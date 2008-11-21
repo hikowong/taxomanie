@@ -42,6 +42,15 @@ function selectGenre( genre ){
         }
     });
 }
+
+$(document).ready(function() { 
+    var error_msg = "{{error_msg}}";
+    if (error_msg){
+    $('#error').jGrowl( "<b>"+error_msg+"</b>", 
+      { sticky: true, life: 10000 } );
+    }
+});
+
 </script>
 {% endblock %}
 
@@ -87,7 +96,8 @@ name="query" />
 {% endif %}
 </div>
 <!-- end query panel -->
-{% if error_msg %} <div  class="error">{{ error_msg }}</div>{% endif %}
+<div  id="error"></div>
+<!--{% if error_msg %} <div  id="error", class="error">{{ error_msg }}</div>{% endif %}-->
 {% if not_empty_collection %}
 </div>
     <br />
