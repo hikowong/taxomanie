@@ -51,6 +51,12 @@ $(document).ready(function() {
     }
 });
 
+$(document).ready(function() { 
+    $('button').click( function(){
+        $('.alone').attr('checked', 'checked');
+    });
+});
+
 </script>
 {% endblock %}
 
@@ -123,6 +129,7 @@ name="query" />
     <!-- Collection correction -->
     <fieldset>
     <legend> Correct your collection </legend>
+    <button>Select all single suggestion</button>
     <form action="recreate_collection">
     <!-- homonym fieldset -->
     {% if nb_homonyms %}
@@ -139,7 +146,13 @@ name="query" />
             <td>
             {% for sugg in suggestions %}
                 {{ sugg }}
-                <input type="radio" name="{{homonym_name}}" value="{{ sugg }}" />
+                <input 
+                {% if suggestions|length_is:"1" %}
+                type="checkbox" class="alone"
+                {% else %}
+                type="radio"
+                {% endif %}
+                name="{{homonym_name}}" value="{{ sugg }}" />
             {% endfor %}
             </td>
             </tr>
@@ -164,7 +177,13 @@ name="query" />
             <td>
             {% for sugg in suggestions %}
                 {{ sugg }}
-                <input type="radio" name="{{synonym_name}}" value="{{ sugg }}" />
+                <input 
+                {% if suggestions|length_is:"1" %}
+                type="checkbox" class="alone"
+                {% else %}
+                type="radio"
+                {% endif %}
+                name="{{synonym_name}}" value="{{ sugg }}" />
             {% endfor %}
             </td>
             </tr>
@@ -189,7 +208,13 @@ name="query" />
             <td>
             {% for sugg in suggestions %}
                 {{ sugg }}
-                <input type="radio" name="{{common_name}}" value="{{ sugg }}" />
+                <input 
+                {% if suggestions|length_is:"1" %}
+                type="checkbox" class="alone"
+                {% else %}
+                type="radio"
+                {% endif %}
+                name="{{common_name}}" value="{{ sugg }}" />
             {% endfor %}
             </td>
             </tr>
