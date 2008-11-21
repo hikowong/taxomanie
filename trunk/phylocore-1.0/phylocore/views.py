@@ -84,8 +84,9 @@ def statistics( request ):
         #    d_stat = collection.get_tree_size_distribution()
         #    d_stat = collection.get_taxon_frequency_distribution()
         request.session['last_query'] = ''
+        request.session['correction'] = {}
     collection = request.session['collection']
-    context = {}
+    context = {'error_msg':[]}
     ## Query
     query = ''
     if 'query_tree' in request.GET: #FIXME POST
@@ -98,14 +99,13 @@ def statistics( request ):
     if query:
         request.session['last_query'] = query
         query_against_treebase = 'treebase' in request.GET
-        print query_against_treebase
-        print query, collection.id
         try:
             collection = collection.get_collection_from_query( query, query_against_treebase )
         except Exception, err:
-            context['error_msg'] = 'bad query: %s not found in taxaonomy' % err.message
+            error_msg = str('bad query: %s not found in taxaonomy' % err.message)
             if err.message == "usertaxa":
-                context['error_msg'] += '. Try to query against TreeBase'
+                error_msg += '. Try to query against TreeBase'
+            context['error_msg'].append( error_msg )
     if 'clear_query' in request.GET:
         return render_to_response( 'statistics.html', request.session['initial_context'] )
     context['query'] = query
@@ -115,7 +115,6 @@ def statistics( request ):
         context['not_empty_collection'] = False
         context['error_msg'] = "Empty collection"
     else:
-        print request.session['correction']
         request.session['current_col_id'] = collection.id
         context['nb_taxa'] = collection.taxa.count()
         context['nb_trees'] = collection.trees.count()
@@ -170,7 +169,7 @@ def statistics( request ):
         print "fin common"
         nb_bad_trees = collection.bad_trees.count()
         if nb_bad_trees:
-            context['error_msg'] = "Warning : your collection have %s bad trees" % nb_bad_trees
+            context['bad_tree_msg'] = "Warning : your collection have %s bad trees. <a href='/phyloexplorer/browse?bad_trees=1'> Show them</a>" % nb_bad_trees
         if 'new_collection' in request.POST:
             request.session['initial_context'] = context
     return render_to_response( 'statistics.html', context )
@@ -213,12 +212,14 @@ def check( request ):
     return render_to_response( 'check.html', context )#TODO Rename to browse
 
 def browse( request ):
-    #source = Source.objects.get( id = request.session['current_source_id'] )
-    source = None
     col_id = request.session['current_col_id']
     collection = TreeCollection.objects.get( id = col_id )
     trees_list = []
-    for i in collection.trees.all():
+    if 'only_bad_trees' in request.GET:
+        tlist = collection.bad_trees.all()
+    else:
+        tlist = collection.trees.all()
+    for i in tlist:
         if i.column_error:
             error_line = " "*(i.column_error-1)+"^"
         else:
@@ -253,7 +254,6 @@ def filter_collection( request ):
     collection = request.session['collection']
     list_correction = []
     filter_list = list( request.GET )
-    print filter_list
     filtered_collection = collection.get_restricted_collection( filter_list )
     request.session['collection'] = filtered_collection
     return statistics( request )
