@@ -5,6 +5,16 @@
    Released by SoO.D and NicoO.A (02/2008)
 */
 
+#error 
+    { 
+    position:fixed; 
+    z-index:3; 
+    float:center;
+    right:10px; 
+    }
+
+
+
 /*-------------------------GENERAL LINKS--------------------------------------*/
 a {
     font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
@@ -324,6 +334,11 @@ td.content
 
 
 /*-------------------------LEFT MENU--------------------------------------*/
+#floatingmenu{
+	padding: 150px 0px 0px 0px;
+    width: 190px;
+}
+
 td.links
     {
 	font-family: "Verdana", "Arial", "XHelvetica", "Helvetica", sans-serif;
