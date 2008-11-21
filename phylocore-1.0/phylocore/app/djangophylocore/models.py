@@ -986,17 +986,19 @@ class TreeCollection( models.Model, TaxonomyReference ):
         else:
             new_col = ''
         parser = NewickParser()
-        for tree in self.trees.all():
-            parser.parse_string( tree.source )
-            filtered_tree = parser.filter( taxon_name_list )
-            if filtered_tree:
-                filtered_tree = self._list2nwk( filtered_tree )
-                # Recreate nexus collection
-                if parser.get_taxa():
-                    if self.format == 'nexus':
-                        new_col += "Tree "+str(tree.name)+" = "+filtered_tree+";\n"
-                    else:
-                        new_col += filtered_tree+";\n"
+        trees_list = self.trees.all()
+        for tree in trees_list:
+            if tree.is_valid:
+                parser.parse_string( tree.source )
+                filtered_tree = parser.filter( taxon_name_list )
+                if filtered_tree:
+                    filtered_tree = self._list2nwk( filtered_tree )
+                    # Recreate nexus collection
+                    if parser.get_taxa():
+                        if self.format == 'nexus':
+                            new_col += "Tree "+str(tree.name)+" = "+filtered_tree+";\n"
+                        else:
+                            new_col += filtered_tree+";\n"
         if self.format == 'nexus':
             new_col += "END;\n"
         return new_col
