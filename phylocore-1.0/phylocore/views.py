@@ -69,6 +69,7 @@ def statistics( request ):
         #    collection, list_correction = collection.get_autocorrected_collection()
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
+        request.session['correction'] = {}
         #if collection.taxa.count():
         #    d_stat = collection.get_tree_size_distribution()
         #    d_stat = collection.get_taxon_frequency_distribution()
@@ -114,6 +115,7 @@ def statistics( request ):
         context['not_empty_collection'] = False
         context['error_msg'] = "Empty collection"
     else:
+        print request.session['correction']
         request.session['current_col_id'] = collection.id
         context['nb_taxa'] = collection.taxa.count()
         context['nb_trees'] = collection.trees.count()
@@ -125,6 +127,10 @@ def statistics( request ):
         commons_list = collection.commons.all()
         context['nb_commons'] = commons_list.count()
         context['not_empty_collection'] = True
+        if request.session['correction']:
+            context['correction'] = True
+        else:
+            context['correction'] = False
         print "fin donnees numeriques"
         # stats
         if context['nb_taxa']:
@@ -236,8 +242,10 @@ def recreate_collection( request ):
         else:
             list_user_taxon_name = [BadTaxa.objects.get( name = bad ).name]
         for user_taxon_name in list_user_taxon_name:
-            list_correction.append( (user_taxon_name, " ".join(good.split()) ))
+            if user_taxon_name != " ".join( good.split() ):
+                list_correction.append( (user_taxon_name, " ".join(good.split()) ))
     corrected_collection = collection.get_corrected_collection( dict(list_correction) ) 
+    request.session['correction'].update( dict( list_correction ) )
     request.session['collection'] = corrected_collection
     return statistics( request )
 
@@ -278,6 +286,14 @@ def reference_tree( request ):
     context['reference_tree'] = collection.get_reference_tree_as_nwk()
     return render_to_response( 'reference_tree.html', context )
 
+def download_correction( request ):
+    csv = ""
+    for (bad, good) in request.session['correction'].iteritems():
+        csv += "%s|%s\n" % ( bad, good )
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=correction-%s.csv' % request.session['original_collection_id']
+    response.write( csv )
+    return response
 
 def downloadCollection( request ):
     col_id = request.session['current_col_id']

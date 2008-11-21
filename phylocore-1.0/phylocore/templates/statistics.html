@@ -199,10 +199,14 @@ name="query" />
     <input type="submit" value="Correct collection"/>
     {% endif %}
     </form>
-    </fieldset><br />
+    </fieldset>
     <!-- end collection correction -->
 {% endif %}
-
+{% if correction %} 
+<a href="/phyloexplorer/download_correction"> Download corrections </a>
+<br />
+<br />
+{% endif %}
 {% if nb_taxa %}
 <!-- stat1 -->
     <fieldset>
