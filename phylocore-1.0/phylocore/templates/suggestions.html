@@ -1,6 +1,3 @@
-
-<fieldset>
-<legend> {{ nb_badtaxa }} taxa(s) </legend>
 <table>
 <!-- <tr><th>user taxa name</th><th>correction</th></tr> -->
 {% for bad_name, suggestions in dict_bad_taxa.iteritems %}
@@ -26,10 +23,5 @@
     </td>
     </tr>
 {% endfor %}
-</table>
-</fieldset>
-{% if display_button %}
-<input type="submit" value="Correct collection"/>
-{% endif %}
 
 

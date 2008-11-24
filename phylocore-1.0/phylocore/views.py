@@ -27,13 +27,14 @@ from django.shortcuts import render_to_response
 
 TAXOREF = TaxonomyReference()
 TAXONOMY_TOC = get_taxonomy_toc()
+D_PROGRESS = {}
 
 import os.path
 localDir = os.path.dirname(__file__)
 absDir = os.path.join(os.getcwd(), localDir)
 
-
 def index( request ):
+    request.session['progress'] = 0
     return render_to_response( 'index.html', {'msg':''} )
 
 def about( request ):
@@ -119,6 +120,7 @@ def statistics( request ):
         context['nb_taxa'] = collection.taxa.count()
         context['nb_trees'] = collection.trees.count()
         context['nb_badtaxa'] = collection.bad_taxa.count()
+        request.session['nb_badtaxa'] = context['nb_badtaxa']
         homonyms_list = collection.homonyms.all()
         context['nb_homonyms'] = homonyms_list.count()
         synonyms_list = collection.synonyms.all()
@@ -261,17 +263,26 @@ def filter_collection( request ):
 def get_img_url( request, taxon ):
    return HttpResponse( _get_image_url( taxon )  )
 
+def progressbar( request ):
+    global D_PROGRESS
+    col_id = request.session['current_col_id']
+    return HttpResponse(D_PROGRESS[col_id])
+
 def suggestions( request ):
     # correct bad taxas
+    global D_PROGRESS
     dict_bad_taxa = {}
     context = {}
     collection = request.session['collection']
+    col_id = collection.id
+    D_PROGRESS[col_id] = 0
     if not collection.homonyms.count() and not collection.synonyms.count() and not collection.commons.count():
         context['display_button'] = True
     else:
         context['display_button'] = False
-    bad_taxa_list = collection.bad_taxa.all()
+    bad_taxa_list = list(collection.bad_taxa.all())
     for bad in bad_taxa_list:
+        D_PROGRESS[col_id] = (bad_taxa_list.index(bad)+1*100.0)/request.session['nb_badtaxa']
         dict_bad_taxa[bad.name] = []
         for i in TAXOREF.correct( bad.name, guess = True ):
             if i != bad.name:
