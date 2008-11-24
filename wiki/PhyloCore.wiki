@@ -30,7 +30,9 @@ PhyloCore relies on Django wich is written in Python. So, you need Python and Dj
 PhyloCore is using a database for dealing with taxonomy. Please install SQLite3 or MySQL
 and their python wrapper : [http://sourceforge.net/projects/mysql-python mysql-python] for MySQL or [http://initd.org/pub/software/pysqlite/ pysqlite] for sqlite...
 
-NetworkX for the graph manipulations.
+[http://networkx.lanl.gov/ NetworkX] for the graph manipulations. If you have easy_install you can install it via `easy_install networkx` as root.
+
+[http://pyparsing.wikispaces.com/ Pyparsing] for parsing newick collection (`easy_install pyparsing`)
 
 You can check whether those dependencies have been successfully installed by typing those 
 lines into the python interpreter:
@@ -39,6 +41,7 @@ lines into the python interpreter:
 >>> import sqlite3
 >>> import django
 >>> import networkx
+>>> import pyparsing
 }}}
 
 = Installation =
