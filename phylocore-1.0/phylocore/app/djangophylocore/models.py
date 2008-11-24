@@ -447,7 +447,6 @@ class Tree( models.Model, TaxonomyReference ):
         if regenerate and not dont_generate:
             self.generate_tree_infos()
 
-    @transaction.commit_on_success
     def generate_tree_infos( self ):
         global get_taxonomy_toc, BADTAXA_TOC
         TAXONOMY_TOC = get_taxonomy_toc()
@@ -709,7 +708,6 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return model_rel.objects.filter( collection = self )
     rel = property( __get_relation )
 
-    @transaction.commit_on_success
     def regenerate_from_source( self ):
         global BADTAXA_TOC
         BADTAXA_TOC = set([i[0] for i in BadTaxa.objects.all().values_list( 'name')])

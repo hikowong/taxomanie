@@ -266,7 +266,10 @@ def get_img_url( request, taxon ):
 def progressbar( request ):
     global D_PROGRESS
     col_id = request.session['current_col_id']
-    return HttpResponse(D_PROGRESS[col_id])
+    response = HttpResponse(mimetype='text/json')
+    response.write( str(D_PROGRESS.get( col_id, {} )) )
+    return response
+    #return HttpResponse(response)
 
 def suggestions( request ):
     # correct bad taxas
@@ -275,18 +278,20 @@ def suggestions( request ):
     context = {}
     collection = request.session['collection']
     col_id = collection.id
-    D_PROGRESS[col_id] = 0
+    if not col_id in D_PROGRESS:
+        D_PROGRESS[col_id] = {}
+    D_PROGRESS[col_id]['suggestions'] = 0
     if not collection.homonyms.count() and not collection.synonyms.count() and not collection.commons.count():
         context['display_button'] = True
     else:
         context['display_button'] = False
     bad_taxa_list = list(collection.bad_taxa.all())
     for bad in bad_taxa_list:
-        D_PROGRESS[col_id] = (bad_taxa_list.index(bad)+1*100.0)/request.session['nb_badtaxa']
         dict_bad_taxa[bad.name] = []
         for i in TAXOREF.correct( bad.name, guess = True ):
             if i != bad.name:
                 dict_bad_taxa[bad.name].append( i )
+        D_PROGRESS[col_id]['suggestions'] = ((bad_taxa_list.index(bad)+1)*100.0)/request.session['nb_badtaxa']
     context['dict_bad_taxa'] = dict_bad_taxa
     return render_to_response( 'suggestions.html', context )
 
@@ -562,10 +567,15 @@ def display_tree_stats( collection, allparents = False ):
     """
     Display NCBI arborescence with stats
     """
+    global D_PROGRESS
     if collection.trees.all().count():
         tree = collection.get_reference_arborescence()
         if len(tree):
             list_taxa_collection = collection.taxa.all()
+            if not collection.id in D_PROGRESS:
+                D_PROGRESS[collection.id] = {}
+            D_PROGRESS[collection.id]['nb_taxa'] =  len( tree )
+            D_PROGRESS[collection.id]['reference_tree'] = 0
             d_stats = collection.get_statistics()
             return _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 'root' )
         else:
@@ -590,6 +600,7 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
     @mydepth (int): depth in the tree
     @return (string): the display in html format
     """
+    global D_PROGRESS
     result = ""
     blocknum = 0
     # Create root node display
@@ -605,6 +616,7 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
         for node in tree.successors( root ):
             n = tree.predecessors( node ) + tree.successors(node)
             nb_inter_parents = 0
+            D_PROGRESS[collection.id]['reference_tree'] += (1.0/D_PROGRESS[collection.id]['nb_taxa'])*100.0
             # Create div for interparents (parents beetween nodes)
             if len(n) == 2:
                 result += _display_itis_tree( collection, list_taxa_collection, d_stats, tree,  node, mydepth, 
