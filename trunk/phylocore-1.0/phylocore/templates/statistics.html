@@ -4,9 +4,31 @@
 
 {% block script %}
 <script type="text/javascript"> 
+
+function get_progress(){
+    var refreshId = setInterval(function() {
+        $.get("progressbar", {}, function(data){
+   //         alert( data );
+            $('#progressbar').progressBar(data);
+        });
+    }, 5000);
+} 
+
+
 $(document).ready(function() { 
-    $('#suggestions').html('<b><font color="red">Processing bad taxa...</font></b><br />');
-    $('#suggestions').load( "suggestions" ); 
+    //$('#suggestions').html('<b><font color="red">Processing bad taxa...</font></b><br />');
+    //$('#suggestions').load( "suggestions" ); 
+    $.ajax({
+        method: "get",url: "suggestions",
+        beforeSend: function(html){
+            get_progress();
+            $("#suggestions").html( '<b><font color="red">Processing bad taxa...</font></b><br />');
+        },
+        complete: function(){ $("#progressbar").hide("fast");},
+        success: function(html){
+            $("#suggestions").html(html);
+        }
+    });
 }); 
 
 $(document).ready(function() { 
@@ -226,12 +248,18 @@ name="query" />
     <!-- end common fieldset -->
     <!-- badtaxa fieldset -->
     {% if nb_badtaxa %}
+        <fieldset>
+        <legend> {{ nb_badtaxa }} bad taxa(s) </legend>
         <span id="suggestions" class="homonymlist"> </span>
+        <div id="progressbar"></div>
+        </fieldset>
+        {% if display_button %}
+            <input type="submit" value="Correct collection"/>
+        {% endif %}
     {% endif %}
     <!-- end badtaxa fieldset -->
-
     {% if nb_commons or nb_synonyms or nb_homonyms %}
-    <input type="submit" value="Correct collection"/>
+        <input type="submit" value="Correct collection"/>
     {% endif %}
     </form>
     </fieldset>
