@@ -58,11 +58,11 @@ sudo ./install
 
 This will create symbolic link into your $PYTHONPATH (/usr/local/lib/pythonX.X/site-packages)
 
-In order to verify if the installation goes well, put this line into your sell:
+In order to verify that the installation goes well, put this line into your shell:
 {{{
 ( cd /tmp ; python -c "from phylocore import *" )
 }}}
-if nothing show up then you're good. Congratulation !
+if nothing shows up then you're good. Congratulation !
 
 = Going further =
 
