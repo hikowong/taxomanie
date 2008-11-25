@@ -1,10 +1,10 @@
 #summary PhyloCore presentation page
 #labels Featured
 
-PhyloCore aims to be a good library for dealing with taxonomy. It use [http://www.sp2000.org/index.php Species 2000] database (with contains [http://www.itis.gov/ Itis database]) to get all informations staff.
+PhyloCore library provides tools for manipulating tree collections and taxonomic information. It can be use either with NCBI [http://www.ncbi.nlm.nih.gov/Taxonomy/] or ITIS [http://www.itis.gov/ Itis database]taxonomic database  .
 
-Here are some features of PhyloCore:
- * Taxa manipulations:  
+Main features of PhyloCore are:
+ * Taxa manipulation:  
    * Getting all scientific names of taxa
    * Getting synonyms, homonyms and commons name from a scientific taxa name
    * Getting parents and children  
@@ -20,7 +20,7 @@ Here are some features of PhyloCore:
 
 = DjangoPhylocore vs PhyloCore =
 
-DjangoPhylocore and PhyloCore are providing the same librairy. The difference relies on the django dependancies for DjangoPhylocore. That's mean that you can't use DjangoPhylocore outside of your django project. That's why we create PhyloCore wich is a wrapper against DjangoPhylocore that allow to use the librairy anywhere.
+DjangoPhylocore and PhyloCore provide the same librairy. The difference relies on the django dependancies of DjangoPhylocore. That means that you can't use DjangoPhylocore outside of your django project. That's why we create PhyloCore wich is a wrapper against DjangoPhylocore that allow to use the librairy anywhere.
 
 In short, if you developpe a web app apon django, use DjangoPhylocore. If not, use PhyloCore.
 
