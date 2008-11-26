@@ -505,10 +505,11 @@ class Tree( models.Model, TaxonomyReference ):
     def get_taxa( self ):
         if not self._from_collection:
             return Taxonomy.objects.filter( taxonomy_occurences__tree = self )
-        try:
-            return Taxonomy.objects.extra( where = ['djangophylocore_taxonomy.id IN (SELECT taxon_id from djangophylocore_reltreecoltaxa%s WHERE tree_id = %s)' % (self.collection.id, self.id)] )
-        except:
-            print (self.source, self.id)
+        return Taxonomy.objects.extra( 
+          tables = ['djangophylocore_reltreecoltaxa%s' % self.collection.id],
+          where = ['djangophylocore_taxonomy.id = djangophylocore_reltreecoltaxa%s.taxon_id and djangophylocore_reltreecoltaxa%s.tree_id = %s' % ( 
+            self.collection.id, self.collection.id, self.id )]
+        ).distinct()
     taxa = property( get_taxa )
 
     def get_ambiguous( self ):
@@ -588,7 +589,10 @@ class Tree( models.Model, TaxonomyReference ):
             cursor = connection.cursor()
             #parent = Taxonomy.objects.get( name = parent_name )
             parent_id = TAXONOMY_TOC[parent_name]
-            cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where (taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s) and tree_id = %s GROUP BY  tree_id ;" % ( self.collection.id, parent_id, parent_id, self.id ) ) 
+           # cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where (taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s) and tree_id = %s GROUP BY  tree_id ;" % ( self.collection.id, parent_id, parent_id, self.id ) ) 
+            cur = cursor.execute( "select tree_id, count(djangophylocore_reltreecoltaxa%s.taxon_id) from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_parentsrelation as par where djangophylocore_reltreecoltaxa%s.taxon_id = djangophylocore_parentsrelation.taxon_id and djangophylocore_parentsrelation.parent_id = %s and djangophylocore_reltreecoltaxa%s.tree_id = %s GROUP BY tree_id;" % ( 
+                self.collection.id, self.collection.id, self.collection.id, parent_id, self.collection.id, self.id )
+            ) 
             if settings.DATABASE_ENGINE == 'sqlite3':
                 results = cur.fetchone()[1]
             else:
@@ -787,7 +791,10 @@ class TreeCollection( models.Model, TaxonomyReference ):
             return ";\n".join( result )+';'
 
     def get_taxa( self ):
-        return Taxonomy.objects.extra( where = ['id IN (SELECT taxon_id from djangophylocore_reltreecoltaxa%s)' % self.id] )
+        return Taxonomy.objects.extra( 
+          tables = ['djangophylocore_reltreecoltaxa%s' % self.id], 
+          where = ['djangophylocore_taxonomy.id = djangophylocore_reltreecoltaxa%s.taxon_id' % self.id]
+        ).distinct()
     taxa = property( get_taxa )
 
     def get_user_taxon_names( self ):
@@ -802,7 +809,9 @@ class TreeCollection( models.Model, TaxonomyReference ):
 
     def get_bad_taxa( self ):
         return BadTaxa.objects.extra(
-          where = ["name in (select user_taxon_name from djangophylocore_reltreecoltaxa%s where taxon_id is null)" % self.id ] )
+          tables = ['djangophylocore_reltreecoltaxa%s' % self.id],
+          where = ['djangophylocore_badtaxa.name = djangophylocore_reltreecoltaxa%s.user_taxon_name' % self.id]
+        ).distinct()
     bad_taxa = property( get_bad_taxa )
 
     def get_scientific_names( self ):
@@ -837,21 +846,25 @@ class TreeCollection( models.Model, TaxonomyReference ):
         l_patterns = re.findall("{([^}]+)}", query)
         for pattern in l_patterns:
             striped_pattern = pattern.strip().lower()
-            print type( striped_pattern )
             if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
                 raise NameError, striped_pattern
             if 'usertaxa' == striped_pattern and treebase:
-                cur = cursor.execute( " select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_reltreecoltaxa%s ) GROUP BY tree_id;" % (self.id ) )
+                #cur = cursor.execute( " select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_reltreecoltaxa%s ) GROUP BY tree_id;" % (self.id ) )
+                cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa1 as tb, djangophylocore_reltreecoltaxa%s as rel where tb.taxon_id = rel.taxon_id GROUP BY tb.tree_id;" % (self.id ) )
             else:
                 parent_id = TAXONOMY_TOC[striped_pattern]
                 if treebase:
-                    cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( parent_id, parent_id ) ) 
+                    cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa1 as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( parent_id ) ) 
                 else:
-                    cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( self.id, parent_id, parent_id ) ) 
+                    print "begin"
+                    cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( self.id, parent_id ) ) 
+                    print "end"
             if settings.DATABASE_ENGINE == 'sqlite3':
                 result = cur.fetchall()
             else:
+                print "begin2"
                 result = cursor.fetchall()
+                print "end2"
             for (tree_id, nb_occurence) in result:
                 if tree_id not in d_trees:
                     d_trees[tree_id] = {}
@@ -965,7 +978,15 @@ class TreeCollection( models.Model, TaxonomyReference ):
         """
         return taxon in collection wich are for parent 'parent_name'
         """
+        global get_taxonomy_toc, BADTAXA_TOC
+        TAXONOMY_TOC = get_taxonomy_toc()
         assert parent_name in TAXONOMY_TOC, "%s does not exist in the current taxonomy" % parent_name
+        parent_id = Taxonomy.objects.get( name = parent_name ).id
+        #return Taxonomy.objects.extra( 
+        #  tables = ["djangophylocore_reltreecoltaxa%s" % self.id, "djangophylocore_parentsrelation"],
+        #  where = ["djangophylocore_taxonomy.id = djangophylocore_reltreecoltaxa%s.taxon_id  and djangophylocore_reltreecoltaxa%s.taxon_id = djangophylocore_parentsrelation.taxon_id and djangophylocore_parentsrelation.parent_id = %s" % (
+        #    self.id, self.id, parent_id )]
+        #).distinct()
         return Taxonomy.objects.extra( where = ["id IN (select taxon_id from djangophylocore_reltreecoltaxa%s where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s))" % (self.id, Taxonomy.objects.get( name = parent_name ).id)])
 
     def get_nb_trees( self, taxon ):
