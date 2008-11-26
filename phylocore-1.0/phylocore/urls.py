@@ -21,6 +21,8 @@ urlpatterns += patterns('phylocore.views',
     #(r'^taxomanie/', include('taxomanie.phylocore.urls')),
 
     (r'^phyloexplorer/get_img_url/(?P<taxon>.*)$', 'get_img_url'),
+    (r'^phyloexplorer/get_images$', 'get_images'),
+    (r'^phyloexplorer/browse_images$', 'browse_images'),
     (r'^phyloexplorer/progressbar$', 'progressbar'),
     (r'^phyloexplorer/suggestions$', 'suggestions'),
     (r'^phyloexplorer/reference_tree$', 'reference_tree'),

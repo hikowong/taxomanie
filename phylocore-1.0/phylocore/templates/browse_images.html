@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block pagedef %} Home > Statistics {% endblock %}
+
+{% block script %}
+<script type="text/javascript"> 
+jQuery(function($) { $('ul.gallery').galleria(); });
+</script>
+{% endblock %}
+
+{% block menu %}
+<!-- <a href="home" class="path" title="Go home">Home</a> -->
+<center> <b> Home </b> </center>
+<a href="." class="path" title="Go to upload collection page">Upload Collection</a>
+<a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help Contents</a>
+<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About</a>
+<br />
+{% if not_empty_collection %}
+<center> <b>Current collection</b> </center>
+<a href="/phyloexplorer/statistics" blockui="wait" class="path" title="Go back to collection"> Back to statistics </a>
+<a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence">
+Download NCBI tree </a>
+<a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
+<br />
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+<br />
+
+<ul class="gallery"> 
+{% for taxon, url in d_taxa_list.iteritems %}
+    <li><img src="{{url|safe}}" title="{{taxon}}" alt="{{taxon}}"></li>
+{% endfor %}
+</ul>
+
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
+<div id="images"></div>
+    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+<!-- CONTENT : END -->
+{% endblock %}
