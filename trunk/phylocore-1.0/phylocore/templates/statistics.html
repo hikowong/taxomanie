@@ -110,6 +110,8 @@ $(document).ready(function() {
 Download NCBI tree </a>
 <a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
+<a href="/phyloexplorer/browse_images" class="path" title="Browse and download images of the collection">Browse collection's images</a>
+<br />
 {% endif %}
 {% endblock %}
 
@@ -307,6 +309,7 @@ name="query" />
     <!-- div preview -->
     <div id="preview"></div>
 {% endif %}
+<div id="images"></div>
 <!-- CONTENT : END -->
 {% endif %}
 {% endblock %}

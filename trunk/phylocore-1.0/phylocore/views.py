@@ -331,7 +331,30 @@ def downloadNCBITree( request ):
     response.write( collection.get_reference_tree_as_nwk() )
     return response
 
+def get_images( request ):
+    col_id = request.session['current_col_id']
+    collection = TreeCollection.objects.get( id = col_id )
+    taxa_list = collection.taxa.all()
+    json = {'items':[]}
+    d_taxa_list = {}
+    for taxon in taxa_list:
+        json['items'].append( {'name': str(taxon.name), 'url':_get_image_url( taxon.name ) } )
+    return HttpResponse( str(json) )
 
+def browse_images( request ):
+    context = {}
+    col_id = request.session['current_col_id']
+    collection = TreeCollection.objects.get( id = col_id )
+    taxa_list = collection.taxa.all()
+    d_taxa_list = {}
+    for taxon in taxa_list:
+        d_taxa_list[taxon.name] = _get_image_url( taxon.name).split()[1][4:].strip('"')
+    context['d_taxa_list'] = d_taxa_list
+    print "ok"
+    if len( taxa_list ):
+        context['not_empty_collection'] = True
+    return render_to_response( 'browse_images.html', context )
+        
 
 ########################################
 #   Needed fonctions (not views)       #
