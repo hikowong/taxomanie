@@ -703,10 +703,11 @@ class TreeCollection( models.Model, TaxonomyReference ):
             os.system( cmd )
         else:
             raise RuntimeError, "%s engine not supported" % settings.DATABASE_ENGINE
-        cursor = connection.cursor()
-        cursor.execute( """CREATE INDEX djangophylocore_reltreecoltaxa%s_taxon_id ON djangophylocore_reltreecoltaxa%s (taxon_id);""" % (self.id, self.id ))
-        cursor.execute( """CREATE INDEX djangophylocore_reltreecoltaxa%s_tree_id ON djangophylocore_reltreecoltaxa%s (tree_id);""" % (self.id, self.id ))
-        cursor.close()
+        if settings.DATABASE_ENGINE == 'mysql':
+            cursor = connection.cursor()
+            cursor.execute( """CREATE INDEX djangophylocore_reltreecoltaxa%s_taxon_id ON djangophylocore_reltreecoltaxa%s (taxon_id);""" % (self.id, self.id ))
+            cursor.execute( """CREATE INDEX djangophylocore_reltreecoltaxa%s_tree_id ON djangophylocore_reltreecoltaxa%s (tree_id);""" % (self.id, self.id ))
+            cursor.close()
         os.system( 'rm /tmp/rel_%s.dmp' % name )
 
     def __get_relation( self ):
