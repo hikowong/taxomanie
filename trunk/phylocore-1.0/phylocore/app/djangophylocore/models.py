@@ -703,6 +703,10 @@ class TreeCollection( models.Model, TaxonomyReference ):
             os.system( cmd )
         else:
             raise RuntimeError, "%s engine not supported" % settings.DATABASE_ENGINE
+        cursor = connection.cursor()
+        cursor.execute( """CREATE INDEX djangophylocore_reltreecoltaxa%s_taxon_id ON djangophylocore_reltreecoltaxa%s (taxon_id);""" % (self.id, self.id ))
+        cursor.execute( """CREATE INDEX djangophylocore_reltreecoltaxa%s_tree_id ON djangophylocore_reltreecoltaxa%s (tree_id);""" % (self.id, self.id ))
+        cursor.close()
         os.system( 'rm /tmp/rel_%s.dmp' % name )
 
     def __get_relation( self ):
@@ -849,16 +853,20 @@ class TreeCollection( models.Model, TaxonomyReference ):
             if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
                 raise NameError, striped_pattern
             if 'usertaxa' == striped_pattern and treebase:
-                #cur = cursor.execute( " select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_reltreecoltaxa%s ) GROUP BY tree_id;" % (self.id ) )
-                cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa1 as tb, djangophylocore_reltreecoltaxa%s as rel where tb.taxon_id = rel.taxon_id GROUP BY tb.tree_id;" % (self.id ) )
+                cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_reltreecoltaxa%s ) GROUP BY tree_id;" % (self.id ) )
             else:
                 parent_id = TAXONOMY_TOC[striped_pattern]
                 if treebase:
-                    cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa1 as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( parent_id ) ) 
+                    if settings.DATABASE_ENGINE == 'sqlite3':
+                        cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( parent_id, parent_id ) )
+                    else:
+                        cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa1 as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( parent_id ) ) 
                 else:
                     print "begin"
-                    #cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( self.id, parent_id ) ) 
-                    cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( self.id, parent_id, parent_id ) )
+                    if settings.DATABASE_ENGINE == 'sqlite3':
+                        cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( self.id, parent_id, parent_id ) )
+                    else:
+                        cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( self.id, parent_id ) ) 
                     print "end"
             if settings.DATABASE_ENGINE == 'sqlite3':
                 result = cur.fetchall()
