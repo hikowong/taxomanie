@@ -5,6 +5,10 @@
    Released by SoO.D and NicoO.A (02/2008)
 */
 
+.treesource{
+    overflow: auto; width: 800px; display:block
+}
+
 #error 
     { 
     position:fixed; 
