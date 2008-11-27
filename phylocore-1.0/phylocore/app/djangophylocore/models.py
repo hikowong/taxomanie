@@ -857,7 +857,8 @@ class TreeCollection( models.Model, TaxonomyReference ):
                     cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa1 as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( parent_id ) ) 
                 else:
                     print "begin"
-                    cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( self.id, parent_id ) ) 
+                    #cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( self.id, parent_id ) ) 
+                    cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( self.id, parent_id, parent_id ) )
                     print "end"
             if settings.DATABASE_ENGINE == 'sqlite3':
                 result = cur.fetchall()
