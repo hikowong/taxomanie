@@ -43,9 +43,18 @@ $(document).ready(function(){
 
 function togglesource(idNode){
     $(document).ready(function(){
-        $("#source-"+idNode).slideToggle("slow");
+        $.get("get_image_tree_url/"+idNode, {}, function(data){
+            $("#source-"+idNode+" img").attr( "src", data )
+        });
+        $("#source-"+idNode).slideToggle(1500);
     });
 }
+
+
+//$(document).ready(function(){
+    //$("#image").load("http://cgi-www.daimi.au.dk/cgi-chili/phyfi/go?newicktext=(mus, rattus)%3B&lineth=1&format=png&angle=15");
+//    $("#image").load("http://www.google.fr");
+//});
 
 </script>
 {% endblock %}
@@ -91,9 +100,9 @@ name="query" />
 </div>
 <!-- end query panel -->
 
-{% for name, source, error_line in trees_list %}
+{% for idtree, name, source, error_line in trees_list %}
 <b> {{name}} </b> 
-<a id='showsource-{{name}}' class="showparents" onclick="javascript:togglesource('{{name}}');"
+<a id='showsource-{{idtree}}' class="showparents" onclick="javascript:togglesource('{{idtree}}');"
 {%if error_line %} style="color:red" {% endif %} > Show source </a> 
 {% if not error_line %}
 <a class="phylowidget" target="_blank" 
@@ -101,16 +110,19 @@ name="query" />
    title="Display the ncbi tree as graph"> Visualize with PhyloWidget </a>
 {% endif %}
 <!-- TODO mettre de l'ajax ici pour eviter un chargement trop lent -->
-<div class="source" id='source-{{name}}'>
+<div class="source" id='source-{{idtree}}'>
 {% if error_line %}
 <font color="red">
 {% endif %}
 <pre>
-{{source}}
+<span class="treesource"> {{source}}
 {% if error_line %}{{error_line}}{% endif %}
 </pre>
 {% if error_line %}
+</span>
 </font>
+{% else %}
+<img class="img"></img>
 {% endif %}
 </div>
 <br />

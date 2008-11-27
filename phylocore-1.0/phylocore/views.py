@@ -65,7 +65,6 @@ def statistics( request ):
             request.session['delimiter'] = request.POST['delimiter']
         delimiter = request.session['delimiter']
         collection = TreeCollection.objects.create( source = input, delimiter = delimiter )
-        print "fin creation collection"
         #if 'autocorrection' in request.POST:
         #    collection, list_correction = collection.get_autocorrected_collection()
         request.session['original_collection_id'] = collection.id
@@ -77,6 +76,7 @@ def statistics( request ):
         #print "fin stats"
         request.session['last_query'] = ''
     elif 'query_treebase' in request.POST:
+        print "query_treebase"
         treebase = TreeCollection.objects.get( id = 1 )
         collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
         request.session['original_collection_id'] = collection.id
@@ -86,6 +86,7 @@ def statistics( request ):
         #    d_stat = collection.get_taxon_frequency_distribution()
         request.session['last_query'] = ''
         request.session['correction'] = {}
+    print "fin creation collection"
     collection = request.session['collection']
     context = {'error_msg':[]}
     ## Query
@@ -118,15 +119,21 @@ def statistics( request ):
     else:
         request.session['current_col_id'] = collection.id
         context['nb_taxa'] = collection.taxa.count()
+        print "nb_taxa"
         context['nb_trees'] = collection.trees.count()
+        print "nb_trees"
         context['nb_badtaxa'] = collection.bad_taxa.count()
         request.session['nb_badtaxa'] = context['nb_badtaxa']
+        print "bad_taxa"
         homonyms_list = collection.homonyms.all()
         context['nb_homonyms'] = homonyms_list.count()
+        print "homonyms"
         synonyms_list = collection.synonyms.all()
         context['nb_synonyms'] = synonyms_list.count()
+        print "synonyms"
         commons_list = collection.commons.all()
         context['nb_commons'] = commons_list.count()
+        print "commons"
         context['not_empty_collection'] = True
         if request.session['correction']:
             context['correction'] = True
@@ -223,10 +230,10 @@ def browse( request ):
         tlist = collection.trees.all()
     for i in tlist:
         if i.column_error:
-            error_line = " "*(i.column_error-1)+"^"
+            error_line = " "*(i.column_error)+"^"
         else:
             error_line = ""
-        trees_list.append( (i.name.replace('.','').replace('|', '_'), i.source, error_line ) )
+        trees_list.append( ( i.id, i.name.replace('.','').replace('|', '_'), i.source, error_line ) )
     paginator = Paginator( trees_list, 100 )
     context = {'trees_list':trees_list}
     if len( trees_list ):
@@ -354,7 +361,24 @@ def browse_images( request ):
     if len( taxa_list ):
         context['not_empty_collection'] = True
     return render_to_response( 'browse_images.html', context )
-        
+
+def get_image_tree_url( request, idtree ):
+    from djangophylocore.lib.phylogelib import tidyNwk
+    tree_source = request.session['collection'].trees.get( id = idtree ).source
+    conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
+    tree_source = tidyNwk( tree_source ).replace( ' ', '+' )
+    conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
+    f = conn.getresponse().read()
+    try:
+        url = f.split('iframe')[1].split('"')[3].replace('http://cgi-www.daimi.au.dk','')
+    except:
+        print tidyNwk( tree_source )
+        print f
+    conn.request("GET", url )
+    f = conn.getresponse().read()
+    img_url = f.split('<img')[1].split('"')[3]
+    return HttpResponse( "http://cgi-www.daimi.au.dk/cgi-chili/phyfi/"+img_url )
+
 
 ########################################
 #   Needed fonctions (not views)       #
@@ -385,6 +409,7 @@ def _get_image_url( taxon ):
     global taximage_url
     taxon = "_".join(taxon.split()).strip().capitalize()
     if not taximage_url.has_key( taxon ):
+        taximage_url[taxon] = ""
         conn = httplib.HTTPConnection("species.wikimedia.org")
         conn.request("GET", "/wiki/"+taxon)
         f = conn.getresponse().read()
@@ -393,8 +418,10 @@ def _get_image_url( taxon ):
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
                 conn.close()    
                 taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
-                return taximage_url[taxon]
-        conn.close()    
+                break
+        conn.close()
+        if taximage_url[taxon]:
+            return taximage_url[taxon]   
         conn = httplib.HTTPConnection("en.wikipedia.org")
         conn.request("GET", "/wiki/"+taxon)
         f = conn.getresponse().read()

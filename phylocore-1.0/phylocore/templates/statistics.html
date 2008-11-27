@@ -22,7 +22,7 @@ function get_progress_tree(){
 } 
 
 $(document).ready(function() { 
-    $.ajax({
+    hxr_suggestion = $.ajax({
         method: "get",url: "suggestions",
         beforeSend: function(html){
             get_progress_suggestions();
@@ -33,10 +33,8 @@ $(document).ready(function() {
             $("#suggestions").html(html);
         }
     });
-}); 
 
-$(document).ready(function() { 
-    $.ajax({
+    hxr_reference = $.ajax({
         method: "get",url: "reference_tree",
         beforeSend: function(html){
             get_progress_tree();
@@ -46,6 +44,11 @@ $(document).ready(function() {
         success: function(html){
             $("#reference_tree").html(html);
         }
+    });
+
+    $('.path').click( function(){
+        hxr_suggestion.abort();
+        hxr_reference.abort();
     });
 }); 
 
