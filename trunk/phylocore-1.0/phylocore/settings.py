@@ -82,6 +82,11 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
+TAXONOMY_TARGET_URL = {
+  "ncbi":"http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=",
+  "itis":"http://www.itis.gov/servlet/SingleRpt/SingleRpt?search_topic=TSN&search_value="
+}
+
 ROOT_URLCONF = 'phylocore.urls'
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.file'

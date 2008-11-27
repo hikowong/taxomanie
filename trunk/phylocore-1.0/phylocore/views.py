@@ -7,6 +7,7 @@ import string
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
+from django.conf import settings
 
 #from django.http import HttpResponse
 #from django.template.context import get_standard_processors
@@ -111,6 +112,7 @@ def statistics( request ):
     if 'clear_query' in request.GET:
         return render_to_response( 'statistics.html', request.session['initial_context'] )
     context['query'] = query
+    request.session['collection'] = collection
     print "fin query"
     ## Dealing collection
     if not collection.trees.count(): #Empty collection
@@ -285,6 +287,7 @@ def suggestions( request ):
     context = {}
     collection = request.session['collection']
     col_id = collection.id
+    print col_id
     if not col_id in D_PROGRESS:
         D_PROGRESS[col_id] = {}
     D_PROGRESS[col_id]['suggestions'] = 0
@@ -366,7 +369,7 @@ def get_image_tree_url( request, idtree ):
     from djangophylocore.lib.phylogelib import tidyNwk
     tree_source = request.session['collection'].trees.get( id = idtree ).source
     conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
-    tree_source = tidyNwk( tree_source ).replace( ' ', '+' )
+    tree_source = tidyNwk( tree_source ).replace( ' ', '_' )
     conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
     f = conn.getresponse().read()
     try:
@@ -720,8 +723,8 @@ def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_
       node.id,
       style,                        
       node.name,
-      "",#self.NCBI,
-      "",#self.reference.TAXONOMY[bdnode]["id"],
+      settings.TAXONOMY_TARGET_URL[settings.TAXONOMY_ENGINE],
+      node.id,
       dispnode.capitalize() )
     if stat:
         result += """(<a title='%s' href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
@@ -729,8 +732,7 @@ def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_
           node.name,
           len(d_stats[node.id]['trees_list']) )
     if nb_inter_parents:
-        result += """<a id="a-%s" class='showparents'
-          onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
+        result += """<a id="a-%s" class='showparents' onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
             blockname,
             blockname )
     elif stat:
@@ -750,25 +752,21 @@ def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False,
     if stat:
         result += """<input class="restrict" type="checkbox" genre="%s"
         onclick="javascript:selectGenre('%s');" />""" % ( node.name, node.name )
-    result += """<a id="%s" %s name="genre" onmouseover="go('%s')" 
-      href="%s%s" target='_blank'> %s </a>""" % (
+    result += """<a id="%s" %s name="genre" onmouseover="go('%s')" href="%s%s" target='_blank'> %s </a>""" % (
       node.id,
       style,
       node.name,
-      "",#self.NCBI,
-      "",#self.reference.TAXONOMY[bdnode]["id"],
+      settings.TAXONOMY_TARGET_URL[settings.TAXONOMY_ENGINE],
+      node.id,
       dispnode.capitalize())
-    result += """
-    (<a class="nolink" title='%s'>%s</a>/
-    <a title="%s" href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
+    result += """ (<a class="nolink" title='%s'>%s</a>/ <a title="%s" href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
       ",".join( d_stats[node.id]['scientific_taxon_list']),
       len( d_stats[node.id]['scientific_taxon_list'] ),
       "Restrict your collection to these trees",
       node.name,
       len( d_stats[node.id]['trees_list'] ) )
     if isinterparent and nb_inter_parents:
-        result += """<a id="a-%s" class='showparents'
-          onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
+        result += """<a id="a-%s" class='showparents' onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
             blockname,
             blockname )
     else:
