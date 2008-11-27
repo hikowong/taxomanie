@@ -8,17 +8,10 @@
 <script type="text/javascript" src="/site_media/jquery-1.2.3.js"></script>
 <script type="text/javascript" src="/site_media/jquery.blockUI.js"></script>
 <script type="text/javascript" src="/site_media/jquery.jgrowl_compressed.js"></script>
-<script type="text/javascript" src="/site_media/jquery.floatingbox.js"></script>
 <script type="text/javascript" src="/site_media/jquery.progressbar.js"></script>
 <script type="text/javascript" src="/site_media/phyloexplorer.js"></script>
 <link href="/site_media/galleria.css" rel="stylesheet" type="text/css" media="screen"> 
 <script type="text/javascript" src="/site_media/jquery.galleria.pack.js"></script> 
-<script type="text/javascript"> 
-$(document).ready(
-    function() {
-        $('#floatingmenu').floating({targetX:'left'});
-});
-</script>
 {% block script %} {% endblock %}
 </head>
 <body>
@@ -38,9 +31,7 @@ $(document).ready(
     </tr>
     <tr class="content" valign="top">
         <td class="links">
-<div id="floatingmenu">
 {% block menu %}{% endblock %}
-</div>
          </td>
          <td class="content">
 {% block content %}{% endblock %}
