@@ -853,7 +853,13 @@ class TreeCollection( models.Model, TaxonomyReference ):
         for pattern in l_patterns:
             striped_pattern = pattern.strip().lower()
             if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
-                raise NameError, striped_pattern
+                raise NameError, striped_pattern+" not found in taxonomy"
+            if not self.is_scientific_name( striped_pattern ):
+                related_scientific_names = Taxonomy.objects.get( name = striped_pattern ).scientifics
+                if len(related_scientific_names) == 1:
+                    striped_pattern = related_scientific_names[0].name
+                else:
+                    raise ValueError, striped_pattern+" is ambiguous : %s" % [str(i.name) for i in related_scientific_names]
             if 'usertaxa' == striped_pattern and treebase:
                 cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_reltreecoltaxa%s ) GROUP BY tree_id;" % (self.id ) )
             else:
@@ -870,12 +876,12 @@ class TreeCollection( models.Model, TaxonomyReference ):
                     else:
                         cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( self.id, parent_id ) ) 
                     print "end"
+            print "begin2"
             if settings.DATABASE_ENGINE == 'sqlite3':
                 result = cur.fetchall()
             else:
-                print "begin2"
                 result = cursor.fetchall()
-                print "end2"
+            print "end2"
             for (tree_id, nb_occurence) in result:
                 if tree_id not in d_trees:
                     d_trees[tree_id] = {}
