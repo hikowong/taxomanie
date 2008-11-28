@@ -59,3 +59,6 @@ class Command(NoArgsCommand):
             if verbose:
                 print cmd
             os.system( cmd )
+            if settings.DATABASE_ENGINE == 'mysql':
+                cursor.execute( """CREATE INDEX djangophylocore_reltreecoltaxa1_taxon_id ON djangophylocore_reltreecoltaxa1 (taxon_id);""" )
+            cursor.close()
