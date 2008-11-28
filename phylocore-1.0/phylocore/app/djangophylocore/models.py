@@ -128,7 +128,8 @@ class TaxonomyReference( object ):
         Strip Taxon name in order to keep the root name and to remove
         all user staff.
         """
-        taxon_name = taxon_name.replace( delimiter, ' ' )
+        for delim in delimiter:
+            taxon_name = taxon_name.replace( delim, ' ' )
         while not self.is_valid_name( taxon_name ):
             new_taxon_name = ' '.join( taxon_name.split()[:-1] )
             if new_taxon_name:
