@@ -6,18 +6,19 @@
 <script type="text/javascript"> 
 
 function get_progress_suggestions(){
-    var refreshId = setInterval(function() {
+    var refreshId1 = setInterval(function() {
         $.getJSON("progressbar", {}, function(data){
             $('#progressbar_badtaxa').progressBar(data.suggestions);
+            if( data.suggestions >= 100 ){ clearInterval(refreshId1);}
         });
     }, 5000);
 } 
 
 function get_progress_tree(){
-    var refreshId = setInterval(function() {
+    var refreshId2 = setInterval(function() {
         $.getJSON("progressbar", {}, function(data){
             $('#progressbar_reference').progressBar(data.reference_tree);
-//            alert( refreshId );
+            if( data.reference_tree == "100" ){ clearInterval(refreshId2);}
         });
     }, 5000);
 } 
