@@ -109,6 +109,8 @@ def statistics( request ):
             if err.message == "usertaxa":
                 error_msg += '. Try to query against TreeBase'
             context['error_msg'].append( error_msg )
+        if query_against_treebase:
+            context['treebase'] = 'on'
     if 'clear_query' in request.GET:
         return render_to_response( 'statistics.html', request.session['initial_context'] )
     context['query'] = query
