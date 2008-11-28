@@ -121,7 +121,13 @@ def statistics( request ):
         context['not_empty_collection'] = False
         context['error_msg'] = "Empty collection"
     else:
+        print "reference tree as nwk"
+        context['reference_tree'] = collection.get_reference_tree_as_nwk()
+        request.session['reference_tree_nwk'] = context['reference_tree']
+        print "fin reference tree as nwk"
+        context['reference_tree'] = collection.get_reference_tree_as_nwk()
         request.session['current_col_id'] = collection.id
+        context['current_col_id'] = collection.id
         context['nb_taxa'] = collection.taxa.count()
         print "nb_taxa"
         context['nb_trees'] = collection.trees.count()
@@ -313,7 +319,7 @@ def reference_tree( request ):
     collection = request.session['collection']
     context = {}
     context['stats_tree'] = display_tree_stats( collection )
-    context['reference_tree'] = collection.get_reference_tree_as_nwk()
+    context['reference_tree'] = request.session['reference_tree_nwk']
     return render_to_response( 'reference_tree.html', context )
 
 def download_correction( request ):
@@ -374,6 +380,23 @@ def get_image_tree_url( request, idtree ):
     tree_source = request.session['collection'].trees.get( id = idtree ).source
     conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
     tree_source = tidyNwk( tree_source ).replace( ' ', '_' )
+    conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
+    f = conn.getresponse().read()
+    try:
+        url = f.split('iframe')[1].split('"')[3].replace('http://cgi-www.daimi.au.dk','')
+    except:
+        print tidyNwk( tree_source )
+        print f
+    conn.request("GET", url )
+    f = conn.getresponse().read()
+    img_url = f.split('<img')[1].split('"')[3]
+    return HttpResponse( "http://cgi-www.daimi.au.dk/cgi-chili/phyfi/"+img_url )
+
+def get_image_reference_tree_url( request, idtree ):
+    from djangophylocore.lib.phylogelib import tidyNwk
+    tree_source = request.session['collection'].get_reference_tree_as_nwk()
+    conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
+    tree_source = tidyNwk( tree_source ).replace( ' ', '_' ).strip(';')
     conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
     f = conn.getresponse().read()
     try:

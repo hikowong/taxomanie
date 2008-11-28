@@ -98,6 +98,17 @@ $(document).ready(function() {
     });
 });
 
+$(document).ready( function(){
+    $('#tab_reference_tree').tabs();
+});
+
+$(document).ready(function(){
+    $.get("get_image_reference_tree_url/{{col_id}}", {}, function(data){
+        $("#image_tree img").attr( "src", data )
+    });
+});
+
+
 </script>
 {% endblock %}
 
@@ -307,8 +318,18 @@ name="query" />
         </tt>
     </fieldset><br />
 <!-- end stat2 -->
-<div id="reference_tree"> </div>
-<div id="progressbar_reference"></div>
+<div id="tab_reference_tree">
+    <ul>
+        <li><a href="#arborescence"><span>Arborescence</span></a></li>
+        <li><a href="#image_tree"><span>Image</span></a></li>
+        <li><a href="#source"><span>Source</span></a></li>
+    </ul>
+    <div id="arborescence">
+        <div id="reference_tree"> </div> <div id="progressbar_reference"></div> 
+    </div>
+    <div id="image_tree"><img class="img"></img></div>
+    <div id="source"><textarea cols=100 rows=30>{{reference_tree}}</textarea></div>
+</div>
 </div>
             <a href="#top" class="posPage">&nbsp;Go to the top of the page&nbsp;</a>
     <!-- div preview -->
