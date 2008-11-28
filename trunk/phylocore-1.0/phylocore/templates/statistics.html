@@ -17,6 +17,7 @@ function get_progress_tree(){
     var refreshId = setInterval(function() {
         $.getJSON("progressbar", {}, function(data){
             $('#progressbar_reference').progressBar(data.reference_tree);
+//            alert( refreshId );
         });
     }, 5000);
 } 
@@ -26,7 +27,7 @@ $(document).ready(function() {
         method: "get",url: "suggestions",
         beforeSend: function(html){
             get_progress_suggestions();
-            $("#suggestions").html( '<b><font color="red">Processing bad taxa...</font></b><br />');
+            $("#suggestions").html( '<b><font color="red">Correcting bad taxa...</font></b><br />');
         },
         complete: function(){ $("#progressbar_badtaxa").hide("fast");},
         success: function(html){
@@ -38,7 +39,7 @@ $(document).ready(function() {
         method: "get",url: "reference_tree",
         beforeSend: function(html){
             get_progress_tree();
-            $('#reference_tree').html('<b><font color="red">Processing reference tree...</font></b><br />');
+            $('#reference_tree').html('<b><font color="red">Drawing reference tree...</font></b><br />');
         },
         complete: function(){ $("#progressbar_reference").hide("fast");},
         success: function(html){
@@ -132,7 +133,7 @@ onfocus="if(this.value=='Your query...'){this.value='';}"
 onblur="if(this.value==''){this.value='Your query...';}"
 {% if query %} value="{{query}}" {% else %} value="Your query..." {% endif %}
 name="query" /> 
-<input type="checkbox" name="treebase"/> query against treebase
+<input type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
 <input type="submit" value="Search" class="button" blockui="wait"> <br>
 <tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
 <br /> 
@@ -277,7 +278,7 @@ name="query" />
         {% endif %}
     {% endif %}
     <!-- end badtaxa fieldset -->
-    {% if nb_commons or nb_synonyms or nb_homonyms %}
+    {% if nb_commons or nb_synonyms or nb_homonyms or nb_badtaxa %}
         <input type="submit" value="Correct collection"/>
     {% endif %}
     </form>
