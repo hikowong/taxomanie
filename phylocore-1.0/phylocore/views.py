@@ -306,6 +306,7 @@ def suggestions( request ):
                 dict_bad_taxa[bad.name].append( i )
         D_PROGRESS[col_id]['suggestions'] = ((bad_taxa_list.index(bad)+1)*100.0)/request.session['nb_badtaxa']
     context['dict_bad_taxa'] = dict_bad_taxa
+    D_PROGRESS[col_id]['suggestions'] = 100
     return render_to_response( 'suggestions.html', context )
 
 def reference_tree( request ):
@@ -633,9 +634,13 @@ def display_tree_stats( collection, allparents = False ):
             D_PROGRESS[collection.id]['nb_taxa'] =  len( tree )
             D_PROGRESS[collection.id]['reference_tree'] = 0
             d_stats = collection.get_statistics()
-            return _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 'root' )
+            itis_tree =  _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 'root' )
+            D_PROGRESS[collection.id]['reference_tree'] = 100
+            return itis_tree
         else:
+            D_PROGRESS[collection.id]['reference_tree'] = 100
             return ""
+    D_PROGRESS[collection.id]['reference_tree'] = 100
     return ''
 
 #def _remove_single_parent( list_taxa_collection, tree ):
