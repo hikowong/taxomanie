@@ -315,7 +315,7 @@ def reference_tree( request ):
     return render_to_response( 'reference_tree.html', context )
 
 def download_correction( request ):
-    csv = ""
+    csv = "user taxa names|corrected names\n"
     for (bad, good) in request.session['correction'].iteritems():
         csv += "%s|%s\n" % ( bad, good )
     response = HttpResponse(mimetype='text/csv')
