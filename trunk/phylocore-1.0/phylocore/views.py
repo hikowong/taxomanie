@@ -105,10 +105,10 @@ def statistics( request ):
         try:
             collection = collection.get_collection_from_query( query, query_against_treebase )
         except Exception, err:
-            error_msg = str('bad query: %s not found in taxaonomy' % err.message)
+            error_msg = str('bad query: %s' % err.message)
             if err.message == "usertaxa":
                 error_msg += '. Try to query against TreeBase'
-            context['error_msg'].append( error_msg )
+            context['error_msg'].append( error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) )
         if query_against_treebase:
             context['treebase'] = 'on'
     if 'clear_query' in request.GET:
