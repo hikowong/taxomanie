@@ -300,7 +300,8 @@ def suggestions( request ):
     bad_taxa_list = list(collection.bad_taxa.all())
     for bad in bad_taxa_list:
         dict_bad_taxa[bad.name] = []
-        for i in TAXOREF.correct( bad.name, guess = True ):
+        correct_list = TAXOREF.correct( bad.name, guess = True )
+        for i in correct_list:
             if i != bad.name:
                 dict_bad_taxa[bad.name].append( i )
         D_PROGRESS[col_id]['suggestions'] = ((bad_taxa_list.index(bad)+1)*100.0)/request.session['nb_badtaxa']
@@ -733,6 +734,13 @@ def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_
           "Restrict your collection to these trees",
           node.name,
           len(d_stats[node.id]['trees_list']) )
+    # ispecies redirection
+    result += """<a href="http://ispecies.org/?q=%s&submit=Go" title="view ispecies informations" target="_blank" style="color:white"><img src="http://ispecies.org/images/logo.jpg" width="50" /></a>""" % (
+        node.name.replace( ' ', '+' ) )
+    # species.wikipedia.org redirection
+    result += """<a href="http://species.wikipedia.org/wiki/%s" title="view wikispecies informations" target="_blank" style="color:white">
+      <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Wikispecies-logo-en.png/70px-Wikispecies-logo-en.png" width="10" /></a>""" % (
+        node.name.replace( ' ', '_' ).capitalize() )
     if nb_inter_parents:
         result += """<a id="a-%s" class='showparents' onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
             blockname,
@@ -767,6 +775,13 @@ def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False,
       "Restrict your collection to these trees",
       node.name,
       len( d_stats[node.id]['trees_list'] ) )
+    # ispecies redirection
+    result += """<a href="http://ispecies.org/?q=%s&submit=Go" title="view ispecies informations" target="_blank" style="color:white"><img src="http://ispecies.org/images/logo.jpg" width="50" /></a>""" % (
+        node.name.replace( ' ', '+' ) )
+    # species.wikipedia.org redirection
+    result += """<a href="http://species.wikipedia.org/wiki/%s" title="view wikispecies informations" target="_blank" style="color:white">
+      <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Wikispecies-logo-en.png/70px-Wikispecies-logo-en.png" width="10" /></a>""" % (
+        node.name.replace( ' ', '_' ).capitalize() )
     if isinterparent and nb_inter_parents:
         result += """<a id="a-%s" class='showparents' onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
             blockname,
