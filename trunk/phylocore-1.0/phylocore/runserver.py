@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import wsgiserver
 #This can be from cherrypy import wsgiserver if you're not running it standalone.
 import os

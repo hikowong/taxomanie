@@ -375,26 +375,18 @@ def browse_images( request ):
         context['not_empty_collection'] = True
     return render_to_response( 'browse_images.html', context )
 
-def get_image_tree_url( request, idtree ):
-    from djangophylocore.lib.phylogelib import tidyNwk
-    tree_source = request.session['collection'].trees.get( id = idtree ).source
-    conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
-    tree_source = tidyNwk( tree_source ).replace( ' ', '_' )
-    conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
-    f = conn.getresponse().read()
-    try:
-        url = f.split('iframe')[1].split('"')[3].replace('http://cgi-www.daimi.au.dk','')
-    except:
-        print tidyNwk( tree_source )
-        print f
-    conn.request("GET", url )
-    f = conn.getresponse().read()
-    img_url = f.split('<img')[1].split('"')[3]
-    return HttpResponse( "http://cgi-www.daimi.au.dk/cgi-chili/phyfi/"+img_url )
+def get_phyfi_tree_image_url( request, idtree ):
+    return get_phyfi_image_url( request, idtree )
 
-def get_image_reference_tree_url( request, idtree ):
+def get_phyfi_reference_tree_image_url( request, idtree ):
+    return get_phyfi_image_url( request, idtree, reference = True )
+
+def get_phyfi_image_url( request, idtree, reference = False ):
     from djangophylocore.lib.phylogelib import tidyNwk
-    tree_source = request.session['collection'].get_reference_tree_as_nwk()
+    if reference:
+        tree_source = request.session['collection'].get_reference_tree_as_nwk()
+    else:
+        tree_source = request.session['collection'].trees.get( id = idtree ).source
     conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
     tree_source = tidyNwk( tree_source ).replace( ' ', '_' ).strip(';')
     conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
@@ -409,6 +401,7 @@ def get_image_reference_tree_url( request, idtree ):
     img_url = f.split('<img')[1].split('"')[3]
     return HttpResponse( "http://cgi-www.daimi.au.dk/cgi-chili/phyfi/"+img_url )
 
+    
 
 ########################################
 #   Needed fonctions (not views)       #
