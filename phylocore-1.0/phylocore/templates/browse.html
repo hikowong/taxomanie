@@ -43,7 +43,7 @@ $(document).ready(function(){
 
 function togglesource(idNode){
     $(document).ready(function(){
-        $.get("get_image_tree_url/"+idNode, {}, function(data){
+        $.get("get_phyfi_tree_image_url/"+idNode, {}, function(data){
             $("#source-"+idNode+" img").attr( "src", data )
         });
         $("#source-"+idNode).slideToggle(1500);
