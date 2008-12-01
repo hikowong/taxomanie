@@ -391,7 +391,7 @@ def get_phyfi_image_url( request, idtree, reference = False ):
     if reference:
         tree_source = request.session['collection'].get_reference_tree_as_nwk()
     else:
-        tree_source = request.session['collection'].trees.get( id = idtree ).source
+        tree_source = Tree.objects.get( id = idtree ).source
     conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
     tree_source = tidyNwk( tree_source ).replace( ' ', '_' ).strip(';')
     conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
@@ -411,6 +411,20 @@ def get_phyfi_image_url( request, idtree, reference = False ):
     conn.close()
     return HttpResponse( "http://cgi-www.daimi.au.dk/cgi-chili/phyfi/"+img_url )
 
+    
+def get_tree_source( request, idtree ):
+    tree = Tree.objects.get( id = idtree )
+    if tree.column_error:
+        error_line = " "*(tree.column_error-1)+"^"
+    else:
+        error_line = ""
+    json = {"source":str(tree.source), "error_line": str(error_line) }
+    return HttpResponse( str(json) )
+
+
+def get_tree_arborescence( request, idtree ):
+    tree = Tree.objects.get( id = idtree )
+    return HttpResponse( _display_tree( tree.arborescence ) )
     
 
 ########################################
