@@ -55,6 +55,7 @@ def help( request ):
     return render_to_response( 'help.html', context )
 
 def statistics( request ):
+    context = {'error_msg':[]}
     if 'new_collection' in request.POST:
         if 'myFile' in request.POST:
             input = request.POST['myFile']
@@ -79,7 +80,12 @@ def statistics( request ):
     elif 'query_treebase' in request.POST:
         print "query_treebase"
         treebase = TreeCollection.objects.get( id = 1 )
-        collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
+        try:
+            collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
+        except Exception, err:
+            error_msg = str('bad query: %s' % err.message)
+            context['error_msg'].append( error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) )
+            return render_to_response( 'index.html', context )
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
         #if collection.taxa:
@@ -89,7 +95,6 @@ def statistics( request ):
         request.session['correction'] = {}
     print "fin creation collection"
     collection = request.session['collection']
-    context = {'error_msg':[]}
     ## Query
     query = ''
     if 'query_tree' in request.GET: #FIXME POST

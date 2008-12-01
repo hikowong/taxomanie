@@ -850,10 +850,14 @@ class TreeCollection( models.Model, TaxonomyReference ):
         d_trees = {}
         cursor = connection.cursor()
         l_patterns = re.findall("{([^}]+)}", query)
+        if not l_patterns:
+            raise ValueError, "malformed request"
         for pattern in l_patterns:
             striped_pattern = pattern.strip().lower()
             if not striped_pattern == 'usertaxa' and not self.is_valid_name( striped_pattern ):
                 raise NameError, striped_pattern+" not found in taxonomy"
+        for pattern in l_patterns:
+            striped_pattern = pattern.strip().lower()
             if not self.is_scientific_name( striped_pattern ):
                 related_scientific_names = Taxonomy.objects.get( name = striped_pattern ).scientifics
                 if len(related_scientific_names) == 1:
