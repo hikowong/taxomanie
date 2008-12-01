@@ -30,6 +30,8 @@ TAXOREF = TaxonomyReference()
 TAXONOMY_TOC = get_taxonomy_toc()
 D_PROGRESS = {}
 CACHE_PHYFI_URL = {'reference':{}, 'tree':{} }
+CACHE_REFERENCE_TREE = {}
+CACHE_SUGGESTIONS = {}
 
 import os.path
 localDir = os.path.dirname(__file__)
@@ -297,34 +299,50 @@ def progressbar( request ):
 def suggestions( request ):
     # correct bad taxas
     global D_PROGRESS
-    dict_bad_taxa = {}
-    context = {}
+    global CACHE_SUGGESTIONS
     collection = request.session['collection']
     col_id = collection.id
     print col_id
     if not col_id in D_PROGRESS:
         D_PROGRESS[col_id] = {}
     D_PROGRESS[col_id]['suggestions'] = 0
+    context = {}
     if not collection.homonyms.count() and not collection.synonyms.count() and not collection.commons.count():
         context['display_button'] = True
     else:
         context['display_button'] = False
-    bad_taxa_list = list(collection.bad_taxa.all())
+    if not col_id in CACHE_SUGGESTIONS:
+        bad_taxa_list = list(collection.bad_taxa.all())
+        CACHE_SUGGESTIONS[col_id] = { 'bad_taxa_list': bad_taxa_list, 'dict_bad_taxa': {}, 'progress':0  }
+    else:
+        if ( len( CACHE_SUGGESTIONS[col_id]['bad_taxa_list'] ) == len( CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'] ) ):
+            context['dict_bad_taxa'] = CACHE_SUGGESTIONS[col_id]['dict_bad_taxa']
+            D_PROGRESS[col_id]['suggestions'] = 100
+            return render_to_response( 'suggestions.html', context )
+        bad_taxa_list = CACHE_SUGGESTIONS[col_id]['bad_taxa_list']
+        D_PROGRESS[col_id]['suggestions'] = CACHE_SUGGESTIONS[col_id]['progress']
     for bad in bad_taxa_list:
-        dict_bad_taxa[bad.name] = []
+        CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'][bad.name] = []
         correct_list = TAXOREF.correct( bad.name, guess = True )
         for i in correct_list:
             if i != bad.name:
-                dict_bad_taxa[bad.name].append( i )
+                CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'][bad.name].append( i )
         D_PROGRESS[col_id]['suggestions'] = ((bad_taxa_list.index(bad)+1)*100.0)/request.session['nb_badtaxa']
-    context['dict_bad_taxa'] = dict_bad_taxa
+        CACHE_SUGGESTIONS[col_id]['progress'] = D_PROGRESS[col_id]['suggestions']
+    context['dict_bad_taxa'] = CACHE_SUGGESTIONS[col_id]['dict_bad_taxa']
     D_PROGRESS[col_id]['suggestions'] = 100
+    CACHE_SUGGESTIONS[col_id]['progress'] = 100
     return render_to_response( 'suggestions.html', context )
 
 def reference_tree( request ):
+    global CACHE_REFERENCE_TREE
     collection = request.session['collection']
     context = {}
-    context['stats_tree'] = display_tree_stats( collection )
+    if collection.id in CACHE_REFERENCE_TREE:
+        context['stats_tree'] = CACHE_REFERENCE_TREE[collection.id]
+    else:
+        context['stats_tree'] = display_tree_stats( collection )
+        CACHE_REFERENCE_TREE[collection.id] = context['stats_tree']
     context['reference_tree'] = request.session['reference_tree_nwk']
     return render_to_response( 'reference_tree.html', context )
 
