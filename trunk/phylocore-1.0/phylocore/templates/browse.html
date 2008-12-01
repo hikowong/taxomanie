@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block pagedef %} Home > Browse collection {% endblock %}
+{% block pagedef %} Upload collection > Browse collection {% endblock %}
 
 {% block script %}
 <script type="text/javascript"> 
@@ -61,7 +61,6 @@ function togglesource(idNode){
 
 {% block menu %}
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
-<center> <b> Home </b> </center>
 <a href="." class="path" title="Go to upload collection page">Upload Collection</a>
 <a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help Contents</a>
 <a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About</a>
@@ -69,8 +68,7 @@ function togglesource(idNode){
 {% if not_empty_collection %}
 <center> <b>Current collection</b> </center>
 <a href="/phyloexplorer/statistics" blockui="wait" class="path" title="Go back to collection"> Back to statistics </a>
-<a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence">
-Download NCBI tree </a>
+<a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence">Download NCBI excerpt</a>
 <a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
 <a href="/phyloexplorer/browse_images" class="path" title="Browse and download images of the collection">Browse images</a>
