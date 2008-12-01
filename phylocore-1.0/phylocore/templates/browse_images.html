@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block pagedef %} Home > Browse collection's images {% endblock %}
+{% block pagedef %} Upload collection > Browse collection's images {% endblock %}
 
 {% block script %}
 <script type="text/javascript"> 
@@ -10,7 +10,6 @@ jQuery(function($) { $('ul.gallery').galleria(); });
 
 {% block menu %}
 <!-- <a href="home" class="path" title="Go home">Home</a> -->
-<center> <b> Home </b> </center>
 <a href="." class="path" title="Go to upload collection page">Upload Collection</a>
 <a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help Contents</a>
 <a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About</a>
@@ -19,8 +18,7 @@ jQuery(function($) { $('ul.gallery').galleria(); });
 <center> <b>Current collection</b> </center>
 <a href="/phyloexplorer/statistics" blockui="wait" class="path" title="Go back to collection"> Back to statistics </a>
 <a href="/phyloexplorer/browse" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
-<a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence">
-Download NCBI tree </a>
+<a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence">Download NCBI excerpt</a>
 <a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
 {% endif %}
