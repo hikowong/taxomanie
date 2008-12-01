@@ -107,26 +107,6 @@ $(document).ready( function(){
 <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
 <br />
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
-<!-- query panel -->
-<div class="query">
-<form action="statistics" class="nopadding">
-<!-- <a onclick="javascript:toggleExemple();" id="exemplelink"> View exemple </a>&nbsp; -->
-<input size=60  type=text 
-onfocus="if(this.value=='Your query...'){this.value='';}" 
-onblur="if(this.value==''){this.value='Your query...';}"
-{% if query %} value="{{query}}" {% else %} value="Your query..." {% endif %}
-name="query" /> 
-<input type="submit" value="Search" class="button" blockui="wait"> <br>
-<tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
-<br /> 
-<i>You can download your result after your query</i></tt>
-</form>
-{% if query %}
-    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_query=1>Back to full collection</a>
-{% endif %}
-</div>
-<!-- end query panel -->
-
 <fieldset> <legend> Trees list </legend>
 <div id="tree_view">
     {% for idtree, name, source, error_line in trees_list %}
