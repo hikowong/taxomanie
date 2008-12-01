@@ -399,11 +399,16 @@ def get_phyfi_image_url( request, idtree, reference = False ):
     try:
         url = f.split('iframe')[1].split('"')[3].replace('http://cgi-www.daimi.au.dk','')
     except:
-        print tidyNwk( tree_source )
-        print f
+        #print tidyNwk( tree_source )
+        print f  
+        print len( f )
+        if "The requested URL's length exceeds the capacity" in f:
+            conn.close()
+            return HttpResponse( "/site_media/exceeds_capacity_limit.png" )
     conn.request("GET", url )
     f = conn.getresponse().read()
     img_url = f.split('<img')[1].split('"')[3]
+    conn.close()
     return HttpResponse( "http://cgi-www.daimi.au.dk/cgi-chili/phyfi/"+img_url )
 
     

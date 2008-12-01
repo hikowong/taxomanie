@@ -103,8 +103,11 @@ $(document).ready( function(){
 });
 
 $(document).ready(function(){
+    $("#image_load").hide();
     $.get("get_phyfi_reference_tree_image_url/{{col_id}}", {}, function(data){
-        $("#image_tree img").attr( "src", data )
+        $("#image_tree img").attr( "src", data );
+        $("#fetching_msg").hide();
+        $("#image_load").show();
     });
 });
 
@@ -326,7 +329,10 @@ name="query" />
     <div id="arborescence">
         <div id="reference_tree"> </div> <div id="progressbar_reference"></div> 
     </div>
-    <div id="image_tree"><img class="img"></img></div>
+    <div id="image_tree">
+        <div id="image_load"><img class="img"></img></div>
+        <span id="fetching_msg"><font color="red">Fetching image...</font></span>
+    </div>
     <div id="source"><textarea cols=100 rows=30>{{reference_tree}}</textarea></div>
 </div>
 </fieldset>
