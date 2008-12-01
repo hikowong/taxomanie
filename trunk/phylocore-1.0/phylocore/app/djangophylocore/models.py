@@ -763,7 +763,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
                 tree = nwktree.lower().strip()
                 if tree:
                     name += 1
-                    t = Tree( name = name, source = tree, rooted = False, 
+                    t = Tree( name = "tree_%s" % name, source = tree, rooted = False, 
                       delimiter = self.delimiter, _from_collection = True,
                       collection = self )
                     t.save()
@@ -874,18 +874,14 @@ class TreeCollection( models.Model, TaxonomyReference ):
                     else:
                         cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa1 as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( parent_id ) ) 
                 else:
-                    print "begin"
                     if settings.DATABASE_ENGINE == 'sqlite3':
                         cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( self.id, parent_id, parent_id ) )
                     else:
                         cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( self.id, parent_id ) ) 
-                    print "end"
-            print "begin2"
             if settings.DATABASE_ENGINE == 'sqlite3':
                 result = cur.fetchall()
             else:
                 result = cursor.fetchall()
-            print "end2"
             for (tree_id, nb_occurence) in result:
                 if tree_id not in d_trees:
                     d_trees[tree_id] = {}
