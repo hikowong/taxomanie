@@ -29,6 +29,7 @@ from django.conf import settings
 TAXOREF = TaxonomyReference()
 TAXONOMY_TOC = get_taxonomy_toc()
 D_PROGRESS = {}
+CACHE_PHYFI_URL = {'reference':{}, 'tree':{} }
 
 import os.path
 localDir = os.path.dirname(__file__)
@@ -387,11 +388,18 @@ def get_phyfi_reference_tree_image_url( request, idtree ):
     return get_phyfi_image_url( request, idtree, reference = True )
 
 def get_phyfi_image_url( request, idtree, reference = False ):
+    global CACHE_PHYFI_URL
     from djangophylocore.lib.phylogelib import tidyNwk
     if reference:
-        tree_source = request.session['collection'].get_reference_tree_as_nwk()
+        if idtree in CACHE_PHYFI_URL['reference']:
+            return HttpResponse( CACHE_PHYFI_URL['reference'][idtree] )
+        else:
+            tree_source = request.session['collection'].get_reference_tree_as_nwk()
     else:
-        tree_source = Tree.objects.get( id = idtree ).source
+        if idtree in CACHE_PHYFI_URL['tree']:
+            return HttpResponse( CACHE_PHYFI_URL['tree'][idtree] )
+        else:
+            tree_source = Tree.objects.get( id = idtree ).source
     conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
     tree_source = tidyNwk( tree_source ).replace( ' ', '_' ).strip(';')
     conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
@@ -409,7 +417,12 @@ def get_phyfi_image_url( request, idtree, reference = False ):
     f = conn.getresponse().read()
     img_url = f.split('<img')[1].split('"')[3]
     conn.close()
-    return HttpResponse( "http://cgi-www.daimi.au.dk/cgi-chili/phyfi/"+img_url )
+    url = "http://cgi-www.daimi.au.dk/cgi-chili/phyfi/"+img_url
+    if reference:
+        CACHE_PHYFI_URL['reference'][idtree] = url
+    else:
+        CACHE_PHYFI_URL['tree'][idtree] = url
+    return HttpResponse( url  )
 
     
 def get_tree_source( request, idtree ):
@@ -693,6 +706,8 @@ def display_tree_stats( collection, allparents = False ):
 #                tree.add_edge( n[0], n[1] )
 #    return tree
 
+WIKISPECIES_ICON = "http://species.wikimedia.org/favicon.ico"
+ISPECIES_ICON = "http://ispecies.org/images/logo.jpg"
 def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
     """
     Pretty print of the tree in HTML.
@@ -755,6 +770,7 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
     return result
 
 def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_inter_parents=0 ):
+    global WIKISPECIES_ICON
     result = ""
     dispnode = node.name
     dispnode = dispnode.replace( "<", "&lt;" )
@@ -780,12 +796,11 @@ def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_
           node.name,
           len(d_stats[node.id]['trees_list']) )
     # ispecies redirection
-    result += """<a href="http://ispecies.org/?q=%s&submit=Go" title="view ispecies informations" target="_blank" style="color:white"><img src="http://ispecies.org/images/logo.jpg" width="50" /></a>""" % (
-        node.name.replace( ' ', '+' ) )
+    result += """<a href="http://ispecies.org/?q=%s&submit=Go" title="view
+    ispecies informations" target="_blank" style="color:white"><img src="%s" width="50" /></a>""" % ( node.name.replace( ' ', '+' ), ISPECIES_ICON )
     # species.wikipedia.org redirection
     result += """<a href="http://species.wikipedia.org/wiki/%s" title="view wikispecies informations" target="_blank" style="color:white">
-      <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Wikispecies-logo-en.png/70px-Wikispecies-logo-en.png" width="10" /></a>""" % (
-        node.name.replace( ' ', '_' ).capitalize() )
+      <img src="%s" /></a>""" % ( node.name.replace( ' ', '_' ).capitalize(), WIKISPECIES_ICON )
     if nb_inter_parents:
         result += """<a id="a-%s" class='showparents' onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
             blockname,
@@ -795,6 +810,7 @@ def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_
     return result
 
 def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False, nb_inter_parents=0, stat = 0  ):
+    global WIKISPECIES_ICON
     result = ""
     dispnode = node.name
     dispnode = dispnode.replace( "<", "&lt;" )
@@ -821,12 +837,11 @@ def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False,
       node.name,
       len( d_stats[node.id]['trees_list'] ) )
     # ispecies redirection
-    result += """<a href="http://ispecies.org/?q=%s&submit=Go" title="view ispecies informations" target="_blank" style="color:white"><img src="http://ispecies.org/images/logo.jpg" width="50" /></a>""" % (
-        node.name.replace( ' ', '+' ) )
+    result += """<a href="http://ispecies.org/?q=%s&submit=Go" title="view ispecies informations" target="_blank" style="color:white"><img src="%s" width="50" /></a>""" % (
+        node.name.replace( ' ', '+' ), ISPECIES_ICON )
     # species.wikipedia.org redirection
     result += """<a href="http://species.wikipedia.org/wiki/%s" title="view wikispecies informations" target="_blank" style="color:white">
-      <img src="http://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Wikispecies-logo-en.png/70px-Wikispecies-logo-en.png" width="10" /></a>""" % (
-        node.name.replace( ' ', '_' ).capitalize() )
+      <img src="%s" /></a>""" % ( node.name.replace( ' ', '_').capitalize(), WIKISPECIES_ICON )
     if isinterparent and nb_inter_parents:
         result += """<a id="a-%s" class='showparents' onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
             blockname,

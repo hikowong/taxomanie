@@ -130,8 +130,11 @@ name="query" />
 <fieldset> <legend> Trees list </legend>
 <div id="tree_view">
     {% for idtree, name, source, error_line in trees_list %}
-        <b> <a id='showsource-{{idtree}}' onclick="javascript:togglesource('{{idtree}}');"
+        <b> <a href="#image_tree" onclick="javascript:togglesource('{{idtree}}');"
         {%if error_line %} style="color:red" {% else %} style="color:black" {% endif %} > {{name}} </a> </b>
+        <a href="http://www.phylowidget.org/full/index.html?tree='{{source}}'" target="_blank"
+           title="Visualize this tree using PhyloWidget" style="color:white">
+        <img src="http://www.phylowidget.org/img/pw.ico" /></a>
         {% comment %}
         {% if not error_line %}
             <a class="phylowidget" target="_blank" 
