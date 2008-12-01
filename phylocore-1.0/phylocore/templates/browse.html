@@ -38,18 +38,45 @@ function selectGenre( genre ){
 }
 
 $(document).ready(function(){
-    $("div.source").hide();
-});
+    $("div.source").hide(); });
 
 function togglesource(idNode){
     $(document).ready(function(){
-        $.get("get_phyfi_tree_image_url/"+idNode, {}, function(data){
-            $("#source-"+idNode+" img").attr( "src", data )
+        $("#image_load").hide();
+        $("#image_tree img").removeAttr( "src" );
+        $("#fetching_msg").html( '<b> Fetching image... </b>' );
+        $("#fetching_msg").show();
+        $.getJSON("get_tree_source/"+idNode, {}, function(data){
+            if( data.error_line){
+                var source = '<font color="red"><pre><span class="treesource">'+data.source+'<br />'+data.error_line+'</span></pre></font>';
+            }
+            else{
+                var source = '<textarea cols=100 rows=30>'+data.source+'</textarea>';
+            }
+            $("#treenewick").html( source );
+            if (data.error_line){
+                $("#fetching_msg").html( '<b style="color:red"> bad tree, image can\'t be fecthed </b>' );
+                $("#fetching_msg").show();
+                $('#tab_reference_tree').disableTab(1);
+                $('#tab_reference_tree').disableTab(2);
+            }
+            else{
+                $('#tab_reference_tree').enableTab(1);
+                $('#tab_reference_tree').enableTab(2);
+                $.get("get_phyfi_tree_image_url/"+idNode, {}, function(data){
+                    $("#image_tree img").attr( "src", data );
+                    $("#fetching_msg").hide();
+                    $("#image_load").show();
+                });
+            }
         });
-        $("#source-"+idNode).slideToggle(1500);
     });
 }
 
+$(document).ready( function(){
+    $("#image_load").hide();
+    $('#tab_reference_tree').tabs(); 
+});
 
 //$(document).ready(function(){
     //$("#image").load("http://cgi-www.daimi.au.dk/cgi-chili/phyfi/go?newicktext=(mus, rattus)%3B&lineth=1&format=png&angle=15");
@@ -100,33 +127,53 @@ name="query" />
 </div>
 <!-- end query panel -->
 
-{% for idtree, name, source, error_line in trees_list %}
-<b> {{name}} </b> 
-<a id='showsource-{{idtree}}' class="showparents" onclick="javascript:togglesource('{{idtree}}');"
-{%if error_line %} style="color:red" {% endif %} > Show source </a> 
-{% if not error_line %}
-<a class="phylowidget" target="_blank" 
-   href="http://www.phylowidget.org/full/index.html?tree='{{ source }} %>'"
-   title="Display the ncbi tree as graph"> Visualize with PhyloWidget </a>
-{% endif %}
-<!-- TODO mettre de l'ajax ici pour eviter un chargement trop lent -->
-<div class="source" id='source-{{idtree}}'>
-{% if error_line %}
-<font color="red">
-{% endif %}
-<pre>
-<span class="treesource"> {{source}}
-{% if error_line %}{{error_line}}{% endif %}
-</pre>
-{% if error_line %}
-</span>
-</font>
-{% else %}
-<img class="img"></img>
-{% endif %}
+<fieldset> <legend> Trees list </legend>
+<div id="tree_view">
+    {% for idtree, name, source, error_line in trees_list %}
+        <b> <a id='showsource-{{idtree}}' onclick="javascript:togglesource('{{idtree}}');"
+        {%if error_line %} style="color:red" {% else %} style="color:black" {% endif %} > {{name}} </a> </b>
+        {% comment %}
+        {% if not error_line %}
+            <a class="phylowidget" target="_blank" 
+               href="http://www.phylowidget.org/full/index.html?tree='{{ source }} %>'"
+               title="Display the ncbi tree as graph"> Visualize with PhyloWidget </a>
+        {% endif %}
+        {% endcomment %}
+        <!-- TODO mettre de l'ajax ici pour eviter un chargement trop lent -->
+        <br />
+    {% endfor %}
 </div>
+</fieldset>
 <br />
-{% endfor %}
+<div id="tab_reference_tree">
+    <ul>
+        <li><a href="#arborescence"><span>Browsable arborescence</span></a></li>
+        <li><a href="#image_tree"><span>Image</span></a></li>
+        <li><a href="#source"><span>Newick format</span></a></li>
+    </ul>
+    <div id="arborescence">
+        <!-- Tree visualization -->
+        <div class="tree">
+        <br />
+        <tt>
+        <span id="tree_arborescence"></span>
+        </tt>
+        <br />
+        </div>
+    </div>
+    <div id="image_tree">
+        <div id="image_load"><img class="img"></img></div>
+        <span id="fetching_msg"></span>
+    </div>
+    <div id="source">
+        <span id="treenewick"></span>
+    </div>
+</div>
+</fieldset>
+</div>
+
+<!-- div preview -->
+<div id="preview"></div>
 
 {% if error_msg %} <div  class="error">{{ error_msg }}</div>{% endif %}
     <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
