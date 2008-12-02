@@ -111,6 +111,15 @@ $(document).ready(function(){
     });
 });
 
+$(document).ready(function(){
+    $("#add_filter").click(function(){
+        var val = $("#taxa_input").attr('value');
+        $("#filter_taxa").append( '<li>'+val+'</li>' );
+        $("#filter_taxa").append( '<input type="hidden" name="'+val+'" value="'+val+'" />' );
+        $("#taxa_input").removeAttr( 'value' );
+    });
+});
+
 
 </script>
 {% endblock %}
@@ -140,7 +149,6 @@ $(document).ready(function(){
 <!-- query panel -->
 <div class="query">
 <form action="statistics" class="nopadding">
-<!-- <a onclick="javascript:toggleExemple();" id="exemplelink"> View exemple </a>&nbsp; -->
 <input size=60  type=text 
 onfocus="if(this.value=='Your query...'){this.value='';}" 
 onblur="if(this.value==''){this.value='Your query...';}"
@@ -152,11 +160,42 @@ name="query" />
 <br /> 
 <i>You can download your result after your query</i></tt>
 </form>
-{% if query %}
-    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_query=1>Back to full collection</a>
+{% if collection_changed %}
+    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
 {% endif %}
 </div>
 <!-- end query panel -->
+
+<!-- filter panel -->
+<div id="filter" class="query">
+<center>
+<form action="filter_collection" class="nopadding">
+<table>
+<tr>
+<td>
+    <select name="filter_option">
+        <option select>keep</option>
+        <option>exclude</option>
+    </select>
+    <input id="taxa_input" size=40  type=text /> 
+    <a id="add_filter" href="#filter"> Add to filter </a>
+    <input type="submit" value="Filter now!" class="button" blockui="wait"> <br>
+    <i>You can download your result after your query</i></tt>
+</td>
+<td>
+    <div>
+    <ul id="filter_taxa"> </ul>
+    </div>
+</td>
+</tr>
+</table>
+</form>
+{% if collection_changed %}
+    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
+{% endif %}
+</center>
+</div>
+<!-- end filter panel -->
 <div  id="error"></div>
 {% if bad_tree_msg %} <div class="error">{{ bad_tree_msg|safe }}</div>{% endif %}
 {% if not_empty_collection %}
