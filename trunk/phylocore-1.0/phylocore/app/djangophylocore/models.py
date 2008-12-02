@@ -1039,13 +1039,15 @@ class TreeCollection( models.Model, TaxonomyReference ):
             new_col += "END;\n"
         return new_col
 
-    def get_restricted_collection( self, taxon_name_list ):
+    def get_restricted_collection( self, taxon_name_list, keep = True ):
         """
         return a collection string wich contains only the taxon present in
         taxon_name_list
         """
-        remove_taxon_list = [i.name for i in self.taxa.exclude( name__in = taxon_name_list )] 
-        new_nwk = self.get_filtered_collection_string( remove_taxon_list )
+        if keep:
+            remove_taxon_list = [i.name for i in self.taxa.exclude( name__in = taxon_name_list )] 
+            taxon_name_list = remove_taxon_list
+        new_nwk = self.get_filtered_collection_string( taxon_name_list )
         return TreeCollection.objects.create( delimiter = self.delimiter, source = new_nwk )
 
     def get_corrected_collection_string( self, correction ):
