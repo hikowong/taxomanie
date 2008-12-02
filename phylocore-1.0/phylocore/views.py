@@ -406,8 +406,11 @@ def browse_images( request ):
     collection = TreeCollection.objects.get( id = col_id )
     taxa_list = collection.taxa.all()
     d_taxa_list = {}
+    d_taxa_list = []
     for taxon in taxa_list:
-        d_taxa_list[taxon.name] = _get_image_url( taxon.name).split()[1][4:].strip('"')
+        #d_taxa_list[taxon.name] = _get_wikipedia_url(taxon.name)
+        l = _get_wikipedia_url( taxon.name ).values()
+        d_taxa_list.append( ( taxon.name, l[0], l[1] ) )
     context['d_taxa_list'] = d_taxa_list
     print "ok"
     if len( taxa_list ):
@@ -498,6 +501,37 @@ def correct_collection( collection ):
 
 taximage_url = {}
 
+def _get_wikipedia_url( taxon ):
+    global taximage_url
+    taxon = "_".join(taxon.split()).strip().capitalize()
+    if not taximage_url.has_key( taxon ):
+        taximage_url[taxon] = ""
+        url_thumb = ''
+        conn = httplib.HTTPConnection("species.wikimedia.org")
+        conn.request("GET", "/wiki/"+taxon)
+        f = conn.getresponse().read()
+        if 'class="thumbimage"' in f:
+            url_thumb = f.split('thumbimage')[0].split('src=')[-1].split()[0].strip('"')
+        else:
+            conn = httplib.HTTPConnection("en.wikipedia.org")
+            conn.request("GET", "/wiki/"+taxon)
+            f = conn.getresponse().read()
+            url_thumb = f.split('class="image"' )[1].split('</a>')[0].split('src=')[1].split()[0].strip('"')
+        conn.close()
+        if url_thumb:
+            url = url_thumb.split('/')[:-1]
+            try:
+                url.remove('thumb' )
+                url = "/".join( url )
+                taximage_url[taxon] = {"thumb": url_thumb, "full":url}
+            except:
+                print url, url_thumb
+                taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+        else:
+            taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+    return taximage_url[taxon]
+
+ 
 def _get_image_url( taxon ):
     global taximage_url
     taxon = "_".join(taxon.split()).strip().capitalize()

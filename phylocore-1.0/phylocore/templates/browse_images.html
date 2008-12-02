@@ -4,7 +4,11 @@
 
 {% block script %}
 <script type="text/javascript"> 
-jQuery(function($) { $('ul.gallery').galleria(); });
+$(document).ready(function(){
+    $("a[rel^='prettyPhoto']").livequery(function(){
+        $(this).prettyPhoto();
+    });
+});
 </script>
 {% endblock %}
 
@@ -28,11 +32,12 @@ jQuery(function($) { $('ul.gallery').galleria(); });
 <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
 <br />
 
-<ul class="gallery"> 
-{% for taxon, url in d_taxa_list.iteritems %}
-    <li><img src="{{url|safe}}" title="{{taxon}}" alt="{{taxon}}"></li>
+<div id="gallery">
+{% for taxon, full, thumb in d_taxa_list %}
+    <a href="{{full}}" rel="prettyPhoto[gallery]" title="{{taxon}}"><img
+      src="{{thumb}}" width="70" title="{{taxon}}" alt="{{taxon}}"></a>
 {% endfor %}
-</ul>
+</div>
 
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
 <div id="images"></div>
