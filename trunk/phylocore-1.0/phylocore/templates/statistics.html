@@ -118,13 +118,26 @@ $(document).ready(function(){
 });
 
 $(document).ready(function(){
+    $('#filter_submit').hide();
+    var idfilter = 0;
     $("#add_filter").click(function(){
         var val = $("#taxa_input").attr('value');
-        $("#filter_taxa").append( '<li>'+val+'</li>' );
-        $("#filter_taxa").append( '<input type="hidden" name="'+val+'" value="'+val+'" />' );
-        $("#taxa_input").removeAttr( 'value' );
+        if (val){
+            idfilter += 1;
+            $("#filter_taxa").append( '<li id="li'+idfilter+'">'+val+'&nbsp; <a onclick="javascript:remove_filter('+idfilter+')" href="#filter" style="color:grey" title="remove">[X]</a></li>' );
+            $("#filter_taxa").append( '<input type="hidden" name="'+val+'" value="'+val+'" />' );
+            $("#taxa_input").removeAttr( 'value' );
+            $('#filter_submit').show();
+        }
+        else{ alert( "You must enter a valid taxon name" );}
     });
 });
+
+function remove_filter( idfilter ){
+    $(document).ready( function(){
+       $("#li"+idfilter).remove(); 
+    });
+}
 
 
 </script>
@@ -188,13 +201,9 @@ $(document).ready(function(){
         <table>
         <tr>
         <td>
-            <select name="filter_option">
-                <option select>keep</option>
-                <option>exclude</option>
-            </select>
             <input id="taxa_input" size=40  type=text /> 
             <a id="add_filter" href="#filter"> Add to filter </a>
-            <input type="submit" value="Filter now!" class="button" blockui="wait"> <br>
+            <br />
             <i>You can download your result after your query</i></tt>
         </td>
         <td>
@@ -204,6 +213,19 @@ $(document).ready(function(){
         </td>
         </tr>
         </table>
+        <center>
+        <div id="filter_submit">
+            <b>
+            Choose to 
+            <select name="filter_option">
+                <option select>keep</option>
+                <option>exclude</option>
+            </select>
+            your taxa and 
+            <input type="submit" value="Restrict your trees" blockui="wait">
+            </b>
+        </div>
+        </center>
         </form>
         {% if collection_changed %}
             Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
