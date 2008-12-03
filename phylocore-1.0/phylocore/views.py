@@ -298,10 +298,15 @@ def filter_collection( request ):
         filter_list.remove( "filter_option" )
         taxa_list = [i.name for i in collection.taxa.all()]
         diff = list(set(filter_list).difference( set( taxa_list ) ))
-        restricted_taxa_list = Taxonomy.objects.filter( name__in = diff )
-        for taxon in restricted_taxa_list:
-            filter_list.extend( [i.name for i in taxon.children.filter( name__in = taxa_list)] )
-    filtered_collection = collection.get_restricted_collection( filter_list, keep=keep )
+        if diff: # inter node we have to fetch leaves
+            restricted_taxa_list = Taxonomy.objects.filter( name__in = diff )
+            for taxon in restricted_taxa_list:
+                filter_list.extend( [i.name for i in taxon.children.filter( name__in = taxa_list)] )
+    user_filter_list = set([])
+    for taxon_name in filter_list:
+        for rel in collection.rel.filter( taxon__id = TAXONOMY_TOC[taxon_name]):
+            user_filter_list.add( rel.user_taxon_name )
+    filtered_collection = collection.get_restricted_collection( list(user_filter_list), keep=keep )
     request.session['collection'] = filtered_collection
     request.session['collection_changed'] = True
     return statistics( request )

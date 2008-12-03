@@ -111,27 +111,33 @@ $(document).ready(function(){
     $("#image_load").hide();
     var col_id = $("#col_id").attr( 'value' );
     $.get("get_phyfi_reference_tree_image_url/"+col_id, {}, function(data){
-        $("#image_tree img").attr( "src", data );
+        $("#image_tree .img").attr( "src", data );
         $("#fetching_msg").hide();
         $("#image_load").show();
     });
 });
 
+function add_item_filter(idfilter){
+    var val = $("#taxa_input").attr('value');
+    if (val){
+        idfilter += 1;
+        $("#filter_taxa").append( '<li id="li'+idfilter+'">'+val+'&nbsp; <a onclick="javascript:remove_filter('+idfilter+')" href="#filter" style="color:grey" title="remove">[X]</a></li>' );
+        $("#filter_submit").append( '<input type="hidden" name="'+val+'" value="'+val+'" />' );
+        $("#taxa_input").removeAttr( 'value' );
+        $('#filter_submit').show();
+    }
+    else{ alert( "You must enter a valid taxon name" );}
+}
+
 $(document).ready(function(){
     $('#filter_submit').hide();
     var idfilter = 0;
-    $("#add_filter").click(function(){
-        var val = $("#taxa_input").attr('value');
-        if (val){
-            idfilter += 1;
-            $("#filter_taxa").append( '<li id="li'+idfilter+'">'+val+'&nbsp; <a onclick="javascript:remove_filter('+idfilter+')" href="#filter" style="color:grey" title="remove">[X]</a></li>' );
-            $("#filter_taxa").append( '<input type="hidden" name="'+val+'" value="'+val+'" />' );
-            $("#taxa_input").removeAttr( 'value' );
-            $('#filter_submit').show();
-        }
-        else{ alert( "You must enter a valid taxon name" );}
+    $("#add_filter").click( function(){ add_item_filter(idfilter); });
+    $("#taxa_input").keypress(function(e){
+        if( e.which == 13 ){ add_item_filter(idfilter) ; }
     });
 });
+
 
 function remove_filter( idfilter ){
     $(document).ready( function(){
@@ -201,7 +207,6 @@ $(document).ready(function(){
         <!-- filter panel -->
         <div id="filter" class="query">
         <center>
-        <form action="filter_collection" class="nopadding">
         <table>
         <tr>
         <td>
@@ -219,6 +224,7 @@ $(document).ready(function(){
         </tr>
         </table>
         <center>
+        <form action="filter_collection" class="nopadding">
         <div id="filter_submit">
             <b>
             Choose to 
@@ -230,8 +236,8 @@ $(document).ready(function(){
             <input type="submit" value="Restrict your trees" blockui="wait">
             </b>
         </div>
-        </center>
         </form>
+        </center>
         {% if collection_changed %}
             Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
         {% endif %}
@@ -414,7 +420,11 @@ $(document).ready(function(){
         <div id="reference_tree"> </div> <div id="progressbar_reference"></div> 
     </div>
     <div id="image_tree">
-        <div id="image_load"><img class="img"></img></div>
+        <div id="image_load">
+            <a class="phylowidget" target="_blank" href="http://www.phylowidget.org/full/index.html?tree='{{ reference_tree }}'"
+            title="Display the ncbi tree as graph"> Click to visualize this tree using PhyloWidget </a> <img src="http://www.phylowidget.org/img/pw.ico" />
+            <br />
+            <img class="img"></img></div>
         <span id="fetching_msg"><font color="red">Fetching image...</font></span>
     </div>
     <div id="source"><textarea cols=100 rows=30>{{reference_tree}}</textarea></div>
