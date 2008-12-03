@@ -541,7 +541,10 @@ def _get_wikipedia_url( taxon ):
             conn = httplib.HTTPConnection("en.wikipedia.org")
             conn.request("GET", "/wiki/"+taxon)
             f = conn.getresponse().read()
-            url_thumb = f.split('class="image"' )[1].split('</a>')[0].split('src=')[1].split()[0].strip('"')
+            try:
+                url_thumb = f.split('class="image"' )[1].split('</a>')[0].split('src=')[1].split()[0].strip('"')
+            except:
+                taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
         conn.close()
         if url_thumb:
             url = url_thumb.split('/')[:-1]
