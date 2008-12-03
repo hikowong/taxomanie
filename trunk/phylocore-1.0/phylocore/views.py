@@ -9,6 +9,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.conf import settings
 
+from djangophylocore.lib.phylogelib import tidyNwk
+
 #from django.http import HttpResponse
 #from django.template.context import get_standard_processors
 #from jinja2 import Environment, FileSystemLoader, ChoiceLoader
@@ -143,8 +145,10 @@ def statistics( request ):
     request.session['current_col_id'] = collection.id
     context['current_col_id'] = collection.id
     context['nb_taxa'] = collection.taxa.count()
+    request.session['nb_taxa'] = context['nb_taxa']
     print "nb_taxa"
     context['nb_trees'] = collection.trees.count()
+    request.session['nb_trees'] = context['nb_trees']
     print "nb_trees"
     context['nb_badtaxa'] = collection.bad_taxa.count()
     request.session['nb_badtaxa'] = context['nb_badtaxa']
@@ -256,8 +260,9 @@ def browse( request ):
             error_line = " "*(i.column_error)+"^"
         else:
             error_line = ""
-        trees_list.append( ( i.id, i.name.replace('.','').replace('|', '_'), i.source, error_line ) )
-    paginator = Paginator( trees_list, 100 )
+        source = tidyNwk( i.source )
+        trees_list.append( ( i.id, i.name.replace('.','').replace('|', '_'), "_".join(source.split()), error_line ) )
+    #paginator = Paginator( trees_list, 100 )
     context = {'trees_list':trees_list}
     if len( trees_list ):
         context['not_empty_collection'] = True
@@ -404,8 +409,7 @@ def browse_images( request ):
     context = {}
     col_id = request.session['current_col_id']
     collection = TreeCollection.objects.get( id = col_id )
-    taxa_list = collection.taxa.all()
-    d_taxa_list = {}
+    taxa_list = collection.taxa.all()[:20]
     d_taxa_list = []
     for taxon in taxa_list:
         #d_taxa_list[taxon.name] = _get_wikipedia_url(taxon.name)
@@ -425,7 +429,6 @@ def get_phyfi_reference_tree_image_url( request, idtree ):
 
 def get_phyfi_image_url( request, idtree, reference = False ):
     global CACHE_PHYFI_URL
-    from djangophylocore.lib.phylogelib import tidyNwk
     if reference:
         if idtree in CACHE_PHYFI_URL['reference']:
             return HttpResponse( CACHE_PHYFI_URL['reference'][idtree] )
@@ -467,7 +470,9 @@ def get_tree_source( request, idtree ):
         error_line = " "*(tree.column_error-1)+"^"
     else:
         error_line = ""
-    json = {"source":str(tree.source), "error_line": str(error_line) }
+    source = tidyNwk( tree.source )
+    source = "_".join( source.split() )
+    json = {"source":str(source), "error_line": str(error_line) }
     return HttpResponse( str(json) )
 
 
@@ -475,6 +480,26 @@ def get_tree_arborescence( request, idtree ):
     tree = Tree.objects.get( id = idtree )
     return HttpResponse( _display_tree( tree.arborescence ) )
     
+def get_matrix( request ):
+    from djangophylocore.lib.svg import Scene, Rectangle
+    nb_trees = request.session['nb_trees']
+    nb_taxa = request.session['nb_taxa']
+    collection = request.session['collection']
+    matrix = collection.get_matrix()
+    scene = Scene('%s' % collection.id, (nb_taxa+1)*10, (nb_trees+1)*10 )
+    pix = 10
+    j = 0
+    for taxa,tmp in matrix.iteritems():
+        j += pix
+        i = 0
+        for tree,val in tmp.iteritems():
+            if val == 0:
+                scene.add(Rectangle((i,j),pix,pix,(255,255,255)))
+            else:
+                scene.add(Rectangle((i,j),pix,pix,(0,0,0)))
+            i += pix
+    scene.write_svg()
+    return HttpResponse( '<img src="/site_media/matrix/%s.png" />' % collection.id )
 
 ########################################
 #   Needed fonctions (not views)       #
