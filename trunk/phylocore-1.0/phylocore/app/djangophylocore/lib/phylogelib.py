@@ -86,15 +86,25 @@ class NewickParser( object ):
                 for i in node[:]:
                     self.__remove_taxa( node, i, remove_list )
 
-#    def __remove_singleton( self, node ):
-#        if type( node ) is list:
-#            for son in node:
-#                if type( son ) is list and len( son ) == 1:
-#                    node[node.index( son )] = son[0]
-#                    self.__remove_singleton( node )
-#                self.__remove_singleton( son )
-#
+    def __remove_singleton( self, node ):
+        #print ">>>node", node
+        if type( node ) is list:
+            for son in node:
+                #print "son", son, "node", node
+                if type( son ) is list and len( son ) == 1:
+                    #print "before remove1", node, "<<<<<->>>>>", son
+                    node[node.index( son )] = son[0]
+                    #print "after remove1", node, "<<<<->>>>", son
+                    self.__remove_singleton( node )
+                elif type( son ) is list and len( son ) == 0:
+                    #print "before remove0", node, "<<<<<->>>>>", son
+                    node.remove( [] )
+                    self.__remove_singleton( node )
+                    #print "after remove0", node, "<<<<->>>>", son
+                self.__remove_singleton( son )
+
     def remove_singleton( self, node ):
+        """ remove singleton of the subtree rooted by node """
         if type( node ) is list:
             for son in node:
                 if type( son ) is list and len( son ) <= 1:
@@ -102,16 +112,19 @@ class NewickParser( object ):
             for son in node:
                 if type( son ) is list:
                     self.remove_singleton( son )
+            self.__remove_one_singleton( node )
 
     def __remove_one_singleton( self, node ):
+        """ remove singleton of the son of node """
         if type( node ) is list:
             for son in node:
                 if type( son ) is list and len( son ) == 1:
                     node[node.index( son )] = son[0]
                     self.__remove_one_singleton( node )
                 else:
-                    if type( son )is list and len(son) == 0:
-                        node.remove( son )
+                    if type( son ) is list and len(son) == 0:
+                        node.remove( [] )
+                        self.remove_singleton( node )
 
     def filter( self, remove_taxa_list ):
         tree = self.tree
@@ -458,26 +471,29 @@ if __name__ == "__main__":
     d = "(t5:0.004647,t4:0.142159,((t6:0.142159,t1:0.047671)10:0.115,DinosauriaxDinosorus:0.545582)60:0.995353)"
     ####################################################################################################
     parser = NewickParser()
-    tree = [['mus', 'rattus'], [['homo', 'pan'], 'echinops']]
-    print parser.parse_string( '(((echinops <mammal> sp./ 2344)),petunia_x_hybrida);' )
-    print parser.get_taxa()
-    print parser.parse_string( """((batomys granti ear1822,batomys granti 458948),(archboldomys luzonensis,(chrotomys gonzalesi,(rhynchomys isarogensis,(((apomys datae 167243,apomys datae 167358),(apomys gracilostris m646,apomys gracilostris m648)),(((apomys sp. d 154816,apomys sp. d 154854),(((apomys hylocoetes 147871,apomys hylocoetes 147914,apomys hylocoetes 148149,apomys insignis 147915,apomys insignis 147924),(apomys insignis 147911,apomys insignis 148160)),(apomys sp. f 458762,apomys sp. f ear1491))),(((apomys microdon 167241,apomys microdon 167242),(apomys microdon 458907,apomys microdon 458919)),((apomys musculus 458925,apomys musculus 458913),(((apomys sp. a/c 135715,apomys sp. a/c 137024,apomys sp.  a/c 458747),apomys sp. a/c 458751),(apomys sp. b 145698,apomys sp. b 145699))))))))))""" )
-    print parser.get_taxa()
-    print parser.parse_string( '(echinops_<mammal>,petunia_x_hybrida);' )
-    print parser.get_taxa()
-    print parser.parse_string( u"(pan,petunia hybrida)" )
-    print parser.get_taxa()
-    print parser.parse_string( "(('mis france', 'rattus'), ((('homo', 'pan')), 'echinops'));" )
-    print parser.correct_tree( {"mis": "mus", "echinops":"echinops <plant>" } )
-    print parser.get_taxa()
-    print parser.parse_string( "(glis,(mus,rattus rattus));")
-    print parser.filter( ['mus', 'glis', 'rattus rattus'] )
-    print parser.get_taxa()
-    print parser.parse_string( "(mus:0.987,rattus:0.93784);")
-    print parser.get_taxa()
+#    tree = [['mus', 'rattus'], [['homo', 'pan'], 'echinops']]
+#    print parser.parse_string( '(((echinops <mammal> sp./ 2344)),petunia_x_hybrida);' )
+#    print parser.get_taxa()
+#    print parser.parse_string( """((batomys granti ear1822,batomys granti 458948),(archboldomys luzonensis,(chrotomys gonzalesi,(rhynchomys isarogensis,(((apomys datae 167243,apomys datae 167358),(apomys gracilostris m646,apomys gracilostris m648)),(((apomys sp. d 154816,apomys sp. d 154854),(((apomys hylocoetes 147871,apomys hylocoetes 147914,apomys hylocoetes 148149,apomys insignis 147915,apomys insignis 147924),(apomys insignis 147911,apomys insignis 148160)),(apomys sp. f 458762,apomys sp. f ear1491))),(((apomys microdon 167241,apomys microdon 167242),(apomys microdon 458907,apomys microdon 458919)),((apomys musculus 458925,apomys musculus 458913),(((apomys sp. a/c 135715,apomys sp. a/c 137024,apomys sp.  a/c 458747),apomys sp. a/c 458751),(apomys sp. b 145698,apomys sp. b 145699))))))))))""" )
+#    print parser.get_taxa()
+#    print parser.parse_string( '(echinops_<mammal>,petunia_x_hybrida);' )
+#    print parser.get_taxa()
+#    print parser.parse_string( u"(pan,petunia hybrida)" )
+#    print parser.get_taxa()
+#    print parser.parse_string( "(('mis france', 'rattus'), ((('homo', 'pan')), 'echinops'));" )
+#    print parser.correct_tree( {"mis": "mus", "echinops":"echinops <plant>" } )
+#    print parser.get_taxa()
+#    print parser.parse_string( "(glis,(mus,rattus rattus));")
+#    print parser.filter( ['mus', 'glis', 'rattus rattus'] )
+#    print parser.get_taxa()
+#    print parser.parse_string( "(mus:0.987,rattus:0.93784);")
+#    print parser.get_taxa()
+    #print parser.parse_string( '((((((((bla, ble))), ((bla, bli), blo),(blu, bla))))))' )
+    #print "ooo", parser.filter( ['bla', 'ble'] )
+    print parser.parse_string( '((bla),((bli),blo),blu)' )
+    print "ooo", parser.filter( ['bla', 'ble'] )
     print parser.parse_string( '((((((((abrocomidae,chinchillidae),((agoutidae,dasyproctidae),(caviidae,hydrochaeridae)),capromyidae,dinomyidae,((echimyidae,myocastoridae),octodontidae)),erethizontidae),((bathyergidae,thryonomyidae),hystricidae)),((dipodidae,muridae),pedetidae)),(anomaluridae,(((aplodontidae,sciuridae),myoxidae),castoridae),(geomyidae,heteromyidae))),(((((((((((antilocapridae,(bovidae,(cervidae,giraffidae))),tragulidae),(((balaenidae,(balaenopteridae,eschrichtiidae)),(((((delphinidae,phocoenidae),monodontidae),platanistidae),ziphiidae),physeteridae)),hippopotamidae)),(suidae,tayassuidae)),camelidae),(equidae,(rhinocerotidae,tapiridae))),(carnivora,manidae)),((((craseonycteridae,emballonuridae),((megadermatidae,(nycteridae,rhinolophidae)),rhinopomatidae)),((((furipteridae,natalidae),thyropteridae),myzopodidae),(molossidae,vespertilionidae),(((mormoopidae,phyllostomidae),noctilionidae),mystacinidae))),pteropodidae)),((((bradypodidae,megalonychidae),dasypodidae),myrmecophagidae),((chrysochloridae,tenrecidae),((((dugongidae,trichechidae),procaviidae),elephantidae),(macroscelididae,orycteropodidae))))),(cynocephalidae,(primates,tupaiidae))),(leporidae,ochotonidae))),(erinaceidae,(solenodontidae,(soricidae,talpidae))))')
-    t = parser.filter( 
-[u'abrocomidae',
+    t = parser.filter ([u'abrocomidae',
 u'agoutidae',
 u'ailanthus desf.',
 u'anomaluridae',
