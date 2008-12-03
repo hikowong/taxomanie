@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block pagedef %} Upload collection > Browse collection's images {% endblock %}
+
+{% block script %}
+{% endblock %}
+
+{% block menu %}
+{% endblock %}
+
+{% block content %}
+<a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+<br />
+
+<fieldset>
+<legend> legend </legend>
+</fieldset>
+<br />
+<fieldset>
+<legend> matrix</legend>
+<table>
+<tr> <td></td><td> <center>Trees</center> </td> </tr>
+<tr>
+<td> T<br />a<br />x<br />a<br /></td>
+<td>
+&nbsp;&nbsp;<img src="/site_media/matrix/{{col_id}}.png" />
+</td>
+</tr>
+</table>
+</fieldset>
+
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
+<div id="images"></div>
+    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+<!-- CONTENT : END -->
+{% endblock %}
