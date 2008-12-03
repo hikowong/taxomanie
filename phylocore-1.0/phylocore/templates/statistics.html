@@ -139,6 +139,10 @@ function remove_filter( idfilter ){
     });
 }
 
+$(document).ready(function(){
+    setAutoComplete("taxa_input", "results", "/phyloexplorer/autocomplete?query=");
+});
+
 
 </script>
 {% endblock %}
@@ -204,6 +208,7 @@ function remove_filter( idfilter ){
             <input id="taxa_input" size=40  type=text /> 
             <a id="add_filter" href="#filter"> Add to filter </a>
             <br />
+            <div id="autocomplete_results"></div>
             <i>You can download your result after your query</i></tt>
         </td>
         <td>

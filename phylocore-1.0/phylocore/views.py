@@ -6,6 +6,7 @@ import string
 
 from django.core.paginator import Paginator
 from django.http import HttpResponse
+from django.utils import simplejson
 from django.shortcuts import render_to_response
 from django.conf import settings
 
@@ -502,6 +503,18 @@ def get_matrix( request ):
         scene.write_svg()
     context = {'col_id': collection.id }
     return render_to_response( 'matrix.html', context )
+
+def autocomplete( request ):
+    results = []
+    if "query" in request.GET:
+         value = request.GET['query']
+         value_size = len(value)
+         if value_size > 2:
+            results = sorted([str(i) for i in TAXONOMY_TOC.keys() if i[:value_size] == value])
+    json = simplejson.dumps(results)
+    return HttpResponse(json, mimetype='application/json')
+
+       
 
 ########################################
 #   Needed fonctions (not views)       #
