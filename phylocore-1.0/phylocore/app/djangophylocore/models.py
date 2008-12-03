@@ -1195,6 +1195,26 @@ class TreeCollection( models.Model, TaxonomyReference ):
             return  self._nxgraph2nwk( tree, Taxonomy.objects.get( name = "root" ))
         return ""
 
+    def get_matrix( self ):
+        """
+        return the matrix wich described the presence of taxa in trees
+        """
+        matrix = {}
+        trees_list = self.trees.all()
+        stat = self.get_statistics()
+        taxa_list = stat.keys()
+        for taxa_id in taxa_list:
+            matrix[taxa_id] = {}
+            for tree in trees_list:
+                tree_id = tree.id
+                if tree_id in stat[taxa_id]['trees_list']:
+                    matrix[taxa_id][tree_id] = 1
+                else:
+                    matrix[taxa_id][tree_id] = 0
+        return matrix
+
+
+
 class AbstractTreeColTaxa( models.Model ):
     collection = models.ForeignKey( TreeCollection )#, related_name = 'rel' )
     tree = models.ForeignKey( Tree )#, related_name = 'rel' )
