@@ -485,21 +485,23 @@ def get_matrix( request ):
     nb_trees = request.session['nb_trees']
     nb_taxa = request.session['nb_taxa']
     collection = request.session['collection']
-    matrix = collection.get_matrix()
-    scene = Scene('%s' % collection.id, (nb_taxa+1)*10, (nb_trees+1)*10 )
-    pix = 10
-    j = 0
-    for taxa,tmp in matrix.iteritems():
-        j += pix
-        i = 0
-        for tree,val in tmp.iteritems():
-            if val == 0:
-                scene.add(Rectangle((i,j),pix,pix,(255,255,255)))
-            else:
-                scene.add(Rectangle((i,j),pix,pix,(0,0,0)))
-            i += pix
-    scene.write_svg()
-    return HttpResponse( '<img src="/site_media/matrix/%s.png" />' % collection.id )
+    if not os.path.exists( os.path.join( "templates", "matrix", "%s.png" % collection.id ) ):
+        matrix = collection.get_matrix()
+        pix = 5
+        scene = Scene('%s' % collection.id, (nb_taxa+1)*pix, (nb_trees+1)*pix )
+        j = 0
+        for taxa,tmp in matrix.iteritems():
+            j += pix
+            i = 0
+            for tree,val in tmp.iteritems():
+                if val == 0:
+                    scene.add(Rectangle((i,j),pix,pix,(255,255,255)))
+                else:
+                    scene.add(Rectangle((i,j),pix,pix,(0,0,0)))
+                i += pix
+        scene.write_svg()
+    context = {'col_id': collection.id }
+    return render_to_response( 'matrix.html', context )
 
 ########################################
 #   Needed fonctions (not views)       #
@@ -615,7 +617,7 @@ def get_tree_size_distribution( d_stat ):
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
             if base:
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" trees)</tt><br />\n"
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" trees with %s leaves)</tt><br />\n" % nbtaxon
     return result
 
 def get_taxon_frequency_distribution( d_stat ):
@@ -637,7 +639,7 @@ def get_taxon_frequency_distribution( d_stat ):
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
             if base:
-                result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("+str(nbtree)+" taxa)</tt><br />\n"
+                result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("+str(nbtree)+" taxa are present in %s tree(s)) </tt><br />\n" % nbtaxon
     return result
 
 #
