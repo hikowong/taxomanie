@@ -46,6 +46,8 @@ function togglesource(idNode){
         $("#image_tree img").removeAttr( "src" );
         $("#fetching_msg").html( '<b> Fetching image... </b>' );
         $("#fetching_msg").show();
+        var tree_name = $('#a'+idNode).text();
+        $("#tree_name_legend").text('Selected tree is "'+tree_name+'"');
         $.getJSON("get_tree_source/"+idNode, {}, function(data){
             if( data.error_line){
                 var source = '<font color="red"><pre><span class="treesource">'+data.source+'<br />'+data.error_line+'</span></pre></font>';
@@ -111,18 +113,19 @@ $(document).ready( function(){
 <fieldset> <legend> Trees list </legend>
 <div id="tree_view">
     {% for idtree, name, source, error_line in trees_list %}
-        <b> <a href="#image_tree" onclick="javascript:togglesource('{{idtree}}');"
+        <b> <a id="a{{idtree}}" href="#image_tree" onclick="javascript:togglesource('{{idtree}}');"
         {%if error_line %} style="color:red" {% else %} style="color:black" {% endif %} > {{name}} </a> </b>
         {% if not error_line %}
         <a href="http://www.phylowidget.org/full/index.html?tree='{{source}}'" target="_blank"
-           title="Visualize this tree using PhyloWidget" style="color:white">
-        <img src="http://www.phylowidget.org/img/pw.ico" /></a>
+           title="Visualize this tree using PhyloWidget" style="color:white"><img src="http://www.phylowidget.org/img/pw.ico" /></a>
         {% endif %}
         <br />
     {% endfor %}
 </div>
 </fieldset>
 <br />
+<fieldset>
+<legend id="tree_name_legend">No tree selected</legend>
 <div id="tab_reference_tree">
     <ul>
         <li><a href="#arborescence"><span>Browsable arborescence</span></a></li>
