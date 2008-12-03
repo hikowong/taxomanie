@@ -102,9 +102,15 @@ $(document).ready( function(){
     $('#tab_reference_tree').tabs();
 });
 
+$(document).ready( function(){
+    $('#query_filter').tabs();
+});
+
+
 $(document).ready(function(){
     $("#image_load").hide();
-    $.get("get_phyfi_reference_tree_image_url/{{col_id}}", {}, function(data){
+    var col_id = $("#col_id").attr( 'value' );
+    $.get("get_phyfi_reference_tree_image_url/"+col_id, {}, function(data){
         $("#image_tree img").attr( "src", data );
         $("#fetching_msg").hide();
         $("#image_load").show();
@@ -137,6 +143,7 @@ $(document).ready(function(){
 <a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 <br />
 <a href="/phyloexplorer/browse_images" class="path" title="Browse and download images of the collection">Browse images</a>
+<a href="/phyloexplorer/get_matrix" target="_blank" class="path" title="">Matrix</a>
 <br />
 {% endif %}
 {% endblock %}
@@ -145,57 +152,68 @@ $(document).ready(function(){
 <a href="#bottom" class="posPage">&nbsp;Go to the bottom of the page&nbsp;</a>
 <br />
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
+<input id="col_id" type="hidden" value="{{current_col_id}}" name="col_id" />
 <div class="stat">
-<!-- query panel -->
-<div class="query">
-<form action="statistics" class="nopadding">
-<input size=60  type=text 
-onfocus="if(this.value=='Your query...'){this.value='';}" 
-onblur="if(this.value==''){this.value='Your query...';}"
-{% if query %} value="{{query}}" {% else %} value="Your query..." {% endif %}
-name="query" /> 
-<input type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
-<input type="submit" value="Search" class="button" blockui="wait"> <br>
-<tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
-<br /> 
-<i>You can download your result after your query</i></tt>
-</form>
-{% if collection_changed %}
-    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
-{% endif %}
-</div>
-<!-- end query panel -->
-
-<!-- filter panel -->
-<div id="filter" class="query">
-<center>
-<form action="filter_collection" class="nopadding">
-<table>
-<tr>
-<td>
-    <select name="filter_option">
-        <option select>keep</option>
-        <option>exclude</option>
-    </select>
-    <input id="taxa_input" size=40  type=text /> 
-    <a id="add_filter" href="#filter"> Add to filter </a>
-    <input type="submit" value="Filter now!" class="button" blockui="wait"> <br>
-    <i>You can download your result after your query</i></tt>
-</td>
-<td>
-    <div>
-    <ul id="filter_taxa"> </ul>
+<div id="query_filter">
+    <ul>
+        <li><a href="#query"><span>Query</span></a></li>
+        <li><a href="#filter"><span>Filter</span></a></li>
+    </ul>
+    <div id="query">
+        <!-- query panel -->
+        <div class="query">
+        <form action="statistics" class="nopadding">
+        <input size=60  type=text 
+        onfocus="if(this.value=='Your query...'){this.value='';}" 
+        onblur="if(this.value==''){this.value='Your query...';}"
+        {% if query %} value="{{query}}" {% else %} value="Your query..." {% endif %}
+        name="query" /> 
+        <input type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
+        <input type="submit" value="Search" class="button" blockui="wait"> <br>
+        <tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
+        <br /> 
+        <i>You can download your result after your query</i></tt>
+        </form>
+        {% if collection_changed %}
+            Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
+        {% endif %}
+        </div>
+        <!-- end query panel -->
     </div>
-</td>
-</tr>
-</table>
-</form>
-{% if collection_changed %}
-    Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
-{% endif %}
-</center>
+    <div id="filter">
+        <!-- filter panel -->
+        <div id="filter" class="query">
+        <center>
+        <form action="filter_collection" class="nopadding">
+        <table>
+        <tr>
+        <td>
+            <select name="filter_option">
+                <option select>keep</option>
+                <option>exclude</option>
+            </select>
+            <input id="taxa_input" size=40  type=text /> 
+            <a id="add_filter" href="#filter"> Add to filter </a>
+            <input type="submit" value="Filter now!" class="button" blockui="wait"> <br>
+            <i>You can download your result after your query</i></tt>
+        </td>
+        <td>
+            <div>
+            <ul id="filter_taxa"> </ul>
+            </div>
+        </td>
+        </tr>
+        </table>
+        </form>
+        {% if collection_changed %}
+            Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
+        {% endif %}
+        </center>
+        </div>
+        <!-- end filter panel -->
+    </div>
 </div>
-<!-- end filter panel -->
+
 <div  id="error"></div>
 {% if bad_tree_msg %} <div class="error">{{ bad_tree_msg|safe }}</div>{% endif %}
 {% if not_empty_collection %}
