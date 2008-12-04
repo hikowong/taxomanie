@@ -72,7 +72,11 @@ def statistics( request ):
         if "delimiter" in request.POST:
             request.session['delimiter'] = request.POST['delimiter']
         delimiter = request.session['delimiter']
-        collection = TreeCollection.objects.create( source = input, delimiter = delimiter )
+        try:
+            collection = TreeCollection.objects.create( source = input, delimiter = delimiter )
+        except Exception, e:
+            context['bad_tree_msg'] = e
+            return render_to_response( 'statistics.html', context )
         #if 'autocorrection' in request.POST:
         #    collection, list_correction = collection.get_autocorrected_collection()
         request.session['original_collection_id'] = collection.id
