@@ -222,7 +222,7 @@ class TaxonomyReference( object ):
         difference = set( taxon2.parents ).difference( set( taxon1.parents ) )
         return sorted( list( difference ), self.__sort )[:-1]
 
-    def get_reference_arborescence( self, taxa_list ):
+    def get_reference_graph( self, taxa_list ):
         """
         Take a taxa list, search in reference all parents names and
         return a networkx.DiGraph tree.
@@ -582,6 +582,9 @@ class Tree( models.Model, TaxonomyReference ):
             self.__generate_arborescence()
         return self.__networkx_tree
     arborescence = property( get_arborescence )
+
+    def get_reference_arborescence( self ):
+        return self.get_reference_graph( self.scientifics.all() )
 
     def get_nb_taxa_from_parent( self, parent_name ):#, taxa_occurence = None ):
         global get_taxonomy_toc
@@ -1106,16 +1109,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         Take a taxon list, search in reference all parents names and
         return a networkx.DiGraph tree.
         """
-        import networkx as NX
-        tree = NX.DiGraph() 
-        taxon_list = self.taxa.filter( type_name = 'scientific name' ).iterator
-        already_done = set([])
-        for taxon in taxon_list():
-            while taxon.name != 'root' and taxon not in already_done:
-                tree.add_edge( taxon.parent, taxon )
-                already_done.add( taxon )
-                taxon = taxon.parent
-        return tree
+        return self.get_reference_graph( self.taxa.filter( type_name = 'scientific name' ).iterator() )
 
     def get_statistics( self ):
         global TAXONOMY_TOC
