@@ -47,6 +47,7 @@ class Command(NoArgsCommand):
             os.system( 'mkdir %s' % DUMP_PATH )
         else:
             os.system( 'rm %s/*' % DUMP_PATH )
+        os.system( 'rm taxdump.tar.gz' )
         self.download_ncbi( verbose )
         self.generate_structure( verbose )
         if self.TEST:
