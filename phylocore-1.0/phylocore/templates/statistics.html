@@ -149,6 +149,11 @@ $(document).ready(function(){
     setAutoComplete("taxa_input", "results", "/phyloexplorer/autocomplete?query=");
 });
 
+$(document).ready(function(){
+    $("#against_treebase").select(function(){
+        $("#exemplequery").html( "e.g: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b>" );
+    });
+});
 
 </script>
 {% endblock %}
@@ -163,11 +168,9 @@ $(document).ready(function(){
 <center> <b>Current collection</b> </center>
 <a href="/phyloexplorer/browse" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
 <br />
-<center> <b>Extra</b> <br /> <i>(in new window)</i></center>
 <a href="/phyloexplorer/browse_images" target="_blank" class="path" title="Browse and download images of the collection">Browse images</a>
 <a href="/phyloexplorer/get_matrix" target="_blank" class="path" title="">Matrix</a>
 <br />
-<center> <b>Download</b> </center>
 <a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence"> Download NCBI excerpt</a>
 <a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
 {% endif %}
@@ -193,9 +196,9 @@ $(document).ready(function(){
         onblur="if(this.value==''){this.value='Your query...';}"
         {% if query %} value="{{query}}" {% else %} value="Your query..." {% endif %}
         name="query" /> 
-        <input type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
+        <input id="against_treebase" type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
         <input type="submit" value="Search" class="button" blockui="wait"> <br>
-        <tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
+        <tt><span id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b></span>
         <br /> 
         <i>You can download your result after your query</i></tt>
         </form>
@@ -258,7 +261,7 @@ $(document).ready(function(){
     <fieldset>
         <legend> General information </legend>
         {{nb_user_taxa}} taxa in {{ nb_trees}} trees <br />
-        {{ nb_taxa }} distinct species &nbsp;
+        {{ nb_taxa }} distinct OTU (Operational Taxonomic Unit) &nbsp;
 
     {% if nb_badtaxa %}
         <font color="red"> {{ nb_badtaxa }} bad taxa </font>&nbsp;
