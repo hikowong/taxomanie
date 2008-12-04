@@ -493,7 +493,14 @@ def get_matrix( request ):
     collection = request.session['collection']
     if not os.path.exists( os.path.join( "templates", "matrix", "%s.png" % collection.id ) ):
         matrix = collection.get_matrix()
-        pix = 5
+        if nb_taxa < 20 and nb_trees < 20:
+            pix = 20
+        elif nb_taxa < 70 and nb_trees < 70:
+            pix = 15
+        elif nb_taxa < 100 and nb_trees < 100:
+            pix = 10
+        else:
+            pix = 5
         scene = Scene('%s' % collection.id, (nb_taxa+1)*pix, (nb_trees+1)*pix )
         j = 0
         for taxa,tmp in matrix.iteritems():
