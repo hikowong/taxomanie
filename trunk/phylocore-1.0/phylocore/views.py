@@ -135,7 +135,7 @@ def statistics( request ):
     ## Dealing collection
     if not collection.trees.count(): #Empty collection
         context['not_empty_collection'] = False
-        context['error_msg'] = "Empty collection"
+        context['bad_tree_msg'] = "Empty collection"
         return render_to_response( 'statistics.html', context )
     # Proceed collection
     print "reference tree as nwk"
