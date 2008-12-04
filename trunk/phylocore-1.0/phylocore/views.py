@@ -385,6 +385,16 @@ def reference_tree( request ):
     context['reference_tree'] = request.session['reference_tree_nwk']
     return render_to_response( 'reference_tree.html', context )
 
+def single_reference_tree( request, idtree ):
+    global CACHE_REFERENCE_TREE
+    if not "tree_%s" % idtree in CACHE_REFERENCE_TREE:
+        tree = Tree.objects.get( id = idtree )
+        if not tree.scientifics:
+            return HttpResponse( '<b><font color="red">No scientifics taxa found in tree. Please correct your collection...</font></b>' )
+        CACHE_REFERENCE_TREE["tree_%s"%idtree] = display_single_tree_stats( tree )
+    return HttpResponse( CACHE_REFERENCE_TREE["tree_%s"%idtree] )
+
+
 def download_correction( request ):
     csv = "user taxa names|corrected names\n"
     for (bad, good) in request.session['correction'].iteritems():
@@ -541,7 +551,6 @@ def autocomplete( request ):
     json = simplejson.dumps(results)
     return HttpResponse(json, mimetype='application/json')
 
-       
 
 ########################################
 #   Needed fonctions (not views)       #
@@ -810,9 +819,25 @@ def _link_genre_tree( node, source, blockname, isinterparent=False, nb_inter_par
 # Display itis tree stats
 #
 
+def display_single_tree_stats( tree, allparents = False ):
+    """
+    Display NCBI arborescence with stats of one tree
+    """
+    global D_PROGRESS
+    graph = tree.get_reference_arborescence()
+    if len(graph):
+        list_taxa_tree = tree.taxa.all()
+        d_stats = {}
+        itis_tree =  _display_itis_tree( tree, list_taxa_tree, d_stats, graph, root = 'root', show_nb_trees = False, progress=False )
+        return itis_tree
+    else:
+        return ""
+    return ''
+
+
 def display_tree_stats( collection, allparents = False ):
     """
-    Display NCBI arborescence with stats
+    Display NCBI arborescence with stats of collection
     """
     global D_PROGRESS
     if collection.trees.all().count():
@@ -845,7 +870,7 @@ def display_tree_stats( collection, allparents = False ):
 
 WIKISPECIES_ICON = "http://species.wikimedia.org/favicon.ico"
 ISPECIES_ICON = "http://ispecies.org/images/logo.jpg"
-def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
+def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "", show_nb_trees = True, progress=True ):
     """
     Pretty print of the tree in HTML.
 
@@ -859,7 +884,9 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
     # Create root node display
     if root == "root":
         nb_taxa = collection.taxa.all().count()
-        nb_trees =  collection.trees.all().count()
+        nb_trees = 1
+        if show_nb_trees:
+            nb_trees =  collection.trees.all().count()
         result += "<a class='genre' href=''>Root</a> (%s/%s) = (%s species in %s trees)<br />\n" % (
           nb_taxa, nb_trees, nb_taxa, nb_trees )
         result += """<span class="treeline">|</span><br />\n"""
@@ -869,7 +896,8 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
         for node in tree.successors( root ):
             n = tree.predecessors( node ) + tree.successors(node)
             nb_inter_parents = 0
-            D_PROGRESS[collection.id]['reference_tree'] += (1.0/D_PROGRESS[collection.id]['nb_taxa'])*100.0
+            if progress:
+                D_PROGRESS[collection.id]['reference_tree'] += (1.0/D_PROGRESS[collection.id]['nb_taxa'])*100.0
             # Create div for interparents (parents beetween nodes)
             if len(n) == 2:
                 if node in list_taxa_collection:
@@ -880,7 +908,7 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
                     result += _link_itis_species( d_stats, collection,  node, True, blockname, nb_inter_parents)
                     mydepth += 1
                 result += _display_itis_tree( collection, list_taxa_collection, d_stats, tree,  node, mydepth, 
-                  lastnode = node, blockname = blockname+"a")
+                  lastnode = node, blockname = blockname+"a", show_nb_trees = show_nb_trees, progress=progress)
                 continue
 #            if create_interparent:
 #                if lastnode in node.parents:
@@ -907,7 +935,7 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
                 else:
                     result += _link_itis_genre( d_stats, collection, node, blockname, True, nb_inter_parents, stat=True )
                 result += _display_itis_tree( collection, list_taxa_collection, d_stats, tree,  node, depth + 1, 
-                  lastnode = node, blockname = blockname+"a")
+                  lastnode = node, blockname = blockname+"a", show_nb_trees = show_nb_trees, progress=progress)
                 result += """</span>\n"""
             else: # it's a species (ie taxon)
                 result += _link_itis_species( d_stats, collection, node, True, blockname, nb_inter_parents)
@@ -934,7 +962,7 @@ def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_
       settings.TAXONOMY_TARGET_URL[settings.TAXONOMY_ENGINE],
       node.id,
       dispnode.capitalize() )
-    if stat:
+    if stat and d_stats:
         result += """(<a title='%s' href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
           "Restrict your collection to these trees",
           node.name,
@@ -974,12 +1002,13 @@ def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False,
       settings.TAXONOMY_TARGET_URL[settings.TAXONOMY_ENGINE],
       node.id,
       dispnode.capitalize())
-    result += """ (<a class="nolink" title='%s'>%s</a>/ <a title="%s" href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
-      ", ".join( sorted( d_stats[node.id]['user_taxon_list'])),
-      len( d_stats[node.id]['user_taxon_list'] ),
-      "Restrict your collection to these trees",
-      node.name,
-      len( d_stats[node.id]['trees_list'] ) )
+    if d_stats:
+        result += """ (<a class="nolink" title='%s'>%s</a>/ <a title="%s" href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
+          ", ".join( sorted( d_stats[node.id]['user_taxon_list'])),
+          len( d_stats[node.id]['user_taxon_list'] ),
+          "Restrict your collection to these trees",
+          node.name,
+          len( d_stats[node.id]['trees_list'] ) )
     # ispecies redirection
     result += """<a href="http://ispecies.org/?q=%s&submit=Go" title="view ispecies informations" target="_blank" style="color:white"><img src="%s" width="50" /></a>""" % (
         node.name.replace( ' ', '+' ), ISPECIES_ICON )
