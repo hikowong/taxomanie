@@ -643,10 +643,14 @@ class Tree( models.Model, TaxonomyReference ):
             str_current = str_current[:-1] # on a une "," en trop
             str_current += ")"
             if internal_label:
-                str_current += "[?" + current_node[2].name
+                str_current += "["
                 if not current_node[1]:
                     if current_node[2].name:
-                        str_current +="?"
+                        str_current +="?" + current_node[2].name + "?"
+                    else:
+                        str_current += "?"
+                else:
+                    str_current += current_node[2].name
                 str_current +=  "]"
         elif len(sons_of_current_node) == 1 and type( sons_of_current_node ) is list:
             # intgernal node of degre 2
