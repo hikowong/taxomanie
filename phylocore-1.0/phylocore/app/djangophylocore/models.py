@@ -1164,8 +1164,11 @@ class TreeCollection( models.Model, TaxonomyReference ):
                 if not d.has_key( i[1] ):
                     d[i[1]] = i[1]        
         m = []
+        taxa_list = self.taxa.all()
         for node in tree.successors( node ):
             if isinstance( d[node], list ):
+                if node in taxa_list:
+                    m.append( node.name )
                 m.append( self._nxgraph2list( tree, node, d ) )
             else:
                 m.append( d[node].name )
