@@ -156,6 +156,9 @@ def statistics( request ):
     context['nb_user_taxa'] = collection.rel.values( 'taxon' ).count()
     request.session['nb_user_taxa'] = context['nb_user_taxa']
     print "nb_user_taxa"
+    context['nb_scientifics'] = collection.scientifics.count()
+    request.session['nb_scientifics'] = context['nb_scientifics']
+    print "nb_scientifics"
     context['nb_trees'] = collection.trees.count()
     request.session['nb_trees'] = context['nb_trees']
     print "nb_trees"
@@ -375,6 +378,8 @@ def reference_tree( request ):
     if collection.id in CACHE_REFERENCE_TREE:
         context['stats_tree'] = CACHE_REFERENCE_TREE[collection.id]
     else:
+        if not request.session['nb_scientifics']:
+            return HttpResponse( '<b><font color="red">No scientifics taxa found. Please correct your collection...</font></b>' )
         context['stats_tree'] = display_tree_stats( collection )
         CACHE_REFERENCE_TREE[collection.id] = context['stats_tree']
     context['reference_tree'] = request.session['reference_tree_nwk']
@@ -466,6 +471,8 @@ def get_phyfi_image_url( request, idtree, reference = False ):
         if "The requested URL's length exceeds the capacity" in f:
             conn.close()
             return HttpResponse( "/site_media/exceeds_capacity_limit.png" )
+        elif "This doesn't seem to be a properly formatted Newick phylogeny" in f:
+            return HttpResponse( "/site_media/no_scientifics_found.png" )
     conn.request("GET", url )
     f = conn.getresponse().read()
     img_url = f.split('<img')[1].split('"')[3]

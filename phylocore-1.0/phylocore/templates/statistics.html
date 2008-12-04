@@ -423,9 +423,11 @@ $(document).ready(function(){
     </div>
     <div id="image_tree">
         <div id="image_load">
+            {% if nb_scientifics %}
             <a class="phylowidget" target="_blank" href="http://www.phylowidget.org/full/index.html?tree='{{ reference_tree }}'"
             title="Display the ncbi tree as graph"> Click to visualize this tree using PhyloWidget </a> <img src="http://www.phylowidget.org/img/pw.ico" />
             <br />
+            {% endif %}
             <img class="img"></img></div>
         <span id="fetching_msg"><font color="red">Fetching image...</font></span>
     </div>
