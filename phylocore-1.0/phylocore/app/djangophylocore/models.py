@@ -1147,49 +1147,75 @@ class TreeCollection( models.Model, TaxonomyReference ):
                 taxon_occurence[node.id]['user_taxon_list'].update( taxon_occurence[child.id]['user_taxon_list'] )
                 taxon_occurence[node.id]['scientific_taxon_list'].update( taxon_occurence[child.id]['scientific_taxon_list'] )
 
-    def _nxgraph2list( self, tree, node, d="" ):
-        if not d:
-            d = {}
-            for i in tree.edges():
-                if not d.has_key( i[0] ):
-                    d[i[0]] = []
-                d[i[0]].append( i[1] )
-            for i in tree.edges():
-                if not d.has_key( i[1] ):
-                    d[i[1]] = i[1]        
-        m = []
-        taxa_list = self.taxa.all()
-        for node in tree.successors( node ):
-            if isinstance( d[node], list ):
-                if node in taxa_list:
-                    m.append( node.name )
-                m.append( self._nxgraph2list( tree, node, d ) )
-            else:
-                m.append( d[node].name )
-        return m
+#    def _nxgraph2list( self, tree, node, d="" ):
+#        if not d:
+#            d = {}
+#            for i in tree.edges():
+#                if not d.has_key( i[0] ):
+#                    d[i[0]] = []
+#                d[i[0]].append( i[1] )
+#            for i in tree.edges():
+#                if not d.has_key( i[1] ):
+#                    d[i[1]] = i[1]        
+#        m = []
+#        taxa_list = self.taxa.all()
+#        for node in tree.successors( node ):
+#            if isinstance( d[node], list ):
+#                if node in taxa_list:
+#                    m.append( node.name )
+#                m.append( self._nxgraph2list( tree, node, d ) )
+#            else:
+#                m.append( d[node].name )
+#        return m
+#
+#    def _list2nwk( self, l ):
+#        NewickParser().remove_singleton( l )
+#        result = str( l )
+#        result = result.replace( "[u'", "['").replace(", u'", ", '" )
+#        result = result.replace( "['", "[" ).replace( "']", "]" )
+#        result = result.replace( "',", "," ).replace( ", '", ", " )
+#        result = result.replace("[", "(" ).replace("]", ")")
+#        result = result.replace("('","(").replace("')",")")
+#        result = result.replace("',", ",").replace(", '", ",").replace( ", ", ",")
+#        return result
+#
+#    def _nxgraph2nwk( self, tree, root ):
+#        l = self._nxgraph2list( tree, root )
+#        return self._list2nwk( l )[1:-1]+";" # removing extras parenthesis
+#        
+    def __graph2nwk_rec( self, tree, current_node, internal_label ):
+        str_current =""
+        sons_of_current_node = tree.successors(current_node)
+        if len(sons_of_current_node) > 1:
+            str_current += "("
+            for s in sons_of_current_node:
+                str_current += self.__graph2nwk_rec(tree, s, internal_label) +","
+            str_current = str_current[:-1] # on a une "," en trop
+            str_current += ")"
+            if internal_label:
+                str_current += "[" + current_node.name + "]"
+            #if (currentNode.fiable == false)
+            #    str_current +="?"
+        elif len(sons_of_current_node) == 1:
+            # intgernal node of degre 2
+            return self.__graph2nwk_rec(tree, sons_of_current_node[0], internal_label)
+        else: # it's a leave
+            #if current_node.fiable == False:
+            #    str_current +="?"
+            str_current = current_node.name
+        return str_current
 
-    def _list2nwk( self, l ):
-        NewickParser().remove_singleton( l )
-        result = str( l )
-        result = result.replace( "[u'", "['").replace(", u'", ", '" )
-        result = result.replace( "['", "[" ).replace( "']", "]" )
-        result = result.replace( "',", "," ).replace( ", '", ", " )
-        result = result.replace("[", "(" ).replace("]", ")")
-        result = result.replace("('","(").replace("')",")")
-        result = result.replace("',", ",").replace(", '", ",").replace( ", ", ",")
-        return result
+    def graph2nwk( self, internal_label=False ):
+        tree = self.get_reference_arborescence()
+        return self.__graph2nwk_rec( tree, Taxonomy.objects.get( name = "root"), internal_label )+";"
 
-    def _nxgraph2nwk( self, tree, root ):
-        l = self._nxgraph2list( tree, root )
-        return self._list2nwk( l )[1:-1]+";" # removing extras parenthesis
-        
     def get_reference_tree_as_nwk( self ):
         """
         return the NCBI arborescence in a newick string
         """
         tree = self.get_reference_arborescence()
         if len(tree):
-            return  self._nxgraph2nwk( tree, Taxonomy.objects.get( name = "root" ))
+            return  self.graph2nwk(True)
         return ""
 
     def get_matrix( self ):
