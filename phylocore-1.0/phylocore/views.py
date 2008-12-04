@@ -315,7 +315,7 @@ def filter_collection( request ):
                 filter_list.extend( [i.name for i in taxon.children.filter( name__in = taxa_list)] )
     user_filter_list = set([])
     for taxon_name in filter_list:
-        for rel in collection.rel.filter( taxon__id = TAXONOMY_TOC[taxon_name]):
+        for rel in collection.rel.filter( taxon__id = TAXONOMY_TOC[taxon_name.lower().strip()]):
             user_filter_list.add( rel.user_taxon_name )
     filtered_collection = collection.get_restricted_collection( list(user_filter_list), keep=keep )
     request.session['collection'] = filtered_collection
@@ -963,10 +963,16 @@ def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_
       node.id,
       dispnode.capitalize() )
     if stat and d_stats:
-        result += """(<a title='%s' href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
+#        result += """(<a title='%s' href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
+#          "Restrict your collection to these trees",
+#          node.name,
+#          len(d_stats[node.id]['trees_list']) )
+        result += """ (<a class="nolink" title='%s'>%s</a>/ <a title="%s" href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
+          ", ".join( sorted( d_stats[node.id]['user_taxon_list'])),
+          len( d_stats[node.id]['user_taxon_list'] ),
           "Restrict your collection to these trees",
           node.name,
-          len(d_stats[node.id]['trees_list']) )
+          len( d_stats[node.id]['trees_list'] ) )
     # ispecies redirection
     result += """<a href="http://ispecies.org/?q=%s&submit=Go" title="view
     ispecies informations" target="_blank" style="color:white"><img src="%s" width="50" /></a>""" % ( node.name.replace( ' ', '+' ), ISPECIES_ICON )
