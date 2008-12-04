@@ -200,7 +200,7 @@ $(document).ready(function(){
         <i>You can download your result after your query</i></tt>
         </form>
         {% if collection_changed %}
-            Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
+            Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to original collection</a>
         {% endif %}
         </div>
         <!-- end query panel -->
@@ -241,7 +241,7 @@ $(document).ready(function(){
         </form>
         </center>
         {% if collection_changed %}
-            Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to full collection</a>
+            Results for --&nbsp; {{query}} &nbsp;--&nbsp;|&nbsp;<a blockui="wait" href=/phyloexplorer/statistics?clear_collection=1>Back to original collection</a>
         {% endif %}
         </center>
         </div>
@@ -257,8 +257,8 @@ $(document).ready(function(){
     <a name="arbo"></a>
     <fieldset>
         <legend> General information </legend>
-        {{ nb_trees}} trees <br />
-        {{ nb_taxa }} taxa &nbsp;
+        {{nb_user_taxa}} taxa in {{ nb_trees}} trees <br />
+        {{ nb_taxa }} distinct species &nbsp;
 
     {% if nb_badtaxa %}
         <font color="red"> {{ nb_badtaxa }} bad taxa </font>&nbsp;
