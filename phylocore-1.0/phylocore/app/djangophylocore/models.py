@@ -536,7 +536,7 @@ class Tree( models.Model, TaxonomyReference ):
         return self.taxa.filter( type_name = 'homonym' )
     homonyms = property( get_homonyms )
 
-    def __generate_arborescence( self, tree=None ):
+    def __generate_arborescence_old( self, tree=None ):
         if tree is None:
             # Init attributes
             import networkx as NX
@@ -577,11 +577,86 @@ class Tree( models.Model, TaxonomyReference ):
                         child = parent_name
                     self.__networkx_tree.add_edge( parent_name, child )
 
+    def __generate_arborescence( self ):
+        import networkx as NX
+        tree = NX.DiGraph()
+        parser = NewickParser()
+        tree_list = parser.parse_string( self.source )
+        current_list = parser.get_taxa()
+        rel_list = self.collection.rel.filter( user_taxon_name__in = current_list )
+        d_infos = {}
+        for rel in rel_list:
+            d_infos[rel.user_taxon_name] = rel.taxon
+        self.__generate_arborescence_rec( tree, tree_list , d_infos, True )
+        return tree
+
+    def __generate_arborescence_rec( self, tree, current_list, d_infos, root=False ):
+        if type(current_list) is list:
+            is_scientific = True
+            son_list = []
+            scientific_son = []
+            for i in current_list[:]:
+                son = self.__generate_arborescence_rec( tree, i, d_infos )
+                son_list.append( son )
+                if son[1]: #it's a scientific son
+                    scientific_son.append( son )
+                else:
+                    is_scientific = False
+            parent = self.get_first_common_parent( [i[2] for i in scientific_son] )
+            node = ( parent.name, is_scientific, parent )
+            if root:
+                tree.add_edge( ("root", True, Taxonomy.objects.get(name = "root")), node ) 
+            for son in son_list:
+                tree.add_edge( node, son )
+        else:
+            taxon = d_infos[current_list]
+            is_scientific = taxon.type_name == "scientific name"
+            node = ( current_list, is_scientific, taxon )
+            tree.add_node( node )
+        return node
+
     def get_arborescence( self ):
-        if not hasattr( self, '__networkx_tree' ):
-            self.__generate_arborescence()
-        return self.__networkx_tree
+        return  self.__generate_arborescence()
     arborescence = property( get_arborescence )
+
+    def __graph2nwk_rec( self, tree, current_node, internal_label ):
+        str_current =""
+        sons_of_current_node = tree.successors(current_node)
+        if len(sons_of_current_node) > 1 and type( sons_of_current_node ) is list:
+            str_current += "("
+            for s in sons_of_current_node:
+                str_current += self.__graph2nwk_rec(tree, s, internal_label) +","
+            str_current = str_current[:-1] # on a une "," en trop
+            str_current += ")"
+            if internal_label:
+                str_current += "[" + current_node[2].name
+                if not current_node[1]:
+                    str_current +="?"
+                str_current +=  "]"
+        elif len(sons_of_current_node) == 1 and type( sons_of_current_node ) is list:
+            # intgernal node of degre 2
+            return self.__graph2nwk_rec(tree, sons_of_current_node[0], internal_label)
+        else: # it's a leave
+            str_current = current_node[0]
+            if not current_node[1]:
+                str_current +="?"
+        return str_current
+
+    def graph2nwk( self, internal_label=False ):
+        tree = self.get_arborescence()
+        return self.__graph2nwk_rec( tree,
+          ( "root", True, Taxonomy.objects.get( name = "root") ),
+          internal_label )+";"
+
+    def get_reference_tree_as_nwk( self ):
+        """
+        return the NCBI arborescence in a newick string
+        """
+        tree = self.get_reference_arborescence()
+        if len(tree):
+            return  self.graph2nwk(True)
+        return ""
+
 
     def get_reference_arborescence( self ):
         return self.get_reference_graph( self.scientifics.all() )
