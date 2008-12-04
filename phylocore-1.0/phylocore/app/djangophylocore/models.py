@@ -642,21 +642,25 @@ class Tree( models.Model, TaxonomyReference ):
                 str_current +="?"
         return str_current
 
-    def graph2nwk( self, internal_label=False ):
+    def get_tree_as_nwk( self, internal_label=False ):
+        """
+        return the newick format of the tree. 
+        If internal_label is True, then display internal_label.
+        """
         tree = self.get_arborescence()
         return self.__graph2nwk_rec( tree,
           ( "root", True, Taxonomy.objects.get( name = "root") ),
           internal_label )+";"
 
-    def get_reference_tree_as_nwk( self ):
+    def get_reference_tree_as_nwk( self, internal_label = True ):
         """
         return the NCBI arborescence in a newick string
+        If internal_label is True, then display internal_label.
         """
         tree = self.get_reference_arborescence()
-        if len(tree):
-            return  self.graph2nwk(True)
-        return ""
-
+        return self.__graph2nwk_rec( tree,
+          ( "root", True, Taxonomy.objects.get( name = "root") ),
+          internal_label )+";"
 
     def get_reference_arborescence( self ):
         return self.get_reference_graph( self.scientifics.all() )
@@ -1280,17 +1284,13 @@ class TreeCollection( models.Model, TaxonomyReference ):
             str_current = current_node.name
         return str_current
 
-    def graph2nwk( self, internal_label=False ):
-        tree = self.get_reference_arborescence()
-        return self.__graph2nwk_rec( tree, Taxonomy.objects.get( name = "root"), internal_label )+";"
-
-    def get_reference_tree_as_nwk( self ):
+    def get_reference_tree_as_nwk( self, internal_label = True ):
         """
         return the NCBI arborescence in a newick string
         """
         tree = self.get_reference_arborescence()
         if len(tree):
-            return  self.graph2nwk(True)
+            return self.__graph2nwk_rec( tree, Taxonomy.objects.get( name = "root"), internal_label )+";"
         return ""
 
     def get_matrix( self ):
