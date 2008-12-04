@@ -586,11 +586,20 @@ class Tree( models.Model, TaxonomyReference ):
         rel_list = self.collection.rel.filter( user_taxon_name__in = current_list )
         d_infos = {}
         for rel in rel_list:
-            d_infos[rel.user_taxon_name] = rel.taxon
+            try:
+                d_infos[rel.user_taxon_name] = rel.taxon
+            except:
+                d_infos[rel.user_taxon_name] = BadTaxa.objects.get( name = rel.user_taxon_name )
         self.__generate_arborescence_rec( tree, tree_list , d_infos, True )
         return tree
 
     def __generate_arborescence_rec( self, tree, current_list, d_infos, root=False ):
+        class MockObj( object ):
+            """
+            object wich represent a parent of bad taxa
+            """
+            def __init__( self ):
+                self.name = ""
         if type(current_list) is list:
             is_scientific = True
             son_list = []
@@ -603,15 +612,20 @@ class Tree( models.Model, TaxonomyReference ):
                 else:
                     is_scientific = False
             parent = self.get_first_common_parent( [i[2] for i in scientific_son] )
-            node = ( parent.name, is_scientific, parent )
+            if parent is None:
+                parent = MockObj() 
+            node = ( parent.name, is_scientific, parent, len(tree)+1 )
             if root:
-                tree.add_edge( ("root", True, Taxonomy.objects.get(name = "root")), node ) 
+                tree.add_edge( ("root", True, Taxonomy.objects.get(name = "root"), 0), node ) 
             for son in son_list:
                 tree.add_edge( node, son )
         else:
             taxon = d_infos[current_list]
-            is_scientific = taxon.type_name == "scientific name"
-            node = ( current_list, is_scientific, taxon )
+            if hasattr( taxon, "type_name" ):
+                is_scientific = taxon.type_name == "scientific name"
+            else:
+                is_scientific = False
+            node = ( current_list, is_scientific, taxon, len(tree)+1 )
             tree.add_node( node )
         return node
 
@@ -629,9 +643,10 @@ class Tree( models.Model, TaxonomyReference ):
             str_current = str_current[:-1] # on a une "," en trop
             str_current += ")"
             if internal_label:
-                str_current += "[" + current_node[2].name
+                str_current += "[?" + current_node[2].name
                 if not current_node[1]:
-                    str_current +="?"
+                    if current_node[2].name:
+                        str_current +="?"
                 str_current +=  "]"
         elif len(sons_of_current_node) == 1 and type( sons_of_current_node ) is list:
             # intgernal node of degre 2
@@ -649,7 +664,7 @@ class Tree( models.Model, TaxonomyReference ):
         """
         tree = self.get_arborescence()
         return self.__graph2nwk_rec( tree,
-          ( "root", True, Taxonomy.objects.get( name = "root") ),
+          ( "root", True, Taxonomy.objects.get( name = "root"), 0 ),
           internal_label )+";"
 
     def get_reference_tree_as_nwk( self, internal_label = True ):
@@ -659,7 +674,7 @@ class Tree( models.Model, TaxonomyReference ):
         """
         tree = self.get_reference_arborescence()
         return self.__graph2nwk_rec( tree,
-          ( "root", True, Taxonomy.objects.get( name = "root") ),
+          ( "root", True, Taxonomy.objects.get( name = "root"), 0 ),
           internal_label )+";"
 
     def get_reference_arborescence( self ):
@@ -1247,17 +1262,17 @@ class TreeCollection( models.Model, TaxonomyReference ):
 #                m.append( d[node].name )
 #        return m
 #
-#    def _list2nwk( self, l ):
-#        NewickParser().remove_singleton( l )
-#        result = str( l )
-#        result = result.replace( "[u'", "['").replace(", u'", ", '" )
-#        result = result.replace( "['", "[" ).replace( "']", "]" )
-#        result = result.replace( "',", "," ).replace( ", '", ", " )
-#        result = result.replace("[", "(" ).replace("]", ")")
-#        result = result.replace("('","(").replace("')",")")
-#        result = result.replace("',", ",").replace(", '", ",").replace( ", ", ",")
-#        return result
-#
+    def _list2nwk( self, l ):
+        NewickParser().remove_singleton( l )
+        result = str( l )
+        result = result.replace( "[u'", "['").replace(", u'", ", '" )
+        result = result.replace( "['", "[" ).replace( "']", "]" )
+        result = result.replace( "',", "," ).replace( ", '", ", " )
+        result = result.replace("[", "(" ).replace("]", ")")
+        result = result.replace("('","(").replace("')",")")
+        result = result.replace("',", ",").replace(", '", ",").replace( ", ", ",")
+        return result
+
 #    def _nxgraph2nwk( self, tree, root ):
 #        l = self._nxgraph2list( tree, root )
 #        return self._list2nwk( l )[1:-1]+";" # removing extras parenthesis
