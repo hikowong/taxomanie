@@ -140,6 +140,7 @@ def statistics( request ):
     if not collection.trees.count(): #Empty collection
         context['not_empty_collection'] = False
         context['bad_tree_msg'] = "Empty collection"
+        context['collection_changed'] = request.session['collection_changed']
         return render_to_response( 'statistics.html', context )
     # Proceed collection
     print "reference tree as nwk"
@@ -152,6 +153,9 @@ def statistics( request ):
     context['nb_taxa'] = collection.taxa.count()
     request.session['nb_taxa'] = context['nb_taxa']
     print "nb_taxa"
+    context['nb_user_taxa'] = collection.rel.values( 'taxon' ).count()
+    request.session['nb_user_taxa'] = context['nb_user_taxa']
+    print "nb_user_taxa"
     context['nb_trees'] = collection.trees.count()
     request.session['nb_trees'] = context['nb_trees']
     print "nb_trees"
@@ -813,6 +817,7 @@ def display_tree_stats( collection, allparents = False ):
             D_PROGRESS[collection.id]['nb_taxa'] =  len( tree )
             D_PROGRESS[collection.id]['reference_tree'] = 0
             d_stats = collection.get_statistics()
+            print d_stats
             itis_tree =  _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 'root' )
             D_PROGRESS[collection.id]['reference_tree'] = 100
             return itis_tree
@@ -957,8 +962,8 @@ def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False,
       node.id,
       dispnode.capitalize())
     result += """ (<a class="nolink" title='%s'>%s</a>/ <a title="%s" href="statistics?query_tree=%%7B%s%%7D">%s</a>)\n""" % (
-      ",".join( d_stats[node.id]['scientific_taxon_list']),
-      len( d_stats[node.id]['scientific_taxon_list'] ),
+      ", ".join( sorted( d_stats[node.id]['user_taxon_list'])),
+      len( d_stats[node.id]['user_taxon_list'] ),
       "Restrict your collection to these trees",
       node.name,
       len( d_stats[node.id]['trees_list'] ) )
