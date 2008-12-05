@@ -211,6 +211,9 @@ $(document).ready(function(){
         <center>
         <table>
         <tr>
+            <center>Here you can focus on a species subset by pruning your trees and keeping only taxa of interest</center>
+        </tr>
+        <tr>
         <td>
             <input id="taxa_input" size=40  type=text /> 
             <a id="add_filter" href="#filter"> Add to filter </a>
@@ -229,12 +232,12 @@ $(document).ready(function(){
         <form action="filter_collection" class="nopadding">
         <div id="filter_submit">
             <b>
-            Choose to 
+            prune your trees and keep only taxa
             <select name="filter_option">
-                <option select>keep</option>
-                <option>exclude</option>
+                <option select>in</option>
+                <option>not in</option>
             </select>
-            your taxa and 
+            the filter list
             <input type="submit" value="Restrict your trees" blockui="wait">
             </b>
         </div>
