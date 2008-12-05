@@ -129,6 +129,13 @@ function add_item_filter(idfilter){
     else{ alert( "You must enter a valid taxon name" );}
 }
 
+
+function remove_filter( idfilter ){
+    $(document).ready( function(){
+       $("#li"+idfilter).remove(); 
+    });
+}
+
 $(document).ready(function(){
     $('#filter_submit').hide();
     var idfilter = 0;
@@ -138,20 +145,26 @@ $(document).ready(function(){
     });
 });
 
-
-function remove_filter( idfilter ){
-    $(document).ready( function(){
-       $("#li"+idfilter).remove(); 
-    });
-}
-
 $(document).ready(function(){
     setAutoComplete("taxa_input", "results", "/phyloexplorer/autocomplete?query=");
 });
 
+function toggle_exemple(){
+    var checked = $("#against_treebase").attr( "checked" );
+    if (checked){
+        $("#exemplequery").hide();
+        $("#exempletreebase").show();
+    }
+    else{
+        $("#exemplequery").show();
+        $("#exempletreebase").hide();
+    }
+}
+
 $(document).ready(function(){
-    $("#against_treebase").click(function(){
-        $(".exemplequery").toggle();
+    toggle_exemple();
+    $("#against_treebase").click( function(){
+        toggle_exemple();
     });
 });
 
@@ -182,8 +195,8 @@ $(document).ready(function(){
         name="query" /> 
         <input id="against_treebase" type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
         <input type="submit" value="Search" class="button" blockui="wait"> <br>
-        <tt><span class="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b></span>
-        <span class="exemplequery" style="display: none">e.g: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b></span>
+        <tt><span id="exemplequery"> e.g: <b> {muridae} > 25  and ({mus}==1 or {rattus}==1) </b></span>
+        <span id="exempletreebase">e.g: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b></span>
         <br /> 
         <i>You can download your result after your query</i></tt>
         </form>
@@ -204,7 +217,7 @@ $(document).ready(function(){
             <a id="add_filter" href="#filter"> Add to filter </a>
             <br />
             <div id="autocomplete_results"></div>
-            <i>You can download your result after your query</i></tt>
+            <i>You can download your result after filtering</i></tt>
         </td>
         <td>
             <div>
