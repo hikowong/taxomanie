@@ -6,10 +6,9 @@
 <script type="text/javascript"> 
 
 $(document).ready(function() { 
-    var error_msg = '{{error_msg|safe}}';
-    for( i in error_msg ){
-        $('#error').jGrowl( "<b>"+error_msg[i]+"</b>", 
-          { life: 10000 } );
+    var error_msg = "{{error_msg|safe}}";
+    if (error_msg){
+        $('#error').jGrowl( "<b>"+error_msg+"</b>", { life: 10000 } );
     }
 });
 
