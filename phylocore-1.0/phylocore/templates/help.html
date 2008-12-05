@@ -2,21 +2,7 @@
 
 {% block pagedef %} Upload collection > About {% endblock %}
 
-{% block menu %}
-<!-- MENU : BEGINNING______________________________________________________________________ -->
-<!-- <a href="home" class="path" title="Go home">Home</a> -->
-<a href="." class="path" title="Go to import collection page">Upload Collection</a>
-<a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help Contents</a>
-<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About</a>
-<br />
-{% if collection %}
-    <center> <b>Current collection</b> </center>
-    <a href="/phyloexplorer/statistics" blockui="wait" class="path" title="Go back to statistics"> Back to statistics</a>
-    <a href="/phyloexplorer/browse" blockui="wait" class="path" title="Go back to browse collection"> Back to browse collection</a>
-<br />
-{% endif %}
-<!-- MENU : END -->
-{% endblock menu %}
+{% block idpage %}/phyloexplorer/help{% endblock %}
 
 {% block content %}
 <h3>Example of Tree</h3>

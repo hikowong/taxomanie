@@ -17,6 +17,13 @@
 <link rel="stylesheet" href="/site_media/prettyPhoto.css" type="text/css" media="screen" title="prettyPhoto main stylesheet" charset="utf-8" />
 <script src="/site_media/jquery.tabs.pack.js" type="text/javascript"></script>
 <link rel="stylesheet" href="/site_media/jquery.tabs.css" type="text/css"/>
+<script>
+$(document).ready( function(){
+    $('#id_page').hide();
+    var id_page = $('#id_page').text();
+    $("a[href="+id_page+"]").hide();
+});
+</script>
 {% block script %} {% endblock %}
 </head>
 <body>
@@ -36,7 +43,26 @@
     </tr>
     <tr class="content" valign="top">
         <td class="links">
-{% block menu %}{% endblock %}
+{% block menu %}
+<div id="menu">
+<!-- <a href="home" class="path" title="Go home">Home</a> -->
+<a href="/phyloexplorer/" class="path" title="Upload a collection">Upload collection</a>
+<a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help & Exemples</a>
+<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About PhyloExplorer</a>
+{% if not_empty_collection %}
+    <center> <h3>explore current collection</h3> </center>
+    <a href="/phyloexplorer/statistics" blockui="wait" class="path" title="Get statistics of the collection and make queries"> statistics & queries </a>
+    <a href="/phyloexplorer/browse" blockui="wait" class="path" title="Browse collection and explorer individual trees">browse collection</a>
+    <a href="/phyloexplorer/browse_images" target="_blank" class="path" title="Browse images of the collection">browse images</a>
+    <a href="/phyloexplorer/get_matrix" blockui="wait" class="path" title="">matrix [tree X taxa]</a>
+    <center><h3> Donwload </h3></center>
+    <a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence"> download NCBI excerpt</a>
+    <a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">download collection</a>
+{% endif %}
+</div>
+{% endblock %}
+
+<div id="id_page">{% block idpage %}{% endblock %}</div>
          </td>
          <td class="content">
 {% block content %}{% endblock %}
