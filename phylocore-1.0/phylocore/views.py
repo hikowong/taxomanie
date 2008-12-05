@@ -41,7 +41,7 @@ localDir = os.path.dirname(__file__)
 absDir = os.path.join(os.getcwd(), localDir)
 
 def index( request ):
-    request.session['progress'] = 0
+    #request.session['progress'] = 0
     if request.session.get( "nb_taxa", "" ):
         not_empty_collection = True
     else:
@@ -66,8 +66,11 @@ def help( request ):
     return render_to_response( 'help.html', context )
 
 def statistics( request ):
+    print request.session.session_key
+    D_PROGRESS[request.session.session_key] = { "initial_load": 0 }
     context = {'error_msg':[]}
     if 'new_collection' in request.POST:
+        print "upload..."
         if 'myFile' in request.POST:
             input = request.POST['myFile']
             myFile = 1
@@ -76,12 +79,17 @@ def statistics( request ):
             myFile = 1
         if "delimiter" in request.POST:
             request.session['delimiter'] = request.POST['delimiter']
+        print "... done"
+        D_PROGRESS[request.session.session_key]["initial_load"] = 5
         delimiter = request.session['delimiter']
+        print "building..."
         try:
             collection = TreeCollection.objects.create( source = input, delimiter = delimiter )
         except Exception, e:
             context['bad_tree_msg'] = e
             return render_to_response( 'statistics.html', context )
+        print "... done"
+        D_PROGRESS[request.session.session_key]["initial_load"] = 60
         #if 'autocorrection' in request.POST:
         #    collection, list_correction = collection.get_autocorrected_collection()
         request.session['original_collection_id'] = collection.id
@@ -94,7 +102,9 @@ def statistics( request ):
         request.session['last_query'] = ''
         request.session['collection_changed'] = False
     elif 'query_treebase' in request.POST:
+        # XXX mettre progression ici aussi
         print "query_treebase"
+        D_PROGRESS[request.session.session_key]["initial_load"] = 5 
         treebase = TreeCollection.objects.get( id = 1 )
         try:
             collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
@@ -110,6 +120,7 @@ def statistics( request ):
         request.session['last_query'] = ''
         request.session['correction'] = {}
         request.session['collection_changed'] = False
+        D_PROGRESS[request.session.session_key]["initial_load"] = 60 
     elif 'clear_collection' in request.GET:
         request.session['collection_changed'] = False
         col_id = request.session['original_collection_id']
@@ -121,6 +132,7 @@ def statistics( request ):
         context['bad_tree_msg'] = "Your session has expired"
         return render_to_response( 'statistics.html', context )
     ## Query
+    print "quering..."
     query = ''
     if 'query_tree' in request.GET: #FIXME POST
         if not request.session['last_query']:
@@ -144,8 +156,10 @@ def statistics( request ):
         request.session['collection_changed'] = True
         context['query'] = query
         request.session['collection'] = collection
-    print "fin query"
+    print "... done"
+    D_PROGRESS[request.session.session_key]["initial_load"] = 65
     ## Dealing collection
+    print "extracting informations..."
     if not collection.trees.count(): #Empty collection
         context['not_empty_collection'] = False
         context['bad_tree_msg'] = "Empty collection"
@@ -188,8 +202,10 @@ def statistics( request ):
         context['correction'] = True
     else:
         context['correction'] = False
-    print "fin donnees numeriques"
+    print "... done"
+    D_PROGRESS[request.session.session_key]["initial_load"] = 85
     # stats
+    print "stats..."
     if context['nb_taxa']:
         d_stat = collection.get_tree_size_distribution()
         context['tree_size_distributions'] = get_tree_size_distribution( d_stat )
@@ -201,6 +217,9 @@ def statistics( request ):
         context['tree_size_distributions'] = ""
         context['taxon_frequency_distribution'] = ""
         context['stats_tree'] = None
+    print "...done"
+    D_PROGRESS[request.session.session_key]["initial_load"] = 90
+    print "suggestions..."
     # correct homonyms
     dict_homonyms = {}
     for homonym in homonyms_list:
@@ -225,10 +244,15 @@ def statistics( request ):
             dict_common[common.name].extend( name.values() )
     context['dict_common'] = dict_common
     print "fin common"
+    print "...done"
+    D_PROGRESS[request.session.session_key]["initial_load"] = 95
+    print "bad trees infos..."
     nb_bad_trees = collection.bad_trees.count()
     if nb_bad_trees:
         context['bad_tree_msg'] = "Warning : your collection have %s bad trees. <a href='/phyloexplorer/browse?only_bad_trees=1'> Show them</a>" % nb_bad_trees
+    print "...done"
     context['collection_changed'] = request.session['collection_changed']
+    D_PROGRESS[request.session.session_key]["initial_load"] = 100
     return render_to_response( 'statistics.html', context )
 
 def check( request ):
@@ -338,7 +362,9 @@ def progressbar( request ):
     global D_PROGRESS
     col_id = request.session['current_col_id']
     response = HttpResponse(mimetype='text/json')
-    response.write( str(D_PROGRESS.get( col_id, {} )) )
+    json = D_PROGRESS.get( col_id, {} )
+    json.update( D_PROGRESS.get( request.session.session_key, {} ) )
+    response.write( str(json) )
     return response
     #return HttpResponse(response)
 
@@ -453,7 +479,6 @@ def browse_images( request ):
         l = _get_wikipedia_url( taxon.name ).values()
         d_taxa_list.append( ( taxon.name, l[0], l[1] ) )
     context['d_taxa_list'] = d_taxa_list
-    print "ok"
     if len( taxa_list ):
         context['not_empty_collection'] = True
     return render_to_response( 'browse_images.html', context )
@@ -466,7 +491,6 @@ def get_phyfi_reference_tree_image_url( request, idtree ):
 
 def get_phyfi_image_url( request, idtree, reference = False ):
     global CACHE_PHYFI_URL
-    print request.GET
     internal_label = "internal_label" in request.GET
     if reference:
         if idtree in CACHE_PHYFI_URL['reference']:
@@ -538,7 +562,6 @@ def get_matrix( request ):
                     if not tree in sort_info["trees"]:
                         sort_info["trees"][tree] = 0 
                     sort_info["trees"][tree] += 1 
-        print sort_info 
         taxa_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['taxa'].items()])]
         tree_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['trees'].items()])]
         if nb_taxa < 20 and nb_trees < 20:
