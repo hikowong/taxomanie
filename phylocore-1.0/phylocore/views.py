@@ -746,7 +746,15 @@ def get_tree_size_distribution( d_stat ):
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
             if base:
-                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("+str(nbtree)+" trees with %s leaves)</tt><br />\n" % nbtaxon
+                result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("
+                if nbtree > 1:
+                    result += str(nbtree)+" trees"
+                else:
+                    result += str(nbtree)+ " tree"
+                if nbtaxon > 1:
+                    result += " with %s leaves)</tt><br />\n" % nbtaxon
+                else:
+                    result += " with %s leave)</tt><br />\n" % nbtaxon
     return result
 
 def get_taxon_frequency_distribution( d_stat ):
@@ -768,7 +776,15 @@ def get_taxon_frequency_distribution( d_stat ):
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
             base = base.replace( " ", "&nbsp;" )
             if base:
-                result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("+str(nbtree)+" taxa are present in %s tree(s)) </tt><br />\n" % nbtaxon
+                result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("
+                if nbtree > 1:
+                    result += str(nbtree)+" taxa are"
+                else:
+                    result += str(nbtree)+" taxon is"
+                if nbtaxon > 1:
+                    result += " present in %s trees) </tt><br />\n" % nbtaxon
+                else:
+                    result += " present in %s tree) </tt><br />\n" % nbtaxon
     return result
 
 #
