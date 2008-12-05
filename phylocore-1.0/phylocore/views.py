@@ -661,7 +661,7 @@ def _get_wikipedia_url( taxon ):
     global taximage_url
     taxon = "_".join(taxon.split()).strip().capitalize()
     if not taximage_url.has_key( taxon ):
-        taximage_url[taxon] = ""
+        taximage_url[taxon] = {}
         url_thumb = ''
         conn = httplib.HTTPConnection("species.wikimedia.org")
         conn.request("GET", "/wiki/"+taxon)
