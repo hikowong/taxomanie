@@ -547,46 +547,69 @@ def get_tree_arborescence( request, idtree ):
     return HttpResponse( _display_tree( tree.arborescence ) )
     
 def get_matrix( request ):
+    """
+    <img src="images/image.gif"
+           width=150 height=70 usemap="#Map">
+        <map name="Map">
+            <area shape="rect" href="debut.html" COORDS="0,0,48,28">
+        </MAP>
+    </IMG>
+    """
     from djangophylocore.lib.svg import Scene, Rectangle
     nb_trees = request.session['nb_trees']
     nb_taxa = request.session['nb_taxa']
     collection = request.session['collection']
-    if not os.path.exists( os.path.join( "templates", "matrix", "%s.png" % collection.id ) ):
-        matrix = collection.get_matrix()
-        # Sorting matrix
-        sort_info = {'trees':{}, 'taxa':{}}
-        for taxa, trees in matrix.iteritems():
-            sort_info["taxa"][taxa] = len( [i for i in trees.values() if i] )
-            for tree, presence in trees.iteritems():
-                if presence:
-                    if not tree in sort_info["trees"]:
-                        sort_info["trees"][tree] = 0 
-                    sort_info["trees"][tree] += 1 
-        taxa_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['taxa'].items()])]
-        tree_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['trees'].items()])]
-        if nb_taxa < 20 and nb_trees < 20:
-            pix = 20
-        elif nb_taxa < 70 and nb_trees < 70:
-            pix = 15
-        elif nb_taxa < 100 and nb_trees < 100:
-            pix = 10
-        else:
-            pix = 5
-        scene = Scene('%s' % collection.id, (nb_taxa+1)*pix, (nb_trees+1)*pix )
-        j = 0
-        for taxa in taxa_list:
-            tmp = matrix[taxa]
-            j += pix
-            i = 0
-            for tree in tree_list:
-                val = tmp[tree]
-                if val == 0:
-                    scene.add(Rectangle((i,j),pix,pix,(255,255,255)))
-                else:
-                    scene.add(Rectangle((i,j),pix,pix,(0,0,0)))
-                i += pix
-        scene.write_svg()
-    context = {'col_id': collection.id, "not_empty_collection": True }
+    stat = collection.get_statistics()
+    matrix = collection.get_matrix()
+    # Sorting matrix
+    sort_info = {'trees':{}, 'taxa':{}}
+    for taxa, trees in matrix.iteritems():
+        sort_info["taxa"][taxa] = len( [i for i in trees.values() if i] )
+        for tree, presence in trees.iteritems():
+            if presence:
+                if not tree in sort_info["trees"]:
+                    sort_info["trees"][tree] = 0 
+                sort_info["trees"][tree] += 1 
+    #
+    taxa_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['taxa'].items()])]
+    tree_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['trees'].items()])]
+    d_tree_id_name = dict( Tree.objects.filter( id__in = tree_list).values_list( 'id','name' ) )
+    print d_tree_id_name
+    if nb_taxa < 20 and nb_trees < 20:
+        pix = 20
+    elif nb_taxa < 70 and nb_trees < 70:
+        pix = 15
+    elif nb_taxa < 100 and nb_trees < 100:
+        pix = 10
+    else:
+        pix = 5
+    scene = Scene('%s' % collection.id, (nb_taxa+1)*pix, (nb_trees+1)*pix )
+    j = 0 # ordonnee
+    map_j = 0
+    map = """<map name="Map">"""
+    for taxa in taxa_list:
+        tmp = matrix[taxa]
+        j += pix
+        map_j += pix
+        i = 0 # abscisse
+        map_i = 0
+        for tree in tree_list:
+            val = tmp[tree]
+            if val == 0:
+                scene.add(Rectangle((i,j),pix,pix,(255,255,255)))
+                map += """<area shape="rect" title="taxon: %s, tree: %s" coords="%s,%s,%s,%s">""" % (
+                  list(stat[taxa]['scientific_taxon_list'])[0], d_tree_id_name[tree],
+                  map_i, map_j, map_i+pix, map_j+pix )
+            else:
+                scene.add(Rectangle((i,j),pix,pix,(0,0,0)))
+                map += """<area shape="rect" title="taxon: %s, tree: %s" coords="%s,%s,%s,%s">""" % (
+                  list(stat[taxa]['scientific_taxon_list'])[0],d_tree_id_name[tree],
+                  map_i, map_j, map_i+pix, map_j+pix )
+            i += pix
+            map_i += pix
+    scene.write_svg()
+    map += """</map>"""
+    context = {'col_id': collection.id, "not_empty_collection": True, "map":map }
     return render_to_response( 'matrix.html', context )
 
 def autocomplete( request ):
