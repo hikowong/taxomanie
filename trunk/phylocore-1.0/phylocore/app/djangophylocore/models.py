@@ -1319,15 +1319,15 @@ class TreeCollection( models.Model, TaxonomyReference ):
         matrix = {}
         trees_list = self.trees.all()
         stat = self.get_statistics()
-        taxa_list = stat.keys()
-        for taxa_id in taxa_list:
-            matrix[taxa_id] = {}
+        taxa_list = self.taxa.all()
+        for taxa in taxa_list:
+            matrix[taxa.id] = {}
             for tree in trees_list:
                 tree_id = tree.id
-                if tree_id in stat[taxa_id]['trees_list']:
-                    matrix[taxa_id][tree_id] = 1
+                if tree_id in stat[taxa.id]['trees_list']:
+                    matrix[taxa.id][tree_id] = 1
                 else:
-                    matrix[taxa_id][tree_id] = 0
+                    matrix[taxa.id][tree_id] = 0
         return matrix
 
 
