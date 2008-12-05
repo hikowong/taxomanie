@@ -190,9 +190,9 @@ $(document).ready(function(){
         <!-- query panel -->
         <div class="query">
         <form action="statistics" class="nopadding">
-        Here you can obtain a new tree collection by searching trees satysfying a taxonomic query in either your collection or in Treebase.<br />
-        When searching Treebase you can use the special query term "{usertaxa}" to define the taxa present <br />
-        in your current collection and thus searching for trees from Treebase overlapping with this collection. <br />
+        Here you can obtain a new tree collection by searching trees
+        satisfying a taxonomic query in either your collection or in
+        Treebase.<br />
         <br />
         <input size=60  type=text 
         onfocus="if(this.value=='Your query...'){this.value='';}" 
@@ -202,7 +202,11 @@ $(document).ready(function(){
         <input id="against_treebase" type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
         <input type="submit" value="Search" class="button" blockui="wait"> <br>
         <tt><span id="exemplequery"> e.g: <b> {muridae} > 25  and ({mus}==1 or {rattus}==1) </b></span>
-        <span id="exempletreebase">e.g: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b></span>
+        <span id="exempletreebase">
+        When searching Treebase you can use the special query term "{usertaxa}" to define the taxa present <br />
+        in your current collection and thus searching for trees from Treebase overlapping with this collection. <br />
+        e.g: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b>
+        </span>
         <br /> 
         <i>You can download your result after your query</i></tt>
         </form>
