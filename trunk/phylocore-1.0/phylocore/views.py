@@ -42,7 +42,12 @@ absDir = os.path.join(os.getcwd(), localDir)
 
 def index( request ):
     request.session['progress'] = 0
-    return render_to_response( 'index.html', {'msg':''} )
+    if request.session.get( "nb_taxa", "" ):
+        not_empty_collection = True
+    else:
+        not_empty_collection = False
+    return render_to_response( 'index.html', 
+      {'msg':'', 'not_empty_collection':not_empty_collection} )
 
 def about( request ):
     context = {}
@@ -524,6 +529,18 @@ def get_matrix( request ):
     collection = request.session['collection']
     if not os.path.exists( os.path.join( "templates", "matrix", "%s.png" % collection.id ) ):
         matrix = collection.get_matrix()
+        # Sorting matrix
+        sort_info = {'trees':{}, 'taxa':{}}
+        for taxa, trees in matrix.iteritems():
+            sort_info["taxa"][taxa] = len( [i for i in trees.values() if i] )
+            for tree, presence in trees.iteritems():
+                if presence:
+                    if not tree in sort_info["trees"]:
+                        sort_info["trees"][tree] = 0 
+                    sort_info["trees"][tree] += 1 
+        print sort_info 
+        taxa_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['taxa'].items()])]
+        tree_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['trees'].items()])]
         if nb_taxa < 20 and nb_trees < 20:
             pix = 20
         elif nb_taxa < 70 and nb_trees < 70:
@@ -534,17 +551,19 @@ def get_matrix( request ):
             pix = 5
         scene = Scene('%s' % collection.id, (nb_taxa+1)*pix, (nb_trees+1)*pix )
         j = 0
-        for taxa,tmp in matrix.iteritems():
+        for taxa in taxa_list:
+            tmp = matrix[taxa]
             j += pix
             i = 0
-            for tree,val in tmp.iteritems():
+            for tree in tree_list:
+                val = tmp[tree]
                 if val == 0:
                     scene.add(Rectangle((i,j),pix,pix,(255,255,255)))
                 else:
                     scene.add(Rectangle((i,j),pix,pix,(0,0,0)))
                 i += pix
         scene.write_svg()
-    context = {'col_id': collection.id }
+    context = {'col_id': collection.id, "not_empty_collection": True }
     return render_to_response( 'matrix.html', context )
 
 def autocomplete( request ):
