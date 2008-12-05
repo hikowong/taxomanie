@@ -120,7 +120,7 @@ function add_item_filter(idfilter){
     var val = $("#taxa_input").attr('value');
     if (val){
         idfilter += 1;
-        $("#filter_taxa").append( '<li id="li'+idfilter+'">'+val+'&nbsp; <a onclick="javascript:remove_filter('+idfilter+')" href="#filter" style="color:grey" title="remove">[X]</a></li>' );
+        $("#filter_taxa").append( '<li class="li" id="li'+idfilter+'">'+val+'&nbsp; <a onclick="javascript:remove_filter('+idfilter+')" href="#filter" style="color:grey" title="remove">[X]</a></li>' );
         $("#filter_submit").append( '<input type="hidden" name="'+val+'" value="'+val+'" />' );
         $("#taxa_input").removeAttr( 'value' );
         $('#filter_submit').show();
@@ -131,6 +131,9 @@ function add_item_filter(idfilter){
 
 function remove_filter( idfilter ){
     $(document).ready( function(){
+        if( $(".li").length == 1){
+            $('#filter_submit').hide();
+       }
        $("#li"+idfilter).remove(); 
     });
 }
@@ -216,7 +219,7 @@ $(document).ready(function(){
         <tr>
         <td>
             <input id="taxa_input" size=40  type=text /> 
-            <a id="add_filter" href="#filter"> Add to filter </a>
+            <a id="add_filter" href="#filter"> Add to filter list </a>
             <br />
             <div id="autocomplete_results"></div>
             <i>You can download your result after filtering</i></tt>
