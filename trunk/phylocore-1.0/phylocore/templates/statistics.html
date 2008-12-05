@@ -293,13 +293,13 @@ $(document).ready(function(){
     <!-- Collection correction -->
     <fieldset>
     <legend> Correct your collection </legend>
-    <button>Select all single suggestion</button>
+    <button>Select all single suggestions</button>
     <form action="recreate_collection">
     <!-- homonym fieldset -->
     {% if nb_homonyms %}
         <span class="homonymlist">
         <fieldset>
-        <legend> homonym names to scientific names </legend>
+        <legend> Homonym names to scientific names </legend>
         <table>
         <!-- <tr><th>user taxa name</th><th>related scientific names</th></tr> -->
         {% for homonym_name, suggestions in dict_homonyms.iteritems %}
