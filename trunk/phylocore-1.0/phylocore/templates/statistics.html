@@ -158,23 +158,7 @@ $(document).ready(function(){
 </script>
 {% endblock %}
 
-{% block menu %}
-<!-- <a href="home" class="path" title="Go home">Home</a> -->
-<a href="." class="path" title="Go to upload collection page">Upload Collection</a>
-<a href="/phyloexplorer/help" class="path" title="(?) Help contents">Help Contents</a>
-<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About</a>
-<br />
-{% if not_empty_collection %}
-<center> <b>Current collection</b> </center>
-<a href="/phyloexplorer/browse" blockui="wait" class="path" title="Go back to collection"> Browse collection </a>
-<br />
-<a href="/phyloexplorer/browse_images" target="_blank" class="path" title="Browse and download images of the collection">Browse images</a>
-<a href="/phyloexplorer/get_matrix" class="path" title="">Matrix</a>
-<br />
-<a href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence"> Download NCBI excerpt</a>
-<a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
-{% endif %}
-{% endblock %}
+{% block idpage %}/phyloexplorer/statistics{% endblock %}
 
 {% block content %}
 <a href="#bottom" class="posPage">&nbsp;Go to the bottom of the page&nbsp;</a>
