@@ -1013,7 +1013,10 @@ class TreeCollection( models.Model, TaxonomyReference ):
         """
         return a new collection with all trees that match the query
         """
-        if self.format == 'phylip':
+        format = self.format
+        if treebase:
+            format = "nexus"
+        if format == 'phylip':
             return TreeCollection.objects.create( delimiter = self.delimiter, 
               source = '\n;'.join( [i.source for i in self._query( query, treebase )] ) )
         else:
