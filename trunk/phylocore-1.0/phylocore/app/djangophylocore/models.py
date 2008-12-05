@@ -181,7 +181,7 @@ class TaxonomyReference( object ):
     #
 
     def __sort( self, x, y ):
-        return y.parents.count() - x.parents.count()
+        return int(y.parents.count() - x.parents.count())
 
     def get_common_parents( self, taxa_list ):
         # XXX a refactoriser
@@ -296,11 +296,19 @@ class Taxonomy( models.Model ):
     def get_parents( self, regenerate = False ):
         if regenerate:
             self.regenerate_parents()    
-        return Taxonomy.objects.extra( 
-          tables = ['djangophylocore_parentsrelation'],
-          where = ["djangophylocore_taxonomy.id = djangophylocore_parentsrelation.parent_id and djangophylocore_parentsrelation.taxon_id = %s"],
-          params = [self.id],
-          order_by = ['djangophylocore_parentsrelation."index"'] )
+        if settings.DATABASE_ENGINE == "sqlite3":
+            parents_list =  Taxonomy.objects.extra( 
+              tables = ['djangophylocore_parentsrelation'],
+              where = ["djangophylocore_taxonomy.id = djangophylocore_parentsrelation.parent_id and djangophylocore_parentsrelation.taxon_id = %s"],
+              params = [self.id],
+              order_by = ['djangophylocore_parentsrelation."index"'] )
+        else:
+            parents_list =  Taxonomy.objects.extra( 
+              tables = ['djangophylocore_parentsrelation'],
+              where = ["djangophylocore_taxonomy.id = djangophylocore_parentsrelation.parent_id and djangophylocore_parentsrelation.taxon_id = %s"],
+              params = [self.id],
+              order_by = ['djangophylocore_parentsrelation.index'] )
+        return parents_list
         #return [i.parent for i in self.parents_relation_taxas.all()]
     parents = property( get_parents )
 
