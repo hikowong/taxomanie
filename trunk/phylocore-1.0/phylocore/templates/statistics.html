@@ -199,15 +199,18 @@ $(document).ready(function(){
         onblur="if(this.value==''){this.value='Your query...';}"
         {% if query %} value="{{query}}" {% else %} value="Your query..." {% endif %}
         name="query" /> 
-        <input id="against_treebase" type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
+        <input id="against_treebase" type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against Treebase
         <input type="submit" value="Search" class="button" blockui="wait"> <br>
-        <tt><span id="exemplequery"> e.g: <b> {muridae} > 25  and ({mus}==1 or {rattus}==1) </b></span>
+        <tt><span id="exemplequery"> query example: <b> {muridae} > 25  and ({mus}==1 or {rattus}==1) </b></span>
         <span id="exempletreebase">
+        query example: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b>
+        <br />
+        <br /> 
         When searching Treebase you can use the special query term "{usertaxa}" to define the taxa present <br />
-        in your current collection and thus searching for trees from Treebase overlapping with this collection. <br />
-        e.g: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b>
+        in your current collection and thus searching for trees from Treebase overlapping with this collection.
         </span>
         <br /> 
+        <br />
         <i>You can download your result after your query</i></tt>
         </form>
         {% if collection_changed %}
