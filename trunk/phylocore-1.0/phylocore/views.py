@@ -574,7 +574,6 @@ def get_matrix( request ):
     taxa_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['taxa'].items()])]
     tree_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['trees'].items()])]
     d_tree_id_name = dict( Tree.objects.filter( id__in = tree_list).values_list( 'id','name' ) )
-    print d_tree_id_name
     if nb_taxa < 20 and nb_trees < 20:
         pix = 20
     elif nb_taxa < 70 and nb_trees < 70:
