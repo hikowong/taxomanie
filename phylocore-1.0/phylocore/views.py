@@ -255,43 +255,43 @@ def statistics( request ):
     D_PROGRESS[request.session.session_key]["initial_load"] = 100
     return render_to_response( 'statistics.html', context )
 
-def check( request ):
-    #source = Source.objects.get( id = request.session['current_source_id'] )
-    source = None
-    col_id = request.session['current_col_id']
-    collection = TreeCollection.objects.get( id = col_id )
-    paginator = Paginator( collection.trees.all(), 1 )
-    if 'page' in request.GET:
-        tree_index = int( request.GET['page'] )-1
-        if tree_index < 0:
-            tree_index = 0
-        elif tree_index > paginator.count-1:
-            tree_index = paginator.count-1
-        tree = collection.trees.all()[tree_index] 
-    elif 'tree_id' in request.GET:
-        tree_id = request.GET['tree_id']
-        tree = Tree.objects.get( id = tree_id ) 
-        for page_index in paginator.page_range:
-            if tree in paginator.page(page_index).object_list:
-                tree_index = page_index - 1
-    else:
-        tree = collection.trees.all()[0] 
-        tree_index = 0
-    context = {}
-    if not tree.is_valid:
-        context['error_msg'] = "Warning : this tree is not well formated"
-    if 1:#try:
-        context['tree'] = _display_tree( tree.arborescence, source )
-    else:#except:
-        context['error_msg'] = "This tree contains error(s). Please, check the source"
-    context['source'] = tree.source.replace( collection.delimiter, ' ' )
-    context['current_tree_id'] = tree.id
-    context['page'] = paginator.page( tree_index+1 )
-    nb_trees = collection.trees.count()
-    context['enable_select_tree_names'] = nb_trees < 100 and nb_trees > 1
-    context['tree_names_list'] = [(tree.name, tree.id) for tree in collection.trees.iterator()]
-    return render_to_response( 'check.html', context )#TODO Rename to browse
-
+#def check( request ):
+#    #source = Source.objects.get( id = request.session['current_source_id'] )
+#    source = None
+#    col_id = request.session['current_col_id']
+#    collection = TreeCollection.objects.get( id = col_id )
+#    paginator = Paginator( collection.trees.all(), 1 )
+#    if 'page' in request.GET:
+#        tree_index = int( request.GET['page'] )-1
+#        if tree_index < 0:
+#            tree_index = 0
+#        elif tree_index > paginator.count-1:
+#            tree_index = paginator.count-1
+#        tree = collection.trees.all()[tree_index] 
+#    elif 'tree_id' in request.GET:
+#        tree_id = request.GET['tree_id']
+#        tree = Tree.objects.get( id = tree_id ) 
+#        for page_index in paginator.page_range:
+#            if tree in paginator.page(page_index).object_list:
+#                tree_index = page_index - 1
+#    else:
+#        tree = collection.trees.all()[0] 
+#        tree_index = 0
+#    context = {}
+#    if not tree.is_valid:
+#        context['error_msg'] = "Warning : this tree is not well formated"
+#    if 1:#try:
+#        context['tree'] = _display_tree( tree.arborescence, source )
+#    else:#except:
+#        context['error_msg'] = "This tree contains error(s). Please, check the source"
+#    context['source'] = tree.source.replace( collection.delimiter, ' ' )
+#    context['current_tree_id'] = tree.id
+#    context['page'] = paginator.page( tree_index+1 )
+#    nb_trees = collection.trees.count()
+#    context['enable_select_tree_names'] = nb_trees < 100 and nb_trees > 1
+#    context['tree_names_list'] = [(tree.name, tree.id) for tree in collection.trees.iterator()]
+#    return render_to_response( 'check.html', context )#TODO Rename to browse
+#
 def browse( request ):
     col_id = request.session['current_col_id']
     collection = TreeCollection.objects.get( id = col_id )
