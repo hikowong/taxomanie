@@ -959,7 +959,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
                 raise NameError, striped_pattern+" not found in taxonomy"
         for pattern in l_patterns:
             striped_pattern = pattern.strip().lower()
-            if not self.is_scientific_name( striped_pattern ):
+            if not self.is_scientific_name( striped_pattern ) and striped_pattern != "usertaxa":
                 related_scientific_names = Taxonomy.objects.get( name = striped_pattern ).scientifics
                 if len(related_scientific_names) == 1:
                     striped_pattern = related_scientific_names[0].name
