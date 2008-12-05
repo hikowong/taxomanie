@@ -68,7 +68,10 @@ def help( request ):
 def statistics( request ):
     print request.session.session_key
     D_PROGRESS[request.session.session_key] = { "initial_load": 0 }
-    context = {'error_msg':[]}
+    context = {'error_msg': "" }
+    if 'error_msg' in request.session:
+        context['error_msg'] = request.session['error_msg']
+        del request.session['error_msg']
     if 'new_collection' in request.POST:
         print "upload..."
         if 'myFile' in request.POST:
@@ -110,7 +113,7 @@ def statistics( request ):
             collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
         except Exception, err:
             error_msg = str('bad query: %s' % err.message)
-            context['error_msg'].append( error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) )
+            context['error_msg'] = error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) 
             return render_to_response( 'index.html', context )
         request.session['original_collection_id'] = collection.id
         request.session['collection'] = collection
@@ -348,7 +351,13 @@ def filter_collection( request ):
                 filter_list.extend( [i.name for i in taxon.children.filter( name__in = taxa_list)] )
     user_filter_list = set([])
     for taxon_name in filter_list:
-        for rel in collection.rel.filter( taxon__id = TAXONOMY_TOC[taxon_name.lower().strip()]):
+        try:
+            rel_list = collection.rel.filter( taxon__id = TAXONOMY_TOC[taxon_name.lower().strip()])
+        except KeyError, e:
+            error_msg = str("bad taxon name : %s" % e.message)
+            request.session['error_msg'] = error_msg.replace( '<', '&lt;').replace( '>', '&gt;' )
+            return statistics( request )
+        for rel in rel_list:
             user_filter_list.add( rel.user_taxon_name )
     filtered_collection = collection.get_restricted_collection( list(user_filter_list), keep=keep )
     request.session['collection'] = filtered_collection
