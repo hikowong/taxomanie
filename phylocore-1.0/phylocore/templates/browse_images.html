@@ -21,7 +21,7 @@ $(document).ready(function(){
 
 <div id="gallery">
 {% for taxon, full, thumb in d_taxa_list %}
-    <a href="{{full}}" rel="prettyPhoto[gallery]" title="{{taxon}}"><img
+    <a style="color:white" href="{{full}}" rel="prettyPhoto[gallery]" title="{{taxon}}"><img
       src="{{thumb}}" width="70" title="{{taxon}}" alt="{{taxon}}"></a>
 {% endfor %}
 </div>
