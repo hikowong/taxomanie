@@ -110,7 +110,7 @@ $(document).ready( function(){
 $(document).ready(function(){
     $("#image_load").hide();
     var col_id = $("#col_id").attr( 'value' );
-    $.get("get_phyfi_reference_tree_image_url/"+col_id, {}, function(data){
+    $.get("get_phyfi_reference_tree_image_url/"+col_id+"?internal_label=1", {}, function(data){
         $("#image_tree .img").attr( "src", data );
         $("#fetching_msg").hide();
         $("#image_load").show();
@@ -150,8 +150,8 @@ $(document).ready(function(){
 });
 
 $(document).ready(function(){
-    $("#against_treebase").select(function(){
-        $("#exemplequery").html( "e.g: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b>" );
+    $("#against_treebase").click(function(){
+        $(".exemplequery").toggle();
     });
 });
 
@@ -198,7 +198,8 @@ $(document).ready(function(){
         name="query" /> 
         <input id="against_treebase" type="checkbox" {% ifequal treebase "on" %} checked="checked" {% endifequal %} name="treebase"/> query against treebase
         <input type="submit" value="Search" class="button" blockui="wait"> <br>
-        <tt><span id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b></span>
+        <tt><span class="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b></span>
+        <span class="exemplequery" style="display: none">e.g: <b>{usertaxa} > 5 and {carnivora}==1 and not {primates}</b></span>
         <br /> 
         <i>You can download your result after your query</i></tt>
         </form>
@@ -434,7 +435,9 @@ $(document).ready(function(){
             <img class="img"></img></div>
         <span id="fetching_msg"><font color="red">Fetching image...</font></span>
     </div>
-    <div id="source"><textarea cols=100 rows=30>{{reference_tree}}</textarea></div>
+    <div id="source">
+        <textarea cols=100 rows=30>{{reference_tree}}</textarea>
+    </div>
 </div>
 </fieldset>
 </div>

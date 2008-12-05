@@ -110,7 +110,11 @@ def statistics( request ):
         col_id = request.session['original_collection_id']
         request.session['collection'] = TreeCollection.objects.get( id = col_id )
     print "fin creation collection"
-    collection = request.session['collection']
+    try:
+        collection = request.session['collection']
+    except:
+        context['bad_tree_msg'] = "Your session has expired"
+        return render_to_response( 'statistics.html', context )
     ## Query
     query = ''
     if 'query_tree' in request.GET: #FIXME POST
@@ -394,7 +398,6 @@ def single_reference_tree( request, idtree ):
         CACHE_REFERENCE_TREE["tree_%s"%idtree] = display_single_tree_stats( tree )
     return HttpResponse( CACHE_REFERENCE_TREE["tree_%s"%idtree] )
 
-
 def download_correction( request ):
     csv = "user taxa names|corrected names\n"
     for (bad, good) in request.session['correction'].iteritems():
@@ -421,7 +424,7 @@ def downloadNCBITree( request ):
     collection = TreeCollection.objects.get( id = col_id )
     response = HttpResponse(mimetype='text/plain')
     response['Content-Disposition'] = 'attachment; filename=ncbi_collection-%s.nwk' % col_id
-    response.write( collection.get_reference_tree_as_nwk() )
+    response.write( collection.get_reference_tree_as_nwk(False) )
     return response
 
 def get_images( request ):
@@ -458,16 +461,21 @@ def get_phyfi_reference_tree_image_url( request, idtree ):
 
 def get_phyfi_image_url( request, idtree, reference = False ):
     global CACHE_PHYFI_URL
+    print request.GET
+    internal_label = "internal_label" in request.GET
     if reference:
         if idtree in CACHE_PHYFI_URL['reference']:
             return HttpResponse( CACHE_PHYFI_URL['reference'][idtree] )
         else:
-            tree_source = request.session['collection'].get_reference_tree_as_nwk()
+            tree_source = request.session['collection'].get_reference_tree_as_nwk(internal_label)
     else:
         if idtree in CACHE_PHYFI_URL['tree']:
             return HttpResponse( CACHE_PHYFI_URL['tree'][idtree] )
         else:
-            tree_source = Tree.objects.get( id = idtree ).source
+            if internal_label:
+                tree_source = Tree.objects.get( id = idtree ).get_tree_as_nwk( True )
+            else:
+                tree_source = Tree.objects.get( id = idtree ).source
     conn = httplib.HTTPConnection("cgi-www.daimi.au.dk" )
     tree_source = tidyNwk( tree_source ).replace( ' ', '_' ).strip(';')
     conn.request("GET", "/cgi-chili/phyfi/go?newicktext=%s%%3B&lineth=1&format=png&angle=15&width=800" % tree_source)
@@ -475,9 +483,6 @@ def get_phyfi_image_url( request, idtree, reference = False ):
     try:
         url = f.split('iframe')[1].split('"')[3].replace('http://cgi-www.daimi.au.dk','')
     except:
-        #print tidyNwk( tree_source )
-        print f  
-        print len( f )
         if "The requested URL's length exceeds the capacity" in f:
             conn.close()
             return HttpResponse( "/site_media/exceeds_capacity_limit.png" )
@@ -493,7 +498,6 @@ def get_phyfi_image_url( request, idtree, reference = False ):
     else:
         CACHE_PHYFI_URL['tree'][idtree] = url
     return HttpResponse( url  )
-
     
 def get_tree_source( request, idtree ):
     tree = Tree.objects.get( id = idtree )
@@ -501,11 +505,13 @@ def get_tree_source( request, idtree ):
         error_line = " "*(tree.column_error-1)+"^"
     else:
         error_line = ""
-    source = tidyNwk( tree.source )
+    if "internal_label" in request.GET:
+        source = tree.get_tree_as_nwk( True )
+    else:
+        source = tidyNwk( tree.source )
     source = "_".join( source.split() )
     json = {"source":str(source), "error_line": str(error_line) }
     return HttpResponse( str(json) )
-
 
 def get_tree_arborescence( request, idtree ):
     tree = Tree.objects.get( id = idtree )
