@@ -15,7 +15,7 @@ $(document).ready(function() {
 
 $(document).ready(function(){
     $('#progressbar').hide();
-    $(".upload").click(function(){
+    $("[blockui='wait_progress']").click(function() { 
         var refreshId1 = setInterval(function() {
             $.getJSON("progressbar", {}, function(data){
                 if( data.initial_load >0 ){ 
@@ -66,7 +66,7 @@ $(document).ready(function(){
             <input type="reset" class="button" value="Clear" />
             Enter your space delimiter for taxon name (e.g., "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
-            <input class="upload" type="submit" class="button" blockui="wait" value="Upload file" />
+            <input type="submit" class="button" blockui="wait_progress" value="Upload file" />
             <input type="hidden" name="new_collection" value="true" />
         </form>
     </fieldset>
@@ -78,7 +78,7 @@ $(document).ready(function(){
             <input type="reset" class="button" value="Clear" />
             Enter your space delimiter for taxon name (e.g., "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
-            <input class="upload" type="submit" class="button" blockui="wait" value="Upload collection" />
+            <input type="submit" class="button" blockui="wait_progress" value="Upload collection" />
             <input type="hidden" name="new_collection" value="true" />
         </form>
     </fieldset>
@@ -87,7 +87,7 @@ $(document).ready(function(){
         <legend>... or enter a query for TreeBase</legend>
         <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
             <input type="text" size="80px" name="query_treebase" />
-            <input class="upload" type="submit" class="button" blockui="wait" value="Go" />
+            <input type="submit" class="button" blockui="wait_progress" value="Go" />
             <input type="reset" class="button" value="Clear" />
             <br />
             <tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>

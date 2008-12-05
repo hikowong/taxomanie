@@ -602,6 +602,7 @@ def autocomplete( request ):
 
 ########################################
 #   Needed fonctions (not views)       #
+#    Beware : html inside !            #
 ########################################
 def get_autocorrected_collection( self ):
     return self.get_corrected_collection( [(i.user_taxon_name,
@@ -743,125 +744,125 @@ def get_taxon_frequency_distribution( d_stat ):
 # Display Tree
 #
 
-def _display_tree( tree, source=None, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
-    """
-    Pretty print of the tree in HTML.
-
-    @root (string): parent name
-    @mydepth (int): depth in the tree
-    @return (string): the display in html format
-    """
-    result = ""
-    blocknum = 0
-    if not root:
-        root = Taxonomy.objects.get( name = 'root' )
-        if source:
-            result += "<a class='genre' name='genre' href='"+source.target_url+ \
-              root.fromsource_set.get( source = source ).taxon_id_in_source+\
-              "'>"+root.name.capitalize()+"</a><br />\n"
-        else:
-            result += "<a class='genre' name='genre' href=''>"+root.name.capitalize()+"</a><br />\n"
-        result += """<span class="treeline">|</span><br />\n"""
-        lastnode = root
-    # Create tree display
-    for node in tree.successors( root ):
-        dispnode = node.name
-        dispnode = dispnode.replace( "<", "&lt;" )
-        dispnode = dispnode.replace( ">", "&gt;" )
-        nb_inter_parents = 0
-        # Create div for interparents (parents beetween nodes)
-        if node._meta.module_name != 'badtaxa':
-            if TAXOREF.is_scientific_name( node.name ):
-                if lastnode in node.parents:
-                    inter_parents = TAXOREF.get_interval_parents( lastnode, node )
-                    nb_inter_parents = len( inter_parents )
-                    blocknum += 1
-                    blockname += str( blocknum )
-                    result += "<div id='%s' class='interparents'><tt>" % blockname
-                    if len( inter_parents ):
-                        result += """<span class="treeline">|</span> """*mydepth
-                        result +=  ("""<span class="treeline">|</span> """*mydepth).join(
-                          _link_genre_tree(i,source,blockname) for i in inter_parents ) 
-                    result += "</tt></div>" 
-        # Create arborescence display
-        depth = 0
-        while depth != mydepth :
-            result += """<span class="treeline">|</span> """
-            depth += 1
-        subnodes = tree.successors( node )
-        if subnodes: # it's a genre
-            result += _link_genre_tree( node, source, blockname, True, nb_inter_parents)
-            result += _display_tree( tree, source, node, depth + 1, 
-              lastnode = node, blockname = blockname+"a")
-        else: # it's a species (ie taxon)
-            if TAXOREF.is_bad_taxon( node.name ):
-                result += "+-<font color='red'><b>"+node.name.capitalize()+"</b></font><br />\n"
-            elif TAXOREF.is_homonym( node.name ):
-                result += "+-<font color='orange'><b>"+node.name.capitalize()+"</b></font><br />\n"
-            elif TAXOREF.is_common( node.name ):
-                result += "+-<font color='violet'><b>"+node.name.capitalize()+"</b></font><br />\n"
-            elif TAXOREF.is_synonym( node.name ):
-                result += "+-<font color='gray'><b>"+node.name.capitalize()+"</b></font><br />\n"
-            else:
-                result += _link_species_tree( node, source, blockname, nb_inter_parents)
-    return result
-
-def _link_species_tree( node, source, blockname, nb_inter_parents ):
-    dispnode = node.name.capitalize()
-    dispnode = dispnode.replace( "<", "&lt;" )
-    dispnode = dispnode.replace( ">", "&gt;" )
-    result = ""
-    if TAXOREF.is_homonym( node.name ):
-        style = 'class="species_homonym"'
-    else:
-        style = 'class="species"'
-    if source:
-        result += """+-<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s </a>""" % (
-          node.fromsource_set.get( source = source ).taxon_id_in_source,
-          style,                        
-          node.name,
-          source.target_url,
-          node.fromsource_set.get( source = source ).taxon_id_in_source,
-          dispnode.capitalize() )
-    else:
-        result += """+-<a %s onmouseover="go('%s');" href=""> %s </a>""" % (
-            style,
-            node.name,
-            dispnode.capitalize() )
-    if nb_inter_parents:
-        result += """<a id="a-%s" class='showparents'
-          onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
-            blockname,
-            blockname )
-    else:
-        result += "<br />\n"
-    return result
-
-def _link_genre_tree( node, source, blockname, isinterparent=False, nb_inter_parents=0 ):
-    dispnode = node.name
-    dispnode = dispnode.replace( "<", "&lt;" )
-    dispnode = dispnode.replace( ">", "&gt;" )
-    result = ""
-    if source:
-        result += """+-<a id="%s" class="genre" name="genre" onmouseover="go('%s')" 
-          href="%s%s" target='_blank'> %s </a>""" % (
-          node.fromsource_set.get( source = source ).taxon_id_in_source,
-          dispnode,
-          source.target_url,
-          node.fromsource_set.get( source = source ).taxon_id_in_source,
-          dispnode.capitalize())
-    else:
-        result += """+-<a class="genre" name="genre" onmouseover="go('%s')" href=""> %s </a>""" % (
-          dispnode,
-          dispnode.capitalize())
-    if isinterparent and nb_inter_parents:
-        result += """<a id="a-%s" class='showparents'
-          onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
-            blockname,
-            blockname )
-    else:
-        result += "<br />\n"
-    return result
+#def _display_tree( tree, source=None, root = "",  mydepth = 0, lastnode = 'root', blockname = "" ):
+#    """
+#    Pretty print of the tree in HTML.
+#
+#    @root (string): parent name
+#    @mydepth (int): depth in the tree
+#    @return (string): the display in html format
+#    """
+#    result = ""
+#    blocknum = 0
+#    if not root:
+#        root = Taxonomy.objects.get( name = 'root' )
+#        if source:
+#            result += "<a class='genre' name='genre' href='"+source.target_url+ \
+#              root.fromsource_set.get( source = source ).taxon_id_in_source+\
+#              "'>"+root.name.capitalize()+"</a><br />\n"
+#        else:
+#            result += "<a class='genre' name='genre' href=''>"+root.name.capitalize()+"</a><br />\n"
+#        result += """<span class="treeline">|</span><br />\n"""
+#        lastnode = root
+#    # Create tree display
+#    for node in tree.successors( root ):
+#        dispnode = node.name
+#        dispnode = dispnode.replace( "<", "&lt;" )
+#        dispnode = dispnode.replace( ">", "&gt;" )
+#        nb_inter_parents = 0
+#        # Create div for interparents (parents beetween nodes)
+#        if node._meta.module_name != 'badtaxa':
+#            if TAXOREF.is_scientific_name( node.name ):
+#                if lastnode in node.parents:
+#                    inter_parents = TAXOREF.get_interval_parents( lastnode, node )
+#                    nb_inter_parents = len( inter_parents )
+#                    blocknum += 1
+#                    blockname += str( blocknum )
+#                    result += "<div id='%s' class='interparents'><tt>" % blockname
+#                    if len( inter_parents ):
+#                        result += """<span class="treeline">|</span> """*mydepth
+#                        result +=  ("""<span class="treeline">|</span> """*mydepth).join(
+#                          _link_genre_tree(i,source,blockname) for i in inter_parents ) 
+#                    result += "</tt></div>" 
+#        # Create arborescence display
+#        depth = 0
+#        while depth != mydepth :
+#            result += """<span class="treeline">|</span> """
+#            depth += 1
+#        subnodes = tree.successors( node )
+#        if subnodes: # it's a genre
+#            result += _link_genre_tree( node, source, blockname, True, nb_inter_parents)
+#            result += _display_tree( tree, source, node, depth + 1, 
+#              lastnode = node, blockname = blockname+"a")
+#        else: # it's a species (ie taxon)
+#            if TAXOREF.is_bad_taxon( node.name ):
+#                result += "+-<font color='red'><b>"+node.name.capitalize()+"</b></font><br />\n"
+#            elif TAXOREF.is_homonym( node.name ):
+#                result += "+-<font color='orange'><b>"+node.name.capitalize()+"</b></font><br />\n"
+#            elif TAXOREF.is_common( node.name ):
+#                result += "+-<font color='violet'><b>"+node.name.capitalize()+"</b></font><br />\n"
+#            elif TAXOREF.is_synonym( node.name ):
+#                result += "+-<font color='gray'><b>"+node.name.capitalize()+"</b></font><br />\n"
+#            else:
+#                result += _link_species_tree( node, source, blockname, nb_inter_parents)
+#    return result
+#
+#def _link_species_tree( node, source, blockname, nb_inter_parents ):
+#    dispnode = node.name.capitalize()
+#    dispnode = dispnode.replace( "<", "&lt;" )
+#    dispnode = dispnode.replace( ">", "&gt;" )
+#    result = ""
+#    if TAXOREF.is_homonym( node.name ):
+#        style = 'class="species_homonym"'
+#    else:
+#        style = 'class="species"'
+#    if source:
+#        result += """+-<a id="%s" %s onmouseover="go('%s');" target='_blank' href="%s%s"> %s </a>""" % (
+#          node.fromsource_set.get( source = source ).taxon_id_in_source,
+#          style,                        
+#          node.name,
+#          source.target_url,
+#          node.fromsource_set.get( source = source ).taxon_id_in_source,
+#          dispnode.capitalize() )
+#    else:
+#        result += """+-<a %s onmouseover="go('%s');" href=""> %s </a>""" % (
+#            style,
+#            node.name,
+#            dispnode.capitalize() )
+#    if nb_inter_parents:
+#        result += """<a id="a-%s" class='showparents'
+#          onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
+#            blockname,
+#            blockname )
+#    else:
+#        result += "<br />\n"
+#    return result
+#
+#def _link_genre_tree( node, source, blockname, isinterparent=False, nb_inter_parents=0 ):
+#    dispnode = node.name
+#    dispnode = dispnode.replace( "<", "&lt;" )
+#    dispnode = dispnode.replace( ">", "&gt;" )
+#    result = ""
+#    if source:
+#        result += """+-<a id="%s" class="genre" name="genre" onmouseover="go('%s')" 
+#          href="%s%s" target='_blank'> %s </a>""" % (
+#          node.fromsource_set.get( source = source ).taxon_id_in_source,
+#          dispnode,
+#          source.target_url,
+#          node.fromsource_set.get( source = source ).taxon_id_in_source,
+#          dispnode.capitalize())
+#    else:
+#        result += """+-<a class="genre" name="genre" onmouseover="go('%s')" href=""> %s </a>""" % (
+#          dispnode,
+#          dispnode.capitalize())
+#    if isinterparent and nb_inter_parents:
+#        result += """<a id="a-%s" class='showparents'
+#          onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
+#            blockname,
+#            blockname )
+#    else:
+#        result += "<br />\n"
+#    return result
 
 #
 # Display itis tree stats
@@ -916,8 +917,10 @@ def display_tree_stats( collection, allparents = False ):
 #                tree.add_edge( n[0], n[1] )
 #    return tree
 
-WIKISPECIES_ICON = "http://species.wikimedia.org/favicon.ico"
-ISPECIES_ICON = "http://ispecies.org/images/logo.jpg"
+#WIKISPECIES_ICON = "http://species.wikimedia.org/favicon.ico"
+WIKISPECIES_ICON = "/site_media/logo_wikipedia.png"
+#ISPECIES_ICON = "http://ispecies.org/images/logo.jpg"
+ISPECIES_ICON = "/site_media/logo_ispecies.jpg"
 def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = "",  mydepth = 0, lastnode = 'root', blockname = "", show_nb_trees = True, progress=True ):
     """
     Pretty print of the tree in HTML.
@@ -1026,7 +1029,7 @@ def _link_itis_species( d_stats, collection, node, stat=False, blockname="", nb_
     ispecies informations" target="_blank" style="color:white"><img src="%s" width="50" /></a>""" % ( node.name.replace( ' ', '+' ), ISPECIES_ICON )
     # species.wikipedia.org redirection
     result += """<a href="http://species.wikipedia.org/wiki/%s" title="view wikispecies informations" target="_blank" style="color:white">
-      <img src="%s" /></a>""" % ( node.name.replace( ' ', '_' ).capitalize(), WIKISPECIES_ICON )
+      <img src="%s" width="20" /></a>""" % ( node.name.replace( ' ', '_' ).capitalize(), WIKISPECIES_ICON )
     if nb_inter_parents:
         result += """<a id="a-%s" class='showparents' onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
             blockname,
@@ -1068,7 +1071,7 @@ def _link_itis_genre( d_stats, collection, node, blockname, isinterparent=False,
         node.name.replace( ' ', '+' ), ISPECIES_ICON )
     # species.wikipedia.org redirection
     result += """<a href="http://species.wikipedia.org/wiki/%s" title="view wikispecies informations" target="_blank" style="color:white">
-      <img src="%s" /></a>""" % ( node.name.replace( ' ', '_').capitalize(), WIKISPECIES_ICON )
+      <img src="%s" width="20" /></a>""" % ( node.name.replace( ' ', '_').capitalize(), WIKISPECIES_ICON )
     if isinterparent and nb_inter_parents:
         result += """<a id="a-%s" class='showparents' onClick="setInternNode('%s');"> show parents</a><br />\n""" % (
             blockname,
