@@ -6,12 +6,32 @@
 <script type="text/javascript"> 
 
 $(document).ready(function() { 
-    var error_msg = {{error_msg|safe}};
+    var error_msg = '{{error_msg|safe}}';
     for( i in error_msg ){
         $('#error').jGrowl( "<b>"+error_msg[i]+"</b>", 
           { life: 10000 } );
     }
 });
+
+$(document).ready(function(){
+    $('#progressbar').hide();
+    $(".upload").click(function(){
+        var refreshId1 = setInterval(function() {
+            $.getJSON("progressbar", {}, function(data){
+                if( data.initial_load >0 ){ 
+                    $("#progressbar").show();
+                }
+                $('#progressbar').progressBar(data.initial_load);
+                if( data.initial_load >= 100 ){ 
+                    $('#progressbar').progressBar(0);
+                    $('#progressbar').hide();
+                    clearInterval(refreshId1);
+                }
+            });
+        }, 500);
+    });
+});
+
 
 </script>
 {% endblock %}
@@ -35,6 +55,7 @@ $(document).ready(function() {
 
 {% block content %}
 <div id="error"></div>
+<div id="progressbar"></div>
 {% if msg %}
     <div id="error" class="error"><center>{{ msg }}</center></div>
 {% endif %}
@@ -45,7 +66,7 @@ $(document).ready(function() {
             <input type="reset" class="button" value="Clear" />
             Enter your space delimiter for taxon name (e.g., "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
-            <input type="submit" class="button" blockui="wait" value="Upload file" />
+            <input class="upload" type="submit" class="button" blockui="wait" value="Upload file" />
             <input type="hidden" name="new_collection" value="true" />
         </form>
     </fieldset>
@@ -57,7 +78,7 @@ $(document).ready(function() {
             <input type="reset" class="button" value="Clear" />
             Enter your space delimiter for taxon name (e.g., "_" or "$" )
             <input type="text" size="1px" name="delimiter" value="_" />
-            <input type="submit" class="button" blockui="wait" value="Upload collection" />
+            <input class="upload" type="submit" class="button" blockui="wait" value="Upload collection" />
             <input type="hidden" name="new_collection" value="true" />
         </form>
     </fieldset>
@@ -66,7 +87,7 @@ $(document).ready(function() {
         <legend>... or enter a query for TreeBase</legend>
         <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
             <input type="text" size="80px" name="query_treebase" />
-            <input type="submit" class="button" blockui="wait" value="Go" />
+            <input class="upload" type="submit" class="button" blockui="wait" value="Go" />
             <input type="reset" class="button" value="Clear" />
             <br />
             <tt id="exemplequery"> e.g: <b> {muridae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
