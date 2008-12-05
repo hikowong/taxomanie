@@ -690,12 +690,14 @@ def _get_wikipedia_url( taxon ):
             taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
     return taximage_url[taxon]
 
+
+taximage_url2 = {}
  
 def _get_image_url( taxon ):
-    global taximage_url
+    global taximage_url2
     taxon = "_".join(taxon.split()).strip().capitalize()
-    if not taximage_url.has_key( taxon ):
-        taximage_url[taxon] = ""
+    if not taximage_url2.has_key( taxon ):
+        taximage_url2[taxon] = ""
         conn = httplib.HTTPConnection("species.wikimedia.org")
         conn.request("GET", "/wiki/"+taxon)
         f = conn.getresponse().read()
@@ -703,11 +705,11 @@ def _get_image_url( taxon ):
             if "thumbinner" in line:
                 url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
                 conn.close()    
-                taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
+                taximage_url2[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
                 break
         conn.close()
-        if taximage_url[taxon]:
-            return taximage_url[taxon]   
+        if taximage_url2[taxon]:
+            return taximage_url2[taxon]   
         conn = httplib.HTTPConnection("en.wikipedia.org")
         conn.request("GET", "/wiki/"+taxon)
         f = conn.getresponse().read()
@@ -715,11 +717,11 @@ def _get_image_url( taxon ):
             if "class=\"image\"" in line and not "<img alt=\"\"" in line:
                 url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
                 conn.close()    
-                taximage_url[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
-                return taximage_url[taxon]
+                taximage_url2[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
+                return taximage_url2[taxon]
         conn.close()    
-        taximage_url[taxon] = "Image not found"
-    return taximage_url[taxon]
+        taximage_url2[taxon] = "Image not found"
+    return taximage_url2[taxon]
 
 
 
