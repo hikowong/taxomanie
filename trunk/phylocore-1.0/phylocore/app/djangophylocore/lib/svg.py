@@ -42,7 +42,8 @@ class Scene:
         file.close()
         if convert:
             print "convert %s templates/matrix/%s.%s" % ( self.svgname, self.name, format )
-            os.system( "convert %s templates/matrix/%s.%s" % ( self.svgname, self.name, format ) )
+            #os.system( "convert %s templates/matrix/%s.%s" % ( self.svgname, self.name, format ) )
+            os.system( "cp %s templates/matrix/%s.%s" % ( self.svgname, self.name, format ) )
             os.system( "rm %s" % self.svgname )
 
     def display(self,prog=display_prog):
