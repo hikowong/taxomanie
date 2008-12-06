@@ -681,7 +681,7 @@ class Tree( models.Model, TaxonomyReference ):
 
     def get_reference_tree_as_nwk( self, internal_label = True ):
         """
-        return the NCBI arborescence in a newick string
+        return the reference arborescence in a newick string
         If internal_label is True, then display internal_label.
         """
         tree = self.get_reference_arborescence()
@@ -1316,7 +1316,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
 
     def get_reference_tree_as_nwk( self, internal_label = True ):
         """
-        return the NCBI arborescence in a newick string
+        return the reference arborescence in a newick string
         """
         tree = self.get_reference_arborescence()
         if len(tree):
