@@ -12,6 +12,7 @@ from django.conf import settings
 
 from djangophylocore.lib.phylogelib import tidyNwk
 
+# Use it for Jinja templates
 #from django.http import HttpResponse
 #from django.template.context import get_standard_processors
 #from jinja2 import Environment, FileSystemLoader, ChoiceLoader
@@ -35,6 +36,7 @@ D_PROGRESS = {}
 CACHE_PHYFI_URL = {'reference':{}, 'tree':{} }
 CACHE_REFERENCE_TREE = {}
 CACHE_SUGGESTIONS = {}
+TAXONOMY_ENGINE = settings.TAXONOMY_ENGINE
 
 import os.path
 localDir = os.path.dirname(__file__)
@@ -42,15 +44,18 @@ absDir = os.path.join(os.getcwd(), localDir)
 
 def index( request ):
     #request.session['progress'] = 0
+    global TAXONOMY_ENGINE
     if request.session.get( "nb_taxa", "" ):
         not_empty_collection = True
     else:
         not_empty_collection = False
     return render_to_response( 'index.html', 
-      {'msg':'', 'not_empty_collection':not_empty_collection} )
+      {'msg':'', 'not_empty_collection':not_empty_collection,
+      "taxo_engine":TAXONOMY_ENGINE} )
 
 def about( request ):
-    context = {}
+    global TAXONOMY_ENGINE
+    context = {"taxo_engine":TAXONOMY_ENGINE}
     if 'original_collection_id' in request.session:
         context['collection'] = True
     else:
@@ -58,7 +63,8 @@ def about( request ):
     return render_to_response( 'about.html', context )
 
 def help( request ):
-    context = {}
+    global TAXONOMY_ENGINE
+    context = {"taxo_engine":TAXONOMY_ENGINE}
     if 'original_collection_id' in request.session:
         context['collection'] = True
     else:
@@ -66,9 +72,10 @@ def help( request ):
     return render_to_response( 'help.html', context )
 
 def statistics( request ):
+    global TAXONOMY_ENGINE
     print request.session.session_key
     D_PROGRESS[request.session.session_key] = { "initial_load": 0 }
-    context = {'error_msg': "" }
+    context = {'error_msg': "", "taxo_engine":TAXONOMY_ENGINE }
     if 'error_msg' in request.session:
         context['error_msg'] = request.session['error_msg']
         del request.session['error_msg']
@@ -296,6 +303,8 @@ def statistics( request ):
 #    return render_to_response( 'check.html', context )#TODO Rename to browse
 #
 def browse( request ):
+    global TAXONOMY_ENGINE
+    context = {'taxo_engine':TAXONOMY_ENGINE}
     col_id = request.session['current_col_id']
     collection = TreeCollection.objects.get( id = col_id )
     trees_list = []
@@ -311,7 +320,7 @@ def browse( request ):
         source = tidyNwk( i.source )
         trees_list.append( ( i.id, i.name.replace('.','').replace('|', '_'), "_".join(source.split()), error_line ) )
     #paginator = Paginator( trees_list, 100 )
-    context = {'trees_list':trees_list}
+    context['trees_list'] = trees_list
     if len( trees_list ):
         context['not_empty_collection'] = True
     return render_to_response( 'browse.html', context )#TODO Rename to browse
@@ -417,8 +426,9 @@ def suggestions( request ):
 
 def reference_tree( request ):
     global CACHE_REFERENCE_TREE
+    global TAXONOMY_ENGINE
+    context = {'taxo_engine':TAXONOMY_ENGINE}
     collection = request.session['collection']
-    context = {}
     if collection.id in CACHE_REFERENCE_TREE:
         context['stats_tree'] = CACHE_REFERENCE_TREE[collection.id]
     else:
@@ -455,15 +465,15 @@ def downloadCollection( request ):
         ext = 'nwk'
     else:
         ext = 'nex'
-    response['Content-Disposition'] = 'attachment; filename=phyloexplorer_collection-%s.%s' % (col_id, ext)
+    response['Content-Disposition'] = 'attachment; filename=collection-%s.%s' % (col_id, ext)
     response.write( collection.get_collection_string() )
     return response
 
-def downloadNCBITree( request ):
+def download_reference_tree( request ):
     col_id = request.session['current_col_id']
     collection = TreeCollection.objects.get( id = col_id )
     response = HttpResponse(mimetype='text/plain')
-    response['Content-Disposition'] = 'attachment; filename=ncbi_collection-%s.nwk' % col_id
+    response['Content-Disposition'] = 'attachment; filename=reference_collection-%s.nwk' % col_id
     response.write( collection.get_reference_tree_as_nwk(False) )
     return response
 
@@ -478,7 +488,8 @@ def get_images( request ):
     return HttpResponse( str(json) )
 
 def browse_images( request ):
-    context = {}
+    global TAXONOMY_ENGINE
+    context = {'taxo_engine':TAXONOMY_ENGINE}
     col_id = request.session['current_col_id']
     collection = TreeCollection.objects.get( id = col_id )
     if "all" in request.GET:
@@ -569,6 +580,7 @@ def get_matrix( request ):
         </MAP>
     </IMG>
     """
+    global TAXONOMY_ENGINE
     from djangophylocore.lib.svg import Scene, Rectangle
     nb_trees = request.session['nb_trees']
     nb_taxa = request.session['nb_taxa']
@@ -622,7 +634,7 @@ def get_matrix( request ):
             map_i += pix
     scene.write_svg()
     map += """</map>"""
-    context = {'col_id': collection.id, "not_empty_collection": True, "map":map }
+    context = {'taxo_engine':TAXONOMY_ENGINE, 'col_id': collection.id, "not_empty_collection": True, "map":map }
     return render_to_response( 'matrix.html', context )
 
 def autocomplete( request ):
@@ -924,7 +936,7 @@ def get_taxon_frequency_distribution( d_stat ):
 
 def display_single_tree_stats( tree, allparents = False ):
     """
-    Display NCBI arborescence with stats of one tree
+    Display reference arborescence with stats of one tree
     """
     global D_PROGRESS
     graph = tree.get_reference_arborescence()
@@ -940,7 +952,7 @@ def display_single_tree_stats( tree, allparents = False ):
 
 def display_tree_stats( collection, allparents = False ):
     """
-    Display NCBI arborescence with stats of collection
+    Display reference arborescence with stats of collection
     """
     global D_PROGRESS
     if collection.trees.all().count():

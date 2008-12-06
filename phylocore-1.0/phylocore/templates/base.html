@@ -56,17 +56,27 @@ $(document).ready( function(){
 <a class="m" href="/phyloexplorer/help" class="path" title="(?) Help contents">Help & Examples</a>
 <a class="m" href="/phyloexplorer/about" class="path" title="About PhyloExplorer project...">About PhyloExplorer</a>
 <br />
-<center><a class="logotaxonomy" title="PhyloExplorer uses NCBI for building its taxonomy" href="http://www.ncbi.nlm.nih.gov"/><img  src="/site_media/logo_ncbi.gif" /></a></center>
+<center>
+Featuring:
+<br />
+{% ifequal taxo_engine "ncbi" %}
+<a title="PhyloExplorer uses NCBI for building its taxonomy" href="http://www.ncbi.nlm.nih.gov"/><img  src="/site_media/logo_ncbi.gif" /></a>
+{% else %}
+<a title="PhyloExplorer uses ITIS for building its taxonomy" href="http://www.itis.gov/"/><img  src="/site_media/logo_itis.gif" /></a>
+{% endifequal %}
+</center>
 {% if not_empty_collection %}
-    <center> <h3>Explore current collection</h3> </center>
+    <br />
+    <br />
+    <center> <h2>Explore current collection</h2> </center>
     <a class="m" href="/phyloexplorer/statistics" blockui="wait" class="path" title="Get statistics of the collection and make queries"> Statistics & queries </a>
     <a class="m" href="/phyloexplorer/browse" blockui="wait" class="path" title="Browse collection and explore individual trees">Individual trees</a>
-    <a class="m" href="/phyloexplorer/browse_images" class="path" title="Browse images of the collection">Taxon images</a>
+    <a class="m" href="/phyloexplorer/browse_images" blockui="wait" class="path" title="Browse images of the collection">Taxon images</a>
     <a class="m" href="/phyloexplorer/get_matrix" blockui="wait" class="path" title="">Matrix [trees X taxa]</a>
     <br />
     <br />
-    <center><h3> Download </h3></center>
-    <a class="m" href="/phyloexplorer/downloadNCBITree" class="path" title="Download the NCBI arborescence">NCBI excerpt</a>
+    <center><h2> Download </h2></center>
+    <a class="m" href="/phyloexplorer/download_reference_tree" class="path" title="Download the {{taxo_engine|upper}} arborescence">{{taxo_engine|upper}} excerpt</a>
     <a class="m" href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Collection</a>
 {% endif %}
 </div>

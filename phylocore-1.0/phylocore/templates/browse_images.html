@@ -19,7 +19,9 @@ $(document).ready(function(){
 {% block idpage %}/phyloexplorer/browse_images{% endblock %}
 
 {% block content %}
+{% if all %}
 <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+{% endif %}
 <br />
 
 {% if not all %}
@@ -42,6 +44,8 @@ $(document).ready(function(){
 
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
 <div id="images"></div>
+{% if all %}
     <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+{% endif %}
 <!-- CONTENT : END -->
 {% endblock %}
