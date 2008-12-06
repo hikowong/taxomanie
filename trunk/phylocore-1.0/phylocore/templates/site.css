@@ -355,7 +355,7 @@ td.links
 	color: #fff;
     }
 
-td.links a
+td.links a.m
     {
 	display: block;
 	margin: 4px 0px 0px 0px;
