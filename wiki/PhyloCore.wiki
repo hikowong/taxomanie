@@ -42,6 +42,8 @@ lines into the python interpreter:
 >>> import pyparsing
 }}}
 
+In order to get matrix working, you will need the "convert" program from [http://www.imagemagick.org/script/index.php ImageMagick].
+
 = Installation =
 First of all, download an install [http://www.djangoproject.com/download/ Django 1.0].
 
