@@ -114,6 +114,10 @@ $(document).ready( function(){
         <li><a href="#arborescence"><span>Browsable NCBI excerpt</span></a></li>
         <li><a href="#source"><span>Newick format</span></a></li>
     </ul>
+    <div id="image_tree">
+        <div id="image_load"><img class="img"></img></div>
+        <span id="fetching_msg"></span>
+    </div>
     <div id="arborescence">
         <!-- Tree visualization -->
         <div class="tree">
@@ -123,10 +127,6 @@ $(document).ready( function(){
         </tt>
         <br />
         </div>
-    </div>
-    <div id="image_tree">
-        <div id="image_load"><img class="img"></img></div>
-        <span id="fetching_msg"></span>
     </div>
     <div id="source">
         <span id="treenewick"></span>
