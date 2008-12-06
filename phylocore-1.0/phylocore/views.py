@@ -481,7 +481,12 @@ def browse_images( request ):
     context = {}
     col_id = request.session['current_col_id']
     collection = TreeCollection.objects.get( id = col_id )
-    taxa_list = collection.taxa.all()[:20]
+    if "all" in request.GET:
+        taxa_list = collection.taxa.all()
+        context["all"] = True
+    else:
+        taxa_list = collection.taxa.all()[:20]
+        context["all"] = False
     d_taxa_list = []
     for taxon in taxa_list:
         #d_taxa_list[taxon.name] = _get_wikipedia_url(taxon.name)

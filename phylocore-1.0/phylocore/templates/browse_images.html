@@ -7,11 +7,13 @@
 $(document).ready(function(){
     $("a[rel^='prettyPhoto']").prettyPhoto( {allowresize: true} );
 });
+
+{% if all %}
+$(document).ready(function(){
+    $("#menu").hide();
+});
+{% endif %}
 </script>
-{% endblock %}
-
-
-{% block menu %}
 {% endblock %}
 
 {% block idpage %}/phyloexplorer/browse_images{% endblock %}
@@ -20,7 +22,11 @@ $(document).ready(function(){
 <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
 <br />
 
+{% if not all %}
 <b> This is a gallery of the first 20 taxa </b>
+<br />
+<br />
+{% endif %}
 
 <div id="gallery">
 {% for taxon, full, thumb in d_taxa_list %}
@@ -28,6 +34,11 @@ $(document).ready(function(){
       src="{{thumb}}" width="70" title="{{taxon}}" alt="{{taxon}}"></a>
 {% endfor %}
 </div>
+<br />
+{% if not all %}
+<br />
+<a href="/phyloexplorer/browse_images?all=1" target="_blank">Display all images of the collection</a> This can take a while...
+{% endif %}
 
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
 <div id="images"></div>
