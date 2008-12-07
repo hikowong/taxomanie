@@ -16,19 +16,12 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 ###############################################################################
 ################################ DON'T EDIT ###################################
 
-TAXONOMY_ENGINE = 'itis'            # 'ncbi" or 'itis'
+TAXONOMY_ENGINE = 'itis' 
 DEBUG = False
 ADMINS = []
 
 assert TAXONOMY_ENGINE == 'itis', "TAXONOMY_ENGINE must be 'itis'"
 assert DATABASE_ENGINE in ['mysql','sqlite3'], "DATABASE_ENGINE must be 'mysql' or 'sqlite3'"
-
-# This is useful for apache
-try:
-    import matplotlib
-    matplotlib.use('Agg')
-except:
-    pass
 
 import os
 ROOT_PATH = os.path.join(os.getcwd(), os.path.dirname(__file__) )
@@ -38,8 +31,8 @@ MANAGERS = ADMINS
 
 # For sqlite3
 if DATABASE_ENGINE == 'sqlite3':
-    import phylocore_ncbi
-    DATABASE_PATH = os.path.join( os.path.split( phylocore_ncbi.__file__ )[0] )
+    import phylocore_itis
+    DATABASE_PATH = os.path.join( os.path.split( phylocore_itis.__file__ )[0] )
     DATABASE_NAME = os.path.join( DATABASE_PATH, 'phylocore_%s.db' % TAXONOMY_ENGINE )    # Or path to database file if using sqlite3.
 elif DATABASE_ENGINE == 'mysql':
     pass
@@ -82,7 +75,8 @@ TEST_DATABASE_NAME = 'test_phylocore'
 #ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'uiq_^0i!e3kw+dtt$w_wiz-03%hp6m=(v9k1$5)zyq$r!j8h5!'
+#SECRET_KEY = 'uiq_^0i!e3kw+dtt$w_wiz-03%hp6m=(v9k1$5)zyq$r!j8h5!'
+#SECRET_KEY = '4^&s8es5l(ee1o#a!7lha00%alhutwv=$iy)o^mpgb48^dh)vc'
 
 # List of callables that know how to import templates from various sources.
 #TEMPLATE_LOADERS = (

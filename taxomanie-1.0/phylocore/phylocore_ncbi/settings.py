@@ -6,9 +6,9 @@
 DATABASE_ENGINE = 'sqlite3'           # 'mysql' or 'sqlite3'
 
 # If you choosed mysql please fill the lines bellow
-DATABASE_NAME = ''    # Database name
-DATABASE_USER = ''    # User name
-DATABASE_PASSWORD = ''     # Password for the user
+DATABASE_NAME = 'phylocore_ncbi'    # Database name
+DATABASE_USER = 'root'    # User name
+DATABASE_PASSWORD = 'mysql'     # Password for the user
 # You can also pass optional database informations
 DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
@@ -22,13 +22,6 @@ ADMINS = []
 
 assert TAXONOMY_ENGINE == 'ncbi', "TAXONOMY_ENGINE must be 'ncbi'"
 assert DATABASE_ENGINE in ['mysql','sqlite3'], "DATABASE_ENGINE must be 'mysql' or 'sqlite3'"
-
-# This is useful for apache
-try:
-    import matplotlib
-    matplotlib.use('Agg')
-except:
-    pass
 
 import os
 ROOT_PATH = os.path.join(os.getcwd(), os.path.dirname(__file__) )
