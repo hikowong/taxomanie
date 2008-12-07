@@ -58,7 +58,7 @@ svn checkout http://taxomanie.googlecode.com/svn/trunk/ taxomanie
 
 Go to the PhyloCore folder and launch the `install` script:
 {{{
-cd taxomanie/phylocore-1.0
+cd taxomanie/taxomanie-1.0
 sudo ./install
 }}}
 
