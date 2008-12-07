@@ -1,6 +1,0 @@
-#summary Ideas about PhyloCore.
-#labels Phase-Design
-
- * use `./manage.py` command for updating from itis database
- * use template tags to display tree in html format
- * [http://code.google.com/p/django-rest-interface/ restify] phylocore
