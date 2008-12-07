@@ -1,0 +1,17 @@
+<a class="phylowidget" target="_blank" 
+href="http://www.phylowidget.org/full/index.html?tree='{{ reference_tree }}'"
+title="Display the ncbi tree as graph"> Click to visualize this tree using
+PhyloWidget </a> <img src="http://www.phylowidget.org/img/pw.ico" />
+<br />
+<br />
+<form action="filter_collection">
+    <a class="selectall" onclick="javascript:selectAll();"> Select all</a> &nbsp; &nbsp;
+    <a class="selectall" onclick="javascript:unselectAll();"> Unselect all </a>
+    <br />
+    <tt>
+     {{ stats_tree|safe }}
+    </tt>
+<b> Select the taxa you want to keep and </b> <br />
+<input type="submit" value="Restrict your trees" />
+</form>
+
