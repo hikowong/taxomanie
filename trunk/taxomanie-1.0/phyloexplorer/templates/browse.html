@@ -40,7 +40,7 @@ function selectGenre( genre ){
 $(document).ready(function(){
     $("div.source").hide(); });
 
-function togglesource(idNode){
+function togglesource(idNode, error_line){
     $(document).ready(function(){
         $("#image_load").hide();
         $("#image_tree img").removeAttr( "src" );
@@ -48,7 +48,13 @@ function togglesource(idNode){
         $("#fetching_msg").show();
         var tree_name = $('#a'+idNode).text();
         $("#tree_name_legend").text('Selected tree is "'+tree_name+'"');
-        $.getJSON("get_tree_source/"+idNode+"?internal_label=1", {}, function(data){
+        if (error_line){
+            var url = "get_tree_source/"+idNode;
+        }
+        else{
+            var url = "get_tree_source/"+idNode+"?internal_label=1";
+        }
+        $.getJSON(url, {}, function(data){
             if( data.error_line){
                 var source = '<font color="red"><pre><span class="treesource">'+data.source+'<br />'+data.error_line+'</span></pre></font>';
             }
@@ -105,7 +111,7 @@ latter to reflect this approximation.
 <fieldset> <legend> Trees list </legend>
 <div id="tree_view">
     {% for idtree, name, source, error_line in trees_list %}
-        <b> <a id="a{{idtree}}" href="#image_tree" onclick="javascript:togglesource('{{idtree}}');"
+        <b> <a id="a{{idtree}}" href="#image_tree" onclick="javascript:togglesource('{{idtree}}', '{{error_line}}');"
         {%if error_line %} style="color:red" {% else %} style="color:black" {% endif %} > {{name}} </a> </b>
         {% if not error_line %}
         <a href="http://www.phylowidget.org/full/index.html?tree='{{source}}'" target="_blank"
