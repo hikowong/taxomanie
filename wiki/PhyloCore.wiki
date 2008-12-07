@@ -22,6 +22,9 @@ Main features of PhyloCore are:
 
 DjangoPhylocore can not easily be used outside a django project. We thus create PhyloCore,  a wrapper against DjangoPhylocore, that provides the same functionnalities and can be used outside a django project. In short, if you developpe a web application upon django, use DjangoPhylocore, otherwise use PhyloCore.
 
+PhyloCore is declined in two version : phylocore_ncbi and phylocore_itis.
+The only difference is the taxonomy underlying.
+
 = Dependencies =
 PhyloCore relies on Django wich is written in Python. So, you need Python and Django.
 
