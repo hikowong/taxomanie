@@ -3,12 +3,23 @@
 
 = Introduction =
 
-First of all, you'll have to import Django setting. So all of your scripts may begin like that :
+There is two version of phylocore : phylocore_ncbi and phylocore_itis. You can use both at the same time :
 
 {{{
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from phylocore import *
+>>> import phylocore_ncbi as ncbi
+>>> import phylocore_itis as itis
+
+>>> nb_ncbi_species = ncbi.Taxonomy.objects.all().count()
+>>> nb_itis_species = itis.Taxonomy.objects.all().count()
+
+>>> nb_ncbi_species == nb_itis_species
+False
+}}}
+
+If you want to work with only one taxonomy, you can import all objects at the same time:
+
+{{{
+>>> from phylocore_ncbi import *
 }}}
 
 = Working with Taxa =
