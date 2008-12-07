@@ -27,8 +27,8 @@ class Command(NoArgsCommand):
         absDir = os.path.join(os.getcwd(), localDir)
         path = os.path.join( absDir,'..','..' ) 
         try:
-            os.remove( os.path.join( path, 'taxonomy_toc' ) )
+            os.remove( os.path.join( path, 'taxonomy_toc_%s' % settings.TAXONOMY_ENGINE ) )
         except:
             pass
-        pickle.dump( d, open( os.path.join( path, 'taxonomy_toc' ), 'w' ) )
+        pickle.dump( d, open( os.path.join( path, 'taxonomy_toc_%s' % settings.TAXONOMY_ENGINE ), 'w' ) )
 

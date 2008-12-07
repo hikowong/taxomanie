@@ -1381,7 +1381,7 @@ def get_taxonomy_toc( test = False ):
         if test:
             TAXONOMY_TOC = pickle.load( open( os.path.join( absDir, 'taxonomy_toc_test') ) )
         else:
-            TAXONOMY_TOC = pickle.load( open( os.path.join( absDir, 'taxonomy_toc') ) )
+            TAXONOMY_TOC = pickle.load( open( os.path.join( absDir, 'taxonomy_toc_%s' % settings.TAXONOMY_ENGINE ) ) )
     else:
         TAXONOMY_TOC = globals()['TAXONOMY_TOC']
     return TAXONOMY_TOC

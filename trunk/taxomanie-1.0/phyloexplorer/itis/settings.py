@@ -124,11 +124,11 @@ TEMPLATE_DIRS = (
     #"/home/taxomanie/phyloexplorer/templates",
 )
 
-INSTALLED_APPS = (
+#INSTALLED_APPS = (
 #    'django.contrib.auth',
 #    'django.contrib.contenttypes',
 #    'django.contrib.sessions',
 #    'django.contrib.sites',
 #    'django_extensions',
-    'djangophylocore',
-)
+#    'djangophylocore',
+#)
