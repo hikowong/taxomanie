@@ -64,15 +64,68 @@ sudo ./install
 
 This will create symbolic link into your $PYTHONPATH (/usr/local/lib/pythonX.X/site-packages)
 
+=== Installing NCBI taxonomy ===
+
+Go to phyloexplorer/ncbi to install NCBI taxonomy.
+
+Edit the settings.py file and change the DATABASE_ENGINE.
+
+Now type those commands :
+
+{{{
+python manage.py install -v
+}}}
+
+This will download the taxonomy from the web and build the database.
+
+=== Installing ITIS taxonomy ===
+
+Go to phyloexplorer/itis to install ITIS taxonomy.
+
+Edit the settings.py file and change the DATABASE_ENGINE.
+
+Now type those commands :
+
+{{{
+python manage.py install -v
+}}}
+This will download the taxonomy from the web and build the database.
+
+=== Verification ===
+
 In order to verify that the installation goes well, put this line into your shell:
+
+for ncbi:
 {{{
 ( cd /tmp ; python -c "from phylocore_ncbi import *" )
 }}}
+
+
+for itis:
+{{{
+( cd /tmp ; python -c "from phylocore_itis import *" )
+}}}
+
 if nothing shows up then you're good. Congratulation !
+
+== Using mysql ==
+
+If you want to use mysql (for deploying reasons), you have to go to
+phylocore/phylocore_ncbi and/or phylocore/phylocore_itis and edit the
+setting.py file.
+
+Change 'sqlite3' by 'mysql' and fill the line bellow.
+
+Then install the taxonomy into the database by typing
+
+{{{
+python manage.py install -v
+}}}
+
 
 = Going further =
 
-See how to [PhyloCoreConfiguration configure] Phylocore.
+Using PhyloExplorer
 
 Next, follow the [PhyloCoreTutorial tutorial].
 
