@@ -62,7 +62,7 @@ This will create symbolic link into your $PYTHONPATH (/usr/local/lib/pythonX.X/s
 
 In order to verify that the installation goes well, put this line into your shell:
 {{{
-( cd /tmp ; python -c "from phylocore import *" )
+( cd /tmp ; python -c "from phylocore_ncbi import *" )
 }}}
 if nothing shows up then you're good. Congratulation !
 
