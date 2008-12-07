@@ -110,11 +110,20 @@ if nothing shows up then you're good. Congratulation !
 
 == Using mysql ==
 
+By default, PhyloCore is configured for sqlite3. 
 If you want to use mysql (for deploying reasons), you have to go to
 phylocore/phylocore_ncbi and/or phylocore/phylocore_itis and edit the
 setting.py file.
 
 Change 'sqlite3' by 'mysql' and fill the line bellow.
+
+Create the database
+
+{{{
+mysql -u user -p -e "CREATE DATABASE database_name CHARACTER SET utf8;"
+}}}
+
+*Utf-8 is important as django stores all it's data into this charset. *
 
 Then install the taxonomy into the database by typing
 
