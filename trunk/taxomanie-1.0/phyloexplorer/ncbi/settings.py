@@ -15,12 +15,12 @@ from phylocore_ncbi.settings import *
 #DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
 #DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
-
-DEBUG = True
-
 ADMINS = (
     ('John foo', 'john@foo.com'),
 )
+
+# True if not in production (ie : behind apache)
+DEBUG = True
 
 ###############################################################################
 ################################ DON'T EDIT ###################################
