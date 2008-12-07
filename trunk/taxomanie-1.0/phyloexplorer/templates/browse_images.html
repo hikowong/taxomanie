@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block pagedef %} Upload collection > Browse collection's images {% endblock %}
+
+{% block script %}
+<script type="text/javascript"> 
+$(document).ready(function(){
+    $("a[rel^='prettyPhoto']").prettyPhoto( {allowresize: true} );
+});
+
+{% if all %}
+$(document).ready(function(){
+    $("#menu").hide();
+});
+{% endif %}
+</script>
+{% endblock %}
+
+{% block idpage %}/phyloexplorer/browse_images{% endblock %}
+
+{% block content %}
+{% if all %}
+<a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+{% endif %}
+<br />
+
+{% if not all %}
+<b> This is a gallery of the first 20 taxa </b>
+<br />
+<br />
+{% endif %}
+
+<div id="gallery">
+{% for taxon, full, thumb in d_taxa_list %}
+    <a style="color:white" href="{{full}}" rel="prettyPhoto[gallery]" title="{{taxon}}"><img
+      src="{{thumb}}" width="70" title="{{taxon}}" alt="{{taxon}}"></a>
+{% endfor %}
+</div>
+<br />
+{% if not all %}
+<br />
+<a href="/phyloexplorer/browse_images?all=1" target="_blank">Display all images of the collection</a> This can take a while...
+{% endif %}
+
+<!-- CONTENU : BEGINNING____________________________________________________________________ -->
+<div id="images"></div>
+{% if all %}
+    <a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+{% endif %}
+<!-- CONTENT : END -->
+{% endblock %}

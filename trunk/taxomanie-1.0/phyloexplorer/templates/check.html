@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block pagedef %} Home > Statistics {% endblock %}
+
+
+{% block script %}
+<script type="text/javascript"> 
+$(document).ready(function(){
+//    $("#exemplequery").hide();
+    $("#exemplelink").click(function () {
+        $("#exemplequery").slideToggle("slow");
+    });
+});
+
+$(document).ready(function(){
+    $("#source").hide();
+    $("#showsource").click(function () {
+        $("#source").slideToggle("slow");
+    });
+});
+</script>
+{% endblock %}
+ 
+{% block menu %}
+<center> <b> Home </b> </center>
+<a href="." class="path" title="Go to import collection page"> Upload Collection </a>
+<a href="/phyloexplorer/help" class="path" title="(?) Help contents"> Help Contents </a>
+<a href="/phyloexplorer/about" class="path" title="About PhyloExplorer project..."> About </a>
+<br />
+<center> <b>Current collection</b> </center>
+<a href="/phyloexplorer/statistics" blockui="wait" class="path"
+title="Go back to statistics for this subset of trees"> Back to statistics </a>
+<a href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Download collection</a>
+<br />
+{% endblock %}
+
+{% block content %}
+
+{% comment %}
+<!-- query panel -->
+<div class="query">
+<form action="check" class="nopadding">
+<!--<a onclick="javascript:toggleExemple();" id="exemplelink"> View example </a>&nbsp;-->
+<input size=60  type=text 
+onfocus="if(this.value=='Your query...'){this.value='';}" 
+onblur="if(this.value==''){this.value='Your query...';}"
+<%
+if _query_:
+    #
+%>
+value="<%$ _query_ %>"
+<%
+else:
+    #
+%>
+value="Your query..."
+<%|%>
+name="query" /> 
+<input type="submit" value="Search" class="button" blockui="wait"><br />
+<tt id="exemplequery"> e.g: <b> {murinae} > 2 and {carnivora}==1 and not ({primates} or {laurasiatheria} < 4) </b>
+<br /> 
+<i>You can download your result after your query</i></tt>
+</form>
+<%
+if _query_:
+    #
+%>
+    Results for --&nbsp;<%$ _query_ %>&nbsp;--&nbsp;|&nbsp;<a blockui="wait"
+    href=/phyloexplorer/check?clear_query=1>Back to full collection</a>
+<%
+else:
+    _query_ = ""
+#
+%>
+</div>
+{% endcomment %}
+
+{% if enable_select_tree_names %}
+<!-- Select on tree names -->
+<center>
+<form name="tree_id" action="browse">
+    <b>Display tree </b>&nbsp;
+    <select name="tree_id" onchange="javascript:document.tree_id.submit();">
+    {% for name, tree_id in tree_names_list %}
+    <option blockui="wait" value="{{tree_id}}"{% ifequal tree_id current_tree_id %} selected{% endifequal %}>{{name}}</option>
+    {% endfor %}
+    </select>
+</form>
+</center>
+{% endif %}
+
+<!-- begin paginator -->
+<center>
+<form>
+{% if page.has_previous %}
+    <a href="/phyloexplorer/browse?page={{page.previous_page_number}}"> Previous </a>&nbsp;
+{% endif %}
+<input size="5" type="text" value="{{page.start_index}}" name="page"/>/{{ page.paginator.count }}
+{% if page.has_next %}
+    &nbsp;<a href="/phyloexplorer/browse?page={{page.next_page_number}}"> Next </a>
+{% endif %}
+</form>
+</center>
+<!-- end paginator -->
+
+<a target="_blank" style="color:green"
+   href="http://www.phylowidget.org/full/index.html?tree='{{ source }} %>'"
+   title="Display the ncbi tree as graph"> Click to visualize this tree using PhyloWidget </a>
+<br />
+<br />
+<a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
+&nbsp;
+&nbsp;
+&nbsp;
+<a id="iNode" onClick="javascript:setNode();" 
+  title="Click to show/hide intern node">Show/Hide intern nodes</a>
+&nbsp;
+<a id="toggleallparents" class="posPage" onClick="javascript:toggleInternNode();" 
+  title="Click to show/hide all parents">Show/Hide all parents</a>
+
+{% if error_msg %} <div  class="error">{{ error_msg }}</div>{% endif %}
+<!-- Tree visualization -->
+<div class="tree">
+<br />
+<tt>
+{{ tree|safe }}
+</tt>
+<br />
+</div>
+<a href="#top" class="posPage">&nbsp;Go to top&nbsp;</a>
+
+<!-- div preview -->
+<div id="preview"></div>
+
+<!-- begin paginator -->
+<center>
+<form>
+{% if page.has_previous %}
+    <a href="/phyloexplorer/browse?page={{page.previous_page_number}}"> Previous </a>&nbsp;
+{% endif %}
+<input size="5" type="text" value="{{page.start_index}}" name="page"/>/{{ page.paginator.count }}
+{% if page.has_next %}
+    &nbsp;<a href="/phyloexplorer/browse?page={{page.next_page_number}}"> Next </a>
+{% endif %}
+</form>
+</center>
+<!-- end paginator -->
+
+<!-- TODO mettre de l'ajax ici pour eviter un chargement trop lent -->
+<a id='showsource' class="showparents"> Show source </a>
+<div id='source'>
+{{source}}
+</div>
+
+{% endblock %}
+

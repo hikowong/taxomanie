@@ -1,0 +1,17 @@
+#!/usr/bin/env python
+
+import os, sys
+python_version = ".".join( "".join( os.popen("python -V 2>&1").read().split()).split(".")[:-1]).lower()
+if sys.platform == 'darwin': # there is no site-packages on MacOS X
+    python_path = "/usr/lib/%s/" % python_version
+else:
+    python_path = "/usr/lib/%s/site-packages/" % python_version
+
+localDir = os.path.dirname(__file__)
+absDir = os.path.join(os.getcwd(), localDir)
+print "installing djangophylocore into %s" % python_path
+os.system( "sudo ln -sf $PWD/phylocore/djangophylocore %s/" % ( python_path ) )
+print "installing phylocore_ncbi into %s" % python_path
+os.system( "sudo ln -sf $PWD/phylocore/phylocore_ncbi %s/" % ( python_path ) )
+print "installing phylocore_itis into %s" % python_path
+os.system( "sudo ln -sf $PWD/phylocore/phylocore_itis %s/" % ( python_path ) )
