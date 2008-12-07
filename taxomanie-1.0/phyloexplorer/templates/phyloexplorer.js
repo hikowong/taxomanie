@@ -6,6 +6,9 @@ $(document).ready(function() {
     $("[blockui='wait']").click(function() { 
         $.blockUI(); 
     }); 
+    $("[blockui='wait_progress']").click(function() { 
+        $.blockUI(); 
+    }); 
 }); 
 
 
