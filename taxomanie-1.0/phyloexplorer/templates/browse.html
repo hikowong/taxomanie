@@ -91,6 +91,16 @@ $(document).ready( function(){
 {% block content %}
 <a href="#bottom" class="posPage">&nbsp;Go to bottom&nbsp;</a>
 <br />
+Here you can view each individual tree of the collection and the corresponding
+excerpt of the taxonomy. For each tree, ambiguous leaves (i.e.
+<i>those that are not uniquely associated to a scientific name present in the
+taxonomy</i>) are
+indicated by a "?". Clades are named by the smallest  taxonomic group
+containing all their leaves. When a clade contains ambiguous leaves, those
+leaves are not taken into account to assign its name but "?" are added to this
+latter to reflect this approximation.
+<br />
+<br />
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
 <fieldset> <legend> Trees list </legend>
 <div id="tree_view">
