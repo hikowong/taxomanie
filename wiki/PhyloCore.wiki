@@ -4,19 +4,20 @@
 PhyloCore library provides tools for manipulating tree collections and taxonomic information. It can be use either with NCBI [http://www.ncbi.nlm.nih.gov/Taxonomy/] or ITIS [http://www.itis.gov/ Itis database] taxonomic database  .
 
 Main features of PhyloCore are:
- * Taxa manipulation:  
+ * Taxon manipulation:  
    * Getting all scientific names of taxa
    * Getting synonyms, homonyms and commons name from a scientific taxa name
    * Getting parents and children  
    * Getting rank
- * Trees manipulations:
+ * Tree manipulations:
    * Getting all taxa (Taxa objects) from newick tree format
    * Getting synonyms, commons names and homonyms from tree
    * Getting NetworkX arborescence (useful for graph manipulations)
- * Trees collections mapulations:
+ * Tree collection mapulations:
    * Support of phylip and nexus format
    * Getting bad formated tree names
    * Getting statistics (number for taxa, number of synonyms...)
+   * Getting trees/taxa matrix
 
 = DjangoPhylocore vs PhyloCore =
 
