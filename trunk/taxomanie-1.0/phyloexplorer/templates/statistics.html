@@ -181,6 +181,7 @@ $(document).ready(function(){
 <!-- CONTENU : BEGINNING____________________________________________________________________ -->
 <input id="col_id" type="hidden" value="{{current_col_id}}" name="col_id" />
 <div class="stat">
+{% if not bad_tree_msg %}
 <div id="query_filter">
     <ul>
         <li><a href="#query"><span>Query</span></a></li>
@@ -265,6 +266,7 @@ $(document).ready(function(){
         <!-- end filter panel -->
     </div>
 </div>
+{% endif %}
 
 <div  id="error"></div>
 {% if bad_tree_msg %} <div class="error">{{ bad_tree_msg|safe }}</div>{% endif %}

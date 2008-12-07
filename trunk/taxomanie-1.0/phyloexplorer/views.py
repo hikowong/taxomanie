@@ -51,6 +51,8 @@ elif settings.TAXONOMY_ENGINE == "itis":
 def index( request ):
     #request.session['progress'] = 0
     global TAXONOMY_ENGINE, REFERENCE_ROOT_URL
+    if "clear_session" in request.GET:
+        request.session.clear()
     if request.session.get( "nb_taxa", "" ):
         not_empty_collection = True
     else:
@@ -311,7 +313,11 @@ def statistics( request ):
 def browse( request ):
     global TAXONOMY_ENGINE, REFERENCE_ROOT_URL
     context = {'taxo_engine':TAXONOMY_ENGINE, "ref_url":REFERENCE_ROOT_URL}
-    col_id = request.session['current_col_id']
+    try:
+        col_id = request.session['current_col_id']
+    except:
+        context['bad_tree_msg'] = "Your session has expired"
+        return render_to_response( 'statistics.html', context )
     collection = TreeCollection.objects.get( id = col_id )
     trees_list = []
     if 'only_bad_trees' in request.GET:
@@ -329,7 +335,7 @@ def browse( request ):
     context['trees_list'] = trees_list
     if len( trees_list ):
         context['not_empty_collection'] = True
-    return render_to_response( 'browse.html', context )#TODO Rename to browse
+    return render_to_response( 'browse.html', context )
 
 def recreate_collection( request ):
     # FIXME TODO Prendre en charge la correction sur les bad_taxa
@@ -496,7 +502,11 @@ def get_images( request ):
 def browse_images( request ):
     global TAXONOMY_ENGINE, REFERENCE_ROOT_URL
     context = {'taxo_engine':TAXONOMY_ENGINE, "ref_url":REFERENCE_ROOT_URL}
-    col_id = request.session['current_col_id']
+    try:
+        col_id = request.session['current_col_id']
+    except:
+        context['bad_tree_msg'] = "Your session has expired"
+        return render_to_response( 'statistics.html', context )
     collection = TreeCollection.objects.get( id = col_id )
     if "all" in request.GET:
         taxa_list = collection.taxa.all()
@@ -588,7 +598,12 @@ def get_matrix( request ):
     """
     global TAXONOMY_ENGINE, REFERENCE_ROOT_URL
     from djangophylocore.lib.svg import Scene, Rectangle
-    nb_trees = request.session['nb_trees']
+    try:
+        nb_trees = request.session['nb_trees']
+    except:
+        context = {}
+        context['bad_tree_msg'] = "Your session has expired"
+        return render_to_response( 'statistics.html', context )
     nb_taxa = request.session['nb_taxa']
     collection = request.session['collection']
     stat = collection.get_statistics()

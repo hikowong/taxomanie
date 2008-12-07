@@ -62,11 +62,11 @@ Featuring:
 {% ifequal taxo_engine "ncbi" %}
 <a title="PhyloExplorer uses NCBI for building its taxonomy" href="http://www.ncbi.nlm.nih.gov"/><img  src="/site_media/logo_ncbi.gif" /></a>
 <br />
-Go to itis version <a href="http://{{ref_url}}/phyloexplorer"> here </a>
+Go to itis version <a href="http://{{ref_url}}/phyloexplorer?clear_session=1"> here </a>
 {% else %}
 <a title="PhyloExplorer uses ITIS for building its taxonomy" href="http://www.itis.gov/"/><img  src="/site_media/logo_itis.jpg" /></a>
 <br />
-Go to ncbi version <a href="http://{{ref_url}}/phyloexplorer"> here </a>
+Go to ncbi version <a href="http://{{ref_url}}/phyloexplorer?clear_session=1"> here </a>
 {% endifequal %}
 </center>
 {% if not_empty_collection %}
