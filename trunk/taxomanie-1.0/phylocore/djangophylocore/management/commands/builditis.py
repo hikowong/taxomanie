@@ -18,6 +18,17 @@ class Command(NoArgsCommand):
     help = "Download and build the itis database"
     requires_model_validation = False
 
+    def download_itis( self, verbose ):
+        if not os.path.exists( './itisdump.tar.gz' ):
+            if verbose:
+                print "Downloading ITIS database on the web"
+            os.system( "curl -# http://www.itis.gov/downloads/itisMS102008.TAR.gz > itisdump.tar.gz ")
+            #os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
+        if verbose:
+            print "Extracting database... please wait"
+        os.system( "tar xf itisdump.tar.gz" )
+        os.system( "mv itisMS.* itisdump" )
+ 
     def handle_noargs(self, **options):
         global DUMP_PATH
         verbose = options.get("verbose", False)
@@ -27,7 +38,8 @@ class Command(NoArgsCommand):
             os.system( 'mkdir %s' % DUMP_PATH )
         else:
             os.system( 'rm %s/*' % DUMP_PATH )
-        path = '/home/namlook/Bureau/ITIS_VR/itis/itis/itis_fic_utils'
+        self.download_itis( verbose )
+        path = './itisdump'
         synonym_file_path = os.path.join( path, 'synonym_links' )
         taxonomic_units_path  = os.path.join( path, 'taxonomic_units' )
         taxon_unit_types_path  = os.path.join( path, 'taxon_unit_types' )
