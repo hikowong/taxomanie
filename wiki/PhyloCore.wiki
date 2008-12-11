@@ -66,11 +66,7 @@ This will create symbolic link into your $PYTHONPATH (/usr/local/lib/pythonX.X/s
 
 === Installing NCBI taxonomy ===
 
-Go to phyloexplorer/ncbi to install NCBI taxonomy.
-
-Edit the settings.py file and change the DATABASE_ENGINE.
-
-Now type those commands :
+Go to phyloexplorer/ncbi to install NCBI taxonomy and type those commands :
 
 {{{
 python manage.py install -v
@@ -80,11 +76,7 @@ This will download the taxonomy from the web and build the database.
 
 === Installing ITIS taxonomy ===
 
-Go to phyloexplorer/itis to install ITIS taxonomy.
-
-Edit the settings.py file and change the DATABASE_ENGINE.
-
-Now type those commands :
+Go to phyloexplorer/itis to install ITIS taxonomy and type those commands :
 
 {{{
 python manage.py install -v
