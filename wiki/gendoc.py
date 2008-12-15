@@ -49,6 +49,6 @@ for obj in objects:
             not_documented.append( method_name ) 
     print obj.__name__,": not_documented :",  not_documented
     big_result.append( "\n".join( result ) )
-open( "api.wiki", 'w' ).write(  "\n".join( big_result ))
+open( "API.wiki", 'w' ).write(  "\n".join( big_result ))
     #open( obj.__name__.capitalize()+".wiki", 'w' ).write(  "\n".join( result ))
 

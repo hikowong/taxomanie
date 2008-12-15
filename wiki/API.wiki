@@ -165,6 +165,8 @@ For more information please read the
     are present of the taxonomy reference (itis, ncbi...) is a Taxonomy
     object.
 
+    This object herites from TaxonomyReference
+
     This object is a Django model. See the django documentation for more
     details.
 
@@ -251,6 +253,8 @@ For more information please read the
 
     the _from_collection attribute indicates if the Tree was build from a
     TreeCollection or not.
+
+    This object herites from TaxonomyReference
 
     This object is a Django model. See the django documentation for more
     details.
@@ -452,6 +456,8 @@ list(sequence) -> new list initialized from sequence's items
 
     Two formats are supported : phylip and nexus. The format is automatiquely
     detected.
+
+    This object herites from TaxonomyReference
 
     This object is a Django model. See the django documentation for more
     details.
