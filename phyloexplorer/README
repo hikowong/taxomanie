@@ -1,0 +1,48 @@
+PHYLOEXPLORER
+=============
+
+What is it ?
+-------------
+
+PhyloExplorer is a free, simple to use web service dedicated to check taxa's
+names and to give statistics of phylogenetic trees.
+
+You can use filter and query in order to extract usefull information of your
+phylogenetic trees.
+
+
+Installation Note
+-----------------
+
+Dependancies
+~~~~~~~~~~~~
+
+In order to make PhyloExplorer work, you must install those python packages
+first:
+ - python >=2.4
+ - cherrypy >=3.0 (http://www.cherrypy.org/) 
+ - Networkx >=0.35 (https://networkx.lanl.gov/wiki)
+ - Pleet (package is provided in tools/)
+
+Install
+-------
+
+Type
+-----------------
+$ python setup.py
+-----------------
+as root or if you don't have permissions, you can specify a folder :
+
+-------------------------------
+$ python setup.py /path/to/the/folder
+-------------------------------
+
+Working Usage
+-------------
+
+To launch the server, juste type: `phyloexplorer`.
+
+Open browser and type `http://localhost:8080` and you should see the
+application working. If not, please edit the file `phyloexplorer.conf` 
+in /usr/share/phyloexplorer/etc/ or `.phyloexplorer` of your HOME.
+
