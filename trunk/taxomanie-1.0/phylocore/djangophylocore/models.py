@@ -1223,27 +1223,29 @@ class TreeCollection( models.Model, TaxonomyReference ):
 
     def get_statistics( self ):
         global TAXONOMY_TOC
-        taxon_occurence = {}
-        # initialisation of user taxon
-        cursor = connection.cursor()
-        cur = cursor.execute( "select rel.tree_id, rel.taxon_id, rel.user_taxon_name, taxonomy.name from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxon_id" % self.id )
-        if settings.DATABASE_ENGINE == 'sqlite3':
-            results = cur.fetchall()
-            cur.close()
-        else:
-            results = cursor.fetchall()
-        cursor.close()
-        for ( tree_id, taxon_id, user_taxon_name, scientific_name ) in results:
-            if taxon_id not in taxon_occurence:
-                taxon_occurence[taxon_id] = {"trees_list": set([]),
-                  'user_taxon_list':set([]), "scientific_taxon_list":set([]), "degree":0}
-            taxon_occurence[taxon_id]['trees_list'].add( tree_id )
-            taxon_occurence[taxon_id]['user_taxon_list'].add( user_taxon_name )
-            taxon_occurence[taxon_id]['scientific_taxon_list'].add( scientific_name )
-        tree = self.get_reference_arborescence()
-        if len( tree ):
-            self.__compute_stats_arborescence( taxon_occurence, tree, Taxonomy.objects.get( name = 'root' ) )
-        return taxon_occurence
+	if not hasattr( self, "taxon_occurence" ):
+            taxon_occurence = {}
+            # initialisation of user taxon
+            cursor = connection.cursor()
+            cur = cursor.execute( "select rel.tree_id, rel.taxon_id, rel.user_taxon_name, taxonomy.name from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxon_id" % self.id )
+            if settings.DATABASE_ENGINE == 'sqlite3':
+                results = cur.fetchall()
+                cur.close()
+            else:
+                results = cursor.fetchall()
+            cursor.close()
+            for ( tree_id, taxon_id, user_taxon_name, scientific_name ) in results:
+                if taxon_id not in taxon_occurence:
+                    taxon_occurence[taxon_id] = {"trees_list": set([]),
+                      'user_taxon_list':set([]), "scientific_taxon_list":set([]), "degree":0}
+                taxon_occurence[taxon_id]['trees_list'].add( tree_id )
+                taxon_occurence[taxon_id]['user_taxon_list'].add( user_taxon_name )
+                taxon_occurence[taxon_id]['scientific_taxon_list'].add( scientific_name )
+            tree = self.get_reference_arborescence()
+            if len( tree ):
+                self.__compute_stats_arborescence( taxon_occurence, tree, Taxonomy.objects.get( name = 'root' ) )
+            self.taxon_occurence = taxon_occurence
+        return self.taxon_occurence
 
     def __compute_stats_arborescence( self, taxon_occurence, tree, node ):
         if node.id not in taxon_occurence:
