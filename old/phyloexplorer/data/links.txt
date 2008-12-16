@@ -1,2 +1,0 @@
-http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=
-http://norvig.com/spell-correct.html
