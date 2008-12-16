@@ -4,6 +4,7 @@ from optparse import make_option
 import os
 import sys, csv
 from django.conf import settings
+import httplib, re
 
 localDir = os.path.dirname(__file__)
 absDir = os.path.join(os.getcwd(), localDir)
@@ -22,7 +23,12 @@ class Command(NoArgsCommand):
         if not os.path.exists( './itisdump.tar.gz' ):
             if verbose:
                 print "Downloading ITIS database on the web"
-            os.system( "curl -# http://www.itis.gov/downloads/itisMS102008.TAR.gz > itisdump.tar.gz ")
+	    url_thumb = ''
+	    conn = httplib.HTTPConnection("www.itis.gov")
+	    conn.request("GET", "/downloads/")
+	    f = conn.getresponse().read()
+	    file_name = re.findall('href="[^"]*itisMS[^"]*gz',f)[0][8:]
+            os.system( "curl -# http://www.itis.gov/downloads/%s > itisdump.tar.gz" % file_name)
             #os.system( "wget ftp://ftp.ncbi.nih.gov/pub/taxonomy/taxdump.tar.gz" )
         if verbose:
             print "Extracting database... please wait"
@@ -53,25 +59,41 @@ class Command(NoArgsCommand):
         #return correct_tax, tax_name, tax_id
         #correct_tax = tax_name = tax_id = getCorrectTaxa("/Users/vranwez/Desktop/ITIS/itis_fic_utils/taxonomic_units")
         taxa_sons={}
+	# collect informations on correct taxa
         correct_taxa, max_id = self.getCorrectTaxa(taxonomic_units_path, taxa_sons, syn_tax)
+	## recuperation des homonyms
+        taxa_homo={}
+        homonyms = {}
+        for tax_id in correct_taxa:
+	    tax_name = correct_taxa[tax_id]["name"]
+            if not tax_name in taxa_homo:
+                 taxa_homo[tax_name]=[]    
+            taxa_homo[tax_name].append(tax_id)
+        for tax_name, tax_id in taxa_homo.items():
+            if len( tax_id ) > 1:
+                for id in tax_id:
+                    if not tax_name in homonyms:
+                        homonyms[tax_name] = []
+                    homonyms[tax_name].append( ( id, "%s <%s>" % (correct_taxa[id]['name'],
+                      d_kingdom[correct_taxa[id]['kingdom']] )) )
+        #
+	for homonym_name, scientific_names_list in homonyms.iteritems():
+	    unambiguous_names =[n[1] for n in scientific_names_list]
+	    names = set(unambiguous_names)
+            if len( names ) != len( unambiguous_names ): # ambiguous names even when adding kingdom to the name
+		for taxa in scientific_names_list:
+                    del correct_taxa[taxa[0]] # taxa[0] = id    
+#            else:
+#		for taxa in scientific_name_list:
+#                    correct_taxa[taxa[0]]["name"] = taxa[1]  # taxa[1] = new name    
         ## recuperation des taxa valid ayant un pere valid 
         reachable_taxa={}
-        taxa_homo={}
         #202420
+        taxa_homo={}
         self.compute_reachable_taxa(correct_taxa, taxa_sons, "0", reachable_taxa, taxa_homo)
         ancestor_file = open( os.path.join( DUMP_PATH, 'parentsrelation.dmp' ), 'a')
         self.compute_write_ancestor( taxa_sons,"0",[],ancestor_file)
         ancestor_file.close()
-        ## recuperation des homonyms
-        homonyms = {}
-        for tax_name, tax_id in taxa_homo.items():
-            if len( tax_id ) > 1:
-#                print tax_name + " : "
-                for id in tax_id:
-                    if not tax_name in homonyms:
-                        homonyms[tax_name] = []
-#                    print "\t"+id
-                    homonyms[tax_name].append( id )
         # getting rank
         rank = self.getRank( taxon_unit_types_path )
         # getting common names
@@ -95,10 +117,10 @@ class Command(NoArgsCommand):
         TAXONOMY_TOC = set([])
         for taxa_id in taxonomy:
             if taxonomy[taxa_id]['name'] in homonyms:
-                if taxonomy[taxa_id]['credibility_rating'] == 'TWG standards met':
-                    taxonomy[taxa_id]['name'] = "%s <%s>" % (taxonomy[taxa_id]['name'], d_kingdom[taxonomy[taxa_id]['kingdom']] )
-        homonyms = {}
-        self.compute_reachable_taxa(correct_taxa, taxa_sons, "0", taxonomy, homonyms)
+                #if taxonomy[taxa_id]['credibility_rating'] == 'TWG standards met':
+	        taxonomy[taxa_id]['name'] = "%s <%s>" % (taxonomy[taxa_id]['name'], d_kingdom[taxonomy[taxa_id]['kingdom']] )
+#        homonyms = {}
+#        self.compute_reachable_taxa(correct_taxa, taxa_sons, "0", taxonomy, homonyms)
         for taxa_id in taxonomy:
             if not taxonomy[taxa_id]['name'] in TAXONOMY_TOC:
                 result.append( "%s|%s|scientific name|%s|%s\n" % ( taxa_id,
@@ -110,13 +132,13 @@ class Command(NoArgsCommand):
         result_rel = []
         index = 0
         for homonym_name in homonyms:
-            assert homonym_name not in TAXONOMY_TOC
+            assert homonym_name not in TAXONOMY_TOC, homonyms[homonym_name]
             max_id += 1
             result_taxonomy.append( "%s|%s|homonym|300|\n" % ( max_id, homonym_name ) )
             TAXONOMY_TOC.add( homonym_name )
             for taxa_id in homonyms[homonym_name]:
                 index += 1
-                result_rel.append( "%s|%s|%s\n" % (index, max_id, taxa_id ) )
+                result_rel.append( "%s|%s|%s\n" % (index, max_id, taxa_id[0] ) )
         open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' ).write( ''.join( result_taxonomy ) )
         open( os.path.join( DUMP_PATH, 'relhomonymtaxa.dmp' ), 'w' ).write( ''.join( result_rel ) )
         # common names
@@ -135,7 +157,8 @@ class Command(NoArgsCommand):
                         result_rel.append( "%s|%s|%s|%s\n" % (index, max_id, common['id'], common['langage'] ) )
                         already_done.add( (max_id, common['id']) )
             else:
-                print "%s is already in toc" % name
+		pass
+                #print "%s is already in toc" % name
         open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' ).write( ''.join( result_taxonomy ) )
         open( os.path.join( DUMP_PATH, 'relcommontaxa.dmp' ), 'w' ).write( ''.join( result_rel ) )
  
@@ -187,7 +210,7 @@ class Command(NoArgsCommand):
         taxa_homo[taxa_name].append(taxa_id)
         if taxa_id in taxa_sons:
             for son_id in taxa_sons[taxa_id]:
-                if son_id != taxa_id: # pb de la racine 0
+                if son_id != taxa_id and son_id in correct_taxa: # pb de la racine 0
                     self.compute_reachable_taxa(correct_taxa,taxa_sons,son_id,reachable_taxa,taxa_homo)
 
     def getKingdom( self, kingdom_file ):
