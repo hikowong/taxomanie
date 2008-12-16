@@ -647,7 +647,7 @@ def get_matrix( request ):
                   list(stat[taxa]['scientific_taxon_list'])[0], d_tree_id_name[tree],
                   map_i, map_j, map_i+pix, map_j+pix )
             else:
-                scene.add(Rectangle((i,j),pix,pix,(0,0,0)))
+                scene.add(Rectangle((i,j),pix,pix,(0,0,255)))
                 map += """<area shape="rect" title="taxon: %s, tree: %s" coords="%s,%s,%s,%s">""" % (
                   list(stat[taxa]['scientific_taxon_list'])[0],d_tree_id_name[tree],
                   map_i, map_j, map_i+pix, map_j+pix )
