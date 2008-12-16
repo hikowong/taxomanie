@@ -16,6 +16,9 @@ import datetime, re, sys, os, codecs
 ##################################################
 
 class TaxonomyReference( object ):
+    """
+    This object provides some useful methods in order to deal with taxonomy
+    """
 
     #
     # Name related
@@ -259,6 +262,22 @@ class Rank( models.Model ):
 ##################################################
 
 class Taxonomy( models.Model ):
+    """
+    A Taxonomy object represent an element in the taxonomy. It can be a
+    scientific name or a synonym, an homonym or a common name. All taxa wich
+    are present of the taxonomy reference (itis, ncbi...) is a Taxonomy
+    object.
+
+    This object herites from TaxonomyReference
+
+    This object is a Django model. See the django documentation for more
+    details.
+
+    >>> mus = Taxonomy.objects.get( name = "mus" )
+
+    # Get all scientific names
+    >>> scientific_names = Taxonomy.objects.filter( type_name = "scientific name" )
+    """
     name = models.CharField( max_length = 200 )#, unique = True )
     type_name = models.CharField( max_length = 50 )
     rank = models.ForeignKey( Rank, related_name = 'taxa', null = True )
@@ -273,15 +292,36 @@ class Taxonomy( models.Model ):
 
     def get_homonyms( self ):
         return Taxonomy.objects.filter( homonym_from_taxa__taxon = self )
-    homonyms = property( get_homonyms )
+    homonyms = property( get_homonyms, None, None,
+        """
+        return a queryset of all homonyms related to the Taxonomy object
+
+        >>> taxon = Taxonomy.objects.get( name = 'echinops <plant>' )
+        >>> taxon.homonyms.all()
+        [<Taxonomy: echinops (homonym)>]
+        """)
 
     def get_synonyms( self ):
         return Taxonomy.objects.filter( synonym_from_taxa__taxon = self )
-    synonyms = property( get_synonyms )
+    synonyms = property( get_synonyms, None, None,
+        """
+        return a queryset of all synonyms related to the Taxonomy object
+
+        >>> taxon = Taxonomy.objects.get( name = 'mus' )
+        >>> taxon.synonyms.all()
+        [<Taxonomy: nannomys (synonym)>]
+        """)
 
     def get_commons( self ):
         return Taxonomy.objects.filter( common_from_taxa__taxon = self )
-    commons = property( get_commons )
+    commons = property( get_commons, None, None,
+        """
+        return a queryset of all commons related to the Taxonomy object
+
+        >>> taxon = Taxonomy.objects.get( name = 'mus musculus' )
+        >>> taxon.commons.all()
+        [<Taxonomy: house mouse (common)>, <Taxonomy: mouse (common)>]
+        """)
 
     def get_scientific_names( self ):
         if self.type_name == 'homonym':
@@ -292,7 +332,14 @@ class Taxonomy( models.Model ):
             return Taxonomy.objects.filter( taxa_from_common__common = self )
         else:
             return Taxonomy.objects.none()
-    scientifics = property( get_scientific_names )
+    scientifics = property( get_scientific_names, None, None,
+        """
+        return a queryset of all scientific names related to the Taxonomy object
+
+        >>> taxon = Taxonomy.objects.get( name = 'echinops' )
+        >>> taxon.scientifics.all()
+        [<Taxonomy: echinops <mammal> (scientific name)>, <Taxonomy: echinops <plant> (scientific name)>]
+        """)
 
     def get_parents( self, regenerate = False ):
         if regenerate:
@@ -311,20 +358,34 @@ class Taxonomy( models.Model ):
               order_by = ['djangophylocore_parentsrelation.index'] )
         return parents_list
         #return [i.parent for i in self.parents_relation_taxas.all()]
-    parents = property( get_parents )
+    parents = property( get_parents, None, None,
+        """
+        return a queryset of all parents related to the Taxonomy object
+
+        >>> taxon = Taxonomy.objects.get( name = 'mus musculus' )
+        >>> taxon.parent
+        <Taxonomy: mus (scientific name)>
+        """)
 
     def get_children( self, regenerate = False ):
         if regenerate:
             return [i.taxon for i in self.parents_relation_parents.all()]
-    children = property( get_children )
+    children = property( get_children, None, None,
+        """
+        get all children related list to the Taxonomy object
 
-    def get_id_in_source( self, source_name ):
-        return self.fromsource_set.get( source__name = source_name ).taxon_id_in_source
+        >>> taxon = Taxonomy.objects.get( name = 'mus' )
+        >>> taxon.children.all()
+        [<Taxonomy: mus musculus (scientific name)>]
+        """)
+
+#    def get_id_in_source( self, source_name ):
+#        return self.fromsource_set.get( source__name = source_name ).taxon_id_in_source
      
     def regenerate_parents( self ):
         """
-        Regenerate parents list of the taxa
-        This method is useful if we add taxa by hand
+        Regenerate parents list of the taxa. This method is useful if we add
+        taxa by hand to the taxonomy.
         """
         ParentsRelation.objects.filter( taxon = self ).delete() 
         if self.name != 'root':
@@ -430,6 +491,43 @@ class TaxonomyTreeOccurence( models.Model ):
         return u'%s (%s) %s' % ( self.taxon, self.nb_occurence, self.tree )
 
 class Tree( models.Model, TaxonomyReference ):
+    """
+    This object represents a phylogenetic tree. It can be valid (well formed)
+    or not. If not, the column_error attribute will indicate the index of the
+    failure in the source.
+
+    the _from_collection attribute indicates if the Tree was build from a
+    TreeCollection or not.
+
+    This object herites from TaxonomyReference
+
+    This object is a Django model. See the django documentation for more
+    details.
+
+    >>> nwk_tree = "( echinops, (rattus, ( mus, azerty, black rat ), nannomys ))"
+    >>> tree = Tree.objects.create( source = nwk_tree, name = "2")
+    >>> tree.is_valid
+    True
+    >>> tree.scientifics.all()
+    [<Taxonomy: mus (scientific name)>, <Taxonomy: rattus (scientific name)>]
+    >>> tree.bad_taxa.all()
+    [<BadTaxa: azerty (0)>]
+    >>> tree.synonyms.all()
+    [<Taxonomy: nannomys (synonym)>]
+    >>> tree.homonyms.all()
+    [<Taxonomy: echinops (homonym)>]
+    >>> tree.commons.all()
+    [<Taxonomy: black rat (common)>]
+
+    # Getting all taxon list
+    >>> tree.taxa.all()
+    [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy:
+    mus (scientific name)>, <Taxonomy: nannomys (synonym)>, <Taxonomy: rattus
+    (scientific name)>]
+
+    # Getting ambiguous taxa (synonms, commons, homonyms...)
+    >>> tree.ambiguous.all() [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: nannomys (synonym)>]
+    """
     name = models.CharField( max_length = 80, null=True )
     delimiter = models.CharField( max_length = 5, default=' ' )
     source = models.TextField()
@@ -450,6 +548,10 @@ class Tree( models.Model, TaxonomyReference ):
 
     @transaction.commit_on_success
     def save( self, dont_generate = False, **kwargs ):
+        """
+        save the tree into the database. If dont_generate is True, the method
+        will call generate_tree_info method.
+        """
         regenerate = False
         if not self.id: # if instance is not in the database
             regenerate = True
@@ -458,6 +560,11 @@ class Tree( models.Model, TaxonomyReference ):
             self.generate_tree_infos()
 
     def generate_tree_infos( self ):
+        """
+        This method will extract all taxa name from source  and wrap them
+        into Taxonomy objects. Those taxonomy objects will be linked to the
+        tree.
+        """
         global get_taxonomy_toc, BADTAXA_TOC
         TAXONOMY_TOC = get_taxonomy_toc()
         if [i for i in ('(',')',',') if i in self.delimiter]:
@@ -509,6 +616,13 @@ class Tree( models.Model, TaxonomyReference ):
     rel = property( __get_relation )
 
     def print_error( self ):
+        """
+        display where the error is in the source
+
+        >>> tree.print_error()
+        (,(mus, rattus)
+         ^
+        """
         print self.source
         print " "*(err.column-1) + "^"
 
@@ -520,71 +634,107 @@ class Tree( models.Model, TaxonomyReference ):
           where = ['djangophylocore_taxonomy.id = djangophylocore_reltreecoltaxa%s.taxon_id and djangophylocore_reltreecoltaxa%s.tree_id = %s' % ( 
             self.collection.id, self.collection.id, self.id )]
         ).distinct()
-    taxa = property( get_taxa )
+    taxa = property( get_taxa, None, None,
+        """
+        return a queryset of all taxa included ambiguous names and scientific names
+        
+        >>> tree.taxa.all()
+        [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: nannomys (synonym)>, <Taxonomy: rattus (scientific name)>]
+        """)
 
     def get_ambiguous( self ):
         """
         return a queryset of taxonomy objects wich are not scientific name
         """
         return self.taxa.exclude( type_name = 'scientific name' )
-    ambiguous = property( get_ambiguous )
+    ambiguous = property( get_ambiguous, None, None,
+        """
+        return a queryset of all ambiguous names (homonym, synonym and common names)
+        
+        >>> tree.ambiguous.all()
+        [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: nannomys (synonym)>]
+        """)
 
     def get_scientific_names( self ):
         return self.taxa.filter( type_name = 'scientific name' )
-    scientifics = property( get_scientific_names )
+    scientifics = property( get_scientific_names, None, None,
+        """
+        return a queryset of all scientific names
+
+        >>> tree.scientifics.all()
+        [<Taxonomy: mus (scientific name)>, <Taxonomy: rattus (scientific name)>]
+        """)
         
     def get_synonyms( self ):
         return self.taxa.filter( type_name = 'synonym' )
-    synonyms = property( get_synonyms )
+    synonyms = property( get_synonyms, None, None,
+        """
+        return a queryset of  all synonym names
+
+        >>> tree.synonyms.all()
+        [<Taxonomy: nannomys (synonym)>]
+        """)
 
     def get_commons( self ):
         return self.taxa.filter( type_name = 'common' )
-    commons = property( get_commons )
+    commons = property( get_commons, None, None,
+        """
+        return a queryset of  all common names
+
+        >>> tree.commons.all()
+        [<Taxonomy: black rat (common)>]
+        """)
 
     def get_homonyms( self ):
         return self.taxa.filter( type_name = 'homonym' )
-    homonyms = property( get_homonyms )
+    homonyms = property( get_homonyms, None, None,
+        """
+        return a queryset of all homonym names
 
-    def __generate_arborescence_old( self, tree=None ):
-        if tree is None:
-            # Init attributes
-            import networkx as NX
-            self.__networkx_tree = NX.DiGraph()
-            tree = self.source
-            self.__children = []
-            self.__last_child = ""
-            self.__rel_name = {}
-            self.__miss_spelled = {}
-            tree = self.newick_parser.tree
-        if tree:
-            if tree == self.source:
-                parent_name = Taxonomy.objects.get( name = 'root' )
-            else:
-                if not self.__rel_name.has_key( tree ):
-                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in self.newick_parser.get_taxa( tree ) if self.is_valid_name( i )]
-                    parent_name = self.get_first_common_parent(taxa_list)
-                else:
-                    parent_name = self.__rel_name[tree]
-            children = tree
-            for child_name in children:
-                if type(child_name) is list: # child is a node
-                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in self.newick_parser.get_taxa( child_name ) if self.is_valid_name( i )]
-                    child = self.get_first_common_parent(taxa_list)
-                    if child is None:
-                        child = parent_name
-                    if child not in self.__children:
-                        self.__children.append( parent_name )
-                    self.__rel_name[child_name] = child
-                    self.__children.append( child )
-                    self.__last_child = child
-                    self.__networkx_tree.add_edge( parent_name, child )
-                    self.__generate_arborescence( tree = child_name )
-                else: # child is a taxon
-                    child_name = child_name.replace( self.delimiter, ' ' )
-                    child = self.get_object_from_name( child_name )
-                    if child is None:
-                        child = parent_name
-                    self.__networkx_tree.add_edge( parent_name, child )
+        >>> tree.homonyms.all()
+        [<Taxonomy: echinops (homonym)>]
+        """)
+
+#    def __generate_arborescence_old( self, tree=None ):
+#        if tree is None:
+#            # Init attributes
+#            import networkx as NX
+#            self.__networkx_tree = NX.DiGraph()
+#            tree = self.source
+#            self.__children = []
+#            self.__last_child = ""
+#            self.__rel_name = {}
+#            self.__miss_spelled = {}
+#            tree = self.newick_parser.tree
+#        if tree:
+#            if tree == self.source:
+#                parent_name = Taxonomy.objects.get( name = 'root' )
+#            else:
+#                if not self.__rel_name.has_key( tree ):
+#                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in self.newick_parser.get_taxa( tree ) if self.is_valid_name( i )]
+#                    parent_name = self.get_first_common_parent(taxa_list)
+#                else:
+#                    parent_name = self.__rel_name[tree]
+#            children = tree
+#            for child_name in children:
+#                if type(child_name) is list: # child is a node
+#                    taxa_list = [Taxonomy.objects.filter( name = i )[0] for i in self.newick_parser.get_taxa( child_name ) if self.is_valid_name( i )]
+#                    child = self.get_first_common_parent(taxa_list)
+#                    if child is None:
+#                        child = parent_name
+#                    if child not in self.__children:
+#                        self.__children.append( parent_name )
+#                    self.__rel_name[child_name] = child
+#                    self.__children.append( child )
+#                    self.__last_child = child
+#                    self.__networkx_tree.add_edge( parent_name, child )
+#                    self.__generate_arborescence( tree = child_name )
+#                else: # child is a taxon
+#                    child_name = child_name.replace( self.delimiter, ' ' )
+#                    child = self.get_object_from_name( child_name )
+#                    if child is None:
+#                        child = parent_name
+#                    self.__networkx_tree.add_edge( parent_name, child )
 
     def __generate_arborescence( self ):
         import networkx as NX
@@ -609,6 +759,7 @@ class Tree( models.Model, TaxonomyReference ):
             """
             def __init__( self ):
                 self.name = ""
+                self.parents = []
         if type(current_list) is list:
             is_scientific = True
             son_list = []
@@ -640,7 +791,10 @@ class Tree( models.Model, TaxonomyReference ):
 
     def get_arborescence( self ):
         return  self.__generate_arborescence()
-    arborescence = property( get_arborescence )
+    arborescence = property( get_arborescence, None, None,
+        """
+        return a NetworkX oriented graph from the tree
+        """)
 
     def __graph2nwk_rec( self, tree, current_node, internal_label ):
         str_current =""
@@ -691,9 +845,16 @@ class Tree( models.Model, TaxonomyReference ):
           internal_label )+";"
 
     def get_reference_arborescence( self ):
+        """
+        return a netorkX oriented graph wich represente the arborescence of
+        the reference taxonomy (itis, ncbi...) of the list of taxa
+        """
         return self.get_reference_graph( self.scientifics.all() )
 
     def get_nb_taxa_from_parent( self, parent_name ):#, taxa_occurence = None ):
+        """
+        return the number of taxa wich have `parent_name` for parent
+        """
         global get_taxonomy_toc
         TAXONOMY_TOC = get_taxonomy_toc()
         if self._from_collection:
@@ -750,6 +911,44 @@ class Tree( models.Model, TaxonomyReference ):
 ##################################################
 
 class TreeCollection( models.Model, TaxonomyReference ):
+    """
+    This object represent a collection of phylogenetic trees.
+
+    Two formats are supported : phylip and nexus. The format is automatiquely
+    detected.
+
+    This object herites from TaxonomyReference
+
+    This object is a Django model. See the django documentation for more
+    details.
+
+    >>> simple_col = "(mus,nannomys,black rat,echinops,blabla);(mus, black rat);"
+    >>> col = TreeCollection.objects.create( name = 'simple', source = simple_col )
+    >>> col.format
+    'phylip'
+
+    # Deeling with taxa
+    >>> col.taxa.all()
+    [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: nannomys (synonym)>]
+    >>> col.ambiguous.all()
+    [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: nannomys (synonym)>]
+    >>> col.scientifics.all()
+    [<Taxonomy: mus (scientific name)>]
+    >>> col.homonyms.all()
+    [<Taxonomy: echinops (homonym)>]
+    >>> col.synonyms.all()
+    [<Taxonomy: nannomys (synonym)>]
+    >>> col.commons.all()
+    [<Taxonomy: black rat (common)>]
+    >>> col.bad_taxa.all()
+    [<BadTaxa: blabla (0)>]
+
+    # working with tree
+    >>> col.trees.all()
+    [<Tree: 1>, <Tree: 2>]
+    >>> col.trees.count()
+    2L
+    """
     name = models.CharField( max_length = 80, null= True )
     source = models.TextField( null = True ) # source
     delimiter = models.CharField( max_length = 5, default=' ' )
@@ -763,6 +962,10 @@ class TreeCollection( models.Model, TaxonomyReference ):
 
     @transaction.commit_on_success
     def save( self, collection_changed = False, dont_regenerate = False,  **kwargs ):
+        """
+        save the collection into the database. If dont_regenerate is False, it
+        will call the regenerate_from_source method
+        """
         collection_string_changed = False
         self.source = self.source.lower()#.replace( self.delimiter, '' )
         if not collection_changed and not dont_regenerate:
@@ -829,6 +1032,10 @@ class TreeCollection( models.Model, TaxonomyReference ):
     rel = property( __get_relation )
 
     def regenerate_from_source( self ):
+        """
+        This method will parse the source in order to extract all trees and
+        taxa. Those objects are linked to the collection.
+        """
         global BADTAXA_TOC
         BADTAXA_TOC = set([i[0] for i in BadTaxa.objects.all().values_list( 'name')])
         # TODO mettre un signal sur cette method quand
@@ -890,8 +1097,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
 
     def get_collection_string( self ):
         """
-        Generate from trees the collection_string in specified format.
-        Formats are 'phylip' (default) or 'nexus'
+        Generate from trees the collection_string into the source format.
         """
         result = []
         for (name, source, rooted) in self.trees.values_list( 'name', 'source', 'rooted' ):
@@ -911,44 +1117,93 @@ class TreeCollection( models.Model, TaxonomyReference ):
           tables = ['djangophylocore_reltreecoltaxa%s' % self.id], 
           where = ['djangophylocore_taxonomy.id = djangophylocore_reltreecoltaxa%s.taxon_id' % self.id]
         ).distinct()
-    taxa = property( get_taxa )
+    taxa = property( get_taxa, None, None,
+        """
+        return a queryset of all taxa from the collection (included ambiguous one)
+
+        >>> col.taxa.all()
+        [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: nannomys (synonym)>]
+        """)
 
     def get_user_taxon_names( self ):
+        """
+        return the user taxon names list
+        """
         return set([i[0] for i in self.rel.values_list( 'user_taxon_name' ) if i])
 
     def get_ambiguous( self ):
+        return self.taxa.exclude( type_name = 'scientific name' )
+    ambiguous = property( get_ambiguous, None, None,
         """
         return a queryset of non scientific name taxonomy objects
-        """
-        return self.taxa.exclude( type_name = 'scientific name' )
-    ambiguous = property( get_ambiguous )
+        
+        >>> col.ambiguous.all()
+        [<Taxonomy: black rat (common)>, <Taxonomy: echinops (homonym)>, <Taxonomy: nannomys (synonym)>]
+        """)
 
     def get_bad_taxa( self ):
         return BadTaxa.objects.extra(
           tables = ['djangophylocore_reltreecoltaxa%s' % self.id],
           where = ['djangophylocore_badtaxa.name = djangophylocore_reltreecoltaxa%s.user_taxon_name' % self.id]
         ).distinct()
-    bad_taxa = property( get_bad_taxa )
+    bad_taxa = property( get_bad_taxa, None, None,
+        """
+        return a queryset of bad taxa
+
+        >>> col.bad_taxa.all()
+        [<BadTaxa: blabla (0)>]
+        """)
 
     def get_scientific_names( self ):
         return self.taxa.filter( type_name = 'scientific name').distinct()
-    scientifics = property( get_scientific_names )
+    scientifics = property( get_scientific_names, None, None,
+        """
+        return a queryset of all scientific names of the collection
+
+        >>> col.scientifics.all()
+        [<Taxonomy: mus (scientific name)>]
+        """)
 
     def get_synonyms( self ):
         return self.taxa.filter( type_name = 'synonym').distinct()
-    synonyms = property( get_synonyms )
+    synonyms = property( get_synonyms, None, None,
+        """
+        return a queryset of all synonym names of the collection
+
+        >>> col.synonyms.all()
+        [<Taxonomy: nannomys (synonym)>]
+        """)
 
     def get_homonyms( self ):
         return self.taxa.filter( type_name = 'homonym' ).distinct()
-    homonyms = property( get_homonyms )
+    homonyms = property( get_homonyms, None, None,
+        """
+        return a queryset of all homonym names of the collection
+
+        >>> col.homonyms.all()
+        [<Taxonomy: echinops (homonym)>]
+        """)
 
     def get_common_names( self ):
         return self.taxa.filter( type_name = 'common' ).distinct()
-    commons = property( get_common_names )
+    commons = property( get_common_names, None, None,
+        """
+        return a queryset of all common names of the collection
+
+        >>> col.commons.all()
+        [<Taxonomy: black rat (common)>]
+        """)
 
     def get_bad_trees( self ):
         return self.trees.filter( is_valid = False )
-    bad_trees = property( get_bad_trees )
+    bad_trees = property( get_bad_trees, None, None,
+        """
+        return a queryset of all bad (misformed) trees present in the
+        collection
+
+        >>> col.bad_trees.all()
+        [<Tree: 2>, <Tree: 4>]
+        """)
 
 
     def _query( self, query, treebase ):
@@ -1013,9 +1268,51 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return Tree.objects.filter( id__in = l_trees_id )
 
     def query( self, query ):
+        """
+        query the collection in order to extract a targeted trees list.
+
+        The query format is a python boolean expression with taxa name
+        beetween braces :
+
+        >>> col.query( "{muridae} > 2 and {primates}" )
+        [<Tree: 1>, <Tree: 4>]
+
+        will return a list of trees wich have more than 2 taxa wich have
+        muridae as parents and at least 1 taxon wich have a primate as
+        parents.
+
+        if a taxa_list is not null, the query can have another variable
+        {usertaxa}. this variable represente all taxa passed in the list.
+
+        tree.eval_query( "{muridae} => 4 and {usertaxa} > 2", ['rattus', 'mus', 'pan', 'boss'] )
+
+        will return true if tree have at least 4 taxa wich are muridae and
+        more than 2 taxa wich are in the usertaxa_list 
+        """
         return self._query( query, False )
 
     def query_treebase( self, query ):
+        """
+        query the treebase collection in order to extract a targeted trees list.
+
+        The query format is a python boolean expression with taxa name
+        beetween braces :
+
+        >>> col.query( "{muridae} > 2 and {primates}" )
+        [<Tree: 1>, <Tree: 4>]
+
+        will return a list of treebase's trees wich have more than 2 taxa wich have
+        muridae as parents and at least 1 taxon wich have a primate as
+        parents.
+
+        The special keyword {usertaxa} represent all the taxa present in the
+        user collection.
+
+        >>> tree.eval_query( "{muridae} => 4 and {usertaxa} > 2" )
+
+        will return a treebase's trees list wich have at least 4 muridae and
+        at least 2 taxa which are present in the user collection.
+        """
         return self._query( query, True )
 
     def get_collection_from_query( self, query, treebase = False ):
@@ -1066,6 +1363,9 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return result_stat
 
     def get_taxon_frequency_distribution( self ):
+        """
+        return stat of taxon frequency distribution
+        """
         stat = {}
         cursor = connection.cursor()
         cur = cursor.execute( "select rel.tree_id, taxonomy.name from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxon_id" % self.id )
@@ -1102,6 +1402,9 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return result_stat
 
     def get_taxon_name_from_parents( self, parent_name ):
+        """
+        return a taxon names list wich have `parent_name` for parent
+        """
         return [i.name for i in self.get_taxon_from_parents( parent_name )] 
 
     def get_taxon_from_parents( self, parent_name ):
@@ -1164,6 +1467,13 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return TreeCollection.objects.create( delimiter = self.delimiter, source = new_nwk )
 
     def get_corrected_collection_string( self, correction ):
+        """
+        return a corrected source string where `correction` is a dictionary
+        
+            {'bad_name': 'good_name'}
+
+        new_source_string = col.get_corrected_collection( {'echinops': 'echinops <plant>', 'ratis': 'rattus' } )
+        """
         parser = NewickParser()
         trees_list = []
         for i in self.trees.all():
@@ -1194,10 +1504,10 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return source
 
     def get_corrected_collection( self, correction ):
-        # FIXME a refactoriser
         """
-        return a collection with correction from tuple_list. tuple_list take
-        the following format : [(bad_name1, good_name1), (bad_name2, good_name2)...]
+        return a corrected collection where `correction` is a dictionary
+        
+            {'bad_name': 'good_name'}
 
         newcol = col.get_corrected_collection( {'echinops': 'echinops <plant>', 'ratis': 'rattus' } )
         """
@@ -1205,7 +1515,9 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return TreeCollection.objects.create( delimiter = self.delimiter, source = new_nwk )
 
     def get_autocorrected_collection( self ):
-        # FIXME a refactoriser
+        """
+        get a new collection wich have all single ambiguous taxa corrected
+        """
         list_correction =  [(i.user_taxon_name, i.taxon.scientifics.get().name)\
           for i in self.rel.extra( where = ["taxon_id in (select id from djangophylocore_taxonomy where type_name != 'scientific name')"] )\
             if i.taxon.scientifics.count() == 1]
@@ -1222,6 +1534,42 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return self.get_reference_graph( self.taxa.filter( type_name = 'scientific name' ).iterator() )
 
     def get_statistics( self ):
+        """
+        return a dictionary with useful statistic informations.
+
+        The dictionary structure take this form:
+           
+           {
+              taxon_id: {
+               'degree': degree_number,
+               'scientific_taxon_list': set([]),
+               'trees_list': set([]),
+               'user_taxon_list': set([])
+              },
+            }
+
+        i.e.:
+        {
+             349722: {'degree': 1,
+                'scientific_taxon_list': set([u'carpomys']),
+                'trees_list': set([6216, 6204, 6206]),
+                'user_taxon_list': set([u'carpomys'])
+             },
+             359160: {'degree': 2,
+                'scientific_taxon_list': set([u'oryza sativa']),
+                'trees_list': set([6214]),
+                'user_taxon_list': set([u'oryza sativa lhb'])
+             },
+            376913: {'degree': 2,
+                'scientific_taxon_list': set([u'homo sapiens']),
+                'trees_list': set([6214]),
+                'user_taxon_list': set([u'homo sapiens cyg', u'homo sapiens mb',
+                  u'homo sapiens ngb', u'homo sapiens hbt', u'homo sapiens hbb',
+                  u'homo sapiens hba', u'homo sapiens hbg', u'homo sapiens hbd',
+                  u'homo sapiens hbe'])
+            },
+        }
+        """
         global TAXONOMY_TOC
 	if not hasattr( self, "taxon_occurence" ):
             taxon_occurence = {}
