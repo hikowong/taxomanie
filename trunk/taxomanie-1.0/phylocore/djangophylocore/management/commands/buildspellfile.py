@@ -19,7 +19,7 @@ class Command(NoArgsCommand):
         taxas = Taxonomy.objects.all().iterator
         result = []
         for taxa in taxas():
-            result.append( taxa.name )
+            result.append( taxa.name.encode( "iso-8859-15" ) )
         localDir = os.path.dirname(__file__)
         absDir = os.path.join(os.getcwd(), localDir)
         path = os.path.join( absDir, "..", "..", "lib" )
