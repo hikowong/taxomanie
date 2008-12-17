@@ -658,6 +658,15 @@ def get_matrix( request ):
     context = {'ref_url':REFERENCE_ROOT_URL, 'taxo_engine':TAXONOMY_ENGINE, 'col_id': collection.id, "not_empty_collection": True, "map":map }
     return render_to_response( 'matrix.html', context )
 
+def download_matrix_csv( request ):
+    col_id = request.session['current_col_id']
+    collection = TreeCollection.objects.get( id = col_id )
+    response = HttpResponse(mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=matrix-%s.csv' % (col_id)
+    response.write( collection.get_matrix_csv() )
+    return response
+
+
 def autocomplete( request ):
     results = []
     if "query" in request.GET:
