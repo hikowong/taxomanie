@@ -1713,13 +1713,13 @@ class TreeCollection( models.Model, TaxonomyReference ):
         taxa_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['taxa'].items()])]
         tree_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['trees'].items()])]
         d_tree_id_name = dict( Tree.objects.filter( id__in = tree_list).values_list( 'id','name' ) )
-        csv = ["|"+"|".join([d_tree_id_name[tree] for tree in tree_list])]
+        csv = [","+",".join([d_tree_id_name[tree] for tree in tree_list])]
         for taxa in taxa_list:
             tmp = matrix[taxa]
             line = [list(stat[taxa]['scientific_taxon_list'])[0]]
             for tree in tree_list:
                 line.append( str(tmp[tree]) )
-            csv.append( "|".join( line ) )
+            csv.append( ",".join( line ) )
         return "\n".join( csv )
 
 
