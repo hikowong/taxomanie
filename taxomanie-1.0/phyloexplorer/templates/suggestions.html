@@ -6,9 +6,12 @@
     <font color="red">{{ bad_name }}</font> :
     </td>
     <td>
+    <input type='text' name="{{bad_name}}" />
     {% if suggestions %}
+        (Do you mean: &nbsp;
         {% for sugg in suggestions %}
-            {{ sugg }}
+            {{ sugg }},
+            <!--
             <input 
             {% if suggestions|length_is:"1" %}
             type="checkbox" class="alone"
@@ -16,9 +19,9 @@
             type="radio"
             {% endif %}
             name="{{bad_name}}" value="{{ sugg }}" />
+            -->
         {% endfor %}
-    {% else %}
-        <input type='text' name="{{bad_name}}" />
+        )
     {% endif %}
     </td>
     </tr>

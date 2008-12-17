@@ -332,7 +332,7 @@ $(document).ready(function(){
     {% if nb_synonyms %}
         <span class="homonymlist">
         <fieldset>
-        <legend> synonym names to scientific names </legend>
+        <legend> Synonym names to scientific names </legend>
         <table>
         <!-- <tr><th>user taxa name</th><th>related scientific names</th></tr> -->
         {% for synonym_name, suggestions in dict_synonym.iteritems %}
@@ -363,7 +363,7 @@ $(document).ready(function(){
     {% if nb_commons %}
         <span class="homonymlist">
         <fieldset>
-        <legend> common names to scientific names </legend>
+        <legend> Common names to scientific names </legend>
         <table>
         <!-- <tr><th>user taxa name</th><th>related scientific names</th></tr> -->
         {% for common_name, suggestions in dict_common.iteritems %}
@@ -393,7 +393,7 @@ $(document).ready(function(){
     <!-- badtaxa fieldset -->
     {% if nb_badtaxa %}
         <fieldset>
-        <legend> {{ nb_badtaxa }} bad taxa(s) </legend>
+        <legend> {{ nb_badtaxa }} bad taxa </legend>
         <span id="suggestions" class="homonymlist"> </span>
         <div id="progressbar_badtaxa"></div>
         </fieldset>
