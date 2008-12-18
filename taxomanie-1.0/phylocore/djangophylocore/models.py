@@ -171,12 +171,15 @@ class TaxonomyReference( object ):
                     if common_list:
                         return common_list
                     elif guess:
-                        from lib.spell import Suggestion
                         #from phylocore.spellcheck import SpellCheck
                         #splchk = SpellCheck( self.TAXONOMY.iterkeys() )
                         #return splchk.correct( name )
-                        sugg = Suggestion( settings.TAXONOMY_ENGINE )
-                        return list(sugg.correct( name ))
+                        #from lib.spell import Suggestion
+                        #sugg = Suggestion( settings.TAXONOMY_ENGINE )
+                        #return list(sugg.correct( name ))
+                        import difflib
+                        possibilities = list( TAXONOMY_TOC )
+                        return difflib.get_close_matches( name, possibilities, n=10, cutoff=0.7 )
                     else:
                         return [0]
 
