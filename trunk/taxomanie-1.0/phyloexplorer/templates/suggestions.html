@@ -6,11 +6,15 @@
     <font color="red">{{ bad_name }}</font> :
     </td>
     <td>
-    <input type='text' name="{{bad_name}}" />
+    <input type='text' name="{{bad_name}}"
+    {% for sugg in suggestions %}
+    {% if forloop.first %}value="{{sugg}}"{% endif %}
+    {% endfor %} />
+    
     {% if suggestions %}
         (Do you mean: &nbsp;
         {% for sugg in suggestions %}
-            {{ sugg }},
+            {{ sugg }}{% ifequal forloop.last 0 %},{% endifequal %}
             <!--
             <input 
             {% if suggestions|length_is:"1" %}
