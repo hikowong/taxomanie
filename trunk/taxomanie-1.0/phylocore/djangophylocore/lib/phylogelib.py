@@ -138,7 +138,7 @@ class NewickParser( object ):
                 tree[tree.index( node )] = correct_dict[node]
             elif " ".join( node.split()[:2]) in correct_dict:
                 old_node = node
-                base_node = correct[" ".join( node.split()[:2] )]
+                base_node = correct_dict[" ".join( node.split()[:2] )]
                 node = base_node+" "+" ".join( node.split()[2:] )
                 tree[tree.index( old_node )] = node
             elif node.split()[0] in correct_dict:
