@@ -362,7 +362,7 @@ def filter_collection( request ):
     keep = True
     if "filter_option" in request.GET:
         filter_option = request.GET['filter_option']
-        keep = filter_option == "keep"
+        keep = filter_option == "in"
         filter_list.remove( "filter_option" )
         taxa_list = [i.name for i in collection.taxa.all()]
         diff = list(set(filter_list).difference( set( taxa_list ) ))
