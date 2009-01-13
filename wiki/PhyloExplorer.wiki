@@ -6,7 +6,7 @@ PhyloExplorer is a free, simple to use web service facilitating the management a
 
 Given an input collection of rooted trees, PhyloExplorer provides facilities for correcting erroneous or ambiguous taxon names,
 for identifying related trees in TreeBASE, for obtaining statistics describing the collection, and a query language to extract
-taxonomically relevant parts of the collection. PhyloExplorer is also available as a standalone version that include both a
+taxonomically relevant parts of the collection. PhyloExplorer is also available as a standalone version that includes both a
 webserver identical to this one and package of Python libraries and database files that can be directly used by users with
 computing skills. 
 
