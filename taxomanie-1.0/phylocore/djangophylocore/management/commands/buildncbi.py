@@ -255,7 +255,7 @@ class Command(NoArgsCommand):
                     continue
             line = '%s|%s|%s|%s|%s\n' % (
               species,
-              self.TBI[species]['name'].replace("," " ").replace( "(", "_").replace(")","_"),
+              self.TBI[species]['name'].replace(",", " ").replace( "(", "_").replace(")","_"),
               self.TBI[species]['type_name'],
               self.RANK[self.TBI[species]['rank']],
               self.TBI[species]['parent']
