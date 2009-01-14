@@ -35,12 +35,12 @@ class Command(NoArgsCommand):
             print "loading taxonomy"
         os.system( 'python manage.py loadtaxonomy %s' % verbose_string )
         if verbose:
-            print "loading treebase informations"
-        os.system( 'python manage.py loadtreebase %s' % verbose_string )
-        if verbose:
             print "building taxonomy toc"
         os.system( 'python manage.py buildtaxonomytoc' )
         if verbose:
             print "building suggestion file"
         os.system( 'python manage.py buildspellfile' )
+        if verbose:
+            print "loading treebase informations"
+        os.system( 'python manage.py loadtreebase %s' % verbose_string )
 
