@@ -201,7 +201,7 @@ class Command(NoArgsCommand):
 
 	# l'id 0 n'est pas accepte par mysql on cree donc root avec le premier id libre
 	max_id +=1;
-	ligne = "%s||root||||||||valid||TWG standards met|unknown|unknown||1996-06-13 14:51:08|0|||5|10|10/27/1999|"%(max_id)
+	ligne = "%s||root||||||||valid||TWG standards met|unknown|unknown||1996-06-13 14:51:08|%s|||5|10|10/27/1999|"%(max_id,max_id)
 	ligne.split('|')
        
 	nameClean = ligne[2].replace(")","_").replace("(","_").replace("'"," ").replace(","," ").replace(":"," ").replace(";"," ");
