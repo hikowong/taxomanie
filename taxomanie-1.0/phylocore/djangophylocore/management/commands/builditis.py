@@ -173,18 +173,20 @@ class Command(NoArgsCommand):
         #mis en 1ere ligne du fichier
         #correct_tax["0"] = {"name": "root", "parent_id": "0", "rank": ""}
         ## recuperation des taxa valid
-        max_id=0
+        ## Compute root_id
+        root_id = max( [int(i.split('|')[0]) for i in fichier] ) + 1
+        print root_id
         for ligne in fichier:
             ligne = ligne.lower().split('|')
             tax_id = ligne[0]
             valid = ligne[10]
             tax_name = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
             tax_parent_id = ligne[17]
+            if tax_parent_id == "0":
+                tax_parent_id = str( root_id )
             rank = ligne[21]
             kingdom = ligne[20]
             credibility_rating = ligne[12]
-            if int(tax_id) > int(max_id):
-                    max_id = int(tax_id)
             if valid in ('accepted', 'valid'): # or ligne[11] in ('synonym')):
                 tax_parent_id = syn_tax.get(tax_parent_id, tax_parent_id)
                 # verification que pas de syno pour les taxa valid
@@ -198,13 +200,11 @@ class Command(NoArgsCommand):
                     taxa_sons[tax_parent_id].append(tax_id)
                     #print "add  %s %s len taxa sons %i" %(tax_parent_id, tax_id, len(taxa_sons))
         #fichier_csv.close()    
-        max_id += 1
-        root_id = int(max_id)
         ligne = "%s||root||||||||valid||TWG standards met|unknown|unknown||1996-06-13 14:51:08|%s|||5|10|10/27/1999|" % ( root_id, root_id )
         ligne = ligne.split('|')
         correct_tax[ligne[0]] = {"name": ligne[2] , "parent_id": ligne[17],
           "rank": ligne[21], 'kingdom': ligne[20], 'credibility_rating':ligne[12]}
-        return correct_tax, int(max_id)
+        return correct_tax, root_id
 
     def compute_reachable_taxa( self, correct_taxa, taxa_sons, taxa_id, reachable_taxa, taxa_homo):
         taxa_info = correct_taxa[taxa_id]
