@@ -61,6 +61,7 @@ class Command(NoArgsCommand):
         taxa_sons={}
 	# collect informations on correct taxa
         correct_taxa, max_id = self.getCorrectTaxa(taxonomic_units_path, taxa_sons, syn_tax)
+        root_id = max_id
 	## recuperation des homonyms
         taxa_homo={}
         homonyms = {}
@@ -90,9 +91,10 @@ class Command(NoArgsCommand):
         reachable_taxa={}
         #202420
         taxa_homo={}
-        self.compute_reachable_taxa(correct_taxa, taxa_sons, "0", reachable_taxa, taxa_homo)
+        self.compute_reachable_taxa(correct_taxa, taxa_sons, str(root_id), reachable_taxa, taxa_homo)
+        print ">>>", len(reachable_taxa)
         ancestor_file = open( os.path.join( DUMP_PATH, 'parentsrelation.dmp' ), 'a')
-        self.compute_write_ancestor( taxa_sons,"0",[],ancestor_file)
+        self.compute_write_ancestor( taxa_sons,str(root_id),[],ancestor_file)
         ancestor_file.close()
         # getting rank
         rank = self.getRank( taxon_unit_types_path )
@@ -171,20 +173,18 @@ class Command(NoArgsCommand):
         #mis en 1ere ligne du fichier
         #correct_tax["0"] = {"name": "root", "parent_id": "0", "rank": ""}
         ## recuperation des taxa valid
-       max_id=0
+        max_id=0
         for ligne in fichier:
             ligne = ligne.lower().split('|')
             tax_id = ligne[0]
             valid = ligne[10]
-            tax_name_base = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
- 	    tax_name = tax_name_base.replace(")","_").replace("(","_").replace("'"," ").replace(","," ").replace(":"," ").replace(";"," ");
-
+            tax_name = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
             tax_parent_id = ligne[17]
             rank = ligne[21]
             kingdom = ligne[20]
             credibility_rating = ligne[12]
             if int(tax_id) > int(max_id):
-                    max_id = tax_id
+                    max_id = int(tax_id)
             if valid in ('accepted', 'valid'): # or ligne[11] in ('synonym')):
                 tax_parent_id = syn_tax.get(tax_parent_id, tax_parent_id)
                 # verification que pas de syno pour les taxa valid
@@ -197,18 +197,13 @@ class Command(NoArgsCommand):
                         taxa_sons[tax_parent_id]=[]    
                     taxa_sons[tax_parent_id].append(tax_id)
                     #print "add  %s %s len taxa sons %i" %(tax_parent_id, tax_id, len(taxa_sons))
-        #fichier_csv.close()  
-
-	# l'id 0 n'est pas accepte par mysql on cree donc root avec le premier id libre
-	max_id +=1;
-	ligne = "%s||root||||||||valid||TWG standards met|unknown|unknown||1996-06-13 14:51:08|%s|||5|10|10/27/1999|"%(max_id,max_id)
-	ligne.split('|')
-       
-	nameClean = ligne[2].replace(")","_").replace("(","_").replace("'"," ").replace(","," ").replace(":"," ").replace(";"," ");
-	#print "replace old:"+ligne[2]+" new:"+ nameClean+"\n";
-        correct_tax[ligne[0]] = {"name": nameClean , "parent_id": ligne[17],
-        "rank": ligne[21], 'kingdom': ligne[20], 'credibility_rating':ligne[12]}
-
+        #fichier_csv.close()    
+        max_id += 1
+        root_id = int(max_id)
+        ligne = "%s||root||||||||valid||TWG standards met|unknown|unknown||1996-06-13 14:51:08|%s|||5|10|10/27/1999|" % ( root_id, root_id )
+        ligne = ligne.split('|')
+        correct_tax[ligne[0]] = {"name": ligne[2] , "parent_id": ligne[17],
+          "rank": ligne[21], 'kingdom': ligne[20], 'credibility_rating':ligne[12]}
         return correct_tax, int(max_id)
 
     def compute_reachable_taxa( self, correct_taxa, taxa_sons, taxa_id, reachable_taxa, taxa_homo):
