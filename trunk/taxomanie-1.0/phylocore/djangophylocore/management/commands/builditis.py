@@ -66,7 +66,7 @@ class Command(NoArgsCommand):
         taxa_homo={}
         homonyms = {}
         for tax_id in correct_taxa:
-	    tax_name = correct_taxa[tax_id]["name"]
+            tax_name = correct_taxa[tax_id]["name"]
             if not tax_name in taxa_homo:
                  taxa_homo[tax_name]=[]    
             taxa_homo[tax_name].append(tax_id)
@@ -78,13 +78,16 @@ class Command(NoArgsCommand):
                     homonyms[tax_name].append( ( id, "%s <%s>" % (correct_taxa[id]['name'],
                       d_kingdom[correct_taxa[id]['kingdom']] )) )
         #
-	for homonym_name, scientific_names_list in homonyms.iteritems():
-	    unambiguous_names =[n[1] for n in scientific_names_list]
-	    names = set(unambiguous_names)
+        homonym_ok = {}
+        for homonym_name, scientific_names_list in homonyms.iteritems():
+            unambiguous_names =[n[1] for n in scientific_names_list]
+            names = set(unambiguous_names)
             if len( names ) != len( unambiguous_names ): # ambiguous names even when adding kingdom to the name
-		for taxa in scientific_names_list:
+                for taxa in scientific_names_list:
                     del correct_taxa[taxa[0]] # taxa[0] = id    
-#            else:
+            else:
+                homonym_ok[homonym_name] = scientific_names_list
+        homonyms = homonym_ok
 #		for taxa in scientific_name_list:
 #                    correct_taxa[taxa[0]]["name"] = taxa[1]  # taxa[1] = new name    
         ## recuperation des taxa valid ayant un pere valid 
@@ -103,6 +106,17 @@ class Command(NoArgsCommand):
         #for tax_id, tax_info in correct_tax_tree.items():
         #    parent_id = tax_info["parent_id"]
         #    print tax_id + " "+parent_id 
+        # recuperation des noms de synonyms
+        synonyms = {}
+        taxa_names = self.getTaxaName(taxonomic_units_path)
+        reachable_values = reachable_taxa.values()
+        for syn_id, ref_id in syn_tax.iteritems():
+            if ref_id in reachable_taxa:
+                syn_name = taxa_names[syn_id]
+                if syn_name not in reachable_values:
+                    synonyms[syn_name] = ref_id
+        syn_tax = synonyms
+        #generating dumps
         self.generating_dumps( max_id, reachable_taxa, rank, common_name,
           homonyms, syn_tax, taxa_sons, d_kingdom, correct_taxa, taxa_sons )
         os.system( 'iconv -f iso8859-15 -t utf-8 %s > %s' % (os.path.join(
@@ -143,6 +157,20 @@ class Command(NoArgsCommand):
                 result_rel.append( "%s|%s|%s\n" % (index, max_id, taxa_id[0] ) )
         open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' ).write( ''.join( result_taxonomy ) )
         open( os.path.join( DUMP_PATH, 'relhomonymtaxa.dmp' ), 'w' ).write( ''.join( result_rel ) )
+        # synonyms
+        result_taxonomy = []
+        result_rel = []
+        index = 0
+        for synonym_name in synonyms:
+            assert synonym_name not in TAXONOMY_TOC, str(synonyms[synonym_name])+" "+ synonym_name
+            max_id += 1
+            result_taxonomy.append( "%s|%s|synonym|300|\n" % ( max_id, synonym_name ) )
+            TAXONOMY_TOC.add( synonym_name )
+            for taxa_id in synonyms[synonym_name]:
+                index += 1
+                result_rel.append( "%s|%s|%s\n" % (index, max_id, taxa_id[0] ) )
+        open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' ).write( ''.join( result_taxonomy ) )
+        open( os.path.join( DUMP_PATH, 'relsynonymtaxa.dmp' ), 'w' ).write( ''.join( result_rel ) )
         # common names
         result_taxonomy = []
         result_rel = []
@@ -164,6 +192,16 @@ class Command(NoArgsCommand):
         open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' ).write( ''.join( result_taxonomy ) )
         open( os.path.join( DUMP_PATH, 'relcommontaxa.dmp' ), 'w' ).write( ''.join( result_rel ) )
  
+    def getTaxaName( self, taxonomy_units_file ):
+        fichier = open( taxonomy_units_file ).readlines()
+        taxa_names = {}
+        for line in fichier:
+            ligne = line.lower().split('|')
+            tax_name_base = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
+            tax_name = tax_name_base.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
+            tax_id = ligne[0]
+            taxa_names[tax_id] = tax_name
+        return taxa_names
 
     def getCorrectTaxa( self, taxonomic_units_file, taxa_sons, syn_tax ):
         #fichier_csv=open(taxonomic_units_file, "rb")
@@ -180,7 +218,8 @@ class Command(NoArgsCommand):
             ligne = ligne.lower().split('|')
             tax_id = ligne[0]
             valid = ligne[10]
-            tax_name = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
+            tax_name_base = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
+            tax_name = tax_name_base.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
             tax_parent_id = ligne[17]
             if tax_parent_id == "0":
                 tax_parent_id = str( root_id )
