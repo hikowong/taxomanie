@@ -55,7 +55,8 @@ class Command(NoArgsCommand):
         # kingdoms
         d_kingdom = self.getKingdom( kingdoms_path )
         # synonyms
-        syn_tax = self.getSynonym( synonym_file_path )
+        syn_tax = self.getSynonym( synonym_file_path)
+     
         #return correct_tax, tax_name, tax_id
         #correct_tax = tax_name = tax_id = getCorrectTaxa("/Users/vranwez/Desktop/ITIS/itis_fic_utils/taxonomic_units")
         taxa_sons={}
@@ -109,12 +110,16 @@ class Command(NoArgsCommand):
         # recuperation des noms de synonyms
         synonyms = {}
         taxa_names = self.getTaxaName(taxonomic_units_path)
-        reachable_values = reachable_taxa.values()
+        reachable_values={}
+        for tax_id, tax_info in reachable_taxa.iteritems():
+            reachable_values[tax_info["name"]] = tax_id
+        
         for syn_id, ref_id in syn_tax.iteritems():
-            if ref_id in reachable_taxa:
-                syn_name = taxa_names[syn_id]
-                if syn_name not in reachable_values:
-                    synonyms[syn_name] = ref_id
+            
+            syn_name = taxa_names[syn_id]
+            #print "testReach:"+ref_id in reachable_taxa +"testSynNameSc"+(syn_name not in reachable_values)
+            if ref_id in reachable_taxa and (syn_name not in reachable_values):
+                synonyms[syn_name] = ref_id
         syn_tax = synonyms
         #generating dumps
         self.generating_dumps( max_id, reachable_taxa, rank, common_name,
@@ -161,14 +166,14 @@ class Command(NoArgsCommand):
         result_taxonomy = []
         result_rel = []
         index = 0
+
         for synonym_name in synonyms:
             assert synonym_name not in TAXONOMY_TOC, str(synonyms[synonym_name])+" "+ synonym_name
             max_id += 1
             result_taxonomy.append( "%s|%s|synonym|300|\n" % ( max_id, synonym_name ) )
             TAXONOMY_TOC.add( synonym_name )
-            for taxa_id in synonyms[synonym_name]:
-                index += 1
-                result_rel.append( "%s|%s|%s\n" % (index, max_id, taxa_id[0] ) )
+            index += 1
+            result_rel.append( "%s|%s|%s\n" % (index, max_id, synonyms[synonym_name] ) )
         open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' ).write( ''.join( result_taxonomy ) )
         open( os.path.join( DUMP_PATH, 'relsynonymtaxa.dmp' ), 'w' ).write( ''.join( result_rel ) )
         # common names
@@ -289,6 +294,9 @@ class Command(NoArgsCommand):
         #fichier_csv.close()
         return common_name
 
+  
+
+
     def getSynonym( self, syn_file):
         #fichier_csv=open(syn_file, "rb")
         #fichier = csv.reader(fichier_csv, delimiter='|')
@@ -297,6 +305,8 @@ class Command(NoArgsCommand):
         for ligne in fichier:
             ligne = ligne.lower().split('|')
             syn_tax[ligne[0]] = ligne[1]
+      
+        
         #fichier_csv.close()
         return syn_tax
 
