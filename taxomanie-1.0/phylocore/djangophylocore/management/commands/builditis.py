@@ -171,15 +171,14 @@ class Command(NoArgsCommand):
         #mis en 1ere ligne du fichier
         #correct_tax["0"] = {"name": "root", "parent_id": "0", "rank": ""}
         ## recuperation des taxa valid
-        ligne = "0||root||||||||valid||TWG standards met|unknown|unknown||1996-06-13 14:51:08|0|||5|10|10/27/1999|".split('|')
-        max_id=0
-        correct_tax[ligne[0]] = {"name": ligne[2] , "parent_id": ligne[17],
-        "rank": ligne[21], 'kingdom': ligne[20], 'credibility_rating':ligne[12]}
+       max_id=0
         for ligne in fichier:
             ligne = ligne.lower().split('|')
             tax_id = ligne[0]
             valid = ligne[10]
-            tax_name = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
+            tax_name_base = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
+ 	    tax_name = tax_name_base.replace(")","_").replace("(","_").replace("'"," ").replace(","," ").replace(":"," ").replace(";"," ");
+
             tax_parent_id = ligne[17]
             rank = ligne[21]
             kingdom = ligne[20]
@@ -198,7 +197,18 @@ class Command(NoArgsCommand):
                         taxa_sons[tax_parent_id]=[]    
                     taxa_sons[tax_parent_id].append(tax_id)
                     #print "add  %s %s len taxa sons %i" %(tax_parent_id, tax_id, len(taxa_sons))
-        #fichier_csv.close()    
+        #fichier_csv.close()  
+
+	# l'id 0 n'est pas accepte par mysql on cree donc root avec le premier id libre
+	max_id +=1;
+	ligne = "%s||root||||||||valid||TWG standards met|unknown|unknown||1996-06-13 14:51:08|0|||5|10|10/27/1999|"%(max_id)
+	ligne.split('|')
+       
+	nameClean = ligne[2].replace(")","_").replace("(","_").replace("'"," ").replace(","," ").replace(":"," ").replace(";"," ");
+	#print "replace old:"+ligne[2]+" new:"+ nameClean+"\n";
+        correct_tax[ligne[0]] = {"name": nameClean , "parent_id": ligne[17],
+        "rank": ligne[21], 'kingdom': ligne[20], 'credibility_rating':ligne[12]}
+
         return correct_tax, int(max_id)
 
     def compute_reachable_taxa( self, correct_taxa, taxa_sons, taxa_id, reachable_taxa, taxa_homo):
