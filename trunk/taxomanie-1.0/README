@@ -8,7 +8,7 @@ To install PhyloExplorer:
    
 === Installing NCBI taxonomy ===
 
-Go to phyloexplorer/ncbi to install NCBI taxonomy.
+Go to phylocore/phylocore_ncbi to install NCBI taxonomy.
 
 Edit the settings.py file and change the DATABASE_ENGINE.
 
@@ -20,7 +20,7 @@ This will download the taxonomy from the web and build the database.
 
 === Installing ITIS taxonomy ===
 
-Go to phyloexplorer/itis to install ITIS taxonomy.
+Go to phylocore/phylocore_itis to install ITIS taxonomy.
 
 Edit the settings.py file and change the DATABASE_ENGINE.
 
