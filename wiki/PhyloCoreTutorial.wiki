@@ -173,7 +173,7 @@ A TreeCollection can take a collection in a nexus or phylip format
 
 {{{
 >>> simple_col = "(mus,antilocapra anteflexa,rat noir,echinops,blabla);(mus, (rat noir);"
->>> col = TreeCollection.objects.create( name = 'simple', original_collection_string = simple_col )
+>>> col = TreeCollection.objects.create( name = 'simple', source = simple_col )
 }}}
 
 Juste like Tree objects, we have access to all taxa:
@@ -246,7 +246,7 @@ We can make queries to get some trees that match it.
 
 {{{
 >>> simple_col = "(mus,echinops <plantae>,rattus);(mus, rattus);"
->>> col = TreeCollection.objects.create( name = 'query_col', original_collection_string = simple_col )
+>>> col = TreeCollection.objects.create( name = 'query_col', source = simple_col )
 }}}
 
 Get all trees wich contain at least on taxa wich are a muridae
