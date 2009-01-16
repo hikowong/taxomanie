@@ -27,7 +27,7 @@ If you want to work with only one taxonomy, you can import all objects at the sa
 To get a taxa from his name do:
 
 {{{
->>> taxa = Taxa.objects.get( name = 'mus musculus' )
+>>> taxa = Taxonomy.objects.get( name = 'mus musculus' )
 >>> taxa
 <Taxa: mus musculus>
 }}}
@@ -71,7 +71,7 @@ Get all parents by order (closest to furthest).
 'root' doesn't have parents
 
 {{{
->>> root = Taxa.objects.get( name = 'root' )
+>>> root = Taxonomy.objects.get( name = 'root' )
 >>> root.parents
 []
 }}}
