@@ -108,7 +108,7 @@ Now we know about taxa, we can create trees. A Tree object is created by passing
 Now we can create our tree:
 
 {{{
->>> tree = Tree.objects.create( tree_string = nwk_tree, name = "example1")
+>>> tree = Tree.objects.create( source = nwk_tree, name = "example1")
 }}}
 
 The `is_valid` attribute tell us if our tree was well formated or not
@@ -223,7 +223,7 @@ or good
 We can add a tree into our collection realy easily:
 
 {{{
->>> tree = Tree.objects.create( name = 'newtree', tree_string = "(mus musculus, rattus rattus )" )
+>>> tree = Tree.objects.create( name = 'newtree', source = "(mus musculus, rattus rattus )" )
 >>> col.trees.add( tree )
 }}}
 
