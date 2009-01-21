@@ -1464,7 +1464,7 @@ class TreeCollection( models.Model, TaxonomyReference ):
         taxon_name_list
         """
         if keep:
-            remove_taxon_list = [i.name for i in self.taxa.exclude( name__in = taxon_name_list )] 
+            remove_taxon_list = [i.user_taxon_name for i in self.rel.exclude( taxon__name__in = taxon_name_list )]
             taxon_name_list = remove_taxon_list
         new_nwk = self.get_filtered_collection_string( taxon_name_list )
         return TreeCollection.objects.create( delimiter = self.delimiter, source = new_nwk )
