@@ -182,13 +182,19 @@ class Command(NoArgsCommand):
         index = 0
         already_done = set([])
         for name in common_name:
-            if name not in TAXONOMY_TOC:
+            nbRefOK=0
+            #check that at least one corresponding scientific name is present in TOC
+            for common in common_name[name]:
+                if common['id'] in taxonomy:
+                    nbRefOK+=1
+            if name not in TAXONOMY_TOC and nbRefOK>0:
                 max_id += 1
                 result_taxonomy.append( "%s|%s|common|300|\n" % ( max_id, name ) )
                 TAXONOMY_TOC.add( name )
+                
                 for common in common_name[name]:
                     index += 1
-                    if not (max_id, common['id'] ) in already_done:
+                    if not (max_id, common['id'] ) in already_done and common['id'] in taxonomy:
                         result_rel.append( "%s|%s|%s|%s\n" % (index, max_id, common['id'], common['langage'] ) )
                         already_done.add( (max_id, common['id']) )
             else:
