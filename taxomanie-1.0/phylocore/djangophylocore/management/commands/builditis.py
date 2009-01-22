@@ -56,7 +56,8 @@ class Command(NoArgsCommand):
         d_kingdom = self.getKingdom( kingdoms_path )
         # synonyms
         syn_tax = self.getSynonym( synonym_file_path)
-     
+        # getting rank
+        rank = self.getRank( taxon_unit_types_path )
         #return correct_tax, tax_name, tax_id
         #correct_tax = tax_name = tax_id = getCorrectTaxa("/Users/vranwez/Desktop/ITIS/itis_fic_utils/taxonomic_units")
         taxa_sons={}
@@ -76,8 +77,8 @@ class Command(NoArgsCommand):
                 for id in tax_id:
                     if not tax_name in homonyms:
                         homonyms[tax_name] = []
-                    homonyms[tax_name].append( ( id, "%s <%s>" % (correct_taxa[id]['name'],
-                      d_kingdom[correct_taxa[id]['kingdom']] )) )
+                    homonyms[tax_name].append( ( id, "%s <%s %s>" % (correct_taxa[id]['name'],
+                      d_kingdom[correct_taxa[id]['kingdom']], rank[correct_taxa[id]['rank']] )) )
         #
         homonym_ok = {}
         for homonym_name, scientific_names_list in homonyms.iteritems():
@@ -100,8 +101,7 @@ class Command(NoArgsCommand):
         ancestor_file = open( os.path.join( DUMP_PATH, 'parentsrelation.dmp' ), 'a')
         self.compute_write_ancestor( taxa_sons,str(root_id),[],ancestor_file)
         ancestor_file.close()
-        # getting rank
-        rank = self.getRank( taxon_unit_types_path )
+        
         # getting common names
         common_name = self.getCommonName( vernaculars_path )
         #for tax_id, tax_info in correct_tax_tree.items():
@@ -139,7 +139,7 @@ class Command(NoArgsCommand):
         for taxa_id in taxonomy:
             if taxonomy[taxa_id]['name'] in homonyms:
                 #if taxonomy[taxa_id]['credibility_rating'] == 'TWG standards met':
-	        taxonomy[taxa_id]['name'] = "%s <%s>" % (taxonomy[taxa_id]['name'], d_kingdom[taxonomy[taxa_id]['kingdom']] )
+	        taxonomy[taxa_id]['name'] = "%s <%s %s>" % (taxonomy[taxa_id]['name'], d_kingdom[taxonomy[taxa_id]['kingdom']],rank[taxonomy[taxa_id]['rank']] )
 #        homonyms = {}
 #        self.compute_reachable_taxa(correct_taxa, taxa_sons, "0", taxonomy, homonyms)
         for taxa_id in taxonomy:
