@@ -588,7 +588,7 @@ class Tree( models.Model, TaxonomyReference ):
         for taxon_name in taxa_list:
             if taxon_name.strip():
                 user_taxon_name = taxon_name.strip()
-                taxon_name = self.strip_taxon_name( taxon_name.strip(), self.delimiter )
+                taxon_name = self.strip_taxon_name( taxon_name.strip(), self.delimiter ).replace( "_", " " ).strip()
                 taxo = TAXONOMY_TOC.get( taxon_name, '' )
                 if self._from_collection:
                     if taxo:
