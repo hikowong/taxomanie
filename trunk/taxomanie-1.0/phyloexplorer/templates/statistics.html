@@ -28,7 +28,7 @@ $(document).ready(function() {
         method: "get",url: "suggestions",
         beforeSend: function(html){
             get_progress_suggestions();
-            $("#suggestions").html( '<b><font color="red">Correcting bad taxa...</font></b><br />');
+            $("#suggestions").html( '<b><font color="red">Searching correct names similar to those of bad taxa...</font></b><br />');
         },
         complete: function(){ $("#progressbar_badtaxa").hide("fast");},
         success: function(html){
@@ -393,7 +393,8 @@ $(document).ready(function(){
     <!-- badtaxa fieldset -->
     {% if nb_badtaxa %}
         <fieldset>
-        <legend> {{ nb_badtaxa }} bad taxa </legend>
+        <legend> {{ nb_badtaxa }} bad taxa</legend>
+	 Due to computing times, suggestions are proposed only when there is less than 10 bad taxa.</br>
         <span id="suggestions" class="homonymlist"> </span>
         <div id="progressbar_badtaxa"></div>
         </fieldset>

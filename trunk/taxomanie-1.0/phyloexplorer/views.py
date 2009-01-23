@@ -423,9 +423,13 @@ def suggestions( request ):
             return render_to_response( 'suggestions.html', context )
         bad_taxa_list = CACHE_SUGGESTIONS[col_id]['bad_taxa_list']
         D_PROGRESS[col_id]['suggestions'] = CACHE_SUGGESTIONS[col_id]['progress']
+    nbBad = len(bad_taxa_list)
     for bad in bad_taxa_list:
         CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'][bad.name] = []
-        correct_list = TAXOREF.correct( bad.name, guess = True )
+        if nbBad<11:
+            correct_list = TAXOREF.correct( bad.name, guess = True )
+        else:
+            correct_list=[]
         for i in correct_list:
             if i != bad.name:
                 CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'][bad.name].append( i )
