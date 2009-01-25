@@ -276,18 +276,28 @@ $(document).ready(function(){
     <a name="arbo"></a>
     <fieldset>
         <legend> General information </legend>
-        {{nb_user_taxa}} taxa in {{ nb_trees}} trees <br />
-        {{ nb_taxa }} distinct OTU (Operational Taxonomic Unit) &nbsp;
-
-    {% if nb_badtaxa %}
-        <font color="red"> {{ nb_badtaxa }} bad taxa </font>&nbsp;
+	{{nb_user_labels}} different label(s) occur in {{ nb_trees}} tree(s) <br />
+       	<ul>
+	<li>{{nb_user_taxa}} are present in the reference taxonomy 
+	<!--{{nb_user_taxa}} taxa in {{ nb_trees}} trees <br />
+        {{ nb_taxa }} distinct OTU (Operational Taxonomic Unit) &nbsp;-->
+    {% if nb_homonyms or nb_synonyms or nb_commons %}
+	including:
     {% endif %}
     {% if nb_homonyms %}
-        <font color="orange">{{ nb_homonyms}} homonyms </font>
+        <font color="orange">{{ nb_homonyms}} homonym(s) </font>
     {% endif %}
     {% if nb_synonyms %}
-        <font color="orange">{{ nb_synonyms}} synonyms </font>
+        <font color="orange">{{ nb_synonyms}} synonym(s) </font>
     {% endif %}
+    {% if nb_commons %}
+        <font color="orange">{{ nb_commons}} vernacular(s) </font>
+    {% endif %}
+	</li>
+    {% if nb_badtaxa %}
+        <li> <font color="red"> {{ nb_badtaxa }} are not present in the reference taxonomy  </font>&nbsp;</li>
+    {% endif %}
+	</ul>
 </fieldset>
 <br />
 
@@ -393,7 +403,7 @@ $(document).ready(function(){
     <!-- badtaxa fieldset -->
     {% if nb_badtaxa %}
         <fieldset>
-        <legend> {{ nb_badtaxa }} bad taxa</legend>
+        <legend> {{ nb_badtaxa }} label(s) not found in the taxonomy</legend>
 	 Due to computing times, suggestions are proposed only when there is less than 10 bad taxa.</br>
         <span id="suggestions" class="homonymlist"> </span>
         <div id="progressbar_badtaxa"></div>
