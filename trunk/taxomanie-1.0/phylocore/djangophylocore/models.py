@@ -588,7 +588,8 @@ class Tree( models.Model, TaxonomyReference ):
         for taxon_name in taxa_list:
             if taxon_name.strip():
                 user_taxon_name = taxon_name.strip()
-                taxon_name = self.strip_taxon_name( taxon_name.strip(), self.delimiter ).replace( "_", " " ).strip()
+                #VR taxon_name = self.strip_taxon_name( taxon_name.strip(), self.delimiter ).replace( "_", " " ).strip()
+                taxon_name = self.strip_taxon_name( taxon_name.strip(), self.delimiter )
                 taxo = TAXONOMY_TOC.get( taxon_name, '' )
                 if self._from_collection:
                     if taxo:
@@ -1341,7 +1342,11 @@ class TreeCollection( models.Model, TaxonomyReference ):
         """ return stat of Tree Size Distribution """
         stat = {}
         cursor = connection.cursor()
-        cur = cursor.execute( " select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s GROUP BY tree_id;" % (self.id))
+        #cur = cursor.execute( " select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s GROUP BY tree_id;" % (self.id))
+        #VR
+        #cur = cursor.execute( " select tree_id, count(rel.user_taxon_name) from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxon_id GROUP BY tree_id;" % (self.id))
+        cur = cursor.execute( " select tree_id, count(rel.user_taxon_name) from djangophylocore_reltreecoltaxa%s as rel GROUP BY tree_id;" % (self.id))
+      
         if settings.DATABASE_ENGINE == 'sqlite3':
             result = cur.fetchall()
             cur.close()
@@ -1371,7 +1376,8 @@ class TreeCollection( models.Model, TaxonomyReference ):
         """
         stat = {}
         cursor = connection.cursor()
-        cur = cursor.execute( "select rel.tree_id, taxonomy.name from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxon_id" % self.id )
+        #VR cur = cursor.execute( "select rel.tree_id, taxonomy.name from djangophylocore_reltreecoltaxa%s as rel, djangophylocore_taxonomy as taxonomy where taxonomy.id = rel.taxon_id" % self.id )
+        cur = cursor.execute( " select rel.tree_id, rel.user_taxon_name from djangophylocore_reltreecoltaxa%s as rel" % (self.id))
         if settings.DATABASE_ENGINE == 'sqlite3':
             results = cur.fetchall()
             cur.close()
@@ -1463,9 +1469,21 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return a collection string wich contains only the taxon present in
         taxon_name_list
         """
+        print "XXXXXXXXXXXX"
+        for n in taxon_name_list:
+                print n
         if keep:
-            remove_taxon_list = [i.user_taxon_name for i in self.rel.exclude( taxon__name__in = taxon_name_list )]
-            taxon_name_list = remove_taxon_list
+            #remove_taxon_list = [i.user_taxon_name for i in self.rel.exclude( taxon__name__in = taxon_name_list )]
+            #taxon_name_list = remove_taxon_list
+            #VR
+            remove_taxon_list = [i.user_taxon_name for i in self.rel]
+            taxon_name_list2 =[i for i in remove_taxon_list if i not in taxon_name_list]
+            taxon_name_list=taxon_name_list2
+            #VR
+            print ">>>>>>>"
+            for n in taxon_name_list:
+                print n
+        print "XXXXXXXXXXXX"
         new_nwk = self.get_filtered_collection_string( taxon_name_list )
         return TreeCollection.objects.create( delimiter = self.delimiter, source = new_nwk )
 

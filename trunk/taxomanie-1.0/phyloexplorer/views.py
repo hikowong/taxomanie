@@ -194,6 +194,11 @@ def statistics( request ):
     context['nb_taxa'] = collection.taxa.count()
     request.session['nb_taxa'] = context['nb_taxa']
     print "nb_taxa"
+    #VR
+    context['nb_user_labels'] = collection.rel.values( 'user_taxon_name' ).count()
+    request.session['nb_user_labels'] = context['nb_user_labels']
+    print "nb_user_labels"
+    # fin VR
     context['nb_user_taxa'] = collection.rel.values( 'taxon' ).count()
     request.session['nb_user_taxa'] = context['nb_user_taxa']
     print "nb_user_taxa"
@@ -804,10 +809,11 @@ def get_tree_size_distribution( d_stat ):
                     result += str(nbtree)+" trees"
                 else:
                     result += str(nbtree)+ " tree"
+                #VR
                 if nbtaxon > 1:
-                    result += " with %s leaves)</tt><br />\n" % nbtaxon
+                    result += " with %s distinct leaf labels)</tt><br />\n" % nbtaxon
                 else:
-                    result += " with %s leave)</tt><br />\n" % nbtaxon
+                    result += " with %s leaf label)</tt><br />\n" % nbtaxon
     return result
 
 def get_taxon_frequency_distribution( d_stat ):
@@ -830,10 +836,11 @@ def get_taxon_frequency_distribution( d_stat ):
             base = base.replace( " ", "&nbsp;" )
             if base:
                 result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("
+                #VR
                 if nbtree > 1:
-                    result += str(nbtree)+" taxa are"
+                    result += str(nbtree)+" leaf labels are"
                 else:
-                    result += str(nbtree)+" taxon is"
+                    result += str(nbtree)+" leaf label is"
                 if nbtaxon > 1:
                     result += " present in %s trees) </tt><br />\n" % nbtaxon
                 else:
