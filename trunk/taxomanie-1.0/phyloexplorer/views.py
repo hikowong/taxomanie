@@ -195,11 +195,11 @@ def statistics( request ):
     request.session['nb_taxa'] = context['nb_taxa']
     print "nb_taxa"
     #VR
-    context['nb_user_labels'] = collection.rel.values( 'user_taxon_name' ).count()
+    context['nb_user_labels'] = collection.rel.values( 'user_taxon_name' ).distinct().count()
     request.session['nb_user_labels'] = context['nb_user_labels']
     print "nb_user_labels"
     # fin VR
-    context['nb_user_taxa'] = collection.rel.values( 'taxon' ).count()
+    context['nb_user_taxa'] = collection.rel.values( 'taxon' ).distinct().count()
     request.session['nb_user_taxa'] = context['nb_user_taxa']
     print "nb_user_taxa"
     context['nb_scientifics'] = collection.scientifics.count()
