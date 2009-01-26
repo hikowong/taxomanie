@@ -151,14 +151,7 @@ Let's try now to get all taxa wich correspond to echinops :
 [<Taxa: echinops <animalia>], [Taxa: echinops <plantae>]
 }}}
 
-We can list all taxa (including homonyms, synonyms, commons name) like this :
-
-{{{
->>> tree.taxonomy_objects.all()
-[<Taxonomy: echinops (homonym)>,<Taxonomy: rattus (scientific name)>, <Taxonomy: mus (scientific name)>, <Taxonomy: mus musculus (scientific name)>]
-}}}
-
-we can retrieve all ambiguous name easyly:
+we can retrieve all ambiguous name easily:
 
 {{{
 >>> tree.ambiguous.all()
