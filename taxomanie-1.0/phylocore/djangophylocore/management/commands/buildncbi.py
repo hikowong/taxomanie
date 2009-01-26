@@ -201,7 +201,7 @@ class Command(NoArgsCommand):
                 if common:
                     if name not in common_toc:
                         index += 1
-                        list_common.append( "%s|%s|common|2|\n" % ( index, name.replace(",", " ").replace( "(", "_").replace( ")", "_") ) )
+                        list_common.append( "%s|%s|common|2|\n" % ( index, name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ") ) )
                         common_toc[name] = index
                     index_relcommon += 1
                     list_relcommontaxa.append(
@@ -209,7 +209,7 @@ class Command(NoArgsCommand):
             if type_name == "scientific name" and homonym:
                 if name not in homonym_toc:
                     index += 1
-                    list_homonym.append( '%s|%s|homonym|2|\n' % ( index, name.replace(",", " ").replace( "(", "_" ).replace( ")", "_" ) ) )
+                    list_homonym.append( '%s|%s|homonym|2|\n' % ( index, name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ") ) )
                     homonym_toc[name] = index
                 index_relhomonym += 1
                 list_relhomonymtaxa.append(
@@ -255,7 +255,7 @@ class Command(NoArgsCommand):
                     continue
             line = '%s|%s|%s|%s|%s\n' % (
               species,
-              self.TBI[species]['name'].replace(",", " ").replace( "(", "_").replace(")","_"),
+              self.TBI[species]['name'].replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " "),
               self.TBI[species]['type_name'],
               self.RANK[self.TBI[species]['rank']],
               self.TBI[species]['parent']

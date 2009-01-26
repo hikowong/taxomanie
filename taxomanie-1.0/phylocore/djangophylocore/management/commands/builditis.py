@@ -72,19 +72,43 @@ class Command(NoArgsCommand):
             if not tax_name in taxa_homo:
                  taxa_homo[tax_name]=[]    
             taxa_homo[tax_name].append(tax_id)
+        
+        
         for tax_name, tax_id in taxa_homo.items():
             if len( tax_id ) > 1:
                 for id in tax_id:
                     if not tax_name in homonyms:
                         homonyms[tax_name] = []
-                    homonyms[tax_name].append( ( id, "%s <%s %s>" % (correct_taxa[id]['name'],
+                    # <> not close yet we may need to add itis id
+                    homonyms[tax_name].append( ( id, "%s <%s %s" % (correct_taxa[id]['name'],
                       d_kingdom[correct_taxa[id]['kingdom']], rank[correct_taxa[id]['rank']] )) )
-        #
+        #if some ambiguity still exist, we add itis id to the name
+        taxa_homo_freq={}
+        for homonym_name, scientific_names_list in homonyms.iteritems():
+            for n in scientific_names_list :
+                if not n[1] in taxa_homo_freq : 
+                    taxa_homo_freq[n[1]]=0
+                taxa_homo_freq[n[1]]= taxa_homo_freq[n[1]]+1;
+                
+        homonyms_tmp ={}
+        for homonym_name, scientific_names_list in homonyms.iteritems():
+            homonyms_tmp[homonym_name]=[]
+            for n in scientific_names_list :
+                if taxa_homo_freq[n[1]] > 1 : 
+                    homonyms_tmp[homonym_name].append( ( n[0], "%s itis %s>" %(n[1],n[0]) ) )
+                else:
+                    homonyms_tmp[homonym_name].append( ( n[0], "%s>" %(n[1]) ) )
+               
+        homonyms = homonyms_tmp; 
+          
+        # avery taxon should now have an unambiguouds name
+        # XXXXXXX in generate dumps the name should be find using homonyms table
         homonym_ok = {}
         for homonym_name, scientific_names_list in homonyms.iteritems():
             unambiguous_names =[n[1] for n in scientific_names_list]
             names = set(unambiguous_names)
             if len( names ) != len( unambiguous_names ): # ambiguous names even when adding kingdom to the name
+                print "===========> ambiguous name should no longer exist"
                 for taxa in scientific_names_list:
                     del correct_taxa[taxa[0]] # taxa[0] = id    
             else:
@@ -136,12 +160,15 @@ class Command(NoArgsCommand):
         # scientifics
         result = []
         TAXONOMY_TOC = set([])
+        homonym_id = {}
+        for homonym_name, scientific_names_list in homonyms.iteritems():
+            for n in scientific_names_list:
+                homonym_id[n[0]]=n[1];
+            
         for taxa_id in taxonomy:
             if taxonomy[taxa_id]['name'] in homonyms:
-                #if taxonomy[taxa_id]['credibility_rating'] == 'TWG standards met':
-	        taxonomy[taxa_id]['name'] = "%s <%s %s>" % (taxonomy[taxa_id]['name'], d_kingdom[taxonomy[taxa_id]['kingdom']],rank[taxonomy[taxa_id]['rank']] )
-#        homonyms = {}
-#        self.compute_reachable_taxa(correct_taxa, taxa_sons, "0", taxonomy, homonyms)
+               taxonomy[taxa_id]['name'] =homonym_id[taxa_id]
+
         for taxa_id in taxonomy:
             if not taxonomy[taxa_id]['name'] in TAXONOMY_TOC:
                 result.append( "%s|%s|scientific name|%s|%s\n" % ( taxa_id,
@@ -209,7 +236,7 @@ class Command(NoArgsCommand):
         for line in fichier:
             ligne = line.lower().split('|')
             tax_name_base = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
-            tax_name = tax_name_base.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
+            tax_name = tax_name_base.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
             tax_id = ligne[0]
             taxa_names[tax_id] = tax_name
         return taxa_names
@@ -230,7 +257,7 @@ class Command(NoArgsCommand):
             tax_id = ligne[0]
             valid = ligne[10]
             tax_name_base = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
-            tax_name = tax_name_base.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
+            tax_name = tax_name_base.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
             tax_parent_id = ligne[17]
             if tax_parent_id == "0":
                 tax_parent_id = str( root_id )
@@ -294,9 +321,12 @@ class Command(NoArgsCommand):
         common_name = {}
         for ligne in fichier:
             ligne = ligne.lower().split('|')
-            if ligne[1] not in common_name:
-                common_name[ligne[1]] = []
-            common_name[ligne[1]].append( {"id":ligne[0],"langage":ligne[2]} )
+            #print ligne[2]
+            if (ligne[2] == "english" or ligne[2] == "unspecified"):
+                tax_name = ligne[1].replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+                if tax_name not in common_name:
+                    common_name[tax_name] = []       
+                common_name[tax_name].append( {"id":ligne[0],"langage":ligne[2]} )
         #fichier_csv.close()
         return common_name
 
