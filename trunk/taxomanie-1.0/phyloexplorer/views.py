@@ -454,7 +454,7 @@ def reference_tree( request ):
         context['stats_tree'] = CACHE_REFERENCE_TREE[collection.id]
     else:
         if not request.session['nb_scientifics']:
-            return HttpResponse( '<b><font color="red">No scientifics taxa found. Please correct your collection...</font></b>' )
+            return HttpResponse( '<b><font color="red">No taxa with valid scientific names. Please correct your collection.</font></b>' )
         context['stats_tree'] = display_tree_stats( collection )
         CACHE_REFERENCE_TREE[collection.id] = context['stats_tree']
     context['reference_tree'] = request.session['reference_tree_nwk']
@@ -465,7 +465,7 @@ def single_reference_tree( request, idtree ):
     if not "tree_%s" % idtree in CACHE_REFERENCE_TREE:
         tree = Tree.objects.get( id = idtree )
         if not tree.scientifics:
-            return HttpResponse( '<b><font color="red">No scientifics taxa found in tree. Please correct your collection...</font></b>' )
+            return HttpResponse( '<b><font color="red">No taxa with valid scientific names. Please correct your collection.</font></b>' )
         CACHE_REFERENCE_TREE["tree_%s"%idtree] = display_single_tree_stats( tree )
     return HttpResponse( CACHE_REFERENCE_TREE["tree_%s"%idtree] )
 
@@ -629,6 +629,9 @@ def get_matrix( request ):
     #
     taxa_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['taxa'].items()])]
     tree_list = [i[1] for i in sorted([(i,v) for v,i in sort_info['trees'].items()])]
+    #VR
+    tree_list.reverse()
+    
     d_tree_id_name = dict( Tree.objects.filter( id__in = tree_list).values_list( 'id','name' ) )
     if nb_taxa < 20 and nb_trees < 20:
         pix = 20
@@ -717,33 +720,36 @@ def _get_wikipedia_url( taxon ):
     global taximage_url
     taxon = "_".join(taxon.split()).strip().capitalize()
     if not taximage_url.has_key( taxon ):
-        taximage_url[taxon] = {}
+        taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+        #taximage_url[taxon] = {}
         url_thumb = ''
         conn = httplib.HTTPConnection("species.wikimedia.org")
         conn.request("GET", "/wiki/"+taxon)
         f = conn.getresponse().read()
-        if 'class="thumbimage"' in f:
-            url_thumb = f.split('thumbimage')[0].split('src=')[-1].split()[0].strip('"')
-        else:
-            conn = httplib.HTTPConnection("en.wikipedia.org")
-            conn.request("GET", "/wiki/"+taxon)
-            f = conn.getresponse().read()
-            try:
-                url_thumb = f.split('class="image"' )[1].split('</a>')[0].split('src=')[1].split()[0].strip('"')
-            except:
-                taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
-        conn.close()
-        if url_thumb:
-            url = url_thumb.split('/')[:-1]
-            try:
-                url.remove('thumb' )
-                url = "/".join( url )
-                taximage_url[taxon] = {"thumb": url_thumb, "full":url}
-            except:
-                print url, url_thumb
-                taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
-        else:
-            taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+        #VR
+        if 'Name' not in f :
+            if 'class="thumbimage"' in f:
+                url_thumb = f.split('thumbimage')[0].split('src=')[-1].split()[0].strip('"')
+            else:
+                conn = httplib.HTTPConnection("en.wikipedia.org")
+                conn.request("GET", "/wiki/"+taxon)
+                f = conn.getresponse().read()
+                try:
+                    url_thumb = f.split('class="image"' )[1].split('</a>')[0].split('src=')[1].split()[0].strip('"')
+                except:
+                    pass #taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+            conn.close()
+            if url_thumb:
+                url = url_thumb.split('/')[:-1]
+                try:
+                    url.remove('thumb' )
+                    url = "/".join( url )
+                    taximage_url[taxon] = {"thumb": url_thumb, "full":url}
+                except:
+                    print url, url_thumb
+                    pass #taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+            #else:
+             #   taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
     return taximage_url[taxon]
 
 
