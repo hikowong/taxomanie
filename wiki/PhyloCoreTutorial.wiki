@@ -89,11 +89,11 @@ and you can get all taxa from a specify rank
 
 {{{
 >>> species = Rank.objects.get( name = 'species' )
->>> species.taxas.all()
+>>> species.taxa.all()
 [<Taxa: echinops <plant>>, <Taxa: echinops <mammal>>, <Taxa: mus musculus>]
 
 >>> genus = Rank.objects.get( name = 'genus' )
->>> genus.taxas.all()
+>>> genus.taxa.all()
 [<Taxa: rattus>, <Taxa: mus>]
 }}}
 
@@ -121,14 +121,14 @@ True
 Now we want all (good named) taxa list:
 
 {{{
->>> tree.taxas.all()
+>>> tree.taxa.all()
 [<Taxa: rattus>, <Taxa: mus>, <Taxa: mus musculus>]
 }}}
 
 We can get informations from bad taxa names and homonyms:
 
 {{{
->>> tree.bad_taxas.all()
+>>> tree.bad_taxa.all()
 [<BadTaxa: badname>]
 >>> tree.homonyms.all()
 [<HomonymName: echinops>]
@@ -147,7 +147,7 @@ Let's try now to get all taxa wich correspond to echinops :
 
 {{{
 >>> homonym = tree.homonyms.all()[0]
->>> homonym.taxas.all()
+>>> homonym.taxa.all()
 [<Taxa: echinops <animalia>], [Taxa: echinops <plantae>]
 }}}
 
@@ -183,7 +183,7 @@ Juste like Tree objects, we have access to all taxa:
 [<Taxonomy: antilocapra anteflexa (synonym)>, <Taxonomy: echinops (homonym)>, <Taxonomy: mus (scientific name)>, <Taxonomy: rat noir (common)>]
 >>> col.ambiguous.all()
 [<Taxonomy: antilocapra anteflexa (synonym)>, <Taxonomy: echinops (homonym)>, <Taxonomy: rat noir (common)>]
->>> col.taxas.all()
+>>> col.taxa.all()
 [<Taxa: mus>]
 >>> col.homonyms.all()
 [<HomonymName: echinops>]
@@ -191,7 +191,7 @@ Juste like Tree objects, we have access to all taxa:
 [<SynonymName: antilocapra anteflexa>]
 >>> col.commons.all()
 [<CommonName: rat noir (french)>]
->>> col.bad_taxas.all()
+>>> col.bad_taxa.all()
 [<BadTaxa: blabla (1)>]
 }}}
 
