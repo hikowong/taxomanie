@@ -55,7 +55,6 @@ Stopping servers
 == Configuring PhyloExplorer ==
 
 You can configure the server address to feed your needs.
-
 Go to phyloexplorer directory and edit the phyloconf.py file.
 
 == FAQ ==
