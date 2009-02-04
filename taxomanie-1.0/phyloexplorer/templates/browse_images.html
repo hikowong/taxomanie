@@ -32,8 +32,12 @@ $(document).ready(function(){
 
 <div id="gallery">
 {% for taxon, full, thumb in d_taxa_list %}
-    <a style="color:white" href="{{full}}" rel="prettyPhoto[gallery]" title="{{taxon}}"><img
-      src="{{thumb}}" width="70" title="{{taxon}}" alt="{{taxon}}"></a>
+	{% ifequal full "Image not found" %}
+ 	<span style="color:Black;border:Black; border-style:solid ;border-width:thin">{{taxon}}</span>
+    {%else %}
+    	<a style="color:black" href="{{full}}" rel="prettyPhoto[gallery]" title="{{taxon}}"><img
+      src="{{thumb}}" width="70" title="{{taxon}}" alt="{{taxon}}"></a>  
+    {% endifequal %}
 {% endfor %}
 </div>
 <br />
