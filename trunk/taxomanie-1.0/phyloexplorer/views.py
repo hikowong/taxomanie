@@ -727,29 +727,31 @@ def _get_wikipedia_url( taxon ):
         conn.request("GET", "/wiki/"+taxon)
         f = conn.getresponse().read()
         #VR
-        if 'Name' not in f :
-            if 'class="thumbimage"' in f:
-                url_thumb = f.split('thumbimage')[0].split('src=')[-1].split()[0].strip('"')
-            else:
-                conn = httplib.HTTPConnection("en.wikipedia.org")
-                conn.request("GET", "/wiki/"+taxon)
-                f = conn.getresponse().read()
+        if 'Taxonavigation' in f and 'class="thumbimage"' in f :
+            url_thumb = f.split('thumbimage')[0].split('src=')[-1].split()[0].strip('"')
+        else:
+            conn.close()
+            conn = httplib.HTTPConnection("en.wikipedia.org")
+            conn.request("GET", "/wiki/"+taxon)
+            f = conn.getresponse().read()
+            if 'Scientific classification' in f:
                 try:
                     url_thumb = f.split('class="image"' )[1].split('</a>')[0].split('src=')[1].split()[0].strip('"')
                 except:
                     pass #taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
-            conn.close()
-            if url_thumb:
-                url = url_thumb.split('/')[:-1]
-                try:
-                    url.remove('thumb' )
-                    url = "/".join( url )
-                    taximage_url[taxon] = {"thumb": url_thumb, "full":url}
-                except:
-                    print url, url_thumb
-                    pass #taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
-            #else:
-             #   taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+        conn.close()
+        
+        if url_thumb and ".svg" not in url_thumb:
+            url = url_thumb.split('/')[:-1]
+            try:
+                url.remove('thumb' )
+                url = "/".join( url )
+                taximage_url[taxon] = {"thumb": url_thumb, "full":url}
+            except:
+                print url, url_thumb
+                pass #taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+        #else:
+         #   taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
     return taximage_url[taxon]
 
 
@@ -757,32 +759,8 @@ taximage_url2 = {}
  
 def _get_image_url( taxon ):
     global taximage_url2
-    taxon = "_".join(taxon.split()).strip().capitalize()
-    if not taximage_url2.has_key( taxon ):
-        taximage_url2[taxon] = ""
-        conn = httplib.HTTPConnection("species.wikimedia.org")
-        conn.request("GET", "/wiki/"+taxon)
-        f = conn.getresponse().read()
-        for line in f.split("\n"):
-            if "thumbinner" in line:
-                url_img = line.split("thumbinner")[1].split("<img")[1].split("src=\"")[1].split("\"")[0].strip()
-                conn.close()    
-                taximage_url2[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
-                break
-        conn.close()
-        if taximage_url2[taxon]:
-            return taximage_url2[taxon]   
-        conn = httplib.HTTPConnection("en.wikipedia.org")
-        conn.request("GET", "/wiki/"+taxon)
-        f = conn.getresponse().read()
-        for line in f.split("\n"):
-            if "class=\"image\"" in line and not "<img alt=\"\"" in line:
-                url_img = line.split("class=\"image\"")[1].split("src=\"")[1].split("\"")[0].strip()
-                conn.close()    
-                taximage_url2[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
-                return taximage_url2[taxon]
-        conn.close()    
-        taximage_url2[taxon] = "Image not found"
+    url_img= _get_wikipedia_url( taxon )["thumb"]
+    taximage_url2[taxon] = """<img src="%s" class="imgTaxa" />""" % url_img
     return taximage_url2[taxon]
 
 
