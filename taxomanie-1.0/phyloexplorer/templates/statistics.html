@@ -278,11 +278,11 @@ $(document).ready(function(){
         <legend> General information </legend>
 	{{nb_user_labels}} different label(s) occur in {{ nb_trees}} tree(s) <br />
        	<ul>
-	<li>{{nb_user_taxa}} are present in the reference taxonomy 
+	<li>{{nb_valid_user_labels}}  
 	<!--{{nb_user_taxa}} taxa in {{ nb_trees}} trees <br />
         {{ nb_taxa }} distinct OTU (Operational Taxonomic Unit) &nbsp;-->
     {% if nb_homonyms or nb_synonyms or nb_commons %}
-	including:
+	(including:
     {% endif %}
     {% if nb_homonyms %}
         <font color="orange">{{ nb_homonyms}} homonym(s) </font>
@@ -293,7 +293,10 @@ $(document).ready(function(){
     {% if nb_commons %}
         <font color="orange">{{ nb_commons}} vernacular(s) </font>
     {% endif %}
-	</li>
+    {% if nb_homonyms or nb_synonyms or nb_commons %}
+	)
+    {% endif %}
+     are successfuly associated to {{nb_user_taxa}} different taxa of the reference taxonomy</li>
     {% if nb_badtaxa %}
         <li> <font color="red"> {{ nb_badtaxa }} are not present in the reference taxonomy  </font>&nbsp;</li>
     {% endif %}
