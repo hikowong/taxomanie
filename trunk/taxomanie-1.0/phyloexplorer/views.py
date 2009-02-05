@@ -773,10 +773,12 @@ def get_tree_size_distribution( d_stat ):
     ratio = sorted( d_stat.keys() )[1]-sorted( d_stat.keys() )[0]
     result = ""
     nbtaxa_max = max( d_stat.values() ) 
+    
     for nbtaxon, nbtree in sorted(d_stat.items()):
+        #result += "nbTaxa =%s  nbTree=%s </br>\n" %(nbtaxon,nbtree)
         if nbtree:
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = " "*( nbtree*70/nbtaxa_max ) # 70 is an abitrary taken number
+            bar = " "*max(1,( nbtree*70/nbtaxa_max )) # 70 is an abitrary taken number
             bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
@@ -786,6 +788,7 @@ def get_tree_size_distribution( d_stat ):
                     base = ""
             else:
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
+            baseTxt=base[:]
             base = base.replace( " ", "&nbsp;" )
             if base:
                 result += "<tt>"+base+"</tt>&nbsp;"+bar+"&nbsp;<tt>("
@@ -794,10 +797,10 @@ def get_tree_size_distribution( d_stat ):
                 else:
                     result += str(nbtree)+ " tree"
                 #VR
-                if nbtaxon > 1:
-                    result += " with %s distinct leaf labels)</tt><br />\n" % nbtaxon
+                if nbtaxon+ratio-1 > 1:
+                    result += " with %s distinct leaf labels)</tt><br />\n" % (baseTxt[1:-1].strip())
                 else:
-                    result += " with %s leaf label)</tt><br />\n" % nbtaxon
+                    result += " with %s leaf label)</tt><br />\n" % (baseTxt[1:-1].strip())
     return result
 
 def get_taxon_frequency_distribution( d_stat ):
@@ -807,7 +810,7 @@ def get_taxon_frequency_distribution( d_stat ):
     for nbtaxon, nbtree in sorted(d_stat.items()):
         if nbtree:
             nbtreepourcent = nbtree*100/nbtaxa_max
-            bar = " "*( nbtree*70/nbtaxa_max )# 70 is an abitrary taken number
+            bar = " "*max(1,( nbtree*70/nbtaxa_max ))# 70 is an abitrary taken number
             bar = bar.replace( " ", "&nbsp;&nbsp;" )#.replace( "-", "&nbsp;")
             bar = """<span class="statMetric">"""+bar+"</span>"
             if nbtaxon == nbtaxon + ratio-1:
@@ -817,6 +820,7 @@ def get_taxon_frequency_distribution( d_stat ):
                     base = ""
             else:
                 base = "["+string.center( str(nbtaxon)+"-"+str(nbtaxon+ratio-1), 7)+"]"
+            baseTxt=base[:]
             base = base.replace( " ", "&nbsp;" )
             if base:
                 result += "<tt>"+base+"&nbsp;"+bar+"&nbsp;("
@@ -825,10 +829,10 @@ def get_taxon_frequency_distribution( d_stat ):
                     result += str(nbtree)+" leaf labels are"
                 else:
                     result += str(nbtree)+" leaf label is"
-                if nbtaxon > 1:
-                    result += " present in %s trees) </tt><br />\n" % nbtaxon
+                if nbtaxon > nbtaxon+ratio-1:
+                    result += " present in %s trees) </tt><br />\n" % (baseTxt[1:-1].strip())
                 else:
-                    result += " present in %s tree) </tt><br />\n" % nbtaxon
+                    result += " present in %s tree) </tt><br />\n" % (baseTxt[1:-1].strip())
     return result
 
 #
