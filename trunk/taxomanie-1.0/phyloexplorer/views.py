@@ -198,6 +198,9 @@ def statistics( request ):
     context['nb_user_labels'] = collection.rel.values( 'user_taxon_name' ).distinct().count()
     request.session['nb_user_labels'] = context['nb_user_labels']
     print "nb_user_labels"
+    context['nb_valid_user_labels'] = collection.rel.values( 'user_taxon_name' ).distinct().count()-collection.bad_taxa.count()
+    request.session['nb_valid_user_labels'] = context['nb_valid_user_labels']
+    print "nb_valid_user_labels"
     # fin VR
     context['nb_user_taxa'] = collection.rel.values( 'taxon' ).distinct().count()
     request.session['nb_user_taxa'] = context['nb_user_taxa']
