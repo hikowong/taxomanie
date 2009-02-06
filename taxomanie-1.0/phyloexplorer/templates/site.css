@@ -639,5 +639,33 @@ a#iNode:hover  {
     {
     padding: 0px 0px;
     }
+    
+span.example_button
+	{
+	border: 1px solid #99AACC;
+	color: #000000;
+	background-color: #DDDDDD;
+	vertical-align: middle;	
+	}
 
+span.example_button:hover
+	{
+	border: 2px solid #333388;
+	background-color: #33CC00;
+	color: #000000;
+	vertical-align: middle;
+	cursor: pointer;	
+	}
 
+span.example_button:active
+	{
+	border: 2px solid #33CC00;
+	background-color: #DDDDDD;
+	color: #000000;
+	vertical-align: middle;
+	cursor: pointer;	
+	}
+	
+fieldset {
+	background-color: #F8F8F8	
+}

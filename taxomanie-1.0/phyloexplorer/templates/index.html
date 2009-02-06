@@ -29,6 +29,14 @@ $(document).ready(function(){
             });
         }, 500);
     });
+    $("span#nexus").click(function() {
+    	$("textarea").text("#nexus\nbegin trees;\ntree aa = ((rattus, pan), homo);\ntree bb = ((homo_sapiens, mus_france), (pan, rattus));\ntree cc = (homo, (bos, pan));\ntree dd = ((mus, rattus),pan);\nend;\n");
+    	$("#demo_delimiter").attr("value","_");
+    });
+    $("span#newick").click(function() {
+    	$("textarea").text("((rattus, pan), homo);\n((homo_sapiens, mus_france), (pan, rattus));\n(homo, (bos, pan));\n((mus, rattus),pan);\n");
+    	$("#demo_delimiter").attr("value","_");
+    });   
 });
 
 
@@ -46,35 +54,37 @@ $(document).ready(function(){
     <fieldset>
         <legend>Choose the file containing your tree collection in newick or nexus...</legend>
         <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
-            Filename: <input type="file" name="myFile" class="button" /><br /><br />
-            <input type="reset" class="button" value="Clear" />
-            Enter your space delimiter for taxon name (e.g., "_" or "$" )
-            <input type="text" size="1px" name="delimiter" value="_" />
-            <input type="submit" class="button" blockui="wait_progress" value="Upload file" />
+           <br/>
+	    <b>Filename:</b> <input type="file" name="myFile" class="button" /><br />
+            <b>Space delimiter:</b> <input type="text" size="1px" name="delimiter" value="_" /> used for complex taxon names (e.g., "_" for "mus_musculus_IRBP" or "$" for "mus$musculus$IRBP", ... )<br /><br/>
+	    <input type="reset" class="button" value="Reset" />
+            <input type="submit" class="button" blockui="wait_progress" value="Upload & explore" />
             <input type="hidden" name="new_collection" value="true" />
         </form>
     </fieldset>
     <br />
     <fieldset>
-        <legend>... or paste your collection...</legend>
+        <legend>... OR paste your tree collection in newick or nexus...</legend>
         <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
             <textarea rows="10" cols="80" name="myFile"></textarea><br />
-            <input type="reset" class="button" value="Clear" />
-            Enter your space delimiter for taxon name (e.g., "_" or "$" )
-            <input type="text" size="1px" name="delimiter" value="_" />
-            <input type="submit" class="button" blockui="wait_progress" value="Upload collection" />
+            <b>Space delimiter:</b> <input id="demo_delimiter" type="text" size="1px" name="delimiter" value="_" /> used for complex taxon names (e.g., "_" for "mus_musculus_IRBP" or "$" for "mus$musculus$IRBP", ... )<br />
+	    
+	    <span class="example_button" id="nexus">nexus example </span> &nbsp
+	    <span class="example_button" id="newick"> newick example </span><br/><br/>
+	    <input type="reset" class="button" value="Reset" />
+            <input type="submit" class="button" blockui="wait_progress" value="Upload & explore" />
             <input type="hidden" name="new_collection" value="true" />
         </form>
     </fieldset>
     <br />
     <fieldset>
-        <legend>... or enter a query for TreeBase</legend>
+        <legend>... OR enter a query for TreeBase</legend>
         <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
-            <input type="text" size="80px" name="query_treebase" />
-            <input type="submit" class="button" blockui="wait_progress" value="Go" />
-            <input type="reset" class="button" value="Clear" />
+            <input type="text" size="80px" name="query_treebase" /><br/>
+            <tt id="exemplequery"> e.g: <b>{muridae} > 25 and ({mus}==1 or {rattus}==1)  </b><br/><br/>
+            <input type="reset" class="button" value="Reset" />
+            <input type="submit" class="button" blockui="wait_progress" value="Retrieve & explore" />
             <br />
-            <tt id="exemplequery"> e.g: <b>{muridae} > 25 and ({mus}==1 or {rattus}==1)  </b>
         </form>
     </fieldset>
 {% endblock %}
