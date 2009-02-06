@@ -744,11 +744,13 @@ def _get_wikipedia_url( taxon ):
                     pass #taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
         conn.close()
         
-        if url_thumb and ".svg" not in url_thumb:
+        if url_thumb :
             url = url_thumb.split('/')[:-1]
             try:
                 url.remove('thumb' )
                 url = "/".join( url )
+                if ".svg" in url:
+                    url = url_thumb                   
                 taximage_url[taxon] = {"thumb": url_thumb, "full":url}
             except:
                 print url, url_thumb
