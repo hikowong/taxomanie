@@ -1051,14 +1051,15 @@ def _display_itis_tree( collection, list_taxa_collection, d_stats, tree, root = 
                 D_PROGRESS[collection.id]['reference_tree'] += (1.0/D_PROGRESS[collection.id]['nb_taxa'])*100.0
             # Create div for interparents (parents beetween nodes)
             if len(n) == 2:
+                nextdepth=mydepth
                 if node in list_taxa_collection:
                     depth = 0
                     while depth != mydepth :
                         result += """<span class="treeline">|</span> """
                         depth += 1
                     result += _link_itis_species( d_stats, collection,  node, True, blockname, nb_inter_parents)
-                    mydepth += 1
-                result += _display_itis_tree( collection, list_taxa_collection, d_stats, tree,  node, mydepth, 
+                    nextdepth +=1
+                result += _display_itis_tree( collection, list_taxa_collection, d_stats, tree,  node, nextdepth, 
                   lastnode = node, blockname = blockname+"a", show_nb_trees = show_nb_trees, progress=progress)
                 continue
 #            if create_interparent:
