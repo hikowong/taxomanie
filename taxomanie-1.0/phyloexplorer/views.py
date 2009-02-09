@@ -720,8 +720,10 @@ def correct_collection( collection ):
 taximage_url = {}
 
 def _get_wikipedia_url( taxon ):
+   
     global taximage_url
     taxon = "_".join(taxon.split()).strip().capitalize()
+    url_found =False
     if not taximage_url.has_key( taxon ):
         taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
         #taximage_url[taxon] = {}
@@ -730,21 +732,38 @@ def _get_wikipedia_url( taxon ):
         conn.request("GET", "/wiki/"+taxon)
         f = conn.getresponse().read()
         #VR
+        
         if 'Taxonavigation' in f and 'class="thumbimage"' in f :
             url_thumb = f.split('thumbimage')[0].split('src=')[-1].split()[0].strip('"')
-        else:
+            if "tatus_iucn" in url_thumb:
+                url_found = False
+            else:
+                url_found = True
+        
+        if not url_found:
             conn.close()
             conn = httplib.HTTPConnection("en.wikipedia.org")
             conn.request("GET", "/wiki/"+taxon)
             f = conn.getresponse().read()
-            if 'Scientific classification' in f:
-                try:
-                    url_thumb = f.split('class="image"' )[1].split('</a>')[0].split('src=')[1].split()[0].strip('"')
-                except:
-                    pass #taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
-        conn.close()
+            
+            tables = f.split("table>")
+            
+            for tab in tables:
+                if 'Scientific classification' in tab:
+                    goodLine = tab.split("tr>")[1]        
+                    try:
+                        url_thumb = goodLine.split('class="image"' )[1].split('</a>')[0].split('src=')[1].split()[0].strip('"')
+                        if "tatus_iucn" in url_thumb:
+                            url_found = False
+                        else:
+                            url_found = True
+                    except:
+                        pass #taximage_url[taxon] = { "thumb": "Image not found", "full": "Image not found" }
+            
+                    break # once a tab with scientific classification is found there is no neeed to check others
+            conn.close()
         
-        if url_thumb :
+        if  url_found :
             url = url_thumb.split('/')[:-1]
             try:
                 url.remove('thumb' )
