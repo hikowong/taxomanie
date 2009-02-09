@@ -276,7 +276,7 @@ $(document).ready(function(){
     <a name="arbo"></a>
     <fieldset>
         <legend> General information </legend>
-	{{nb_user_labels}} different label(s) occur in {{ nb_trees}} tree(s) <br />
+	{{nb_user_labels}} different label(s) occur(s) in {{ nb_trees}} tree(s) <br />
        	<ul>
 	<li>{{nb_valid_user_labels}}  
 	<!--{{nb_user_taxa}} taxa in {{ nb_trees}} trees <br />
@@ -296,9 +296,9 @@ $(document).ready(function(){
     {% if nb_homonyms or nb_synonyms or nb_commons %}
 	)
     {% endif %}
-     are successfuly associated to {{nb_user_taxa}} different taxa of the reference taxonomy</li>
+     are successfuly mapped to {{nb_user_taxa}} different taxa of the reference taxonomy</li>
     {% if nb_badtaxa %}
-        <li> <font color="red"> {{ nb_badtaxa }} are not present in the reference taxonomy  </font>&nbsp;</li>
+        <li> <font color="red"> {{ nb_badtaxa }} can not be mapped to the reference taxonomy  </font>&nbsp;</li>
     {% endif %}
 	</ul>
 </fieldset>
@@ -406,7 +406,7 @@ $(document).ready(function(){
     <!-- badtaxa fieldset -->
     {% if nb_badtaxa %}
         <fieldset>
-        <legend> {{ nb_badtaxa }} label(s) not found in the taxonomy</legend>
+        <legend> {{ nb_badtaxa }} label(s) can not be mapped to the reference taxonomy</legend>
 	 Due to computing times, suggestions are proposed only when there is less than 10 bad taxa.</br>
         <span id="suggestions" class="homonymlist"> </span>
         <div id="progressbar_badtaxa"></div>

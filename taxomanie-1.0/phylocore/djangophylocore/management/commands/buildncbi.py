@@ -159,7 +159,7 @@ class Command(NoArgsCommand):
             id = node.split("|")[0].strip()
             self.TBI[id]["parents"] = getParents( id, self.TBI )
 
-    def make_taxonomy_plus( self, verbose ):
+    def make_taxonomy_plus_old( self, verbose ):
         if verbose:
             print "Adding synonyms, homonyms and common names..."
         # Adding synonyms, homonyms and common names
@@ -186,6 +186,7 @@ class Command(NoArgsCommand):
                 if id not in self.list_id:
                     continue
             name = line.split("|")[1].strip().lower()
+            name = name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ");
             if synonym or common:
                 if homonym: # We do not want synonym wich have homonym
                     continue
@@ -193,7 +194,7 @@ class Command(NoArgsCommand):
                 if synonym:
                     if name not in synonym_toc:
                         index += 1
-                        list_synonym.append( "%s|%s|synonym|2|\n" % ( index, name.replace(",", " ").replace( "(", "_" ).replace( ")", "_") ) )
+                        list_synonym.append( "%s|%s|synonym|2|\n" % ( index, name ) )
                         synonym_toc[name] = index
                     index_relsynonym += 1
                     list_relsynonymtaxa.append(
@@ -201,7 +202,7 @@ class Command(NoArgsCommand):
                 if common:
                     if name not in common_toc:
                         index += 1
-                        list_common.append( "%s|%s|common|2|\n" % ( index, name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ") ) )
+                        list_common.append( "%s|%s|common|2|\n" % ( index, name) )
                         common_toc[name] = index
                     index_relcommon += 1
                     list_relcommontaxa.append(
@@ -209,11 +210,100 @@ class Command(NoArgsCommand):
             if type_name == "scientific name" and homonym:
                 if name not in homonym_toc:
                     index += 1
-                    list_homonym.append( '%s|%s|homonym|2|\n' % ( index, name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ") ) )
+                    list_homonym.append( '%s|%s|homonym|2|\n' % ( index, name) )
                     homonym_toc[name] = index
                 index_relhomonym += 1
                 list_relhomonymtaxa.append(
                   "%s|%s|%s\n" % ( index_relhomonym, homonym_toc[name], id ) )
+        taxonomy_file = open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' )
+        taxonomy_file.write( ''.join( list_synonym ) )
+        taxonomy_file.write( ''.join( list_common ) )
+        taxonomy_file.write( ''.join( list_homonym ) )
+        taxonomy_file.close()
+        open( os.path.join( DUMP_PATH, 'relsynonymtaxa.dmp' ), 'w' ).write(
+          ''.join( list_relsynonymtaxa ) )
+        open( os.path.join( DUMP_PATH, 'relcommontaxa.dmp' ), 'w' ).write(
+          ''.join( list_relcommontaxa ) )
+        open( os.path.join( DUMP_PATH, 'relhomonymtaxa.dmp' ), 'w' ).write(
+          ''.join( list_relhomonymtaxa ) )
+
+
+
+    def make_taxonomy_plus( self, verbose ):
+        if verbose:
+            print "Adding synonyms, homonyms and common names..."
+        # Adding synonyms, homonyms and common names
+        index = self.index
+        list_synonym = []
+        list_common = []
+        list_homonym = []
+        list_relsynonymtaxa = []
+        list_relcommontaxa = []
+        list_relhomonymtaxa = []
+        index_relsynonym = 0
+        index_relcommon = 0
+        index_relhomonym = 0
+        homonym_toc = {}
+        common_toc = {}
+        synonym_toc = {}
+        
+        for line in file( self.NAMES ).readlines():
+            type_name = line.split("|")[3].strip()
+            synonym = "synonym" in type_name
+            common = "common name" in type_name
+            homonym = line.split("|")[2].strip().lower()
+            id = line.split("|")[0].strip()
+            if self.TEST:
+                if id not in self.list_id:
+                    continue
+            name = line.split("|")[1].strip().lower()
+            name = name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+            if synonym :
+                if homonym: # We do not want synonym wich have homonym
+                    continue
+                base_name = self.TBI[id]["name"]
+                if synonym:
+                    if name not in synonym_toc:
+                        index += 1
+                        list_synonym.append( "%s|%s|synonym|2|\n" % ( index, name) )
+                        synonym_toc[name] = index
+                    index_relsynonym += 1
+                    list_relsynonymtaxa.append(
+                      "%s|%s|%s\n" % ( index_relsynonym, index, id ) )
+            if type_name == "scientific name" and homonym:
+                if name not in homonym_toc:
+                    index += 1
+                    list_homonym.append( '%s|%s|homonym|2|\n' % ( index, name) )
+                    homonym_toc[name] = index
+                index_relhomonym += 1
+                list_relhomonymtaxa.append(
+                  "%s|%s|%s\n" % ( index_relhomonym, homonym_toc[name], id ) )
+        
+        #commons        
+        for line in file( self.NAMES ).readlines():
+            type_name = line.split("|")[3].strip()
+            synonym = "synonym" in type_name
+            common = "common name" in type_name
+            homonym = line.split("|")[2].strip().lower()
+            id = line.split("|")[0].strip()
+            if self.TEST:
+                if id not in self.list_id:
+                    continue
+            name = line.split("|")[1].strip().lower()
+            name= name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ");
+            if common:
+                if homonym: # We do not want synonym wich have homonym
+                    continue
+                base_name = self.TBI[id]["name"]         
+                if common:
+                    if name not in common_toc and name not in homonym_toc.keys() and name not in synonym_toc and not self.TBN.has_key( name ):
+                        index += 1
+                        list_common.append( "%s|%s|common|2|\n" % ( index, name) )
+                        common_toc[name] = index
+                    index_relcommon += 1
+                    list_relcommontaxa.append(
+                      "%s|%s|%s|english\n" % ( index_relcommon, index, id ) )
+            
         taxonomy_file = open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' )
         taxonomy_file.write( ''.join( list_synonym ) )
         taxonomy_file.write( ''.join( list_common ) )
