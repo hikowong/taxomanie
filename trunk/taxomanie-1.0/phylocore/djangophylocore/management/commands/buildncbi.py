@@ -87,6 +87,11 @@ class Command(NoArgsCommand):
         os.system( 'rm nodes.dmp names.dmp' )
         os.system( 'rm taxdump.tar.gz' )
  
+    def clean_name(self,name):
+        cleanNameNwk = name.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
+        cleanName = cleanNameNwk.replace("'", " ").replace("`"," ").replace('"',' ').strip()
+        return cleanName
+   
     def download_ncbi( self, verbose ):
         if not os.path.exists( './taxdump.tar.gz' ):
             if verbose:
@@ -257,7 +262,8 @@ class Command(NoArgsCommand):
                 if id not in self.list_id:
                     continue
             name = line.split("|")[1].strip().lower()
-            name = name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+            #name = name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+            name =self.clean_name(name)
             if synonym :
                 if homonym: # We do not want synonym wich have homonym
                     continue
@@ -265,7 +271,7 @@ class Command(NoArgsCommand):
                 if synonym:
                     if name not in synonym_toc:
                         index += 1
-                        list_synonym.append( "%s|%s|synonym|2|\n" % ( index, name) )
+                        list_synonym.append( "%s|%s|synonym|2|%s\n" % ( index, name,index) )
                         synonym_toc[name] = index
                     index_relsynonym += 1
                     list_relsynonymtaxa.append(
@@ -273,7 +279,7 @@ class Command(NoArgsCommand):
             if type_name == "scientific name" and homonym:
                 if name not in homonym_toc:
                     index += 1
-                    list_homonym.append( '%s|%s|homonym|2|\n' % ( index, name) )
+                    list_homonym.append( '%s|%s|homonym|2|%s\n' % ( index, name,index) )
                     homonym_toc[name] = index
                 index_relhomonym += 1
                 list_relhomonymtaxa.append(
@@ -290,7 +296,8 @@ class Command(NoArgsCommand):
                 if id not in self.list_id:
                     continue
             name = line.split("|")[1].strip().lower()
-            name= name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ");
+            #name= name.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ");
+            name = self.clean_name(name)
             if common:
                 if homonym: # We do not want synonym wich have homonym
                     continue
@@ -298,7 +305,7 @@ class Command(NoArgsCommand):
                 if common:
                     if name not in common_toc and name not in homonym_toc.keys() and name not in synonym_toc and not self.TBN.has_key( name ):
                         index += 1
-                        list_common.append( "%s|%s|common|2|\n" % ( index, name) )
+                        list_common.append( "%s|%s|common|2|%s\n" % ( index, name,index) )
                         common_toc[name] = index
                     index_relcommon += 1
                     list_relcommontaxa.append(

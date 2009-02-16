@@ -153,6 +153,12 @@ class Command(NoArgsCommand):
         os.system( 'mv %s %s' % ( os.path.join( DUMP_PATH,
           'taxonomy.dmp_utf-8' ), os.path.join( DUMP_PATH, 'taxonomy.dmp' ) ))
 
+    def clean_name(self,name):
+        cleanNameNwk = name.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
+        cleanName = cleanNameNwk.replace("'", " ").replace("`"," ").replace('"',' ').strip()
+        return cleanName
+           
+
     def generating_dumps( self, max_id, taxonomy, rank, common_name, homonyms,
       synonyms, ancestors, d_kingdom, correct_taxa, taxa_sons ):
         # rank
@@ -182,7 +188,8 @@ class Command(NoArgsCommand):
         for homonym_name in homonyms:
             assert homonym_name not in TAXONOMY_TOC, homonyms[homonym_name]
             max_id += 1
-            result_taxonomy.append( "%s|%s|homonym|300|\n" % ( max_id, homonym_name ) )
+            #result_taxonomy.append( "%s|%s|homonym|300|\n" % ( max_id, homonym_name ) )
+            result_taxonomy.append( "%s|%s|homonym|300|%s\n" % ( max_id, homonym_name,max_id ) )
             TAXONOMY_TOC.add( homonym_name )
             for taxa_id in homonyms[homonym_name]:
                 index += 1
@@ -197,7 +204,8 @@ class Command(NoArgsCommand):
         for synonym_name in synonyms:
             assert synonym_name not in TAXONOMY_TOC, str(synonyms[synonym_name])+" "+ synonym_name
             max_id += 1
-            result_taxonomy.append( "%s|%s|synonym|300|\n" % ( max_id, synonym_name ) )
+            #result_taxonomy.append( "%s|%s|synonym|300|\n" % ( max_id, synonym_name ) )
+            result_taxonomy.append( "%s|%s|synonym|300|%s\n" % ( max_id, synonym_name,max_id ) )
             TAXONOMY_TOC.add( synonym_name )
             index += 1
             result_rel.append( "%s|%s|%s\n" % (index, max_id, synonyms[synonym_name] ) )
@@ -216,7 +224,8 @@ class Command(NoArgsCommand):
                     nbRefOK+=1
             if name not in TAXONOMY_TOC and nbRefOK>0:
                 max_id += 1
-                result_taxonomy.append( "%s|%s|common|300|\n" % ( max_id, name ) )
+                #result_taxonomy.append( "%s|%s|common|300|\n" % ( max_id, name ) )
+                result_taxonomy.append( "%s|%s|common|300|%s\n" % ( max_id, name,max_id ) )
                 TAXONOMY_TOC.add( name )
                 
                 for common in common_name[name]:
@@ -236,7 +245,8 @@ class Command(NoArgsCommand):
         for line in fichier:
             ligne = line.lower().split('|')
             tax_name_base = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
-            tax_name = tax_name_base.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+            #tax_name = tax_name_base.replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+            tax_name=self.clean_name(tax_name_base)
             tax_id = ligne[0]
             taxa_names[tax_id] = tax_name
         return taxa_names
@@ -257,7 +267,8 @@ class Command(NoArgsCommand):
             tax_id = ligne[0]
             valid = ligne[10]
             tax_name_base = " ".join( [ligne[2], ligne[4], ligne[6], ligne[8]]).strip()
-            tax_name = tax_name_base.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+            #tax_name = tax_name_base.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+            tax_name=self.clean_name(tax_name_base)
             tax_parent_id = ligne[17]
             if tax_parent_id == "0":
                 tax_parent_id = str( root_id )
@@ -323,7 +334,8 @@ class Command(NoArgsCommand):
             ligne = ligne.lower().split('|')
             #print ligne[2]
             if (ligne[2] == "english" or ligne[2] == "unspecified"):
-                tax_name = ligne[1].replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+                #tax_name = ligne[1].replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " ")
+                tax_name = self.clean_name(ligne[1])
                 if tax_name not in common_name:
                     common_name[tax_name] = []       
                 common_name[tax_name].append( {"id":ligne[0],"langage":ligne[2]} )
