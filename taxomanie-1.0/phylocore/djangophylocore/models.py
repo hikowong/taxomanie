@@ -906,8 +906,8 @@ class Tree( models.Model, TaxonomyReference ):
             try:
                 return eval( res )
             except:
-                raise SyntaxError, "bad query %s" % query
-        raise SyntaxError, "bad query %s" % query
+                raise SyntaxError, "bad query 3 %s" % query
+        raise SyntaxError, "bad query 4 %s" % query
 
 
 ##################################################
@@ -1256,6 +1256,37 @@ class TreeCollection( models.Model, TaxonomyReference ):
                     d_trees[tree_id] = {}
                 d_trees[tree_id][pattern] =  nb_occurence
         l_trees_id = set()
+        
+        #VR il faut faire sur tout les arbres et non sur ceux present dans le rsultat (a cause des 0)
+        # if a tree with none of the taxa can be a solution we have to tests alltrees not only those in d_trees
+        # ex : {rodent}<4  ex2: {rodent}<4 and ({primate}>3 or {primate} <4)
+        res0 = res;
+        needAllTrees = False;
+        for pattern in l_patterns:
+            res0 = res0.replace( '{'+pattern+'}', '0' )
+        if res0:
+                try:
+                    if eval( res0 ):
+                       needAllTrees = True; 
+                except:
+                    raise SyntaxError, "bad query 0 %s" % query
+        
+        if needAllTrees: 
+            baseId=self.id;
+            if treebase:
+                baseId=1;
+                
+            cur = cursor.execute( "select tree_id,tree_id from djangophylocore_reltreecoltaxa%s;" %baseId)
+            if settings.DATABASE_ENGINE == 'sqlite3':
+                result = cur.fetchall()
+            else:
+                result = cursor.fetchall()
+            
+            for (tree_id,tmp) in result:
+                if tree_id not in d_trees:
+                    d_trees[tree_id] = {}
+            
+        #VR
         for tree_id in d_trees:
             result = res
             for pattern in l_patterns:
@@ -1268,7 +1299,8 @@ class TreeCollection( models.Model, TaxonomyReference ):
                     if eval( result ):
                        l_trees_id.add( tree_id ) 
                 except:
-                    raise SyntaxError, "bad query %s" % query
+                    raise SyntaxError, "bad query 2 %s %s" %( query, result)
+      
         return Tree.objects.filter( id__in = l_trees_id )
 
     def query( self, query ):

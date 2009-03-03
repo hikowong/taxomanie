@@ -36,7 +36,14 @@ $(document).ready(function(){
     $("span#newick").click(function() {
     	$("textarea").text("((rattus, pan), homo);\n((homo_sapiens, mus_france), (pan, rattus));\n(homo, (bos, pan));\n((mus, rattus),pan);\n");
     	$("#demo_delimiter").attr("value","_");
-    });   
+    }); 
+        $("input#badreset").click(function() {
+    	$("textarea").text("lll");
+    	$("#demo_delimiter").attr("value","@");
+    });
+    
+    
+     
 });
 
 
@@ -66,12 +73,12 @@ $(document).ready(function(){
     <fieldset>
         <legend>... OR paste your tree collection in newick or nexus...</legend>
         <form action="/phyloexplorer/statistics" method="post" enctype="multipart/form-data">
-            <textarea rows="10" cols="80" name="myFile"></textarea><br />
+            <textarea rows="10" cols="80" name="myFile" value=""></textarea><br />
             <b>Space delimiter:</b> <input id="demo_delimiter" type="text" size="1px" name="delimiter" value="_" /> used for complex taxon names (e.g., "_" for "mus_musculus_IRBP" or "$" for "mus$musculus$IRBP", ... )<br />
 	    
 	    <span class="example_button" id="nexus">nexus example </span> &nbsp
 	    <span class="example_button" id="newick"> newick example </span><br/><br/>
-	    <input type="reset" class="button" value="Reset" />
+	    <input type="button" class="button" value="Reset" id="badreset"/>
             <input type="submit" class="button" blockui="wait_progress" value="Upload & explore" />
             <input type="hidden" name="new_collection" value="true" />
         </form>

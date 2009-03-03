@@ -162,13 +162,16 @@ def statistics( request ):
     if query:
         request.session['last_query'] = query
         query_against_treebase = 'treebase' in request.GET
+        _filter_col_works = False
+        previous_col_id = collection.id
         try:
             collection = collection.get_collection_from_query( query, query_against_treebase )
         except Exception, err:
-            error_msg = str('bad query: %s' % err.message)
+            error_msg = str('bad query view1: %s' % err.message)
             if err.message == "usertaxa":
                 error_msg += '. Try to query against TreeBase'
-            context['error_msg'].append( error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) )
+            #context['error_msg'].append( error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) )
+            context['error_msg']= error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) 
         if query_against_treebase:
             context['treebase'] = 'on'
         request.session['collection_changed'] = True
@@ -181,6 +184,8 @@ def statistics( request ):
     if not collection.trees.count(): #Empty collection
         context['not_empty_collection'] = False
         context['bad_tree_msg'] = "Empty collection"
+        if query:
+            request.session['collection'] = TreeCollection.objects.get( id = previous_col_id )
         context['collection_changed'] = request.session['collection_changed']
         return render_to_response( 'statistics.html', context )
     # Proceed collection
