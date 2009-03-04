@@ -1236,17 +1236,15 @@ class TreeCollection( models.Model, TaxonomyReference ):
             if 'usertaxa' == striped_pattern and treebase:
                 cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_reltreecoltaxa%s ) GROUP BY tree_id;" % (self.id ) )
             else:
-                parent_id = TAXONOMY_TOC[striped_pattern]
+                baseId=self.id;
                 if treebase:
-                    if settings.DATABASE_ENGINE == 'sqlite3':
-                        cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa1 where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( parent_id, parent_id ) )
-                    else:
-                        cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa1 as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( parent_id ) ) 
+                    baseId=1;
+                parent_id = TAXONOMY_TOC[striped_pattern]
+                
+                if settings.DATABASE_ENGINE == 'sqlite3':
+                    cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( baseId, parent_id, parent_id ) )
                 else:
-                    if settings.DATABASE_ENGINE == 'sqlite3':
-                        cur = cursor.execute( "select tree_id, count(taxon_id) from djangophylocore_reltreecoltaxa%s where taxon_id IN (select taxon_id from djangophylocore_parentsrelation where parent_id = %s) or taxon_id = %s GROUP BY  tree_id ;" % ( self.id, parent_id, parent_id ) )
-                    else:
-                        cur = cursor.execute( "select tb.tree_id, count(tb.taxon_id) from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where tb.taxon_id = par.taxon_id and par.parent_id = %s GROUP BY tb.tree_id ;" % ( self.id, parent_id ) ) 
+                    cur = cursor.execute( "select tu.tree_id, count(tu.taxon_id) from ((select tb.tree_id, tb.taxon_id from djangophylocore_reltreecoltaxa%s as tb, djangophylocore_parentsrelation as par where (tb.taxon_id = par.taxon_id and par.parent_id =%s)  ) union (select tb.tree_id, tb.taxon_id from djangophylocore_reltreecoltaxa%s as tb where (tb.taxon_id = %s) )) as tu group by tu.tree_id ;"% ( baseId, parent_id, baseId, parent_id ) )
             if settings.DATABASE_ENGINE == 'sqlite3':
                 result = cur.fetchall()
             else:
