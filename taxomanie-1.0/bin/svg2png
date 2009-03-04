@@ -16,25 +16,25 @@ def usage ():
  
 if __name__ == "__main__":
     try:
-#        opts, args = getopt.getopt (argv[1:], 'o:h',
-#                                    ['width=', 'height=', 'output=', 'help'])
-        output = argv[1]
-    except getopt.GetoptError:
+        #opts, args = getopt.getopt (argv[1:], 'o:h',
+        #                            ['width=', 'height=', 'output=', 'help'])
+        output = argv[2]
+    except:
         usage ()
     width = 0
     height = 0
-    for o, a in opts:
-            if o in ('-o', '--output'):
-                output = str (a)
-            elif o == '--width':
-                width = int (a)
-            elif o == '--height':
-                height = int (a)
-            elif o in ('-h', '--help'):
-                usage ()
-    if len (args) == 0:
-        usage ()
-    file = args[0]
+#    for o, a in opts:
+#            if o in ('-o', '--output'):
+#                output = str (a)
+#            elif o == '--width':
+#                width = int (a)
+#            elif o == '--height':
+#                height = int (a)
+#            elif o in ('-h', '--help'):
+#                usage ()
+#    if len (args) == 0:
+#        usage ()
+    file = argv[1]
  
     if not exists (file):
         usage ()

@@ -9,6 +9,8 @@ ADMINS = (
     ('John foo', 'john@foo.com'),
 )
 
+CONVERT_SVG_BIN = 'convert'
+
 # True if not in production (ie : behind apache)
 DEBUG = True
 
