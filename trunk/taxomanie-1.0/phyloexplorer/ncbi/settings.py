@@ -10,6 +10,7 @@ ADMINS = (
 )
 
 CONVERT_SVG_BIN = 'convert'
+MATRIX_PATH=''
 
 # True if not in production (ie : behind apache)
 DEBUG = True

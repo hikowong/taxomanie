@@ -39,6 +39,7 @@ CACHE_REFERENCE_TREE = {}
 CACHE_SUGGESTIONS = {}
 TAXONOMY_ENGINE = settings.TAXONOMY_ENGINE
 CONVERT_SVG_BIN = settings.CONVERT_SVG_BIN
+MATRIX_PATH = settings.MATRIX_PATH
 
 import os.path
 localDir = os.path.dirname(__file__)
@@ -673,7 +674,7 @@ def get_matrix( request ):
                   map_i, map_j, map_i+pix, map_j+pix )
             i += pix
             map_i += pix
-    scene.write_svg(convert=CONVERT_SVG_BIN)
+    scene.write_svg(convert=CONVERT_SVG_BIN, path=MATRIX_PATH)
     map += """</map>"""
     context = {'ref_url':REFERENCE_ROOT_URL, 'taxo_engine':TAXONOMY_ENGINE, 'col_id': collection.id, "not_empty_collection": True, "map":map }
     return render_to_response( 'matrix.html', context )
