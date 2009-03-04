@@ -32,19 +32,17 @@ class Scene:
         var += [" </g>\n</svg>\n"]
         return var
 
-    def write_svg(self,filename=None, convert="convert", format="png"):
+    def write_svg(self,filename=None, convert="convert", format="png", path=''):
         if filename:
             self.svgname = filename
         else:
             self.svgname = self.name + ".svg"
-        if not os.path.exists( "/tmp/phyloexplorer_matrix" ):
-            os.mkdir( "/tmp/phyloexplorer_matrix" )
-        file = open("/tmp/phyloexplorer_matrix/%s"%self.svgname,'w')
+        file = open( os.path.join( path, self.svgname ),'w')
         file.writelines(self.strarray())
         file.close()
         if convert:
-            os.system( "%s /tmp/phyloexplorer_matrix/%s /tmp/phyloexplorer_matrix/%s.%s" % ( convert, self.svgname, self.name, format ) )
-            os.system( "rm /tmp/phyloexplorer_matrix/%s" % self.svgname )
+            os.system( "%s %s %s" % ( convert, os.path.join( path, self.svgname),os.path.join( path, "%s.%s" % (self.name, format )  ) ))
+            os.system( "rm %s" % os.path.join( path, self.svgname ) )
 
     def display(self,prog=display_prog):
         os.system("%s %s" % (prog,self.svgname))
