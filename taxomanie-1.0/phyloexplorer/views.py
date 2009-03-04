@@ -38,6 +38,7 @@ CACHE_PHYFI_URL = {'reference':{}, 'tree':{} }
 CACHE_REFERENCE_TREE = {}
 CACHE_SUGGESTIONS = {}
 TAXONOMY_ENGINE = settings.TAXONOMY_ENGINE
+CONVERT_SVG_BIN = settings.CONVERT_SVG_BIN
 
 import os.path
 localDir = os.path.dirname(__file__)
@@ -162,7 +163,6 @@ def statistics( request ):
     if query:
         request.session['last_query'] = query
         query_against_treebase = 'treebase' in request.GET
-        _filter_col_works = False
         previous_col_id = collection.id
         try:
             collection = collection.get_collection_from_query( query, query_against_treebase )
@@ -673,7 +673,7 @@ def get_matrix( request ):
                   map_i, map_j, map_i+pix, map_j+pix )
             i += pix
             map_i += pix
-    scene.write_svg()
+    scene.write_svg(convert=CONVERT_SVG_BIN)
     map += """</map>"""
     context = {'ref_url':REFERENCE_ROOT_URL, 'taxo_engine':TAXONOMY_ENGINE, 'col_id': collection.id, "not_empty_collection": True, "map":map }
     return render_to_response( 'matrix.html', context )
