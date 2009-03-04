@@ -125,7 +125,7 @@ python manage.py install -v
 
 === configuring matrix image conversion ===
 
-Insert in the (taxomanie-1.0/phyloexplorer/ncbi/settings.py / taxomanie-1.0/phyloexplorer/itis/settings.py) settings files the line :
+Insert in the taxomanie-1.0/phyloexplorer/ncbi/settings.py and taxomanie-1.0/phyloexplorer/itis/settings.py setting files the following line :
 
 {{{
 CONVERT_SVG_BIN = 'convert'
