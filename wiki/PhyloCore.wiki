@@ -46,7 +46,7 @@ lines into the python interpreter:
 >>> import pyparsing
 }}}
 
-In order to get matrix working, you will need the "convert" program from [http://www.imagemagick.org/script/index.php ImageMagick].
+In order to get matrix working, you will need the "convert" program from [http://www.imagemagick.org/script/index.php ImageMagick] or cairo python librairies[http://cairographics.org/pycairo/].
 
 = Installation =
 First of all, download an install [http://www.djangoproject.com/download/ Django 1.0].
@@ -123,6 +123,26 @@ Then install the taxonomy into the database by typing
 python manage.py install -v
 }}}
 
+=== configuring matrix image conversion ===
+
+Insert in the (ncbi/itis) settings the line :
+
+{{{
+CONVERT_SVG_BIN = 'convert'
+}}}
+
+this tell phyloexplorer which conversion program to use (here the convert command from image magick). You can use all commands (prog) with the followinging syntax : 
+
+{{{
+prog img.svg img.png
+}}}
+
+As an alternative to imagemagick you can for instance use the script provided with phyloexplorer that rely on the cairo library. In this case add the following line in your setting files
+
+{{{
+CONVERT_SVG_BIN = 'svg2png'
+}}}
+and ensure that svg2png is in your PATH
 
 = Going further =
 
