@@ -30,7 +30,7 @@ $(document).ready(function(){
         }, 500);
     });
     $("span#nexus").click(function() {
-    	$("textarea").text("#nexus\nbegin trees;\ntree aa = ((rattus, pan), homo);\ntree bb = ((homo_sapiens, mus_france), (pan, rattus));\ntree cc = (homo, (bos, pan));\ntree dd = ((mus, rattus),pan);\nend;\n");
+    	$("textarea").attr("value","#nexus\nbegin trees;\ntree aa = ((rattus, pan), homo);\ntree bb = ((homo_sapiens, mus_france), (pan, rattus));\ntree cc = (homo, (bos, pan));\ntree dd = ((mus, rattus),pan);\nend;\n");
     	$("#demo_delimiter").attr("value","_");
     });
     $("span#newick").click(function() {
@@ -38,8 +38,8 @@ $(document).ready(function(){
     	$("#demo_delimiter").attr("value","_");
     }); 
         $("input#badreset").click(function() {
-    	$("textarea").text("lll");
-    	$("#demo_delimiter").attr("value","@");
+    	$("textarea").text("");
+    	$("#demo_delimiter").attr("value","_");
     });
     
     
