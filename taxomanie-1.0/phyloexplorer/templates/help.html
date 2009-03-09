@@ -28,36 +28,38 @@ end;
 <ul><b>You can get <font color="blue">STATISTICS</font> describing your collection of trees (as soon as your collection is loaded):</b>
 <pre>
 - <u>General information</u>: shows the number of trees and the number of taxon present in this collection
-              --> Taxa whose names are not found in the NCBI taxonomy are highlighted in red and those with
+              --> Taxa whose names are not found in the reference taxonomy are highlighted in red and those with
                   ambiguous names are highlighted in orange.
-- <u>Correct your collection</u>: decide how to correct or refine problematic taxon names based on the NCBI
-                                  proposition of closely matching names and then click "<u>Correct collection</u>".
+- <u>Correct your collection</u>: decide how to correct or refine problematic taxon names based on the reference taxonomy
+                  proposition of closely matching names and then click "<u>Correct collection</u>".
 - <u>Chart area</u>: 2 charts are displayed
               --> The 1st one displays tree size distribution.
               --> The 2nd one displays taxon frequency distribution.
-- <u>NCBI taxonomy</u>: every taxon present in the whole collection is displayed using the NCBI taxonomy as a base.
+- <u>Reference taxonomy</u>(<a href="http://www.itis.gov/"> ITIS</a> / <a href"http://www.ncbi.nlm.nih.gov/Taxonomy/">NCBI </a>): every taxon present in the whole collection is displayed using the reference taxonomy as a base.
               --> For every taxonomic group 2 numbers are provided --> (the number of representatives found
                   within the tree collection and the number of user trees where it is represented).
               --> <i>Dark blue</i> names represent taxon that are within YOUR collection.
               --> <i>Light blue</i> names represent the smallest taxonomic group containing the taxon of the clade.
+              --> You can see a picture of a taxon when you put the cursor over its name (Pictures are taken from WikiSpecies and/or WikiPedia)
               --> You can <font color="blue">FILTER YOUR COLLECTION</font> thanks to the checkbox next to each name.
                   (A checked box means will remove this node from all your trees.
                   All boxes within the clade are automatically checked but these can be manually unchecked.)
                   Then click "<u>Restrict your tree</u>" to filter.
-              --> You can visualize the NCBI tree (restricted or not) as a phylogram by clicking the link above
+              --> You can visualize the excerpt of the reference taxonomy as a phylogram by clicking the link above
                   the tree. It opens a new page of the <a href = "http://www.phylowidget.org/" style="font-size:10px">PhyloWidget</a> site.
 
 </pre>
 </ul>
 
-<ul><b>You can see a picture of a taxon when you put the cursor over its name</b>
+<ul><b>You can get picture collection (pictures are taken from <a href="http://en.wikipedia.org/wiki/Wikispecies">WikiSpecies</a> and/or <a href="http://www.wikipedia.org/">WikiPedia</a>)</b>
 <pre>
-- Pictures are taken from WikiSpecies and/or WikiPedia
+- The initial picture collection is build for the 20 first taxa.
+- You can also obtain the whole picture collection (but it may take a while.)
 
 </pre>
 </ul>
 
-<ul><b>You can <font color="blue">QUERY</font> the collection to search for trees containing a group of taxon</b>
+<ul><b>You can <font color="blue">QUERY</font> the collection to search for trees containing a group of taxa</b>
 <pre>
 - <u>Example of query</u>: <i>{catarrhini}>3 and {murinae} and {bos} and not {glires}</i>
                     i.e: get every tree where "murinae" and "bos" are, but not "glires" 
@@ -72,29 +74,17 @@ end;
         --> <b>==</b>           {name 1} <b>==</b> 3 ... e.g: {laurasiatheria} <b>==</b> 2
   Spaces between operands are allowed: <b>{glires}>3</b> is equivalent to <b>{glires} > 3</b>.
   The same is true for <b>==</b>, <b><=</b>, <b>>=</b>...
-
+- <u>Selecting the queried collection</u>: you can search for trees satisfying your queries either in your current collection or in TreeBASE. 
 </pre>
 </ul>
-
-<ul><b>You can <font color="blue">BROWSE YOUR COLLECTION</font></b>
+<br/>
+<ul><b>You can <font color="blue"> PRUNE THE TREES OF YOUR COLLECTION</font> according to taxonomic filters</b>
 <pre>
-- Click the "<u>Browse collection</u>" button
-- <u>Display tree</u>: choose the tree you want to display using the select menu
-- <u>Show parents</u>: show intermediate taxonomic groups between two nodes (<i>usually hidden for visual comfort</i>)
-- <u>Show/hide all parents</u>: expand/hide all intermediate taxonomic groups 
-
+This is an advance version of the prune possibilities offered by using the checkbox of the reference taxonomy excerpt.
 </pre>
 </ul>
 
-<ul><b>You can hide/show internal nodes in trees</b>
-<pre>
-- Click the "<u>Show/hide intern nodes</u>" button above the tree name
-- The tree will be displayed with/without the internal nodes
-  showing just the structure of the user's original tree
-
-</pre>
-</ul>
-
+<br/>
 <ul><b>You can <font color="blue">DOWNLOAD</font> your <font color="blue">filtered collection</font></b>
 <pre>
 - Click the "<u>Download collection</u>" button
@@ -102,9 +92,22 @@ end;
 </pre>
 </ul>
 
-<ul><b>You can <font color="blue">DOWNLOAD</font> the <font color="blue">NCBI taxonomy</font></b>
+<ul><b>You can <font color="blue">DOWNLOAD</font> the <font color="blue">reference taxonomy</font></b>
 <pre>
-- Click the "<u>Download NCBI tree</u>" button
+- Click the "<u>ITIS/NCBI excerpt</u>" button
 </pre>
 </ul>
+<br/>
+<ul><b>You can <font color="blue">BROWSE INDIVIDUAL TREES OF YOUR COLLECTION</font></b> click the "<u>Individual trees</u>" button
+<pre>
+
+- <u> For each individual tree you can:</u>
+	visualize it using <a href = "http://www.phylowidget.org/" style="font-size:10px">PhyloWidget</a>
+	obtain the following views:
+	--> an image of the current tree including internal node labels (obtained using the <a href="http://cgi-www.daimi.au.dk/cgi-chili/phyfi/go">phyfi webserver</a>)
+	--> a browsable html excerpt of the reference taxonomy
+	--> a newick string
+</pre>
+</ul>
+
 {% endblock %}
