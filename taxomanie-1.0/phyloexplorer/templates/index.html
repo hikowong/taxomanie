@@ -34,11 +34,11 @@ $(document).ready(function(){
     	$("#demo_delimiter").attr("value","_");
     });
     $("span#newick").click(function() {
-    	$("textarea").text("((rattus, pan), homo);\n((homo_sapiens, mus_france), (pan, rattus));\n(homo, (bos, pan));\n((mus, rattus),pan);\n");
+    	$("textarea").attr("value","((rattus, pan), homo);\n((homo_sapiens, mus_france), (pan, rattus));\n(homo, (bos, pan));\n((mus, rattus),pan);\n");
     	$("#demo_delimiter").attr("value","_");
     }); 
         $("input#badreset").click(function() {
-    	$("textarea").text("");
+    	$("textarea").attr("value","");
     	$("#demo_delimiter").attr("value","_");
     });
     
