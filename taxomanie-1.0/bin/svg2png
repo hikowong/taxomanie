@@ -53,7 +53,7 @@ if __name__ == "__main__":
  
     if width == 0 and height == 0:
         width = svg.props.width
-        height = svg.props.width
+        height = svg.props.height
     elif width != 0:
         ratio = float (width) / svg.props.width
         height = int (ratio * svg.props.height)
