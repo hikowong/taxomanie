@@ -33,7 +33,7 @@ class Scene:
         return var
 
 
-    def ensure_dir(f):
+    def ensure_dir(self,f):
         d = os.path.dirname(f)
         if not os.path.exists(d):
             os.makedirs(d)
