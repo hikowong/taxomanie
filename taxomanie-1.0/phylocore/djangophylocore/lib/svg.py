@@ -32,11 +32,18 @@ class Scene:
         var += [" </g>\n</svg>\n"]
         return var
 
+
+    def ensure_dir(f):
+        d = os.path.dirname(f)
+        if not os.path.exists(d):
+            os.makedirs(d)
+       
     def write_svg(self,filename=None, convert="convert", format="png", path=''):
         if filename:
             self.svgname = filename
         else:
             self.svgname = self.name + ".svg"
+        self.ensure_dir(path)
         file = open( os.path.join( path, self.svgname ),'w')
         file.writelines(self.strarray())
         file.close()
