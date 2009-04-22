@@ -43,8 +43,9 @@ class Scene:
             self.svgname = filename
         else:
             self.svgname = self.name + ".svg"
-        self.ensure_dir(path)
-        file = open( os.path.join( path, self.svgname ),'w')
+        fullFileName = os.path.join( path, self.svgname )
+        self.ensure_dir(fullFileName)
+        file = open (fullFileName,'w')
         file.writelines(self.strarray())
         file.close()
         if convert:
