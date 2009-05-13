@@ -40,6 +40,9 @@ CACHE_SUGGESTIONS = {}
 TAXONOMY_ENGINE = settings.TAXONOMY_ENGINE
 CONVERT_SVG_BIN = settings.CONVERT_SVG_BIN
 MATRIX_PATH = settings.MATRIX_PATH
+NB_MAX_DISPLAYED_BAD_TAXA = 50
+NB_SUGGESTION_SEARCH = 10
+MAX_TAXA_DISPLAY_REFERENCE = 1000
 
 import os.path
 localDir = os.path.dirname(__file__)
@@ -285,6 +288,9 @@ def statistics( request ):
     print "...done"
     context['collection_changed'] = request.session['collection_changed']
     D_PROGRESS[request.session.session_key]["initial_load"] = 100
+    context['NB_SUGGESTION_SEARCH'] = NB_SUGGESTION_SEARCH
+    context['display_reference'] = context['nb_taxa'] <= MAX_TAXA_DISPLAY_REFERENCE
+    context['MAX_TAXA_DISPLAY_REFERENCE'] = MAX_TAXA_DISPLAY_REFERENCE
     return render_to_response( 'statistics.html', context )
 
 #def check( request ):
@@ -429,6 +435,11 @@ def suggestions( request ):
         context['display_button'] = False
     if not col_id in CACHE_SUGGESTIONS:
         bad_taxa_list = list(collection.bad_taxa.all())
+        context['not_all_bad_taxa'] = False
+	context['NB_MAX_DISPLAYED_BAD_TAXA'] = NB_MAX_DISPLAYED_BAD_TAXA
+	if len(bad_taxa_list) > NB_MAX_DISPLAYED_BAD_TAXA:
+	    bad_taxa_list = bad_taxa_list[:NB_MAX_DISPLAYED_BAD_TAXA]
+            context['not_all_bad_taxa'] = True
         CACHE_SUGGESTIONS[col_id] = { 'bad_taxa_list': bad_taxa_list, 'dict_bad_taxa': {}, 'progress':0  }
     else:
         if ( len( CACHE_SUGGESTIONS[col_id]['bad_taxa_list'] ) == len( CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'] ) ):
@@ -437,13 +448,9 @@ def suggestions( request ):
             return render_to_response( 'suggestions.html', context )
         bad_taxa_list = CACHE_SUGGESTIONS[col_id]['bad_taxa_list']
         D_PROGRESS[col_id]['suggestions'] = CACHE_SUGGESTIONS[col_id]['progress']
-    nbBad = len(bad_taxa_list)
-    for bad in bad_taxa_list:
+    for bad in bad_taxa_list[:NB_SUGGESTION_SEARCH]:
         CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'][bad.name] = []
-        if nbBad<11:
-            correct_list = TAXOREF.correct( bad.name, guess = True )
-        else:
-            correct_list=[]
+        correct_list = TAXOREF.correct( bad.name, guess = True )
         for i in correct_list:
             if i != bad.name:
                 CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'][bad.name].append( i )

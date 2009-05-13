@@ -1,5 +1,8 @@
 <table>
 <!-- <tr><th>user taxa name</th><th>correction</th></tr> -->
+{% if not_all_bad_taxa %}
+   Only the {{ NB_MAX_DISPLAYED_BAD_TAXA }} first bad taxa are displayed.
+{% endif %}
 {% for bad_name, suggestions in dict_bad_taxa.iteritems %}
     <tr>
     <td>
