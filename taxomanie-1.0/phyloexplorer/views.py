@@ -486,7 +486,7 @@ def single_reference_tree( request, idtree ):
     return HttpResponse( CACHE_REFERENCE_TREE["tree_%s"%idtree] )
 
 def download_correction( request ):
-    csv = "user taxa names|corrected names\n"
+    csv = "user taxa names;corrected names\n"
     for (bad, good) in request.session['correction'].iteritems():
         csv += "%s;%s\n" % ( bad, good )
     response = HttpResponse(mimetype='text/csv')
