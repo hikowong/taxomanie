@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.conf.urls.defaults import *
+from django.http import HttpResponseRedirect
 
 import os
 ROOT_PATH = os.path.join(os.getcwd(), os.path.dirname(__file__) )
@@ -58,4 +59,7 @@ urlpatterns += patterns('views',
     # (r'^admin/(.*)', admin.site.root),
 )
 
+urlpatterns += patterns('',
+  url(r'^$', lambda _: HttpResponseRedirect('/phyloexplorer')),
+)
 
