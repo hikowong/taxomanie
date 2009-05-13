@@ -9,13 +9,10 @@ ROOT_PATH = os.path.join(os.getcwd(), os.path.dirname(__file__) )
 # from django.contrib import admin
 # admin.autodiscover()
 
-if settings.DEBUG:
-    urlpatterns = patterns('',
+urlpatterns = patterns('',
     (r'^site_media/(?P<path>.*)$', 'django.views.static.serve',
       {'document_root': os.path.join( ROOT_PATH, 'templates' )}),
-    )
-else:
-    urlpatterns = patterns('')
+)
 
 urlpatterns += patterns('views',
     # Example:
