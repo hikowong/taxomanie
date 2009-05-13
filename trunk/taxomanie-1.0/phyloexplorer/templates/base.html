@@ -82,6 +82,9 @@ Go to ncbi version <a href="http://{{ref_url}}/phyloexplorer?clear_session=1"> h
     <center><h2> Download </h2></center>
     <a class="m" href="/phyloexplorer/download_reference_tree" class="path" title="download the {{taxo_engine|upper}} subtree corresponding to user taxa">{{taxo_engine|upper}} excerpt</a>
     <a class="m" href="/phyloexplorer/downloadCollection" class="path" title="Download the (full or filtered) collection">Collection</a>
+    {% if correction %} 
+       <a class="m" href="/phyloexplorer/download_correction" class="path" title="Download the list of taxa name corrections"> Taxa name corrections </a>
+    {% endif %}
 {% endif %}
 </div>
 {% endblock %}
