@@ -407,7 +407,7 @@ $(document).ready(function(){
     {% if nb_badtaxa %}
         <fieldset>
         <legend> {{ nb_badtaxa }} label(s) can not be mapped to the reference taxonomy</legend>
-	 Due to computing times, suggestions are proposed only when there is less than 10 unrecognized taxa.</br>
+	 Due to computing times, suggestions are proposed only for the {{ NB_SUGGESTION_SEARCH }} first unrecognized taxa.</br>
         <span id="suggestions" class="homonymlist"> </span>
         <div id="progressbar_badtaxa"></div>
         </fieldset>
@@ -452,7 +452,15 @@ $(document).ready(function(){
         <li><a href="#source"><span>Newick format</span></a></li>
     </ul>
     <div id="arborescence">
-        <div id="reference_tree"> </div> <div id="progressbar_reference"></div> 
+	{% if display_reference %}
+            <div id="reference_tree"> </div> <div id="progressbar_reference"></div> 
+        {% else %}
+		<a class="phylowidget" target="_blank" 
+		href="http://www.phylowidget.org/full/index.html?tree='{{ reference_tree }}'"
+		title="Display the ncbi tree as graph"> Click to visualize this tree using
+		PhyloWidget </a> <img src="http://www.phylowidget.org/img/pw.ico" />
+                <br />The browsable arborescence is too large to be dispayed in HTML (&gt; {{MAX_TAXA_DISPLAY_REFERENCE}}) .
+        {% endif %}
     </div>
     <div id="image_tree">
         <div id="image_load">
