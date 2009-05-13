@@ -43,6 +43,7 @@ Type 'yes' to continue, or 'no' to cancel: """ % (settings.DATABASE_NAME,))
                 except Exception, e:
                     pass
             TreeCollection.objects.all().delete()
+            cursor.execute( "ALTER TABLE djangophylocore_treecollection AUTO_INCREMENT = 1;" )
             BadTaxa.objects.all().delete()
             print "Clean up successful."
         else:

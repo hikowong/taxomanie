@@ -132,7 +132,7 @@ def statistics( request ):
         try:
             collection = treebase.get_collection_from_query( request.POST['query_treebase'] )
         except Exception, err:
-            error_msg = str('bad query: %s' % err.message)
+            error_msg = 'bad query: %s' % str(err)
             context['error_msg'] = error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) 
             return render_to_response( 'index.html', context )
         request.session['original_collection_id'] = collection.id
@@ -171,8 +171,8 @@ def statistics( request ):
         try:
             collection = collection.get_collection_from_query( query, query_against_treebase )
         except Exception, err:
-            error_msg = str('bad query view1: %s' % err.message)
-            if err.message == "usertaxa":
+            error_msg = 'bad query view1: %s' % str(err)
+            if str(err) == "usertaxa":
                 error_msg += '. Try to query against TreeBase'
             #context['error_msg'].append( error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) )
             context['error_msg']= error_msg.replace( '<', '&lt;').replace( '>', '&gt;' ) 
@@ -395,7 +395,7 @@ def filter_collection( request ):
         try:
             rel_list = collection.rel.filter( taxon__id = TAXONOMY_TOC[taxon_name.lower().strip()])
         except KeyError, e:
-            error_msg = str("bad taxon name : %s" % e.message)
+            error_msg = "bad taxon name : %s" % str(e)
             request.session['error_msg'] = error_msg.replace( '<', '&lt;').replace( '>', '&gt;' )
             return statistics( request )
         for rel in rel_list:
@@ -488,7 +488,7 @@ def single_reference_tree( request, idtree ):
 def download_correction( request ):
     csv = "user taxa names|corrected names\n"
     for (bad, good) in request.session['correction'].iteritems():
-        csv += "%s|%s\n" % ( bad, good )
+        csv += "%s;%s\n" % ( bad, good )
     response = HttpResponse(mimetype='text/csv')
     response['Content-Disposition'] = 'attachment; filename=correction-%s.csv' % request.session['original_collection_id']
     response.write( csv )
