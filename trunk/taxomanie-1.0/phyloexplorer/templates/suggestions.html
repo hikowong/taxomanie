@@ -3,7 +3,7 @@
 {% if not_all_bad_taxa %}
    Only the {{ NB_MAX_DISPLAYED_BAD_TAXA }} first bad taxa are displayed.
 {% endif %}
-{% for bad_name, suggestions in dict_bad_taxa.iteritems %}
+{% for suggestions, bad_name in dict_bad_taxa %}
     <tr>
     <td>
     <font color="red">{{ bad_name }}</font> :
@@ -15,7 +15,7 @@
     {% endfor %} />
     
     {% if suggestions %}
-        (Do you mean: &nbsp;
+        (Do you mean:  
         {% for sugg in suggestions %}
             {{ sugg }}{% ifequal forloop.last 0 %},{% endifequal %}
             <!--
@@ -33,5 +33,3 @@
     </td>
     </tr>
 {% endfor %}
-
-
