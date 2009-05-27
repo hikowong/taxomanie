@@ -40,8 +40,8 @@ CACHE_SUGGESTIONS = {}
 TAXONOMY_ENGINE = settings.TAXONOMY_ENGINE
 CONVERT_SVG_BIN = settings.CONVERT_SVG_BIN
 MATRIX_PATH = settings.MATRIX_PATH
-NB_MAX_DISPLAYED_BAD_TAXA = 50
-NB_SUGGESTION_SEARCH = 10
+NB_MAX_DISPLAYED_BAD_TAXA = 5
+NB_SUGGESTION_SEARCH = 2
 MAX_TAXA_DISPLAY_REFERENCE = 1000
 
 import os.path
@@ -443,12 +443,12 @@ def suggestions( request ):
         CACHE_SUGGESTIONS[col_id] = { 'bad_taxa_list': bad_taxa_list, 'dict_bad_taxa': {}, 'progress':0  }
     else:
         if ( len( CACHE_SUGGESTIONS[col_id]['bad_taxa_list'] ) == len( CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'] ) ):
-            context['dict_bad_taxa'] = CACHE_SUGGESTIONS[col_id]['dict_bad_taxa']
+            context['dict_bad_taxa'] = list(reversed(sorted((v,k) for k, v in CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'].items())))
             D_PROGRESS[col_id]['suggestions'] = 100
             return render_to_response( 'suggestions.html', context )
         bad_taxa_list = CACHE_SUGGESTIONS[col_id]['bad_taxa_list']
         D_PROGRESS[col_id]['suggestions'] = CACHE_SUGGESTIONS[col_id]['progress']
-    for bad in bad_taxa_list[:NB_SUGGESTION_SEARCH]:
+    for bad in bad_taxa_list:
         CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'][bad.name] = []
         correct_list = TAXOREF.correct( bad.name, guess = True )
         for i in correct_list:
@@ -456,7 +456,7 @@ def suggestions( request ):
                 CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'][bad.name].append( i )
         D_PROGRESS[col_id]['suggestions'] = ((bad_taxa_list.index(bad)+1)*100.0)/request.session['nb_badtaxa']
         CACHE_SUGGESTIONS[col_id]['progress'] = D_PROGRESS[col_id]['suggestions']
-    context['dict_bad_taxa'] = CACHE_SUGGESTIONS[col_id]['dict_bad_taxa']
+    context['dict_bad_taxa'] = list(reversed(sorted((v,k) for k, v in CACHE_SUGGESTIONS[col_id]['dict_bad_taxa'].items())))
     D_PROGRESS[col_id]['suggestions'] = 100
     CACHE_SUGGESTIONS[col_id]['progress'] = 100
     return render_to_response( 'suggestions.html', context )
