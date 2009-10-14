@@ -26,7 +26,7 @@ class Command(NoArgsCommand):
         if verbose:
             print "loading treebase, please wait, it can take a while..."
         treebase_collection = open( os.path.join( absDir,'..','..', 'treebase.nexus') ).read()
-        TreeCollection.objects.create( source = treebase_collection )
+        TreeCollection.objects.create( source = treebase_collection, delimiter="_" ) #VR sept09 add delimiter
         if verbose:
             print "...done"
 #        db_name = settings.DATABASE_NAME

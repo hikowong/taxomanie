@@ -47,6 +47,7 @@ class Command(NoArgsCommand):
             os.system( 'mkdir %s' % DUMP_PATH )
         else:
             os.system( 'rm %s/*' % DUMP_PATH )
+        #VR 15 aout 2009 otherwise the file is always loaded from the web
         os.system( 'rm taxdump.tar.gz' )
         self.download_ncbi( verbose )
         self.generate_structure( verbose )
@@ -59,38 +60,45 @@ class Command(NoArgsCommand):
             print "making taxonomy.dmp"
         self.make_taxa()
         self.make_taxonomy_plus( verbose )
-#        if verbose:
-#            print "making synonym"
-        #self.make_taxonomy( 'synonym', 'synonymname.dmp', 'synonym.dmp' )
-#        self.make_taxonomy( 'synonym', 'relsynonymtaxa.dmp' )
-#        if verbose:
-#            print "making homonym"
-#        self.make_taxonomy( 'homonym', 'relhomonymtaxa.dmp' )
-#        if verbose:
-#            print "making common"
-#        self.make_taxonomy( 'common', 'relcommontaxa.dmp' )
         if verbose:
             print "making parents"
         self.make_parents()
-        # generate taxonomy
-#        if verbose:
-#            print "making taxonomy"
-#        open( os.path.join( DUMP_PATH, './taxonomy.dmp' ), 'w').write( '' )
-#        file = open( os.path.join( DUMP_PATH, './taxonomy.dmp' ), 'a' )
-#        index = 1
-#        index = self.generate_homonyms(file, index)
-#        index = self.generate_synonyms(file, index)
-#        index = self.generate_commons(file, index)
-#        index = self.generate_scientific(file, index)
-#        if verbose:
-#            print '%s items in the taxonomy' % index
-        os.system( 'rm nodes.dmp names.dmp' )
-        os.system( 'rm taxdump.tar.gz' )
- 
+#VRaou09 debug
+#        os.system( 'rm nodes.dmp names.dmp' )
+#        os.system( 'rm taxdump.tar.gz' )
+    
+    def clean_homonym(self, name, homonym):
+        cleanName = self.clean_name(name);
+        cleanHomonyn = self.clean_name(homonym);
+        homonymBegin = homonym.find("<");
+        homonymEnd = homonym.find(">")
+        if( homonymBegin >0 and homonymEnd >0):
+            cleanHomonyn =cleanHomonyn[(homonymBegin+1):homonymEnd]
+        return cleanName+ " <"+cleanHomonyn+">"
+        
     def clean_name(self,name):
-        cleanNameNwk = name.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
-        cleanName = cleanNameNwk.replace("'", " ").replace("`"," ").replace('"',' ').strip()
+        cleanName ="";
+        allowed="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+-*<>";
+        spaceOpen = False
+        for l in name :
+            if l in allowed :
+#                if l in "'":
+#                    if spaceOpen :
+#                        l="pr "
+#                    else :
+#                        l=" pr "
+#                    spaceOpen=True;
+                cleanName = cleanName + l;
+                spaceOpen = False
+            else :
+                if not spaceOpen :
+                    spaceOpen = True
+                    cleanName = cleanName+" "
+        cleanName = cleanName.strip()
+        #cleanName = cleanName.replace(" ", "_")
         return cleanName
+        #cleanNameNwk = name.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
+        #cleanName = cleanNameNwk.replace("'", " ").replace("`"," ").replace('"',' ').strip()
    
     def download_ncbi( self, verbose ):
         if not os.path.exists( './taxdump.tar.gz' ):
@@ -118,7 +126,14 @@ class Command(NoArgsCommand):
         for line in file( self.NAMES ).readlines():
             id = line.split("|")[0].strip()
             name = line.split("|")[1].strip().lower()
+            
+            name =self.clean_name(name) #VR sept 09 clean name
             homonym = line.split("|")[2].strip().lower()
+            if homonym:
+                homonym = self.clean_homonym(name,homonym) #VR sept 09 clean name
+            # bad way to handle homonym not declare by NCBI e.g. Influenza A virus (A/turkey/Beit_Herut/1265/03(H9N2))
+            if not homonym and self.TBN.has_key( name ):
+                name = name + " ncbiid "+id
             type_name = line.split("|")[3].strip()
             synonym = "synonym" in type_name
             common = "common name" in type_name
@@ -268,13 +283,17 @@ class Command(NoArgsCommand):
                 if homonym: # We do not want synonym wich have homonym
                     continue
                 base_name = self.TBI[id]["name"]
+                #we don't want synonyms similar to scientific names
+                if self.TBN.has_key(name):
+                    continue
                 if synonym:
                     if name not in synonym_toc:
                         index += 1
                         list_synonym.append( "%s|%s|synonym|2|%s\n" % ( index, name,index) )
                         synonym_toc[name] = index
-                    index_relsynonym += 1
-                    list_relsynonymtaxa.append(
+                    #VR sept09 bug correction next line were out of the if when the name was encounter a second time the same line was added
+                        index_relsynonym += 1
+                        list_relsynonymtaxa.append(
                       "%s|%s|%s\n" % ( index_relsynonym, index, id ) )
             if type_name == "scientific name" and homonym:
                 if name not in homonym_toc:
@@ -307,8 +326,9 @@ class Command(NoArgsCommand):
                         index += 1
                         list_common.append( "%s|%s|common|2|%s\n" % ( index, name,index) )
                         common_toc[name] = index
-                    index_relcommon += 1
-                    list_relcommontaxa.append(
+                        #VR sept 09 the two following line should be in the if
+                        index_relcommon += 1
+                        list_relcommontaxa.append(
                       "%s|%s|%s|english\n" % ( index_relcommon, index, id ) )
             
         taxonomy_file = open( os.path.join( DUMP_PATH, 'taxonomy.dmp' ), 'a' )
@@ -352,7 +372,9 @@ class Command(NoArgsCommand):
                     continue
             line = '%s|%s|%s|%s|%s\n' % (
               species,
-              self.TBI[species]['name'].replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " "),
+              #self.TBI[species]['name'].replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " "),
+              #self.clean_name(self.TBI[species]['name']),
+              self.TBI[species]['name'],#VR sept09 .replace( ")", " " ).replace( "(", " " ).replace(",", " ").replace(":", " ").replace(";", " ").replace("'", " "),
               self.TBI[species]['type_name'],
               self.RANK[self.TBI[species]['rank']],
               self.TBI[species]['parent']

@@ -153,11 +153,29 @@ class Command(NoArgsCommand):
         os.system( 'mv %s %s' % ( os.path.join( DUMP_PATH,
           'taxonomy.dmp_utf-8' ), os.path.join( DUMP_PATH, 'taxonomy.dmp' ) ))
 
+#    def clean_name(self,name):
+#        cleanNameNwk = name.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
+#        cleanName = cleanNameNwk.replace("'", " ").replace("`"," ").replace('"',' ').strip()
+#        return cleanName
+# VR sept 09
     def clean_name(self,name):
-        cleanNameNwk = name.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
-        cleanName = cleanNameNwk.replace("'", " ").replace("`"," ").replace('"',' ').strip()
+        cleanName ="";
+        allowed="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+-*<>";
+        spaceOpen = False
+        for l in name :
+            if l in allowed :
+                cleanName = cleanName + l;
+                spaceOpen = False
+            else :
+                if not spaceOpen :
+                    spaceOpen = True
+                    cleanName = cleanName+" "
+        cleanName = cleanName.strip()
+        #cleanName = cleanName.replace(" ", "_")
         return cleanName
-           
+        #cleanNameNwk = name.replace( ")", "_" ).replace( "(", "_" ).replace(",", " ").replace(":", " ").replace(";", " ")
+        #cleanName = cleanNameNwk.replace("'", " ").replace("`"," ").replace('"',' ').strip()
+              
 
     def generating_dumps( self, max_id, taxonomy, rank, common_name, homonyms,
       synonyms, ancestors, d_kingdom, correct_taxa, taxa_sons ):

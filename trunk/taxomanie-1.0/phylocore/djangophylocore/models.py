@@ -601,10 +601,12 @@ class Tree( models.Model, TaxonomyReference ):
                         self.taxon_ids[user_taxon_name] = ''
                 else:
                     if not taxo:
+                        t, created = BadTaxa.objects.get_or_create( name = user_taxon_name )
                         if user_taxon_name not in self.bad_taxon_ids:
-                            t, created = BadTaxa.objects.get_or_create( name = user_taxon_name )
-                            self.bad_taxa.add( t )
+                            print "creating %s in bad taxa" % user_taxon_name
                             self.bad_taxon_ids.add( t.id )
+                        print "adding %s in bad taxa" % t.id
+                        self.bad_taxa.add( t )
                     else:
                         taxon = Taxonomy.objects.get( id = taxo )
                         tto, created = TaxonomyTreeOccurence.objects.get_or_create( 
@@ -1146,10 +1148,12 @@ class TreeCollection( models.Model, TaxonomyReference ):
         """)
 
     def get_bad_taxa( self ):
-        return BadTaxa.objects.extra(
+        bad_taxa = BadTaxa.objects.extra(
           tables = ['djangophylocore_reltreecoltaxa%s' % self.id],
           where = ['djangophylocore_badtaxa.name = djangophylocore_reltreecoltaxa%s.user_taxon_name' % self.id]
         ).distinct()
+        return [taxa for taxa in bad_taxa if not self.is_valid_name(self.strip_taxon_name(taxa.name,self.delimiter))]
+             
     bad_taxa = property( get_bad_taxa, None, None,
         """
         return a queryset of bad taxa
@@ -1499,9 +1503,9 @@ class TreeCollection( models.Model, TaxonomyReference ):
         return a collection string wich contains only the taxon present in
         taxon_name_list
         """
-        print "XXXXXXXXXXXX"
-        for n in taxon_name_list:
-                print n
+        #print "XXXXXXXXXXXX"
+        #for n in taxon_name_list:
+        #        print n
         if keep:
             #remove_taxon_list = [i.user_taxon_name for i in self.rel.exclude( taxon__name__in = taxon_name_list )]
             #taxon_name_list = remove_taxon_list
@@ -1510,10 +1514,10 @@ class TreeCollection( models.Model, TaxonomyReference ):
             taxon_name_list2 =[i for i in remove_taxon_list if i not in taxon_name_list]
             taxon_name_list=taxon_name_list2
             #VR
-            print ">>>>>>>"
-            for n in taxon_name_list:
-                print n
-        print "XXXXXXXXXXXX"
+            #print ">>>>>>>"
+            #for n in taxon_name_list:
+            #    print n
+        #print "XXXXXXXXXXXX"
         new_nwk = self.get_filtered_collection_string( taxon_name_list )
         return TreeCollection.objects.create( delimiter = self.delimiter, source = new_nwk )
 
