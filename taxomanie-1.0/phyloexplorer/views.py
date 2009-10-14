@@ -86,14 +86,12 @@ def help( request ):
 
 def statistics( request ):
     global TAXONOMY_ENGINE, REFERENCE_ROOT_URL
-    print request.session.session_key
     D_PROGRESS[request.session.session_key] = { "initial_load": 0 }
     context = {'error_msg': "", "taxo_engine":TAXONOMY_ENGINE, "ref_url":REFERENCE_ROOT_URL }
     if 'error_msg' in request.session:
         context['error_msg'] = request.session['error_msg']
         del request.session['error_msg']
     if 'new_collection' in request.POST:
-        print "upload..."
         if 'myFile' in request.POST:
             input = request.POST['myFile']
             myFile = 1
@@ -102,16 +100,14 @@ def statistics( request ):
             myFile = 1
         if "delimiter" in request.POST:
             request.session['delimiter'] = request.POST['delimiter']
-        print "... done"
         D_PROGRESS[request.session.session_key]["initial_load"] = 5
         delimiter = request.session['delimiter']
-        print "building..."
         try:
             collection = TreeCollection.objects.create( source = input, delimiter = delimiter )
         except Exception, e:
             context['bad_tree_msg'] = e
             return render_to_response( 'statistics.html', context )
-        print "... done"
+
         D_PROGRESS[request.session.session_key]["initial_load"] = 60
         #if 'autocorrection' in request.POST:
         #    collection, list_correction = collection.get_autocorrected_collection()
@@ -121,12 +117,10 @@ def statistics( request ):
         #if collection.taxa.count():
         #    d_stat = collection.get_tree_size_distribution()
         #    d_stat = collection.get_taxon_frequency_distribution()
-        #print "fin stats"
         request.session['last_query'] = ''
         request.session['collection_changed'] = False
     elif 'query_treebase' in request.POST:
         # XXX mettre progression ici aussi
-        print "query_treebase"
         D_PROGRESS[request.session.session_key]["initial_load"] = 5 
         treebase = TreeCollection.objects.get( id = 1 )
         try:
@@ -148,14 +142,12 @@ def statistics( request ):
         request.session['collection_changed'] = False
         col_id = request.session['original_collection_id']
         request.session['collection'] = TreeCollection.objects.get( id = col_id )
-    print "fin creation collection"
     try:
         collection = request.session['collection']
     except:
         context['bad_tree_msg'] = "Your session has expired"
         return render_to_response( 'statistics.html', context )
     ## Query
-    print "quering..."
     query = ''
     if 'query_tree' in request.GET: #FIXME POST
         if not request.session['last_query']:
@@ -181,10 +173,9 @@ def statistics( request ):
         request.session['collection_changed'] = True
         context['query'] = query
         request.session['collection'] = collection
-    print "... done"
+    
     D_PROGRESS[request.session.session_key]["initial_load"] = 65
     ## Dealing collection
-    print "extracting informations..."
     if not collection.trees.count(): #Empty collection
         context['not_empty_collection'] = False
         context['bad_tree_msg'] = "Empty collection"
@@ -193,68 +184,50 @@ def statistics( request ):
         context['collection_changed'] = request.session['collection_changed']
         return render_to_response( 'statistics.html', context )
     # Proceed collection
-    print "reference tree as nwk"
     context['reference_tree'] = collection.get_reference_tree_as_nwk()
     request.session['reference_tree_nwk'] = context['reference_tree']
-    print "fin reference tree as nwk"
     context['reference_tree'] = collection.get_reference_tree_as_nwk()
     request.session['current_col_id'] = collection.id
     context['current_col_id'] = collection.id
     context['nb_taxa'] = collection.taxa.count()
     request.session['nb_taxa'] = context['nb_taxa']
-    print "nb_taxa"
     #VR
     context['nb_user_labels'] = collection.rel.values( 'user_taxon_name' ).distinct().count()
     request.session['nb_user_labels'] = context['nb_user_labels']
-    print "nb_user_labels"
-    context['nb_valid_user_labels'] = collection.rel.values( 'user_taxon_name' ).distinct().count()-collection.bad_taxa.count()
+    context['nb_valid_user_labels'] = collection.rel.values( 'user_taxon_name' ).distinct().count()-len(collection.bad_taxa)
     request.session['nb_valid_user_labels'] = context['nb_valid_user_labels']
-    print "nb_valid_user_labels"
     # fin VR
     context['nb_user_taxa'] = collection.rel.values( 'taxon' ).distinct().count()
     request.session['nb_user_taxa'] = context['nb_user_taxa']
-    print "nb_user_taxa"
     context['nb_scientifics'] = collection.scientifics.count()
     request.session['nb_scientifics'] = context['nb_scientifics']
-    print "nb_scientifics"
     context['nb_trees'] = collection.trees.count()
     request.session['nb_trees'] = context['nb_trees']
-    print "nb_trees"
-    context['nb_badtaxa'] = collection.bad_taxa.count()
+    context['nb_badtaxa'] = len(collection.bad_taxa)
     request.session['nb_badtaxa'] = context['nb_badtaxa']
-    print "bad_taxa"
     homonyms_list = collection.homonyms.all()
     context['nb_homonyms'] = homonyms_list.count()
-    print "homonyms"
     synonyms_list = collection.synonyms.all()
     context['nb_synonyms'] = synonyms_list.count()
-    print "synonyms"
     commons_list = collection.commons.all()
     context['nb_commons'] = commons_list.count()
-    print "commons"
     context['not_empty_collection'] = True
     if request.session['correction']:
         context['correction'] = True
     else:
         context['correction'] = False
-    print "... done"
     D_PROGRESS[request.session.session_key]["initial_load"] = 85
     # stats
-    print "stats..."
     if context['nb_taxa']:
         d_stat = collection.get_tree_size_distribution()
         context['tree_size_distributions'] = get_tree_size_distribution( d_stat )
         d_stat = collection.get_taxon_frequency_distribution()
         context['taxon_frequency_distribution'] = get_taxon_frequency_distribution( d_stat )
-        print "fin stats"
-        print "fin arbre ncbi"
     else:
         context['tree_size_distributions'] = ""
         context['taxon_frequency_distribution'] = ""
         context['stats_tree'] = None
-    print "...done"
     D_PROGRESS[request.session.session_key]["initial_load"] = 90
-    print "suggestions..."
     # correct homonyms
     dict_homonyms = {}
     for homonym in homonyms_list:
@@ -262,7 +235,6 @@ def statistics( request ):
         for name in homonym.scientifics.values('name'):
             dict_homonyms[homonym.name].extend( name.values() )
     context['dict_homonyms'] = dict_homonyms
-    print "fin homonym"
     # correct synonym
     dict_synonym = {}
     for synonym in synonyms_list:
@@ -270,7 +242,6 @@ def statistics( request ):
         for name in synonym.scientifics.values('name'):
             dict_synonym[synonym.name].extend( name.values() )
     context['dict_synonym'] = dict_synonym
-    print "fin synonym"
     # correct common
     dict_common = {}
     for common in commons_list:
@@ -278,14 +249,10 @@ def statistics( request ):
         for name in common.scientifics.values('name'):
             dict_common[common.name].extend( name.values() )
     context['dict_common'] = dict_common
-    print "fin common"
-    print "...done"
     D_PROGRESS[request.session.session_key]["initial_load"] = 95
-    print "bad trees infos..."
     nb_bad_trees = collection.bad_trees.count()
     if nb_bad_trees:
         context['bad_tree_msg'] = "Warning : your collection have %s bad trees. <a href='/phyloexplorer/browse?only_bad_trees=1'> Show them</a>" % nb_bad_trees
-    print "...done"
     context['collection_changed'] = request.session['collection_changed']
     D_PROGRESS[request.session.session_key]["initial_load"] = 100
     context['NB_SUGGESTION_SEARCH'] = NB_SUGGESTION_SEARCH
@@ -424,7 +391,6 @@ def suggestions( request ):
     global CACHE_SUGGESTIONS
     collection = request.session['collection']
     col_id = collection.id
-    print col_id
     if not col_id in D_PROGRESS:
         D_PROGRESS[col_id] = {}
     D_PROGRESS[col_id]['suggestions'] = 0
@@ -434,7 +400,7 @@ def suggestions( request ):
     else:
         context['display_button'] = False
     if not col_id in CACHE_SUGGESTIONS:
-        bad_taxa_list = list(collection.bad_taxa.all())
+        bad_taxa_list = collection.bad_taxa
         context['not_all_bad_taxa'] = False
 	context['NB_MAX_DISPLAYED_BAD_TAXA'] = NB_MAX_DISPLAYED_BAD_TAXA
 	if len(bad_taxa_list) > NB_MAX_DISPLAYED_BAD_TAXA:
